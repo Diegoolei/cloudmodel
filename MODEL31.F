@@ -44,7 +44,7 @@
 
       if (ini.eq.0) then
 *&&
-	call condi
+	    call condi
       else
 
       open(13,file='inis.da')

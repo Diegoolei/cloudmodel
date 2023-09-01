@@ -204,8 +204,8 @@
       endif
 
 *##
- *       if(l.eq.21 .and. m.eq.36 .and. n.ge.23)
- *    &     write(*,*) 'cri2',n,qcriaux,hieconv
+*       if(l.eq.21 .and. m.eq.36 .and. n.ge.23)
+*    &     write(*,*) 'cri2',n,qcriaux,hieconv
 
 **    nieve a cristales (solo cuando hay evaporacion) !19/12/99)
 
