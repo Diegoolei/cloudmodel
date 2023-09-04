@@ -1206,6 +1206,7 @@
 !     grabacion 2D
 !       include 'graba231.i'
 !     grabacion 3D
+               write(*,*) 'graba320'
                include 'graba320.i'
             endif
 
@@ -1246,6 +1247,7 @@
 !        endif
 ! 2345 continue
 !#
+            write(*,*) 'esta aqui  ',lt1,tt
 
     1    continue
 
@@ -1267,7 +1269,6 @@
          close(32)
          close(33)
 
-         write(*,*) 'esta aqui  ',lt1,tt
 
 !       stop
 
