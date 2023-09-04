@@ -32,7 +32,7 @@
       dimension Tesvs(210:320)
       dimension Eautcn(210:320)
       dimension Eacrcn(210:320)
-      
+
       common /const/Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Eautcn,Eacrcn
       real Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Eautcn,Eacrcn
 

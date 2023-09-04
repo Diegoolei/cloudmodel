@@ -50,11 +50,11 @@
       integer lqgramax,mqgramax,nqgramax
       integer qgottot,qllutot,qcritot,qnietot,qgratot
 
-      real cks,turbu,lapla      
+      real cks,turbu,lapla
 
       bre='01020304050607080910111213141516171819202122232425'
-      tie='31'      
-      
+      tie='31'
+
       ini=0                            !inicio por vez primera= 0
       t1=0                             !paso a inicio (si ini=0->t1=0)
 !      ltt=25.*3.*60.                       !tiempo total de simulacion
@@ -68,14 +68,14 @@
 !      lte=2.                          !tiempo de grabacion estadistica
 !      ltb=3*60.                        ! tiempo de grabacion de backup
       ltb=10.                        ! tiempo de grabacion de backup
-      
+
       ctur=.5
-      
+
       pro1=1.-2e-2*(dt1/5.)
       pro2=(1.-pro1)/6.
       pro3=1.-2e-2*(dt1/5.)
       pro4=(1.-pro1)/4.
-            
+
       lt1=nint(ltt/dt1)
       lt2=nint(dt1/dt2)
       lt3=2*nint(dt1/dt3)

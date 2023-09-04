@@ -5,7 +5,7 @@
       real F0,F0p
       real auxl,auxs,rs,rl,mcri,Rcri,caux
       integer l,m,n,hhh,s,xxx
-      
+
 !     parametros de las particulas
       real Rgotmin,Acri,Bcri
       parameter (Rgotmin=7e-6,Acri=1e-11,Bcri=.6)   !A en cm^-3

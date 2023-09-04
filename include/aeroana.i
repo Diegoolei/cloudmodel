@@ -29,7 +29,7 @@
       real aerdif(-3:nx1+3,-3:nx1+3,-3:nz1+3)
 
       ctur=.5
-                  
+
       lt2=nint(dt1/dt2)
       lt3=2*nint(dt1/dt3)
       cteturb=ctur/2.**.5

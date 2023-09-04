@@ -1,6 +1,6 @@
 !     include para la microfisica
 
-!     cantidades 
+!     cantidades
       real els,ess,Lvl,Lvs,Lsl,T,Fcal,Dv,nu,daer2,Naer
       real Lsl00
       real Eaucn,Eaccn,Eacng
@@ -29,16 +29,16 @@
 !     numero de cristales por colision
       real Ncrgrni,Ncrgrgr
       parameter (Ncrgrni=20.,Ncrgrgr=20.)
-            
+
 !     variables para la evaporacion y la condensacion
       real Qvls,Qvss,Qvls0
-      
+
 !     parametros de las particulas
 !$$
       real*8 Rgot,Ngot,Rllu,Nllu,Rcri,Ncri,Rnie,Nnie,Rgra,Ngra
       real*8 Vtm,Vtgra,Nre,Nsc,A,fventl,fventn,fventgs,fventgl,Rgotmin
       parameter (Rgotmin=7e-6)
-      
+
 
       integer s
 !$$

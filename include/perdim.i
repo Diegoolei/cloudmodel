@@ -8,7 +8,7 @@
       dimension W2(-3:nx1+3,-3:nx1+3,-2:nz1+2)
       common /UVW/U1,V1,W1,U2,V2,W2
       real U2,V2,W2,U1,V1,W1
-      
+
       dimension Pres1(-3:nx1+3,-3:nx1+3,-2:nz1+2)
       dimension Pres2(-3:nx1+3,-3:nx1+3,-2:nz1+2)
       common /pre/ Pres1,Pres2

@@ -1,235 +1,235 @@
 !     calculo de algunas cantidades de interes (12/02/99)
-        
-        umax=0.
-          lumax=0
-          mumax=0
-          numax=0
-        vmax=0.
-          lvmax=0
-          mvmax=0
-          nvmax=0
-        wmax=0.
-          lwmax=0
-          mwmax=0
-          nwmax=0
-        titamax=0.
-          ltitamax=0
-          mtitamax=0
-          ntitamax=0
-        qvapmax=0.
-          lqvapmax=0
-          mqvapmax=0
-          nqvapmax=0
-        qgotmax=0.
-          lqgotmax=0
-          mqgotmax=0
-          nqgotmax=0
-        qllumax=0.
-          lqllumax=0
-          mqllumax=0
-          nqllumax=0
-        qcrimax=0.
-          lqcrimax=0
-          mqcrimax=0
-          nqcrimax=0
+
+      umax=0.
+      lumax=0
+      mumax=0
+      numax=0
+      vmax=0.
+      lvmax=0
+      mvmax=0
+      nvmax=0
+      wmax=0.
+      lwmax=0
+      mwmax=0
+      nwmax=0
+      titamax=0.
+      ltitamax=0
+      mtitamax=0
+      ntitamax=0
+      qvapmax=0.
+      lqvapmax=0
+      mqvapmax=0
+      nqvapmax=0
+      qgotmax=0.
+      lqgotmax=0
+      mqgotmax=0
+      nqgotmax=0
+      qllumax=0.
+      lqllumax=0
+      mqllumax=0
+      nqllumax=0
+      qcrimax=0.
+      lqcrimax=0
+      mqcrimax=0
+      nqcrimax=0
 !$$
-        qniemax=0.
-          lqniemax=0
-          mqniemax=0
-          nqniemax=0
-        qgramax=0.
-          lqgramax=0
-          mqgramax=0
-          nqgramax=0
-        aermax=0.
-          laermax=0
-          maermax=0
-          naermax=0
+      qniemax=0.
+      lqniemax=0
+      mqniemax=0
+      nqniemax=0
+      qgramax=0.
+      lqgramax=0
+      mqgramax=0
+      nqgramax=0
+      aermax=0.
+      laermax=0
+      maermax=0
+      naermax=0
 
-        umin=0.
-          lumin=0
-          mumin=0
-          numin=0
-        vmin=0.
-          lvmin=0
-          mvmin=0
-          nvmin=0
-        wmin=0.
-          lwmin=0
-          mwmin=0
-          nwmin=0
-        titamin=0.
-          ltitamin=0
-          mtitamin=0
-          ntitamin=0
-        qvapmin=0.
-          lqvapmin=0
-          mqvapmin=0
-          nqvapmin=0
+      umin=0.
+      lumin=0
+      mumin=0
+      numin=0
+      vmin=0.
+      lvmin=0
+      mvmin=0
+      nvmin=0
+      wmin=0.
+      lwmin=0
+      mwmin=0
+      nwmin=0
+      titamin=0.
+      ltitamin=0
+      mtitamin=0
+      ntitamin=0
+      qvapmin=0.
+      lqvapmin=0
+      mqvapmin=0
+      nqvapmin=0
 
-        qgottot=0.
-        qllutot=0.
-        qcritot=0.
-        qnietot=0.
-        qgratot=0.
+      qgottot=0.
+      qllutot=0.
+      qcritot=0.
+      qnietot=0.
+      qgratot=0.
 
-        do 700 k=1,nz1
-        do 700 i=1,nx1
-        do 700 j=1,nx1
-          
-          if (umax.lt.U1(i,j,k)*10) then
-            umax=U1(i,j,k)*10
-            lumax=i
-            mumax=j
-            numax=k
-          endif
+      do 700 k=1,nz1
+         do 700 i=1,nx1
+            do 700 j=1,nx1
 
-          if (umin.gt.U1(i,j,k)*10) then
-            umin=U1(i,j,k)*10
-            lumin=i
-            mumin=j
-            numin=k
-          endif
+               if (umax.lt.U1(i,j,k)*10) then
+                  umax=U1(i,j,k)*10
+                  lumax=i
+                  mumax=j
+                  numax=k
+               endif
 
-          if (vmax.lt.V1(i,j,k)*10) then
-            vmax=V1(i,j,k)*10
-            lvmax=i
-            mvmax=j
-            nvmax=k
-          endif
+               if (umin.gt.U1(i,j,k)*10) then
+                  umin=U1(i,j,k)*10
+                  lumin=i
+                  mumin=j
+                  numin=k
+               endif
 
-          if (vmin.gt.V1(i,j,k)*10) then
-            vmin=V1(i,j,k)*10
-            lvmin=i
-            mvmin=j
-            nvmin=k
-          endif
+               if (vmax.lt.V1(i,j,k)*10) then
+                  vmax=V1(i,j,k)*10
+                  lvmax=i
+                  mvmax=j
+                  nvmax=k
+               endif
 
-          if (wmax.lt.W1(i,j,k)*10) then
-            wmax=W1(i,j,k)*10
-            lwmax=i
-            mwmax=j
-            nwmax=k
-          endif
+               if (vmin.gt.V1(i,j,k)*10) then
+                  vmin=V1(i,j,k)*10
+                  lvmin=i
+                  mvmin=j
+                  nvmin=k
+               endif
 
-          if (wmin.gt.W1(i,j,k)*10) then
-            wmin=W1(i,j,k)*10
-            lwmin=i
-            mwmin=j
-            nwmin=k
-          endif
+               if (wmax.lt.W1(i,j,k)*10) then
+                  wmax=W1(i,j,k)*10
+                  lwmax=i
+                  mwmax=j
+                  nwmax=k
+               endif
 
-          if (titamax.lt.Titaa1(i,j,k)*100) then
-            titamax=Titaa1(i,j,k)*100
-            ltitamax=i
-            mtitamax=j
-            ntitamax=k
-          endif
-          
-          if (titamin.gt.Titaa1(i,j,k)*100) then
-            titamin=Titaa1(i,j,k)*100
-            ltitamin=i
-            mtitamin=j
-            ntitamin=k
-          endif
-          
-          if (qvapmax.lt.Qvap1(i,j,k)*1e5) then
-            qvapmax=Qvap1(i,j,k)*1e5
-            lqvapmax=i
-            mqvapmax=j
-            nqvapmax=k
-          endif
-          
-          if (qvapmin.gt.Qvap1(i,j,k)*1e5) then
-            qvapmin=Qvap1(i,j,k)*1e5
-            lqvapmin=i
-            mqvapmin=j
-            nqvapmin=k
-          endif
-          
-          if (qgotmax.lt.Qgot1(i,j,k)*1e5) then
-            qgotmax=Qgot1(i,j,k)*1e5
-            lqgotmax=i
-            mqgotmax=j
-            nqgotmax=k
-          endif
-            qgottot=qgottot+Qgot1(i,j,k)*1e5
-          
-          if (qllumax.lt.Qllu1(i,j,k)*1e5) then
-            qllumax=Qllu1(i,j,k)*1e5
-            lqllumax=i
-            mqllumax=j
-            nqllumax=k
-          endif
-            qllutot=qllutot+Qllu1(i,j,k)*1e5
+               if (wmin.gt.W1(i,j,k)*10) then
+                  wmin=W1(i,j,k)*10
+                  lwmin=i
+                  mwmin=j
+                  nwmin=k
+               endif
 
-          if (qcrimax.lt.Qcri1(i,j,k)*1e6) then
-            qcrimax=Qcri1(i,j,k)*1e6
-            lqcrimax=i
-            mqcrimax=j
-            nqcrimax=k
+               if (titamax.lt.Titaa1(i,j,k)*100) then
+                  titamax=Titaa1(i,j,k)*100
+                  ltitamax=i
+                  mtitamax=j
+                  ntitamax=k
+               endif
 
+               if (titamin.gt.Titaa1(i,j,k)*100) then
+                  titamin=Titaa1(i,j,k)*100
+                  ltitamin=i
+                  mtitamin=j
+                  ntitamin=k
+               endif
 
-            write(*,*) qcrimax,Qcri1(i,j,k),i,j,k
-            pause
+               if (qvapmax.lt.Qvap1(i,j,k)*1e5) then
+                  qvapmax=Qvap1(i,j,k)*1e5
+                  lqvapmax=i
+                  mqvapmax=j
+                  nqvapmax=k
+               endif
 
-          endif
-            qcritot=qcritot+Qcri1(i,j,k)*1e5
+               if (qvapmin.gt.Qvap1(i,j,k)*1e5) then
+                  qvapmin=Qvap1(i,j,k)*1e5
+                  lqvapmin=i
+                  mqvapmin=j
+                  nqvapmin=k
+               endif
 
-!$$          
-          if (qniemax.lt.Qnie1(i,j,k)*1e5) then
-            qniemax=Qnie1(i,j,k)*1e5
-            lqniemax=i
-            mqniemax=j
-            nqniemax=k
-          endif
-            qnietot=qnietot+Qnie1(i,j,k)*1e5
+               if (qgotmax.lt.Qgot1(i,j,k)*1e5) then
+                  qgotmax=Qgot1(i,j,k)*1e5
+                  lqgotmax=i
+                  mqgotmax=j
+                  nqgotmax=k
+               endif
+               qgottot=qgottot+Qgot1(i,j,k)*1e5
 
-          if (qgramax.lt.Qgra1(i,j,k)*1e5) then
-            qgramax=Qgra1(i,j,k)*1e5
-            lqgramax=i
-            mqgramax=j
-            nqgramax=k
-          endif
-            qgratot=qgratot+Qgra1(i,j,k)*1e5
+               if (qllumax.lt.Qllu1(i,j,k)*1e5) then
+                  qllumax=Qllu1(i,j,k)*1e5
+                  lqllumax=i
+                  mqllumax=j
+                  nqllumax=k
+               endif
+               qllutot=qllutot+Qllu1(i,j,k)*1e5
 
-          if (aermax.lt.aer1(i,j,k)/1000) then
-            aermax=aer1(i,j,k)/1000
-            laermax=i
-            maermax=j
-            naermax=k
-          endif
-  700   continue
+               if (qcrimax.lt.Qcri1(i,j,k)*1e6) then
+                  qcrimax=Qcri1(i,j,k)*1e6
+                  lqcrimax=i
+                  mqcrimax=j
+                  nqcrimax=k
 
 
-        qgotmax=0.
-        qllumax=0.
-        qcrimax=0.
-        qniemax=0.
-        qgramax=0.
-        do 719 i=-1,1
-        do 719 j=-1,1
-        do 719 k=-1,1
-          qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
-          qllumax=qllumax+1e5*Qllu1(lqllumax+i,mqllumax+j,nqllumax+k)
-          qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
-          qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
-          qgramax=qgramax+1e5*Qgra1(lqgramax+i,mqgramax+j,nqgramax+k)
+                  write(*,*) qcrimax,Qcri1(i,j,k),i,j,k
+                  pause
+
+               endif
+               qcritot=qcritot+Qcri1(i,j,k)*1e5
+
+!$$
+               if (qniemax.lt.Qnie1(i,j,k)*1e5) then
+                  qniemax=Qnie1(i,j,k)*1e5
+                  lqniemax=i
+                  mqniemax=j
+                  nqniemax=k
+               endif
+               qnietot=qnietot+Qnie1(i,j,k)*1e5
+
+               if (qgramax.lt.Qgra1(i,j,k)*1e5) then
+                  qgramax=Qgra1(i,j,k)*1e5
+                  lqgramax=i
+                  mqgramax=j
+                  nqgramax=k
+               endif
+               qgratot=qgratot+Qgra1(i,j,k)*1e5
+
+               if (aermax.lt.aer1(i,j,k)/1000) then
+                  aermax=aer1(i,j,k)/1000
+                  laermax=i
+                  maermax=j
+                  naermax=k
+               endif
+  700 continue
 
 
-        write(*,*) qcrimax,Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k),
-     &             lqcrimax+i,mqcrimax+j,nqcrimax+k
+      qgotmax=0.
+      qllumax=0.
+      qcrimax=0.
+      qniemax=0.
+      qgramax=0.
+      do 719 i=-1,1
+         do 719 j=-1,1
+            do 719 k=-1,1
+               qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
+               qllumax=qllumax+1e5*Qllu1(lqllumax+i,mqllumax+j,nqllumax+k)
+               qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
+               qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
+               qgramax=qgramax+1e5*Qgra1(lqgramax+i,mqgramax+j,nqgramax+k)
 
 
-  719  continue
-        stop
+               write(*,*) qcrimax,Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k),
+     &                    lqcrimax+i,mqcrimax+j,nqcrimax+k
 
-       qgotmax=qgotmax*1e5/9.
-       qllumax=qllumax*1e5/9.
-       qcrimax=qcrimax*1e5/9.
-       qniemax=qniemax*1e5/9.
-       qgramax=qgramax*1e5/9.
-!$$       
+
+  719 continue
+      stop
+
+      qgotmax=qgotmax*1e5/9.
+      qllumax=qllumax*1e5/9.
+      qcrimax=qcrimax*1e5/9.
+      qniemax=qniemax*1e5/9.
+      qgramax=qgramax*1e5/9.
+!$$
       write(30,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin
      &            ,qvapmax,qvapmin,qgotmax,qllumax,qcrimax,qniemax
      &            ,qgramax,aermax
@@ -248,6 +248,6 @@
 
       write(33,715) qgottot,qllutot,qcritot,qnietot,qgratot
 
- 710  format(16i5,48i4)
- 715  format(5i9)
+  710 format(16i5,48i4)
+  715 format(5i9)
 
