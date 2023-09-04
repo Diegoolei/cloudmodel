@@ -208,9 +208,12 @@
       do 719 i=-1,1
          do 719 j=-1,1
             do 719 k=-1,1
-               qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
-               qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
-               qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
+               qgotmax=qgotmax+
+     &             1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
+               qcrimax=qcrimax+
+     &             1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
+               qniemax=qniemax+
+     &             1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
 
 
 !        write(*,*) qcrimax,Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k),

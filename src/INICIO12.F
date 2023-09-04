@@ -112,8 +112,8 @@
             Eacrcn(k)=exp(.09*Tk)
 
 
-            write(3,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k),Tesvs(k)
-     &                  ,Eautcn(k),Eacrcn(k)
+            write(3,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k)
+     &                  ,Tesvs(k),Eautcn(k),Eacrcn(k)
 
   400    continue
          close(3)
@@ -248,8 +248,10 @@
 
          do 475 k=1,nz1+1
             Vtgra0(2*k-1)=(Vtgra0(2*k-2)+Vtgra0(2*k))/2.  ! punto intermedio
-            write(*,*) 'vt',k,Vtgra0(2*k-2)*5e-3**.8,Vtgra0(2*k-1)*5e-3**.8
-     &                ,Tvis(Temp0(k-1)),Den0(k-1)
+            write(*,*) 'vt',k,
+     &                Vtgra0(2*k-2)*5e-3**.8,
+     &                Vtgra0(2*k-1)*5e-3**.8,
+     &                Tvis(Temp0(k-1)),Den0(k-1)
   475    continue
 
 !**************************************************************
@@ -265,8 +267,8 @@
             Pres00(k)=Temp0(k)/Tita0(k)
             cc2(k)=Cp*Rd*Tita0(k)*Pres00(k)/Cv
 
-            write(7,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),Den0(k),
-     &                     aer0(k),Qvap0(k),UU(k),VV(k)
+            write(7,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),
+     &                     Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
 
   100    continue
          close(7)

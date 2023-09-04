@@ -5,7 +5,7 @@
 
       subroutine filtro(varia1,facx,facy,facz)
          implicit none
-
+         character*50 text
          include 'dimen.i'
          include 'filtro01.i'
 
@@ -13,7 +13,8 @@
 
          if (fact.lt.0.25) then
             write(*,*) '              Moco, fact= ',fact
-            write(*,*) 'El valor de la variable no debe ser menor a 0.25'
+            text = 'El valor de la variable no debe ser menor a 0.25'
+            write(*,*) text
             stop
          endif
 

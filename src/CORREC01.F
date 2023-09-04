@@ -43,7 +43,9 @@
             do 25 l=lgot(1),lgot(2)
                do 25 m=mgot(1),mgot(2)
                   do 25 n=ngot(1),ngot(2)
-                     if(Qgot2(l,m,n).gt.0) Qgot2(l,m,n)=Qgot2(l,m,n)*(1.+aux1)
+                     if(Qgot2(l,m,n).gt.0) then
+                        Qgot2(l,m,n)=Qgot2(l,m,n)*(1.+aux1)
+                     endif
    25       continue
 
          endif
@@ -96,7 +98,9 @@
             do 25 l=lllu(1),lllu(2)
                do 25 m=mllu(1),mllu(2)
                   do 25 n=nllu(1),nllu(2)
-                     if(Qllu2(l,m,n).gt.0) Qllu2(l,m,n)=Qllu2(l,m,n)*(1.+aux1)
+                     if(Qllu2(l,m,n).gt.0) then
+                        Qllu2(l,m,n)=Qllu2(l,m,n)*(1.+aux1)
+                     endif
    25       continue
 
          endif
@@ -148,7 +152,9 @@
             do 25 l=lcri(1),lcri(2)
                do 25 m=mcri(1),mcri(2)
                   do 25 n=ncri(1),ncri(2)
-                     if(Qcri2(l,m,n).gt.0) Qcri2(l,m,n)=Qcri2(l,m,n)*(1.+aux1)
+                     if(Qcri2(l,m,n).gt.0) then
+                        Qcri2(l,m,n)=Qcri2(l,m,n)*(1.+aux1)
+                     endif
    25       continue
 
          endif
@@ -206,7 +212,9 @@
             do 25 l=lnie(1),lnie(2)
                do 25 m=mnie(1),mnie(2)
                   do 25 n=nnie(1),nnie(2)
-                     if(Qnie2(l,m,n).gt.0) Qnie2(l,m,n)=Qnie2(l,m,n)*(1.+aux1)
+                     if(Qnie2(l,m,n).gt.0) then
+                        Qnie2(l,m,n)=Qnie2(l,m,n)*(1.+aux1)
+                     endif
    25       continue
 
          endif
@@ -258,7 +266,9 @@
             do 25 l=lgra(1),lgra(2)
                do 25 m=mgra(1),mgra(2)
                   do 25 n=ngra(1),ngra(2)
-                     if(Qgra2(l,m,n).gt.0) Qgra2(l,m,n)=Qgra2(l,m,n)*(1.+aux1)
+                     if(Qgra2(l,m,n).gt.0) then
+                        Qgra2(l,m,n)=Qgra2(l,m,n)*(1.+aux1)
+                     endif
    25       continue
 
          endif

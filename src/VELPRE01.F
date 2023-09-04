@@ -128,16 +128,20 @@
                do 40 j=1,nx1
                   do 50 k=1,nz1-1
                      if (k.eq.1) then
-                        U2(i,j,k)=U3(i,j,k)-kkk*(2.*U3(i,j,k)-U3(i,j,k+1))
-                        V2(i,j,k)=V3(i,j,k)-kkk*(2.*V3(i,j,k)-V3(i,j,k+1))
-                        W2(i,j,k)=W3(i,j,k)-kkk*(2.*W3(i,j,k)-W3(i,j,k+1))
+                        U2(i,j,k)=U3(i,j,k)-kkk*
+     &                  (2.*U3(i,j,k)-U3(i,j,k+1))
+                        V2(i,j,k)=V3(i,j,k)-kkk*
+     &                  (2.*V3(i,j,k)-V3(i,j,k+1))
+                        W2(i,j,k)=W3(i,j,k)-kkk*
+     &                  (2.*W3(i,j,k)-W3(i,j,k+1))
                      else
                         U2(i,j,k)=U3(i,j,k)
                         V2(i,j,k)=V3(i,j,k)
                         W2(i,j,k)=W3(i,j,k)
                      endif
-                     Pres2(i,j,k)=prom1*Pres3(i,j,k)+prom*(((Pres3(i+1,j,k)+
-     &                         Pres3(i-1,j,k))+(Pres3(i,j+1,k)+Pres3(i,j-1,k)))+
+                     Pres2(i,j,k)=prom1*Pres3(i,j,k)+prom*(
+     &                        ((Pres3(i+1,j,k)+ Pres3(i-1,j,k))+
+     &                        (Pres3(i,j+1,k)+Pres3(i,j-1,k)))+
      &                         Pres3(i,j,k+1)+Pres3(i,j,k-1))
                      presprom=Pres2(i,j,k)+presprom
 

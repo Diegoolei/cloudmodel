@@ -141,12 +141,16 @@
          dqvap(2)=Qvap1(l,m+1,n)-Qvap1(l,m-1,n)
          dqvap(3)=Qvap1(l,m,n+1)-Qvap1(l,m,n-1)
 
-         adv(1)=(((U2(l+1,m,n)+U2(l,m,n))*(Qvap1(l+1,m,n)+Qvap1(l,m,n)))-
-     &         ((U2(l-1,m,n)+U2(l,m,n))*(Qvap1(l-1,m,n)+Qvap1(l,m,n))))/4.
+         adv(1)=(((U2(l+1,m,n)+U2(l,m,n))*
+     &              (Qvap1(l+1,m,n)+Qvap1(l,m,n)))-
+     &         ((U2(l-1,m,n)+U2(l,m,n))*
+     &              (Qvap1(l-1,m,n)+Qvap1(l,m,n))))/4.
          adv(1)=adv(1)+dqvap(1)/2.*UU(n)
 
-         adv(2)=(((V2(l,m+1,n)+V2(l,m,n))*(Qvap1(l,m+1,n)+Qvap1(l,m,n)))-
-     &         ((V2(l,m-1,n)+V2(l,m,n))*(Qvap1(l,m-1,n)+Qvap1(l,m,n))))/4.
+         adv(2)=(((V2(l,m+1,n)+V2(l,m,n))*
+     &              (Qvap1(l,m+1,n)+Qvap1(l,m,n)))-
+     &         ((V2(l,m-1,n)+V2(l,m,n))*
+     &              (Qvap1(l,m-1,n)+Qvap1(l,m,n))))/4.
          adv(2)=adv(2)+dqvap(2)/2.*VV(n)
 
 
