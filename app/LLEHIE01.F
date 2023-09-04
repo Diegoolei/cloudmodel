@@ -42,7 +42,7 @@
          real Qvap0(-3:nz1+3)
 
          character*12 httfla
-         character*6 hthead
+         character*17 hthead
 
          character*6 httima
          character*15 entrav5d

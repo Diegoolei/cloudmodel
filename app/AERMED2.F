@@ -14,7 +14,7 @@
 
          character*2 paso
          character*2 nombre
-         character*25 arch
+         character*36 arch
 
          integer imax(-3:nz1+3),jmax(-3:nz1+3)
          real aermax(-3:nz1+3)

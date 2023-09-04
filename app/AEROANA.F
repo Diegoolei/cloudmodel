@@ -25,7 +25,7 @@
          parameter (nvar=13)
          character*100 paso
          character*2 nombre
-         character*25 arch
+         character*36 arch
          character*2 var(13)
          integer*4 variable(nx1,nz1,nvar)
 
