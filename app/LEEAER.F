@@ -26,9 +26,9 @@
          write(*,*) 'Ingrese intervalo en z a mostrar '
          read(*,*) z1,z2
 
-         open(unit=15, file='saleaer')
+         open(unit=15, file='outputdata/saleaer')
 
-         open(unit=10,file='aerdif'//nombre,
+         open(unit=10,file='outputdata/aerdif'//nombre,
      &        status='unknown',form='unformatted')
          read(10) aerdif
          close(10)

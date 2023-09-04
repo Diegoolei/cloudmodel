@@ -75,21 +75,21 @@
 
 !*    lectura de los datos generales y de base
 
-         open(15,file='aerores')
-         open(13,file='inis.da')
-         open(unit=14,file='velos.da',status='unknown',form='unformatted')
+         open(unit=15,file='outputdata/aerores')
+         open(unit=13,file='outputdata/inis.da')
+         open(unit=14,file='outputdata/velos.da',status='unknown',form='unformatted')
          rewind 14
-         open(unit=3,file='varconz.da',status='unknown',form='unformatted')
-         rewind 3
+         open(unit=30,file='outputdata/varconz.da',status='unknown',form='unformatted')
+         rewind 30
 
          read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0
      &                   ,cc2,aer0,UU,VV
 
 !$$
-         read(3)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
+         read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
      &              Qvaprel,aerrel,Eautcn,Eacrcn
 
-         close(3)
+         close(30)
          close(13)
 
 !**   definicion de calores y presiones de vapor a 0 K
@@ -103,15 +103,15 @@
 
 !*        lectura de la nube
 
-               arch='d:\nube21c2\nube'//nombre
+               arch='outputdata/nube'//nombre
      &               //paso(ii*2-1:ii*2)//'.sal'
 
                write(*,*) arch
 
-               open(unit=6,file=arch,status='unknown',form='unformatted')
-               read(6) U2,V2,W2,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1
+               open(unit=60,file=arch,status='unknown',form='unformatted')
+               read(60) U2,V2,W2,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1
      &               ,Qgra1,aer1
-               close(6)
+               close(60)
 
 
 !*    inicializado para cada paso
@@ -541,10 +541,10 @@
 !*****************************************************
 !                 grabacion
 
-               open(unit=10,file='aerdif'//paso(ii*2-1:ii*2),
+               open(unit=11,file='outputdata/aerdif'//paso(ii*2-1:ii*2),
      &              status='unknown',form='unformatted')
-               write(10) aerdif
-               close(10)
+               write(11) aerdif
+               close(11)
 
                write(15,*) ii,totnuc,totmic
 

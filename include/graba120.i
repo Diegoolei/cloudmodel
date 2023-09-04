@@ -1,7 +1,9 @@
-      open(unit=40,file='inis.da')
-      open(unit=41,file='velos.da',status='unknown',form='unformatted')
+      open(unit=40,file='outputdata/inis.da')
+      open(unit=41,file='outputdata/velos.da',
+     &  status='unknown',form='unformatted')
       rewind 41
-      open(unit=42,file='varconz.da',status='unknown',
+      open(unit=42,file='outputdata/varconz.da',
+     &  status='unknown',
      &   form='unformatted')
       rewind 42
 

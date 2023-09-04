@@ -76,7 +76,7 @@
 
 !**   calculo de 'constantes' que dependen de T
 
-         open(3,file='ccc')
+         open(unit=30,file='outputdata/ccc')
 
          do 400 k=313,210,-1
 
@@ -112,11 +112,11 @@
             Eacrcn(k)=exp(.09*Tk)
 
 
-            write(3,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k)
+            write(30,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k)
      &                  ,Tesvs(k),Eautcn(k),Eacrcn(k)
 
   400    continue
-         close(3)
+         close(30)
 
 !**   condiciones de tiempo bueno
 
@@ -261,7 +261,7 @@
 
          call PP2(G,dx1,Den0,Presi0,P00)
 
-         open (7,file='inic03.sa')
+         open(unit=70,file='outputdata/inic03.sa')
          do 100 k=0,nz1
             Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
             Pres00(k)=Temp0(k)/Tita0(k)
@@ -271,7 +271,7 @@
      &                     Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
 
   100    continue
-         close(7)
+         close(70)
 
 
          Tita0(-1)=Tita0(0)

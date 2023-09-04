@@ -114,9 +114,9 @@
 
                write(*,*) arch
 
-               open(unit=6,file=arch,status='unknown',form='unformatted')
-               read(6) aer1
-               close(6)
+               open(unit=60,file=arch,status='unknown',form='unformatted')
+               read(60) aer1
+               close(60)
 
 !*        cuenta de positivos y negativos
 
@@ -144,11 +144,11 @@
 
                      write(*,*) archaux
 
-                     open(10,file=archaux)
+                     open(unit=11,file=archaux)
                      do 90 k=1,nz1
-                        write(10,1000) (variable(i,k),i=1,nx1)
+                        write(11,1000) (variable(i,k),i=1,nx1)
    90                continue
-                     close(10)
+                     close(11)
    80                continue
 
                   endif

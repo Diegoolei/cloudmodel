@@ -68,19 +68,19 @@
 
 !*    lectura de los datos generales y de base
 
-         open(5,file='inis.da')
-         open(unit=3,file='varconz.da',status='unknown'
+         open(unit=50,file='outputdata/inis.da')
+         open(unit=30,file='outputdata/varconz.da',status='unknown'
      &           ,form='unformatted')
 
-         read(5,*) Den0,Temp0,Tita0,Pres00,Qvap0
+         read(50,*) Den0,Temp0,Tita0,Pres00,Qvap0
      &                     ,cc2,aer0,UU,VV
-         read(3)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
+         read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
      &                Qvaprel,aerrel,Eautcn,Eacrcn
 
-         close(3)
-         close(5)
+         close(30)
+         close(50)
 
-         open(4,'cortes/possx')
+         open(unit=40,'cortes/possx')
 
          write(*,*) 'aqui'
 
@@ -89,15 +89,15 @@
 
 !*        lectura de la nube
 
-               arch='d:\nube'//nombre//'\nube'//nombre
+               arch='outputdata/nube'//nombre//'\nube'//nombre
      &               //paso(ii*2-1:ii*2)//'.sal'
 
                write(*,*) arch
 
-               open(unit=6,file=arch,status='unknown',form='unformatted')
-               read(6) U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1
+               open(unit=60,file=arch,status='unknown',form='unformatted')
+               read(60) U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1
      &               ,Qgra1,aer1
-               close(6)
+               close(60)
 
                write(*,*) W1(nx1/2,nx1/2,15),W1(nx1/2,nx1/2,20)
 
@@ -111,83 +111,83 @@
                            maxpre=Qgra1(i,j,k)+Qllu1(i,j,k)
                            xmax=i
                         endif
-   300                  continue
+  300          continue
 
-                        write(4,*) ii,xmax,maxpre
+               write(40,*) ii,xmax,maxpre
 
 !*        cortes (no incluyen el piso)
-                        i=xmax
-                        do 50 j=1,nx1
-                           do 50 k=1,nz1
+               i=xmax
+               do 50 j=1,nx1
+                  do 50 k=1,nz1
 !           calculo de la temperatua
-                              aux=Pres00(k)+Pres1(i,j,k)
-                              variable(j,k,4)=(Tita0(k)+Titaa1(i,j,k))*aux*1e2
+                     aux=Pres00(k)+Pres1(i,j,k)
+                     variable(j,k,4)=(Tita0(k)+Titaa1(i,j,k))*aux*1e2
 
 !           velocidades
-                              variable(j,k,1)=(UU(k)+U1(i,j,k))*1e3
-                              variable(j,k,2)=(VV(k)+V1(i,j,k))*1e3
-                              variable(j,k,3)=W1(i,j,k)*1e3
+                     variable(j,k,1)=(UU(k)+U1(i,j,k))*1e3
+                     variable(j,k,2)=(VV(k)+V1(i,j,k))*1e3
+                     variable(j,k,3)=W1(i,j,k)*1e3
 
 !           filtrado de gotitas
-                              aux=0.
-                              do 200 l=i-1,i+1
-                                 do 200 m=j-1,j+1
-                                    do 200 n=k-1,k+1
-                                       aux=aux+Qgot1(l,m,n)*1e6
-  200                         continue
-                              variable(j,k,5)=aux/27.
+                     aux=0.
+                     do 200 l=i-1,i+1
+                        do 200 m=j-1,j+1
+                           do 200 n=k-1,k+1
+                              aux=aux+Qgot1(l,m,n)*1e6
+  200                continue
+                     variable(j,k,5)=aux/27.
 !           filtrado de lluvia
-                              aux=0.
-                              do 210 l=i-1,i+1
-                                 do 210 m=j-1,j+1
-                                    do 210 n=k-1,k+1
-                                       aux=aux+Qllu1(l,m,n)*1e6
-  210                         continue
-                              variable(j,k,6)=aux/27.*.5+Qllu1(i,j,k)*1e6*.5
+                     aux=0.
+                     do 210 l=i-1,i+1
+                        do 210 m=j-1,j+1
+                           do 210 n=k-1,k+1
+                              aux=aux+Qllu1(l,m,n)*1e6
+  210                continue
+                     variable(j,k,6)=aux/27.*.5+Qllu1(i,j,k)*1e6*.5
 !           filtrado de cristales
-                              aux=0.
-                              do 220 l=i-1,i+1
-                                 do 220 m=j-1,j+1
-                                    do 220 n=k-1,k+1
-                                       aux=aux+Qcri1(l,m,n)*1e6
-  220                         continue
-                              variable(j,k,7)=aux/27.
+                     aux=0.
+                     do 220 l=i-1,i+1
+                        do 220 m=j-1,j+1
+                           do 220 n=k-1,k+1
+                              aux=aux+Qcri1(l,m,n)*1e6
+  220                continue
+                     variable(j,k,7)=aux/27.
 !           filtrado de nieve
-                              aux=0.
-                              do 230 l=i-1,i+1
-                                 do 230 m=j-1,j+1
-                                    do 230 n=k-1,k+1
-                                       aux=aux+Qnie1(l,m,n)*1e6
-  230                         continue
-                              variable(j,k,8)=aux/27.
+                     aux=0.
+                     do 230 l=i-1,i+1
+                        do 230 m=j-1,j+1
+                           do 230 n=k-1,k+1
+                              aux=aux+Qnie1(l,m,n)*1e6
+  230                continue
+                     variable(j,k,8)=aux/27.
 !           filtrado de granizos
-                              aux=0.
-                              do 240 l=i-1,i+1
-                                 do 240 m=j-1,j+1
-                                    do 240 n=k-1,k+1
-                                       aux=aux+Qgra1(l,m,n)*1e6
-  240                         continue
-                              variable(j,k,9)=aux/27.*.5+Qgra1(i,j,k)*1e6*.5
+                     aux=0.
+                     do 240 l=i-1,i+1
+                        do 240 m=j-1,j+1
+                           do 240 n=k-1,k+1
+                              aux=aux+Qgra1(l,m,n)*1e6
+  240                continue
+                     variable(j,k,9)=aux/27.*.5+Qgra1(i,j,k)*1e6*.5
 
-                              variable(j,k,10)=(Qvap0(k)+Qvap1(i,j,k))*1e6
-                              variable(j,k,11)=(aer0(k)+aer1(i,j,k))*1e1
-                              variable(j,k,12)=Qvap1(i,j,k)*1e6
-                              variable(j,k,13)=aer1(i,j,k)*1e1
-   50                   continue
+                     variable(j,k,10)=(Qvap0(k)+Qvap1(i,j,k))*1e6
+                     variable(j,k,11)=(aer0(k)+aer1(i,j,k))*1e1
+                     variable(j,k,12)=Qvap1(i,j,k)*1e6
+                     variable(j,k,13)=aer1(i,j,k)*1e1
+   50          continue
 
-                        do 80 lvar=1,11
-                           archaux=var(lvar)//nombre//
-     &                             'x'//paso(ii*2-1:ii*2)
-                           write(*,*) archaux
-                           open(10+lvar,file='cortes\'//archaux)
-                           do 90 k=1,nz1
-                              write(10+lvar,1000) (variable(j,k,lvar),j=1,nx1)
-   90                      continue
-                           close(10+lvar)
-   80                   continue
+               do 80 lvar=1,11
+                  archaux=var(lvar)//nombre//
+     &                    'x'//paso(ii*2-1:ii*2)
+                  write(*,*) archaux
+                  open(unit=10+lvar,file='outputdata/cortes\'//archaux)
+                  do 90 k=1,nz1
+                     write(10+lvar,1000) (variable(j,k,lvar),j=1,nx1)
+   90             continue
+                  close(10+lvar)
+   80          continue
 
-                     endif
-   10                continue
-
- 1000                format(50i7)
-                  end
+            endif
+   10    continue
+      close(40)
+ 1000    format(50i7)
+      end

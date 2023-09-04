@@ -47,13 +47,13 @@
             call condi
          else
 
-            open(13,file='inis.da')
-            open(unit=14,file='velos.da',status='unknown',
+            open(unit=13,file='outputdata/inis.da')
+            open(unit=14,file='outputdata/velos.da',status='unknown',
      &       form='unformatted')
             rewind 14
-            open(unit=3,file='varconz.da',status='unknown',
+            open(unit=30,file='outputdata/varconz.da',status='unknown',
      &       form='unformatted')
-            rewind 3
+            rewind 30
 
             read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0
      &                      ,cc2,aer0,UU,VV
@@ -63,10 +63,10 @@
      &                 Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,
      &                 Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,
      &                 aer1,aer2,Fcalo
-            read(3)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
+            read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
      &                 Qvaprel,aerrel,Eautcn,Eacrcn
 
-            close(3)
+            close(30)
             close(13)
             close(14)
 
@@ -104,19 +104,19 @@
          write(*,*) Tita0(20),Tita0(17),Tita0(18)
 !##
 
-         open(13,file='u2'//tie//bre(2*t1+1:2*t1+2))
-         open(14,file='v2'//tie//bre(2*t1+1:2*t1+2))
-         open(15,file='w2'//tie//bre(2*t1+1:2*t1+2))
-         open(16,file='va'//tie//bre(2*t1+1:2*t1+2))
-         open(17,file='go'//tie//bre(2*t1+1:2*t1+2))
-         open(18,file='ae'//tie//bre(2*t1+1:2*t1+2))
-         open(19,file='pr'//tie//bre(2*t1+1:2*t1+2))
-         open(20,file='ti'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=13,file='outputdata/u2'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=14,file='outputdata/v2'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=15,file='outputdata/w2'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=16,file='outputdata/va'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=17,file='outputdata/go'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=18,file='outputdata/ae'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=19,file='outputdata/pr'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=20,file='outputdata/ti'//tie//bre(2*t1+1:2*t1+2))
 
-         open(30,file='esta'//tie//bre(2*t1+1:2*t1+2))
-         open(31,file='vara'//tie//bre(2*t1+1:2*t1+2))
-         open(32,file='posnub'//tie//'.sa')
-         open(33,file='est'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=30,file='outputdata/esta'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=31,file='outputdata/vara'//tie//bre(2*t1+1:2*t1+2))
+         open(unit=32,file='outputdata/posnub'//tie//'.sa')
+         open(unit=33,file='outputdata/est'//tie//bre(2*t1+1:2*t1+2))
 
 !     write(*,*) ltt,dt1,lt1,lt2,lt3
 
@@ -1274,9 +1274,9 @@
 !*******************************************************************
 !#
          write(*,*) 'termina'
-         open(3,file='termina')
-         write(3,*) '1'
-         close(3)
+         open(unit=30,file='outputdata/termina')
+         write(30,*) '1'
+         close(30)
 !#
 
 !********************************************************************

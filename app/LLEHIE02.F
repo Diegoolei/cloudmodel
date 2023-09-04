@@ -55,7 +55,7 @@
          integer i,j,k,tt,nt1,nt
          real aux,T
 
-         hthead='nube11'
+         hthead='outputdata/nube11'
          bre='01020304050607080910111213141516171819202122232425'
 
          ent='ent'
@@ -85,14 +85,14 @@
 !********************************************************************
 
 !     Lectura del estado base
-         open (7,file='inic03.sa')
+         open(unit=70,file='outputdata/inic03.sa')
          do 100 k=0,nz1
 
-            read(7,210) i,Temp0(k),Tita0(k),Presi0(k),Pres00(k),Den0(k),
+            read(70,210) i,Temp0(k),Tita0(k),Presi0(k),Pres00(k),Den0(k),
      &                     aer0(k),Qvap0(k),UU(k),VV(k)
 
   100    continue
-         close(7)
+         close(70)
   210    format(I3,9E12.4)
 
 !     inicializacion todas las variables en su estado base
@@ -120,46 +120,46 @@
 
          entrav5d='entra30'
 
-         open(unit=3,file=entrav5d)
+         open(unit=30,file=entrav5d)
 
-         write(3,*) fipasos+1-inpasos
-         write(3,*) nvar
-         write(3,*) ny1
-         write(3,*) nx1-10
-         write(3,*) nz1
+         write(30,*) fipasos+1-inpasos
+         write(30,*) nvar
+         write(30,*) ny1
+         write(30,*) nx1-10
+         write(30,*) nz1
 
-         write(3,111) 'U  '
-         write(3,111) 'V  '
-         write(3,111) 'W  '
-         write(3,111) 'T '
-         write(3,111) 'Qv '
-         write(3,111) 'Qg '
-         write(3,111) 'Ql '
-         write(3,111) 'Qc '
-         write(3,111) 'Qn '
-         write(3,111) 'Qh '
-         write(3,111) 'Ae '
-         write(3,111) 'Con'
+         write(30,111) 'U  '
+         write(30,111) 'V  '
+         write(30,111) 'W  '
+         write(30,111) 'T '
+         write(30,111) 'Qv '
+         write(30,111) 'Qg '
+         write(30,111) 'Ql '
+         write(30,111) 'Qc '
+         write(30,111) 'Qn '
+         write(30,111) 'Qh '
+         write(30,111) 'Ae '
+         write(30,111) 'Con'
 
          do 1 paso=inpasos,fipasos
             haux=paso*delpaso/3600
             maux=paso*delpaso/60-haux*60
             saux=paso*delpaso-maux*60-haux*3600
             hora=(haux+12)*10000+maux*100+saux
-            write(3,*) hora
+            write(30,*) hora
             write(*,*) hora,paso,delpaso,haux,maux,saux
     1    continue
 
          do 2 paso=inpasos,fipasos
-            write(3,113) '98100'
+            write(30,113) '98100'
     2    continue
 
-         write(3,*) '0.'
-         write(3,*) '.01'
-         write(3,*) '0.'
-         write(3,*) '.01'
-         write(3,*) '0.'
-         write(3,*) '1.'
+         write(30,*) '0.'
+         write(30,*) '.01'
+         write(30,*) '0.'
+         write(30,*) '.01'
+         write(30,*) '0.'
+         write(30,*) '1.'
   111    format (A3)
   112    format (A5)
   113    format (A6)
@@ -191,10 +191,10 @@
             write(*,*) httfla
 !           pause
 
-            open(unit=6,file=httfla,status='unknown',form='unformatted')
-            read(6) U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,
+            open(unit=60,file=httfla,status='unknown',form='unformatted')
+            read(60) U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,
      &              Qgra1,aer1
-            close(6)
+            close(60)
 
             write(*,*) 'archivo leido OK'
 
@@ -268,13 +268,13 @@
                do 30 ly=1,ny1
                   do 30 lx=6,nx1-5
                      do 30 lz=1,nz1
-                        write(3,*) vars(lx,ly,lz,ls)
+                        write(30,*) vars(lx,ly,lz,ls)
    30          continue
    20       continue
 
     3    continue
 
-         close(unit=3)
+         close(unit=30)
 
 
          write(*,*)
