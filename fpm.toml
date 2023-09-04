@@ -1,0 +1,30 @@
+name = "Fortran77-Cloud-Model"
+version = "0.1.0"
+license = "license"
+author = "Federico E. Benelli"
+maintainer = "fedebenelli@outlook.com"
+copyright = "Copyright 2023, Federico E. Benelli"
+
+[build]
+auto-executables = false
+auto-tests = true
+auto-examples = true
+module-naming = false
+
+[install]
+library = false
+
+[[executable]]
+name = "MODEL31"
+source-dir = "app"
+main = "MODEL31.F"
+
+[fortran]
+implicit-typing = true
+implicit-external = true
+source-form = "default"
+
+# implicit-typing = false
+# implicit-external = false
+# source-form = "free"
+
