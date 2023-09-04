@@ -267,7 +267,7 @@
             Pres00(k)=Temp0(k)/Tita0(k)
             cc2(k)=Cp*Rd*Tita0(k)*Pres00(k)/Cv
 
-            write(7,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),
+            write(70,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),
      &                     Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
 
   100    continue
