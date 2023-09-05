@@ -1247,8 +1247,9 @@
 !        endif
 ! 2345 continue
 !#
-            write(*,*) 'esta aqui  ',lt1,tt
-
+            write(*,*) ""
+            write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
+            write(*,*) ""
     1    continue
 
 !********************************************************************
