@@ -53,15 +53,15 @@
          do 100 i=1,nx1
             do 100 j=1,nx1
                do 100 k=1,nz1-1
-                  varx=(9.*(varia2(i-1,j,k)+varia2(i+1,j,k))-
-     &                 (varia2(i-3,j,k)+varia2(i+3,j,k)))/16.
-                  vary=(9.*(varia2(i,j-1,k)+varia2(i,j+1,k))-
-     &                 (varia2(i,j-3,k)+varia2(i,j+3,k)))/16.
-                  varz=(9.*(varia2(i,j,k-1)+varia2(i,j,k+1))-
-     &                 (varia2(i,j,k-3)+varia2(i,j,k+3)))/16.
+                  varx=(9.*(varia2(i-1,j,k)+varia2(i+1,j,k))-&
+                      (varia2(i-3,j,k)+varia2(i+3,j,k)))/16.
+                  vary=(9.*(varia2(i,j-1,k)+varia2(i,j+1,k))-&
+                      (varia2(i,j-3,k)+varia2(i,j+3,k)))/16.
+                  varz=(9.*(varia2(i,j,k-1)+varia2(i,j,k+1))-&
+                      (varia2(i,j,k-3)+varia2(i,j,k+3)))/16.
 
-                  varia1(i,j,k)=((facx*varx+facy*vary)+facz*varz)+
-     &                          fact*varia2(i,j,k)
+                  varia1(i,j,k)=((facx*varx+facy*vary)+facz*varz)+&
+                               fact*varia2(i,j,k)
 
 !#
 !      if (i.eq.9 .and.(j.eq.2.or.j.eq.31).and.k.eq.1)then

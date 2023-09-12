@@ -48,23 +48,19 @@
          else
 
             open(unit=13,file='outputdata/inis.da')
-            open(unit=14,file='outputdata/velos.da',status='unknown',
-     &       form='unformatted')
+            open(unit=14,file='outputdata/velos.da',status='unknown',form='unformatted')
             rewind 14
-            open(unit=30,file='outputdata/varconz.da',status='unknown',
-     &       form='unformatted')
+            open(unit=30,file='outputdata/varconz.da',status='unknown',form='unformatted')
             rewind 30
 
-            read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0
-     &                      ,cc2,aer0,UU,VV
+            read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
 
 !$$
-            read(14) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,
-     &                 Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,
-     &                 Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,
-     &                 aer1,aer2,Fcalo
-            read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
-     &                 Qvaprel,aerrel,Eautcn,Eacrcn
+            read(14) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,&
+                      Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
+                      Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,&
+                      aer1,aer2,Fcalo
+            read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
 
             close(30)
             close(13)
@@ -75,8 +71,7 @@
                   do 5001 k=1,nz1
 !           aux=.7*exp(-((i-35)**2.+(j-25.5)**2.+(k-10)**2.)/50.)
 !           aux=1.*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
-                     aux=.8*exp(-((i-35)**2.+
-     &                (j-25.5)**2.+(k-8)**2.)/50.)
+                     aux=.8*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
                      Titaa1(i,j,k)=Titaa1(i,j,k)+aux
                      Titaa2(i,j,k)=Titaa2(i,j,k)+aux
  5001       continue
@@ -120,8 +115,7 @@
 
 !     write(*,*) ltt,dt1,lt1,lt2,lt3
 
-         write(*,*) 'inis',Titaa1(16,16,4),Qvap1(16,16,4),
-     &              Tita0(4),Qvap0(4)
+         write(*,*) 'inis',Titaa1(16,16,4),Qvap1(16,16,4),Tita0(4),Qvap0(4)
 
          write(*,*) 'tem',Fcalo(21,16,5)
 !***********************************************************
@@ -237,11 +231,7 @@
                      call inomo(l,m,n,dden0z)
 
 !**     calculo de la energia cinetica
-                     ener1=.5*Den0(k)*
-     &                (U2(i,j,k)**2.+
-     &                  V2(i,j,k)**2.+
-     &                  W2(i,j,k)**2.)
-     &                +ener1
+                     ener1=.5*Den0(k)*(U2(i,j,k)**2.+V2(i,j,k)**2.+W2(i,j,k)**2.)+ener1
 
 !      if(((i.eq.11.and.j.eq.3).or.(i.eq.3.and.j.eq.11)).and.k.eq.4)then
 !	  write(*,'(a3,i3,4g16.8)') 'kk',i,KMM,KM1,KM2,KM3
@@ -282,8 +272,7 @@
 
 !##
 !      if  (i.eq.16.and.(m.eq.16.or.m.eq.16).and. k.eq.25) then
-                     if  (i.eq.20.and.m.eq.22.and.
-     &                (k.ge.27.and. k.le.28)) then
+                     if  (i.eq.20.and.m.eq.22.and.(k.ge.27.and. k.le.28)) then
 !	write(*,*) 'got0',Qgot1(i,j,k),Qgot2(i,j,k)
                         write(*,*) 'cri0',k,Qcri1(i,j,k),Qcri2(i,j,k)
 !	write(*,*) 'nie0',Qnie1(i,j,k),Qnie2(i,j,k)
@@ -367,8 +356,7 @@
                      endif
 
                      if(aer0(k)+aer2(i,j,k).lt.0) then
-                        write(*,*) 'moco con aerosoles',l,
-     &                  m,n,aer0(k)+aer2(i,j,k)
+                        write(*,*) 'moco con aerosoles',l,m,n,aer0(k)+aer2(i,j,k)
                         write(*,*) aer2(i,j,k),aer0(k),P,T,W2(i,j,k)
                         aerneg=aerneg+aer0(k)+aer2(i,j,k)
                         laerneg=1
@@ -377,8 +365,7 @@
 
    20       continue
 
-            write(*,3000) 'limites',lnie(1),lnie(2),mnie(1),mnie(2),
-     &                  nnie(1),nnie(2)
+            write(*,3000) 'limites',lnie(1),lnie(2),mnie(1),mnie(2),nnie(1),nnie(2)
 
 
 !*    correccion de negativos
@@ -406,8 +393,7 @@
                      aert1=aert1+aer2(i,j,k)
 
                      if(Qvap2(i,j,k)+Qvap0(k).lt.0) then
-                        write(*,*) 'vapomoco',
-     &                   i,j,k,Qvap2(i,j,k),Qvap0(k),Qvap1(i,j,k)
+                        write(*,*) 'vapomoco',i,j,k,Qvap2(i,j,k),Qvap0(k),Qvap1(i,j,k)
                         stop
                      endif
 
@@ -469,11 +455,8 @@
                      rs=(e1-esvs)/esvs
                      yy=0
 
-                     if ((rl.gt.1e-3 .or. rs.gt.1e-3)
-     &                .and.Naer.gt.0) then
-                        call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs
-     &                  ,esvs,rl,rs,Lvl,Lvs,
-     &                  l,m,n,daer,dqgot,dqcri)
+                     if ((rl.gt.1e-3 .or. rs.gt.1e-3).and.Naer.gt.0) then
+                        call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,rl,rs,Lvl,Lvs,l,m,n,daer,dqgot,dqcri)
 
 
                         Taux=T-Temp0(k)-Tempa1(i,j,k)
@@ -494,9 +477,7 @@
                      aert2=aert2+aer2(i,j,k)
 
 !$$
-                     if (Qgot2(i,j,k).gt.0 .or. dqgot.gt.0 .or.
-     &                     Qllu2(i,j,k).gt.0 .or. Qcri2(i,j,k).gt.0 .or.
-     &                     Qnie2(i,j,k).gt.0) then
+                     if (Qgot2(i,j,k).gt.0 .or. dqgot.gt.0 .or.Qllu2(i,j,k).gt.0 .or. Qcri2(i,j,k).gt.0 .or.Qnie2(i,j,k).gt.0) then
 
                         qgotaux=Qgot2(i,j,k)
                         if (Qgot2(i,j,k).eq.0) qgotaux=0d0
@@ -542,19 +523,16 @@
 !         write(*,*) rl,rs,Naer,dqgot,yy
 !       endif
 !$$
-                           call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,
-     &                                     Eaccn,Eaucn,Eacng,Lsl00,
-     &                                     Fcal,l,m,n,qvapaux,qgotaux,
-     &                                     qlluaux,qcriaux,qnieaux,
-     &                                     qgraaux,Naer,daer2,nu,yy)
+                           call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,&
+                                          Fcal,l,m,n,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
+                                          qgraaux,Naer,daer2,nu,yy)
 
                            Fcalo(l,m,n)=Fcalo(l,m,n)+Fcal/dt1/densi
                            Naer=Naer+daer2
 
                            totmic=totmic+daer2
 
-                           if (i.eq.20.and.(j.eq.22.or.j.eq.22)
-     &                      .and.k.eq.28) then
+                           if (i.eq.20.and.(j.eq.22.or.j.eq.22).and.k.eq.28) then
 !        write(*,'(a5,i3,2g16.8)') 'aer2',j,Naer,daer2
 !        write(*,'(a5,i3,g16.8)') 'vap2',j,qvapaux
                               write(*,*) qgotaux,qlluaux,qcriaux
@@ -592,12 +570,9 @@
                      endif
 
 
-                     if (Tita0(k).lt.abs(Titaa2(i,j,k))+200
-     &               .or.Temp0(k).lt.
-     &                 abs(Tempa1(i,j,k))+200) then
+                     if (Tita0(k).lt.abs(Titaa2(i,j,k))+200.or.Temp0(k).lt.abs(Tempa1(i,j,k))+200) then
                         write(*,*) 'problemas con la temperatura 2'
-                        write(*,*) i,j,k,Titaa2(i,j,k),Tita0(k),
-     &                     Tempa1(i,j,k),Temp0(k)
+                        write(*,*) i,j,k,Titaa2(i,j,k),Tita0(k),Tempa1(i,j,k),Temp0(k)
                         write(*,*) T,Titaa2(i,j,k),aux
                         stop
                      endif
@@ -653,26 +628,20 @@
             do 400 i=1,nx1
                do 400 j=1,nx1
 
-                  Titaa2(i,j,0)=-W2(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+
-     &                            Titaa1(i,j,0)
+                  Titaa2(i,j,0)=-W2(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+Titaa1(i,j,0)
                   Titaa2(i,j,nz1)=Titaa2(i,j,nz1-1)
 
 !   modificado 04/05/98
 !   suponemos que las velocidades horizontales a nivel de piso son
 !   iguales a 1/4 de la correspondiente en el nivel 1
 
-                  auxx=((U2(i+1,j,1)+U2(i,j,1))*
-     &                     (Qvap1(i+1,j,0)+Qvap1(i,j,0))
-     &                  -(U2(i-1,j,1)+U2(i,j,1))*
-     &                     (Qvap1(i-1,j,0)+Qvap1(i,j,0)))
-     &                   /4.*.25
-                  auxy=((V2(i,j+1,1)+V2(i,j,1))*
-     &                     (Qvap1(i,j+1,0)+Qvap1(i,j,0))
-     &                  -(V2(i,j-1,1)+V2(i,j,1))*
-     &                     (Qvap1(i,j-1,0)+Qvap1(i,j,0)))
-     &                   /4.*.25
-                  auxz=W2(i,j,1)*((Qvap1(i,j,1)+Qvap1(i,j,0))+
-     &                   Qvap0(1)+Qvap0(0))/2.*.5
+                  auxx=((U2(i+1,j,1)+U2(i,j,1))*(Qvap1(i+1,j,0)+Qvap1(i,j,0))&
+                       -(U2(i-1,j,1)+U2(i,j,1))*(Qvap1(i-1,j,0)+Qvap1(i,j,0)))&
+                        /4.*.25
+                  auxy=((V2(i,j+1,1)+V2(i,j,1))*(Qvap1(i,j+1,0)+Qvap1(i,j,0))&
+                       -(V2(i,j-1,1)+V2(i,j,1))*(Qvap1(i,j-1,0)+Qvap1(i,j,0)))&
+                        /4.*.25
+                  auxz=W2(i,j,1)*((Qvap1(i,j,1)+Qvap1(i,j,0))+Qvap0(1)+Qvap0(0))/2.*.5
 
                   Qvap2(i,j,nz1)=Qvap2(i,j,nz1-1)
 
@@ -698,18 +667,13 @@
 !   suponemos que las velocidades horizontales a nivel de piso son
 !   iguales a 1/4 de la correspondiente en el nivel 1
 
-                  auxx=((U2(i+1,j,1)+U2(i,j,1))*
-     &                     (aer1(i+1,j,0)+aer1(i,j,0))
-     &                  -(U2(i-1,j,1)+U2(i,j,1))*
-     &                     (aer1(i-1,j,0)+aer1(i,j,0)))
-     &                   /4.*.25
-                  auxy=((V2(i,j+1,1)+V2(i,j,1))*
-     &                     (aer1(i,j+1,0)+aer1(i,j,0))
-     &                  -(V2(i,j-1,1)+V2(i,j,1))*
-     &                     (aer1(i,j-1,0)+aer1(i,j,0)))
-     &                   /4.*.25
-                  auxz=W2(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+
-     &                   aer0(1)+aer0(0))/2.*.5
+                  auxx=((U2(i+1,j,1)+U2(i,j,1))*(aer1(i+1,j,0)+aer1(i,j,0))&
+                       -(U2(i-1,j,1)+U2(i,j,1))*(aer1(i-1,j,0)+aer1(i,j,0)))&
+                         /4.*.25
+                  auxy=((V2(i,j+1,1)+V2(i,j,1))*(aer1(i,j+1,0)+aer1(i,j,0))&
+                       -(V2(i,j-1,1)+V2(i,j,1))*(aer1(i,j-1,0)+aer1(i,j,0)))&
+                        /4.*.25
+                  auxz=W2(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+aer0(1)+aer0(0))/2.*.5
 
                   if (W2(i,j,0).gt.0) then
                      aeraux=-((auxx+auxy)+2.*auxz)*dt1/dx1
@@ -720,10 +684,8 @@
 
 !     agregamos un termino de turbulencia para los aerosoles
 !       a nivel de piso (6/5/98)
-                  turbu=cks/dx1*.25*(abs(U2(i,j,1))+abs(V2(i,j,1))+
-     &                    2.*abs(W2(i,j,1)))
-                  lapla=((aer1(i+1,j,0)+aer1(i-1,j,0))+(aer1(i,j+1,0)+
-     &                    aer1(i,j-1,0)+aer1(i,j,1)))-5.*aer1(i,j,0)
+                  turbu=cks/dx1*.25*(abs(U2(i,j,1))+abs(V2(i,j,1))+2.*abs(W2(i,j,1)))
+                  lapla=((aer1(i+1,j,0)+aer1(i-1,j,0))+(aer1(i,j+1,0)+aer1(i,j-1,0)+aer1(i,j,1)))-5.*aer1(i,j,0)
                   lapla=lapla+(aer0(1)-aer0(0))
 
                   aer2(i,j,0)=aeraux+aer1(i,j,0)+turbu*lapla
@@ -802,23 +764,20 @@
 
                   k=0
 
-                  Titaa1(i,j,k)=pro3*Titaa2(i,j,k)+
-     &                          pro4*((Titaa2(i+1,j,k)+Titaa2(i-1,j,k))
-     &                           +(Titaa2(i,j+1,k)+Titaa2(i,j-1,k)))
+                  Titaa1(i,j,k)=pro3*Titaa2(i,j,k)+&
+                               pro4*((Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+(Titaa2(i,j+1,k)+Titaa2(i,j-1,k)))
 
                   if (abs(Titaa1(i,j,k)).lt.1e-10) Titaa1(i,j,k)=0
 
-                  Qvap1(i,j,k)=pro3*Qvap2(i,j,k)+
-     &                         pro4*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+
-     &                           (Qvap2(i,j+1,k)+Qvap2(i,j-1,k)))
+                  Qvap1(i,j,k)=pro3*Qvap2(i,j,k)+&
+                              pro4*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+(Qvap2(i,j+1,k)+Qvap2(i,j-1,k)))
 
 
                   if (abs(Qvap1(i,j,k)).lt.1e-10) Qvap1(i,j,k)=0
 !	if (Qvap0+Qvap1(i,j,k)).lt.0) Qvap1(i,j,k)=-Qvap0(k)
 
-                  Qgot1(i,j,k)=pro3*Qgot2(i,j,k)+
-     &                         pro4*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))
-     &                            +(Qgot2(i,j+1,k)+Qgot2(i,j-1,k)))
+                  Qgot1(i,j,k)=pro3*Qgot2(i,j,k)+&
+                              pro4*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+(Qgot2(i,j+1,k)+Qgot2(i,j-1,k)))
 
                   if (Qgot1(i,j,k).lt.1e-10) Qgot1(i,j,k)=0
 
@@ -827,14 +786,13 @@
                   if (Qllu1(i,j,k).lt.1e-10) Qllu1(i,j,k)=0
 
 !$$
-                  Qcri1(i,j,k)=pro3*Qcri2(i,j,k)+
-     &                        pro4*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))
-     &                           +(Qcri2(i,j+1,k)+Qcri2(i,j-1,k)))
+                  Qcri1(i,j,k)=pro3*Qcri2(i,j,k)+&
+                             pro4*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+(Qcri2(i,j+1,k)+Qcri2(i,j-1,k)))
 
                   if (Qcri1(i,j,k).lt.1e-10) Qcri1(i,j,k)=0
 
-                  Qnie1(i,j,k)=pro3*Qnie2(i,j,k)+pro4*((Qnie2(i+1,j,k)
-     &                 +Qnie2(i-1,j,k))+(Qnie2(i,j+1,k)+Qnie2(i,j-1,k)))
+                  Qnie1(i,j,k)=pro3*Qnie2(i,j,k)+pro4*((Qnie2(i+1,j,k)&
+                              +Qnie2(i-1,j,k))+(Qnie2(i,j+1,k)+Qnie2(i,j-1,k)))
 
                   if (Qnie1(i,j,k).lt.1e-10) Qnie1(i,j,k)=0
 
@@ -842,15 +800,12 @@
 
                   if (Qgra1(i,j,k).lt.1e-10) Qgra1(i,j,k)=0
 
-                  aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)
-     &                   +aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
+                  aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
 
 !     correccion cambiando la absorcion de aerosoles (07/04/00)
-                  if ((Qllu1(i,j,1)+Qgra1(i,j,1)).gt.1e-6 .and.
-     &                         W2(i,j,1).lt.0) then
+                  if ((Qllu1(i,j,1)+Qgra1(i,j,1)).gt.1e-6 .and.W2(i,j,1).lt.0) then
                      aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
-                     aer1(i,j,k)=aer1(i,j,k)-
-     &                  (aer1(i,j,k)+aer0(k))*aeraux
+                     aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
                   endif
 
                   if (abs(aer1(i,j,k)).lt.1e-10) aer1(i,j,k)=0
@@ -858,19 +813,18 @@
 
                   do 155 k=1,nz1-1
 
-                     Titaa1(i,j,k)=pro1*Titaa2(i,j,k)+
-     &                             pro2*(
-     &                               (Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+
-     &                               (Titaa2(i,j+1,k)+Titaa2(i,j-1,k))+
-     &                               Titaa2(i,j,k+1)+
-     &                               Titaa2(i,j,k-1))
+                     Titaa1(i,j,k)=pro1*Titaa2(i,j,k)+&
+                                  pro2*(&
+                                    (Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+&
+                                    (Titaa2(i,j+1,k)+Titaa2(i,j-1,k))+&
+                                    Titaa2(i,j,k+1)+Titaa2(i,j,k-1))
 
                      if (abs(Titaa1(i,j,k)).lt.1e-10) Titaa1(i,j,k)=0
 
-                     Qvap1(i,j,k)=pro1*Qvap2(i,j,k)+
-     &                     pro2*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+
-     &                      (Qvap2(i,j+1,k)+Qvap2(i,j-1,k))+
-     &                      Qvap2(i,j,k+1)+Qvap2(i,j,k-1))
+                     Qvap1(i,j,k)=pro1*Qvap2(i,j,k)+&
+                          pro2*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+&
+                           (Qvap2(i,j+1,k)+Qvap2(i,j-1,k))+&
+                           Qvap2(i,j,k+1)+Qvap2(i,j,k-1))
 
 
 !        if(i.eq.15 .and.(j.eq.15.or.j.eq.18).and.k.eq.10) then
@@ -885,10 +839,10 @@
 
                      if (abs(Qvap1(i,j,k)).lt.1e-10) Qvap1(i,j,k)=0
 
-                     Qgot1(i,j,k)=pro1*Qgot2(i,j,k)+
-     &                            pro2*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+
-     &                              (Qgot2(i,j+1,k)+Qgot2(i,j-1,k))+
-     &                              Qgot2(i,j,k+1)+Qgot2(i,j,k-1))
+                     Qgot1(i,j,k)=pro1*Qgot2(i,j,k)+&
+                                 pro2*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+&
+                                   (Qgot2(i,j+1,k)+Qgot2(i,j-1,k))+&
+                                   Qgot2(i,j,k+1)+Qgot2(i,j,k-1))
 
 
 !##
@@ -900,18 +854,16 @@
 
                      if (Qgot1(i,j,k).lt.1e-10) Qgot1(i,j,k)=0
 
-                     Qllu1(i,j,k)=pro1*Qllu2(i,j,k)+
-     &                            pro2*((Qllu2(i+1,j,k)+Qllu2(i-1,j,k))+
-     &                              (Qllu2(i,j+1,k)+Qllu2(i,j-1,k))+
-     &                              Qllu2(i,j,k+1)+Qllu2(i,j,k-1))
+                     Qllu1(i,j,k)=pro1*Qllu2(i,j,k)+&
+                                 pro2*((Qllu2(i+1,j,k)+Qllu2(i-1,j,k))+&
+                                 (Qllu2(i,j+1,k)+Qllu2(i,j-1,k))+Qllu2(i,j,k+1)+Qllu2(i,j,k-1))
 
                      if (Qllu1(i,j,k).lt.1e-10) Qllu1(i,j,k)=0
 
 !$$
-                     Qcri1(i,j,k)=pro1*Qcri2(i,j,k)+
-     &                            pro2*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+
-     &                              (Qcri2(i,j+1,k)+Qcri2(i,j-1,k))+
-     &                              Qcri2(i,j,k+1)+Qcri2(i,j,k-1))
+                     Qcri1(i,j,k)=pro1*Qcri2(i,j,k)+&
+                                 pro2*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+&
+                                   (Qcri2(i,j+1,k)+Qcri2(i,j-1,k))+Qcri2(i,j,k+1)+Qcri2(i,j,k-1))
 
 !##
 !      if (i.eq.17 .and. j.eq.16 .and. k.eq.14) then
@@ -930,17 +882,17 @@
 !       endif
 !#
 
-                     Qnie1(i,j,k)=pro1*Qnie2(i,j,k)+
-     &                            pro2*((Qnie2(i+1,j,k)+Qnie2(i-1,j,k))+
-     &                              (Qnie2(i,j+1,k)+Qnie2(i,j-1,k))+
-     &                              Qnie2(i,j,k+1)+Qnie2(i,j,k-1))
+                     Qnie1(i,j,k)=pro1*Qnie2(i,j,k)+&
+                                 pro2*((Qnie2(i+1,j,k)+Qnie2(i-1,j,k))+&
+                                   (Qnie2(i,j+1,k)+Qnie2(i,j-1,k))+&
+                                   Qnie2(i,j,k+1)+Qnie2(i,j,k-1))
 
                      if (Qnie1(i,j,k).lt.1e-10) Qnie1(i,j,k)=0
 
-                     Qgra1(i,j,k)=pro1*Qgra2(i,j,k)+
-     &                            pro2*((Qgra2(i+1,j,k)+Qgra2(i-1,j,k))+
-     &                              (Qgra2(i,j+1,k)+Qgra2(i,j-1,k))+
-     &                              Qgra2(i,j,k+1)+Qgra2(i,j,k-1))
+                     Qgra1(i,j,k)=pro1*Qgra2(i,j,k)+&
+                                 pro2*((Qgra2(i+1,j,k)+Qgra2(i-1,j,k))+&
+                                   (Qgra2(i,j+1,k)+Qgra2(i,j-1,k))+&
+                                   Qgra2(i,j,k+1)+Qgra2(i,j,k-1))
 
 !##
 !       if(i.eq.17 .and. j.eq.17 .and. k.eq.10)then
@@ -951,10 +903,9 @@
 
                      if (Qgra1(i,j,k).lt.1e-10) Qgra1(i,j,k)=0
 
-                     aer1(i,j,k)=pro1*aer2(i,j,k)+
-     &                           pro2*((aer2(i+1,j,k)+aer2(i-1,j,k))+
-     &                              (aer2(i,j+1,k)+aer2(i,j-1,k))+
-     &                              aer2(i,j,k+1)+aer2(i,j,k-1))
+                     aer1(i,j,k)=pro1*aer2(i,j,k)+&
+                                 pro2*((aer2(i+1,j,k)+aer2(i-1,j,k))+&
+                                  (aer2(i,j+1,k)+aer2(i,j-1,k))+aer2(i,j,k+1)+aer2(i,j,k-1))
 
 
                      if (abs(aer1(i,j,k)).lt.1e-10) aer1(i,j,k)=0
@@ -1090,10 +1041,8 @@
 !        pause
 
 
-            write(*,*) W1(20,22,30),W1(19,22,30),W1(21,22,30),
-     &                 W1(20,21,30),W1(20,23,30)
-            write(*,*) W1(19,21,30),W1(21,21,30),W1(21,23,30),
-     &                 W1(19,23,30),W1(21,22,30)
+            write(*,*) W1(20,22,30),W1(19,22,30),W1(21,22,30),W1(20,21,30),W1(20,23,30)
+            write(*,*) W1(19,21,30),W1(21,21,30),W1(21,23,30),W1(19,23,30),W1(21,22,30)
 
 !       write(*,*) Qcri1(20,22,22),Qnie1(20,22,22),Qvap1(20,22,22)
 !     &           ,Qvap0(22),W1(20,22,22)
@@ -1105,20 +1054,13 @@
 !     &           ,Qvap0(25),W1(20,22,25)
 !       write(*,*) Qcri1(20,22,26),Qnie1(20,22,26),Qvap1(20,22,26)
 !     &           ,Qvap0(26),W1(20,22,26)
-            write(*,*) Qcri1(20,22,27),Qnie1(20,22,27),Qvap1(20,22,27)
-     &                ,Qvap0(27),W1(20,22,27)
-            write(*,*) Qcri1(20,22,28),Qnie1(20,22,28),Qvap1(20,22,28)
-     &                ,Qvap0(28),W1(20,22,28)
-            write(*,*) Qcri1(20,22,29),Qnie1(20,22,29),Qvap1(20,22,29)
-     &                ,Qvap0(29),W1(20,22,29)
-            write(*,*) Qcri1(20,22,30),Qnie1(20,22,30),Qvap1(20,22,30)
-     &                ,Qvap0(30),W1(20,22,30)
-            write(*,*) Qcri1(20,22,31),Qnie1(20,22,31),Qvap1(20,22,31)
-     &                ,Qvap0(31),W1(20,22,31)
-            write(*,*) Qcri1(20,22,32),Qnie1(20,22,32),Qvap1(20,22,32)
-     &                ,Qvap0(32),W1(20,22,32)
-            write(*,*) Qcri1(20,22,33),Qnie1(20,22,33),Qvap1(20,22,33)
-     &                ,Qvap0(33),W1(20,22,33)
+            write(*,*) Qcri1(20,22,27),Qnie1(20,22,27),Qvap1(20,22,27),Qvap0(27),W1(20,22,27)
+            write(*,*) Qcri1(20,22,28),Qnie1(20,22,28),Qvap1(20,22,28),Qvap0(28),W1(20,22,28)
+            write(*,*) Qcri1(20,22,29),Qnie1(20,22,29),Qvap1(20,22,29),Qvap0(29),W1(20,22,29)
+            write(*,*) Qcri1(20,22,30),Qnie1(20,22,30),Qvap1(20,22,30),Qvap0(30),W1(20,22,30)
+            write(*,*) Qcri1(20,22,31),Qnie1(20,22,31),Qvap1(20,22,31),Qvap0(31),W1(20,22,31)
+            write(*,*) Qcri1(20,22,32),Qnie1(20,22,32),Qvap1(20,22,32),Qvap0(32),W1(20,22,32)
+            write(*,*) Qcri1(20,22,33),Qnie1(20,22,33),Qvap1(20,22,33),Qvap0(33),W1(20,22,33)
 
 !      write(*,*) 'fin',lll
 !      write(*,*) 'llu2',Qllu1(16,16,13),Qllu2(16,16,13)
@@ -1146,30 +1088,14 @@
 
 !     Evolucion para puntos seleccionados
 
-            write(13,44) U2(16,16,1),U2(17,17,1),
-     &                   U2(16,19,1),U2(17,19,1),
-     &                   U2(19,16,1),U2(19,17,1)
-            write(14,44) V2(16,16,1),V2(17,17,1),
-     &                   V2(16,19,1),V2(17,19,1),
-     &                   V2(19,16,1),V2(19,17,1)
-            write(15,44) W2(16,16,1),W2(17,17,1),
-     &                   W2(16,19,1),W2(17,19,1),
-     &                   W2(19,16,1),W2(19,17,1)
-            write(16,44) Qvap1(16,16,1),Qvap1(17,17,1),
-     &                   Qvap1(16,19,1),Qvap1(17,19,1),
-     &                   Qvap1(19,16,1),Qvap1(19,17,1)
-            write(17,44) Qgot1(16,16,1),Qgot1(17,17,1),
-     &                   Qgot1(16,19,1),Qgot1(17,19,1),
-     &                   Qgot1(19,16,1),Qgot1(19,17,1)
-            write(18,44) aer1(16,16,1),aer1(17,17,1),
-     &                   aer1(16,19,1),aer1(17,19,1),
-     &                   aer1(19,16,1),aer1(19,17,1)
-            write(19,44) Pres2(16,16,1),Pres2(17,17,1),
-     &                   Pres2(16,19,1),Pres2(17,19,1),
-     &                   Pres2(19,16,1),Pres2(19,17,1)
-            write(20,44) Titaa1(16,16,1),Titaa1(17,17,1),
-     &                   Titaa1(16,19,1),Titaa1(17,19,1),
-     &                   Titaa1(19,16,1),Titaa1(19,17,1)
+            write(13,44) U2(16,16,1),U2(17,17,1),U2(16,19,1),U2(17,19,1),U2(19,16,1),U2(19,17,1)
+            write(14,44) V2(16,16,1),V2(17,17,1),V2(16,19,1),V2(17,19,1),V2(19,16,1),V2(19,17,1)
+            write(15,44) W2(16,16,1),W2(17,17,1),W2(16,19,1),W2(17,19,1),W2(19,16,1),W2(19,17,1)
+            write(16,44) Qvap1(16,16,1),Qvap1(17,17,1),Qvap1(16,19,1),Qvap1(17,19,1),Qvap1(19,16,1),Qvap1(19,17,1)
+            write(17,44) Qgot1(16,16,1),Qgot1(17,17,1),Qgot1(16,19,1),Qgot1(17,19,1),Qgot1(19,16,1),Qgot1(19,17,1)
+            write(18,44) aer1(16,16,1),aer1(17,17,1),aer1(16,19,1),aer1(17,19,1),aer1(19,16,1),aer1(19,17,1)
+            write(19,44) Pres2(16,16,1),Pres2(17,17,1),Pres2(16,19,1),Pres2(17,19,1),Pres2(19,16,1),Pres2(19,17,1)
+            write(20,44) Titaa1(16,16,1),Titaa1(17,17,1),Titaa1(16,19,1),Titaa1(17,19,1),Titaa1(19,16,1),Titaa1(19,17,1)
 
 !     este es el unico que interesa
             aux1=0.
@@ -1197,8 +1123,7 @@
                tte=tte+1
                include 'posnub02.i'
                include 'corrinu2.i'
-               write(32,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),
-     &                     posxx,posyy
+               write(32,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),posxx,posyy
             endif
 
             if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then

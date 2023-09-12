@@ -28,8 +28,7 @@
 
          open(unit=15, file='outputdata/saleaer')
 
-         open(unit=10,file='outputdata/aerdif'//nombre,
-     &        status='unknown',form='unformatted')
+         open(unit=10,file='outputdata/aerdif'//nombre,status='unknown',form='unformatted')
          read(10) aerdif
          close(10)
 

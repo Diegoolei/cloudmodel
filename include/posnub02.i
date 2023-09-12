@@ -23,10 +23,10 @@
             do 1300 i=laux1,laux2
                do 1300 j=maux1,maux2
 
-                  Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+
-     &                  Qnie1(i,j,k)+Qgra1(i,j,k)
-                  Qagua=Qgot1(i,j,k)+Qllu1(i,j,k)+
-     &                  (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
+                  Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+&
+                       Qnie1(i,j,k)+Qgra1(i,j,k)
+                  Qagua=Qgot1(i,j,k)+Qllu1(i,j,k)+&
+                       (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
                   zmed=zmed+k*Qagua
                   Qaguat=Qaguat+Qagua
 

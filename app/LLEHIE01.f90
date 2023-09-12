@@ -88,8 +88,7 @@
          open(unit=70,file='outputdata/inic03.sa')
          do 100 k=0,nz1
 
-            read(70,210) i,Temp0(k),Tita0(k),Presi0(k),Pres00(k),Den0(k),
-     &                     aer0(k),Qvap0(k),UU(k),VV(k)
+            read(70,210) i,Temp0(k),Tita0(k),Presi0(k),Pres00(k),Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
 
   100    continue
          close(70)
@@ -192,8 +191,7 @@
 !           pause
 
             open(unit=60,file=httfla,status='unknown',form='unformatted')
-            read(60) U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,
-     &              Qgra1,aer1
+            read(60) U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1
             close(60)
 
             write(*,*) 'archivo leido OK'

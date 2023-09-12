@@ -53,5 +53,6 @@ va3101
 vara3101
 w23101
 fort.7
-outputdata/n
-outputdata/termina
+outputdata/*
+outputdata1/*
+.vscode/settings.json

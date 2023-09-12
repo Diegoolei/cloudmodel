@@ -112,8 +112,7 @@
             Eacrcn(k)=exp(.09*Tk)
 
 
-            write(30,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k)
-     &                  ,Tesvs(k),Eautcn(k),Eacrcn(k)
+            write(30,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k),Tesvs(k),Eautcn(k),Eacrcn(k)
 
   400    continue
          close(30)
@@ -178,15 +177,15 @@
                   equis=i*dx1
                   ygrie=j*dx1
 
-                  G1=exp(-((centx-equis)**2.+(centy-ygrie)**2.)*.5
-     &                 /radiomed**2.)
+                  G1=exp(-((centx-equis)**2.+(centy-ygrie)**2.)*.5&
+                      /radiomed**2.)
 
                   Titaa1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
 
                   if (Titaa1(i,j,k).lt.1e-5) Titaa1(i,j,k)=0.
 
-                  G1=exp(-((cenaerx-equis)**2.+(cenaery-ygrie)**2.)*.5
-     &                 /radiomed**2.)
+                  G1=exp(-((cenaerx-equis)**2.+(cenaery-ygrie)**2.)*.5&
+                      /radiomed**2.)
 
 
                   aer1(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
@@ -228,15 +227,13 @@
 
 !**   Velocidad terminal para gota de lluvia, cte que depende de P
          do 450 k=1,nz1+1
-            Av(2*k-1)=Av0*((P00/Presi0(k-1))**.286+    !puntos intermedios
-     &                (P00/Presi0(k))**.286)/2.
+            Av(2*k-1)=Av0*((P00/Presi0(k-1))**.286+(P00/Presi0(k))**.286)/2. !puntos intermedios
             Av(2*k)=Av0*(P00/Presi0(k))**.286
   450    continue
 
 !**   Velocidad terminal para la nieve, cte que depende de P
          do 460 k=1,nz1+1
-            Vtnie(2*k-1)=Vtnie0*((P00/Presi0(k-1))**.3+  !puntos intermedio
-     &                (P00/Presi0(k))**.3)/2.
+            Vtnie(2*k-1)=Vtnie0*((P00/Presi0(k-1))**.3+(P00/Presi0(k))**.3)/2. !puntos intermedios&
             Vtnie(2*k)=Vtnie0*(P00/Presi0(k))**.3
   460    continue
 
@@ -248,10 +245,10 @@
 
          do 475 k=1,nz1+1
             Vtgra0(2*k-1)=(Vtgra0(2*k-2)+Vtgra0(2*k))/2.  ! punto intermedio
-            write(*,*) 'vt',k,
-     &                Vtgra0(2*k-2)*5e-3**.8,
-     &                Vtgra0(2*k-1)*5e-3**.8,
-     &                Tvis(Temp0(k-1)),Den0(k-1)
+            write(*,*) 'vt',k,&
+                     Vtgra0(2*k-2)*5e-3**.8,&
+                     Vtgra0(2*k-1)*5e-3**.8,&
+                     Tvis(Temp0(k-1)),Den0(k-1)
   475    continue
 
 !**************************************************************
@@ -267,8 +264,8 @@
             Pres00(k)=Temp0(k)/Tita0(k)
             cc2(k)=Cp*Rd*Tita0(k)*Pres00(k)/Cv
 
-            write(70,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),
-     &                     Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
+            write(70,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),&
+                          Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
 
   100    continue
          close(70)

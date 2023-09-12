@@ -208,12 +208,9 @@
       do 719 i=-1,1
          do 719 j=-1,1
             do 719 k=-1,1
-               qgotmax=qgotmax+
-     &             1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
-               qcrimax=qcrimax+
-     &             1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
-               qniemax=qniemax+
-     &             1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
+               qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
+               qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
+               qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
 
 
 !        write(*,*) qcrimax,Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k),
@@ -242,20 +239,20 @@
       qgratot=qgratot/1000
 
 !$$
-      write(30,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin
-     &            ,qvapmax,qvapmin,qgotmax,qllumax,qcrimax,qniemax
-     &            ,qgramax,aermax
-     &            ,lumax,mumax,numax,lumin,mumin,numin
-     &            ,lvmax,mvmax,nvmax,lvmin,mvmin,nvmin
-     &            ,lwmax,mwmax,nwmax,lwmin,mwmin,nwmin
-     &            ,ltitamax,mtitamax,ntitamax,ltitamin,mtitamin
-     &            ,ntitamin,lqvapmax,mqvapmax,nqvapmax,lqvapmin
-     &            ,mqvapmin,nqvapmin,lqgotmax,mqgotmax,nqgotmax
-     &            ,lqllumax,mqllumax,nqllumax
-     &            ,lqcrimax,mqcrimax,nqcrimax
-     &            ,lqniemax,mqniemax,nqniemax
-     &            ,lqgramax,mqgramax,nqgramax
-     &            ,laermax,maermax,naermax
+      write(30,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin&
+                 ,qvapmax,qvapmin,qgotmax,qllumax,qcrimax,qniemax&
+                 ,qgramax,aermax&
+                 ,lumax,mumax,numax,lumin,mumin,numin&
+                 ,lvmax,mvmax,nvmax,lvmin,mvmin,nvmin&
+                 ,lwmax,mwmax,nwmax,lwmin,mwmin,nwmin&
+                 ,ltitamax,mtitamax,ntitamax,ltitamin,mtitamin&
+                 ,ntitamin,lqvapmax,mqvapmax,nqvapmax,lqvapmin&
+                 ,mqvapmin,nqvapmin,lqgotmax,mqgotmax,nqgotmax&
+                 ,lqllumax,mqllumax,nqllumax&
+                 ,lqcrimax,mqcrimax,nqcrimax&
+                 ,lqniemax,mqniemax,nqniemax&
+                 ,lqgramax,mqgramax,nqgramax&
+                 ,laermax,maermax,naermax
 
 
       write(33,715) qgottot,qllutot,qcritot,qnietot,qgratot

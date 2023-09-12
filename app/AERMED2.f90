@@ -29,14 +29,12 @@
 
 !*        lectura de la nube
 
-         arch='outputdata/nube'//nombre
-     &         //paso//'.sal'
+         arch='outputdata/nube'//nombre//paso//'.sal'
 
          write(*,*) arch
 
          open(unit=60,file=arch,status='unknown',form='unformatted')
-         read(60) U2,V2,W2,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1
-     &         ,Qgra1,aer1
+         read(60) U2,V2,W2,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1
          close(60)
 
 !*        calculo y grabacion

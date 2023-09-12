@@ -23,15 +23,15 @@
                do 20 lz=-1,1
                   ldis=abs(lx)+abs(ly)+abs(lz)
                   if (ldis.le.2) then
-                     call suma(aux,
-     &               D(1,1,i+lx,j+ly,2+lz)**2.,
-     &               D(2,2,i+lx,j+ly,2+lz)**2.,
-     &               D(3,3,i+lx,j+ly,2+lz)**2.)
+                     call suma(aux,&
+                    D(1,1,i+lx,j+ly,2+lz)**2.,&
+                    D(2,2,i+lx,j+ly,2+lz)**2.,&
+                    D(3,3,i+lx,j+ly,2+lz)**2.)
                      sum=aux/2.
-                     call suma(aux,
-     &               D(1,2,i+lx,j+ly,2+lz)**2.,
-     &               D(1,3,i+lx,j+ly,2+lz)**2.,
-     &               D(2,3,i+lx,j+ly,2+lz)**2.)
+                     call suma(aux,&
+                    D(1,2,i+lx,j+ly,2+lz)**2.,&
+                    D(1,3,i+lx,j+ly,2+lz)**2.,&
+                    D(2,3,i+lx,j+ly,2+lz)**2.)
                      sum=sum+aux
 
                      KM(lx,ly,lz)=sum**.5

@@ -44,9 +44,9 @@
          turbulz=cteturb*((a1+a2)+a3)
 
 !$$
-         grave=G*(Titaa1(i,j,k)/Tita0(k)+(AA*Qvap1(i,j,k)-
-     &            Qgot1(i,j,k)-Qllu1(i,j,k)-Qcri1(i,j,k)-
-     &            Qnie1(i,j,k)-Qgra1(i,j,k))/Den0(k))
+         grave=G*(Titaa1(i,j,k)/Tita0(k)+(AA*Qvap1(i,j,k)-&
+                 Qgot1(i,j,k)-Qllu1(i,j,k)-Qcri1(i,j,k)-&
+                 Qnie1(i,j,k)-Qgra1(i,j,k))/Den0(k))
 !      grave=G*(Titaa1(i,j,k)/Tita0(k))
 
          fu(i,j,k)=turbulx/dx8-diverx/dx12
@@ -54,9 +54,9 @@
          fw(i,j,k)=turbulz/dx8-diverz/dx12+grave
 
 !     agregado para la P (23/8/97)
-         laplap=(Pres2(i+1,j,k)+Pres2(i-1,j,k))+(Pres2(i,j+1,k)+
-     &          Pres2(i,j-1,k))+Pres2(i,j,k+1)+Pres2(i,j,k-1)-
-     &          6.*Pres2(i,j,k)
+         laplap=(Pres2(i+1,j,k)+Pres2(i-1,j,k))+(Pres2(i,j+1,k)+&
+               Pres2(i,j-1,k))+Pres2(i,j,k+1)+Pres2(i,j,k-1)-&
+               6.*Pres2(i,j,k)
          fp(i,j,k)=cteturb*KMM/dx2*laplap
 
 !##

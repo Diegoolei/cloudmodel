@@ -12,5 +12,4 @@
       real Qvaprel(nz1)
       real aerrel(nz1)
 
-      common /estbase/ Temp0,Tita0,Pres00,Presi0,UU,VV,cc2,Den0,
-     &                 aer0,Qvap0,Qvaprel,aerrel
+      common /estbase/ Temp0,Tita0,Pres00,Presi0,UU,VV,cc2,Den0,aer0,Qvap0,Qvaprel,aerrel

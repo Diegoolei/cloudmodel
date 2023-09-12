@@ -45,8 +45,8 @@
          var(11)='AE'
 
 
-         paso='01020304050607080910111213141516171819202122232425'
-     &        //'26272829303132333435363738394041424344454647484950'
+         paso='01020304050607080910111213141516171819202122232425'&
+         //'26272829303132333435363738394041424344454647484950'
          pasoaux(1)=0
          pasoaux(2)=0
          pasoaux(3)=0
@@ -82,12 +82,10 @@
          open(unit=30,file='outputdata/varconz.da',status='unknown',form='unformatted')
          rewind 30
 
-         read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0
-     &                   ,cc2,aer0,UU,VV
+         read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
 
 !$$
-         read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
-     &              Qvaprel,aerrel,Eautcn,Eacrcn
+         read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
 
          close(30)
          close(13)
@@ -103,14 +101,12 @@
 
 !*        lectura de la nube
 
-               arch='outputdata/nube'//nombre
-     &               //paso(ii*2-1:ii*2)//'.sal'
+               arch='outputdata/nube'//nombre//paso(ii*2-1:ii*2)//'.sal'
 
                write(*,*) arch
 
                open(unit=60,file=arch,status='unknown',form='unformatted')
-               read(60) U2,V2,W2,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1
-     &               ,Qgra1,aer1
+               read(60) U2,V2,W2,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1
                close(60)
 
 
@@ -220,8 +216,7 @@
                         call inomo(l,m,n,dden0z)
 
 !**     calculo de la energia cinetica
-                        ener1=.5*Den0(k)*(U2(i,j,k)**2.+V2(i,j,k)**2.+W2(i,j,k)**2.)
-     &                         +ener1
+                        ener1=.5*Den0(k)*(U2(i,j,k)**2.+V2(i,j,k)**2.+W2(i,j,k)**2.)+ener1
 
 !     calculo de la temperatura potencial
                         call tempot(l,m,n,dden0z,Fcalo(i,j,k))
@@ -413,8 +408,7 @@
 
                         if ((rl.gt.1e-3 .or. rs.gt.1e-3).and. Naer.gt.0) then
 
-                           call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,
-     &                                 rl,rs,Lvl,Lvs,l,m,n,daer,dqgot,dqcri)
+                           call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,rl,rs,Lvl,Lvs,l,m,n,daer,dqgot,dqcri)
 
 
                            Taux=T-Temp0(k)-Tempa1(i,j,k)
@@ -435,9 +429,9 @@
                         aert2=aert2+aer2(i,j,k)
 
 !$$
-                        if (Qgot2(i,j,k).gt.0 .or. dqgot.gt.0 .or.
-     &                        Qllu2(i,j,k).gt.0 .or. Qcri2(i,j,k).gt.0 .or.
-     &                        Qnie2(i,j,k).gt.0) then
+                        if (Qgot2(i,j,k).gt.0 .or. dqgot.gt.0 .or.&
+                             Qllu2(i,j,k).gt.0 .or. Qcri2(i,j,k).gt.0 .or.&
+                             Qnie2(i,j,k).gt.0) then
 
                            qgotaux=Qgot2(i,j,k)
                            if (Qgot2(i,j,k).eq.0) qgotaux=0d0
@@ -470,10 +464,10 @@
                               elvs=Telvs(iT)*(1-aux2)+Telvs(iT+1)*aux2
                               esvs=Tesvs(iT)*(1-aux2)+Tesvs(iT+1)*aux2
 
-                              call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,
-     &                                        Eacng,Lsl00,Fcal,l,m,n,
-     &                                        qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,
-     &                                        qgraaux,Naer,daer2,nu,yy)
+                              call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
+                                             Eacng,Lsl00,Fcal,l,m,n,&
+                                             qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
+                                             qgraaux,Naer,daer2,nu,yy)
 
                               Fcalo(l,m,n)=Fcalo(l,m,n)+Fcal/dt1/densi
                               Naer=Naer+daer2
@@ -495,8 +489,7 @@
                         endif
 
 
-                        if (Tita0(k).lt.abs(Titaa2(i,j,k))+200 .or. Temp0(k).lt.
-     &                    abs(Tempa1(i,j,k))+200) then
+                        if (Tita0(k).lt.abs(Titaa2(i,j,k))+200 .or. Temp0(k).lt.abs(Tempa1(i,j,k))+200) then
                            write(*,*) 'problemas con la temperatura 2'
                            write(*,*) i,j,k,Titaa2(i,j,k),Tita0(k),Tempa1(i,j,k),Temp0(k)
                            write(*,*) T,Titaa2(i,j,k),aux
@@ -541,8 +534,7 @@
 !*****************************************************
 !                 grabacion
 
-               open(unit=11,file='outputdata/aerdif'//paso(ii*2-1:ii*2),
-     &              status='unknown',form='unformatted')
+               open(unit=11,file='outputdata/aerdif'//paso(ii*2-1:ii*2),status='unknown',form='unformatted')
                write(11) aerdif
                close(11)
 

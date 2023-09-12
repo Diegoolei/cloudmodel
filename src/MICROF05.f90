@@ -7,10 +7,10 @@
 !     revisado 24/09/00
 
 !$$
-      subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,
-     &           Eacng,Lsl00,Fcal,l,m,n,
-     &           qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,
-     &           qgraaux,Naer,daer2,nu,yy)
+      subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
+                Eacng,Lsl00,Fcal,l,m,n,&
+                qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
+                qgraaux,Naer,daer2,nu,yy)
       
       implicit none
       include 'dimen.i'
@@ -161,9 +161,9 @@
       else
         libaer=0.
       endif
-      if (coevcri.gt.0) 
-     &    libaer=libaer+coevcri/(pi*rhocri*Rcri**3./10.)*.5 !mod(2/4/00)
-
+      if (coevcri.gt.0) then
+        libaer=libaer+coevcri/(pi*rhocri*Rcri**3./10.)*.5 !mod(2/4/00)
+      endif
 !**********************************************************
 
 !**   Autoconversion
@@ -182,9 +182,9 @@
         aux=20./3.*Eaucn*5e-3*.25*6.      !(22/01/99)
         hieconv=-aux/Rcri/rhocri*qcriaux**2.
 
-        if (qcriaux.gt.5e-4) hieconv=hieconv
-     &                       -2.*qcriaux**2. !mod 11/12/99
-
+        if (qcriaux.gt.5e-4) then 
+          hieconv=hieconv-2.*qcriaux**2. !mod 11/12/99
+        endif
 !##
 !        if(l.eq.21 .and. m.eq.36 .and. n.ge.23)
 !     &     write(*,*) 'cri1',n,qcriaux,hieconv
@@ -209,9 +209,9 @@
 
 !*    nieve a cristales (solo cuando hay evaporacion) !19/12/99)
 
-      if (qauxs.lt.0 .and.T.le.T0 .and.qcriaux.lt.5e-4)
-     &           hieconv=hieconv+1e-2*qnieaux          !mod 27/2/2000
-
+      if (qauxs.lt.0 .and.T.le.T0 .and.qcriaux.lt.5e-4) then
+        hieconv=hieconv+1e-2*qnieaux          !mod 27/2/2000
+      endif
 !##
 !        if(l.eq.21 .and. m.eq.36 .and. n.ge.23) then
 !          write(*,*) 'cri3',n,qcriaux,qnieaux,hieconv,coevcri
@@ -271,12 +271,11 @@
       endif
       
 !*    lluvia por granizo
-      if (Rllu.gt.0 .and. Rgra.gt.0 .and. s.eq.0 .and.
-     &   Vtgra.gt.Vtm) then
-        acllgra=-pi*Efcol*Ngra*qlluaux*
-     &         (gam3p8*(Vtgra*Rgra**2.-Vtm*Rllu**2.)+
-     &          2.*gam2p8*Rgra*Rllu*(Vtgra-Vtm)+
-     &          2.*gam1p8*(Vtgra*Rllu**2.-Vtm*Rgra**2.))
+      if (Rllu.gt.0 .and. Rgra.gt.0 .and. s.eq.0 .and.Vtgra.gt.Vtm) then
+        acllgra=-pi*Efcol*Ngra*qlluaux*&
+              (gam3p8*(Vtgra*Rgra**2.-Vtm*Rllu**2.)+&
+               2.*gam2p8*Rgra*Rllu*(Vtgra-Vtm)+&
+               2.*gam1p8*(Vtgra*Rllu**2.-Vtm*Rgra**2.))
 !     para que no de cantidades negativas de lluvia siendo colectada
         if (acllgra.gt.qlluaux/dt2*.98) acllgra=qlluaux/dt2*.98      
       else
@@ -354,8 +353,8 @@
           cfln2=-coevnie*Lvs/Lsl
           if(T.lt.T0-10.) cfln2=0. !mod 11/12/99
         else
-          cfln2=-coevnie*Lvl0/Lsl00+
-     &        (8.*Kair*fventl*Rnie*Nnie+Cwl*cfln1)*(T-T0)/Lsl00
+          cfln2=-coevnie*Lvl0/Lsl00+&
+             (8.*Kair*fventl*Rnie*Nnie+Cwl*cfln1)*(T-T0)/Lsl00
         endif
         if (cfln2.lt.0) cfln2=0.
         cfllunie=cfln1+cfln2
@@ -393,9 +392,9 @@
 
 !*    lluvia con nieve     (mod 10/12/99)
       if(T.lt.T0.and.(Rllu.gt.5e-5.and.Rnie.gt.0))then
-        coliln=pi*Efcol*Nllu*Nnie*(Vtm*
-     &      (gam3p8*Rllu**2.+gam1p8*2.*Rnie**2.+2.*gam2p8*Rnie*Rllu)
-     &      -Vtnie(2*n)*2.*(Rllu**2.+Rnie**2.+Rnie*Rllu))
+        coliln=pi*Efcol*Nllu*Nnie*(Vtm*&
+           (gam3p8*Rllu**2.+gam1p8*2.*Rnie**2.+2.*gam2p8*Rnie*Rllu)&
+           -Vtnie(2*n)*2.*(Rllu**2.+Rnie**2.+Rnie*Rllu))
         coliln=min(abs(coliln),Nllu*.3,Nnie*.3)
         congagua=congagua+coliln*(qnieaux/Nnie+qlluaux/Nllu)
       else
@@ -515,8 +514,8 @@
           if (Tg .le. T0)  then
             crecigra=2          ! crecimiento seco
             Qvaux=esvs0/Rv/Tg*exp(Lvs0/Rv*(1./T0-1./Tg))
-            coevgra=-4.*pi*Dv*Rgra*Ngra*fventgs*
-     &            (qvapaux-Qvaux)                
+            coevgra=-4.*pi*Dv*Rgra*Ngra*fventgs*&
+                 (qvapaux-Qvaux)                
             Q2=-coevgra*Lvs0
             Qt=Q1+Q2+Q3+Q4
           else
@@ -670,24 +669,24 @@
 
 !     prevencion de negativos
 !$$
-      if (qgotaux1.lt.0 .or. qlluaux1.lt.0 .or. qcriaux1.lt.0 .or.
-     &    qnieaux1.lt.0 .or. qgraaux1.lt.0) then
+      if (qgotaux1.lt.0 .or. qlluaux1.lt.0 .or. qcriaux1.lt.0 .or.&
+         qnieaux1.lt.0 .or. qgraaux1.lt.0) then
 
-      if (qgotaux1.lt.-1e-10 .or. qlluaux1.lt.-1e-10 .or. 
-     &    qcriaux1.lt.-1e-10 .or.
-     &    qnieaux1.lt.-1e-10 .or. qgraaux1.lt.-1e-10) then
+      if (qgotaux1.lt.-1e-10 .or. qlluaux1.lt.-1e-10 .or. &
+         qcriaux1.lt.-1e-10 .or.&
+         qnieaux1.lt.-1e-10 .or. qgraaux1.lt.-1e-10) then
       
 	write(*,*) 'prob con microfis',l,m,n,T
-	write(*,*) coevgot,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,
-     &             qgraaux
-	write(*,*) qvapaux1,qgotaux1,qlluaux1,qcriaux1,qnieaux1,
-     &             qgraaux1
+	write(*,*) coevgot,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
+                  qgraaux
+	write(*,*) qvapaux1,qgotaux1,qlluaux1,qcriaux1,qnieaux1,&
+                  qgraaux1
         write(*,*) 'cri',Intcri,invapcri,ingotcri,incrinie,incrigra
-        write(*,*) incrinie,hieconv,accrnie,mucrgrni,
-     &             -colilc*qcriaux/Ncri
+        write(*,*) incrinie,hieconv,accrnie,mucrgrni,&
+                  -colilc*qcriaux/Ncri
 
-        write(*,*) 'nie',Intnie,invapnie,ingotnie,inllunie,incrinie
-     &             ,inniegra,cfllunie,acgonie
+        write(*,*) 'nie',Intnie,invapnie,ingotnie,inllunie,incrinie&
+                  ,inniegra,cfllunie,acgonie
         write(*,*) incrinie,hieconv,accrnie+mucrgrni*.8
 
 
@@ -720,8 +719,8 @@
       aux=Intvap+Intgot+Intllu+Intcri+Intnie+Intgra
       if (aux.gt.1e-9) then
         write(*,*) 'no conserva la masa',l,m,n
-        write(*,*) aux,Intvap,Intgot,Intllu,Intcri,Intnie,
-     &             Intgra
+        write(*,*) aux,Intvap,Intgot,Intllu,Intcri,Intnie,&
+                  Intgra
         stop
       endif
 
@@ -771,8 +770,8 @@
 
 !     calculo del calor obtenido por cambio de fase (por m^-3)
 !$$
-	Fcal=Fcal+(-(invapgot+invapllu)*Lvl-
-     &       ingotcri*Lsl-invapcri*Lvs+Fcalgra)*dt2
+	Fcal=Fcal+(-(invapgot+invapllu)*Lvl-&
+            ingotcri*Lsl-invapcri*Lvs+Fcalgra)*dt2
 
         if (invapnie.gt.0 .or. T.lt.T0-10.) then !mod11/12/99
           Fcal=Fcal-invapnie*Lvs*dt2

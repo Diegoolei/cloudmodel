@@ -1,7 +1,6 @@
 !     revisado 13/04/99
 !23456789*123456789*123456789*123456789*123456789*123456789*123456789*
-      subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,
-     &                 rl,rs,Lvl,Lvs,l,m,n,Naux,auxl,auxs)
+      subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,auxl,auxs)
 
          implicit none
          include 'dimen.i'

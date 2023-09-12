@@ -18,37 +18,37 @@
          daer(3)=aer1(l,m,n+1)-aer1(l,m,n-1)
 
 
-         adv(1)=(((U2(l+1,m,n)+U2(l,m,n))*(aer1(l+1,m,n)+aer1(l,m,n)))-
-     &         ((U2(l-1,m,n)+U2(l,m,n))*(aer1(l-1,m,n)+aer1(l,m,n))))/4.
+         adv(1)=(((U2(l+1,m,n)+U2(l,m,n))*(aer1(l+1,m,n)+aer1(l,m,n)))-&
+              ((U2(l-1,m,n)+U2(l,m,n))*(aer1(l-1,m,n)+aer1(l,m,n))))/4.
          adv(1)=adv(1)+daer(1)/2.*UU(n)
 
-         adv(2)=(((V2(l,m+1,n)+V2(l,m,n))*(aer1(l,m+1,n)+aer1(l,m,n)))
-     &         -((V2(l,m-1,n)+V2(l,m,n))*(aer1(l,m-1,n)+aer1(l,m,n))))/4.
+         adv(2)=(((V2(l,m+1,n)+V2(l,m,n))*(aer1(l,m+1,n)+aer1(l,m,n)))&
+              -((V2(l,m-1,n)+V2(l,m,n))*(aer1(l,m-1,n)+aer1(l,m,n))))/4.
          adv(2)=adv(2)+daer(2)/2.*VV(n)
 
-         advaer2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*
-     &                (aer1(l,m,n)+aer1(l,m,n+1))/4.
+         advaer2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+                     (aer1(l,m,n)+aer1(l,m,n+1))/4.
 
          adv(3)=advaer2(l,m)-advaer1(l,m)
 
          advec=-(adv(1)+adv(2)+adv(3))
 
-         verti=-((W2(l,m,n+1)+W2(l,m,n))*(aer0(n+1)+aer0(n))-
-     &         (W2(l,m,n-1)+W2(l,m,n))*(aer0(n-1)+aer0(n)))/4.
+         verti=-((W2(l,m,n+1)+W2(l,m,n))*(aer0(n+1)+aer0(n))-&
+              (W2(l,m,n-1)+W2(l,m,n))*(aer0(n-1)+aer0(n)))/4.
 
 !## agregado
-         aux=-((U2(l+1,m,n)-U2(l-1,m,n))+(V2(l,m+1,n)-V2(l,m-1,n)))*
-     &       aer0(n)/2.
+         aux=-((U2(l+1,m,n)-U2(l-1,m,n))+(V2(l,m+1,n)-V2(l,m-1,n)))*&
+            aer0(n)/2.
 
          escal=daer(1)*KM1+daer(2)*KM2+daer(3)*KM3
 
-         lapla=aer1(l+1,m,n)+aer1(l,m+1,n)+aer1(l,m,n+1)+
-     &         aer1(l-1,m,n)+aer1(l,m-1,n)+aer1(l,m,n-1)-
-     &         6.*aer1(l,m,n)
+         lapla=aer1(l+1,m,n)+aer1(l,m+1,n)+aer1(l,m,n+1)+&
+              aer1(l-1,m,n)+aer1(l,m-1,n)+aer1(l,m,n-1)-&
+              6.*aer1(l,m,n)
 
-         lapla=((aer1(l+1,m,n)+aer1(l-1,m,n))+(aer1(l,m+1,n)+
-     &         aer1(l,m-1,n)))+aer1(l,m,n-1)+aer1(l,m,n+1)-
-     &         6.*aer1(l,m,n)
+         lapla=((aer1(l+1,m,n)+aer1(l-1,m,n))+(aer1(l,m+1,n)+&
+              aer1(l,m-1,n)))+aer1(l,m,n-1)+aer1(l,m,n+1)-&
+              6.*aer1(l,m,n)
 
 
          lapla=lapla+(aer0(n+1)+aer0(n-1)-2.*aer0(n))
@@ -90,18 +90,18 @@
          dqgot(2)=Qgot1(l,m+1,n)-Qgot1(l,m-1,n)
          dqgot(3)=Qgot1(l,m,n+1)-Qgot1(l,m,n-1)
 
-         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qgot1(l+1,m,n)+Qgot1(l,m,n))
-     &         -(U2(l-1,m,n)+U2(l,m,n))*(Qgot1(l-1,m,n)+Qgot1(l,m,n)))/4.
+         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qgot1(l+1,m,n)+Qgot1(l,m,n))&
+              -(U2(l-1,m,n)+U2(l,m,n))*(Qgot1(l-1,m,n)+Qgot1(l,m,n)))/4.
          adv(1)=adv(1)+dqgot(1)/2.*UU(n)
 
-         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qgot1(l,m+1,n)+Qgot1(l,m,n))
-     &         -(V2(l,m-1,n)+V2(l,m,n))*(Qgot1(l,m-1,n)+Qgot1(l,m,n)))/4.
+         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qgot1(l,m+1,n)+Qgot1(l,m,n))&
+              -(V2(l,m-1,n)+V2(l,m,n))*(Qgot1(l,m-1,n)+Qgot1(l,m,n)))/4.
          adv(2)=adv(2)+dqgot(2)/2.*VV(n)
 
-         advgot2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*
-     &                (Qgot1(l,m,n)+Qgot1(l,m,n+1))/4.
-         if ((advgot2(l,m)-advgot1(l,m))*dt1/dx1.gt.Qgot1(l,m,n) .and.
-     &        W2(l,m,n).gt.0) then
+         advgot2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+                     (Qgot1(l,m,n)+Qgot1(l,m,n+1))/4.
+         if ((advgot2(l,m)-advgot1(l,m))*dt1/dx1.gt.Qgot1(l,m,n) .and.&
+             W2(l,m,n).gt.0) then
             advgot2(l,m)=advgot1(l,m)+Qgot1(l,m,n)*dx1/dt1
          endif
          adv(3)=advgot2(l,m)-advgot1(l,m)
@@ -112,9 +112,9 @@
          escal=dqgot(1)*KM1+dqgot(2)*KM2+dqgot(3)*KM3
 
 
-         lapla=Qgot1(l+1,m,n)+Qgot1(l,m+1,n)+Qgot1(l,m,n+1)+
-     &         Qgot1(l-1,m,n)+Qgot1(l,m-1,n)+Qgot1(l,m,n-1)-
-     &         6.*Qgot1(l,m,n)
+         lapla=Qgot1(l+1,m,n)+Qgot1(l,m+1,n)+Qgot1(l,m,n+1)+&
+              Qgot1(l-1,m,n)+Qgot1(l,m-1,n)+Qgot1(l,m,n-1)-&
+              6.*Qgot1(l,m,n)
 
          turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
@@ -141,38 +141,38 @@
          dqvap(2)=Qvap1(l,m+1,n)-Qvap1(l,m-1,n)
          dqvap(3)=Qvap1(l,m,n+1)-Qvap1(l,m,n-1)
 
-         adv(1)=(((U2(l+1,m,n)+U2(l,m,n))*
-     &              (Qvap1(l+1,m,n)+Qvap1(l,m,n)))-
-     &         ((U2(l-1,m,n)+U2(l,m,n))*
-     &              (Qvap1(l-1,m,n)+Qvap1(l,m,n))))/4.
+         adv(1)=(((U2(l+1,m,n)+U2(l,m,n))*&
+                   (Qvap1(l+1,m,n)+Qvap1(l,m,n)))-&
+              ((U2(l-1,m,n)+U2(l,m,n))*&
+                   (Qvap1(l-1,m,n)+Qvap1(l,m,n))))/4.
          adv(1)=adv(1)+dqvap(1)/2.*UU(n)
 
-         adv(2)=(((V2(l,m+1,n)+V2(l,m,n))*
-     &              (Qvap1(l,m+1,n)+Qvap1(l,m,n)))-
-     &         ((V2(l,m-1,n)+V2(l,m,n))*
-     &              (Qvap1(l,m-1,n)+Qvap1(l,m,n))))/4.
+         adv(2)=(((V2(l,m+1,n)+V2(l,m,n))*&
+                   (Qvap1(l,m+1,n)+Qvap1(l,m,n)))-&
+              ((V2(l,m-1,n)+V2(l,m,n))*&
+                   (Qvap1(l,m-1,n)+Qvap1(l,m,n))))/4.
          adv(2)=adv(2)+dqvap(2)/2.*VV(n)
 
 
-         advvap2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*
-     &                (Qvap1(l,m,n)+Qvap1(l,m,n+1))/4.
+         advvap2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+                     (Qvap1(l,m,n)+Qvap1(l,m,n+1))/4.
 
          adv(3)=advvap2(l,m)-advvap1(l,m)
 
          advec=-((adv(1)+adv(2))+adv(3))
 
-         verti=-((W2(l,m,n+1)+W2(l,m,n))*(Qvap0(n+1)+Qvap0(n))-
-     &         (W2(l,m,n-1)+W2(l,m,n))*(Qvap0(n-1)+Qvap0(n)))/4.
+         verti=-((W2(l,m,n+1)+W2(l,m,n))*(Qvap0(n+1)+Qvap0(n))-&
+              (W2(l,m,n-1)+W2(l,m,n))*(Qvap0(n-1)+Qvap0(n)))/4.
 
 !## agregado
-         aux=-(U2(l+1,m,n)-U2(l-1,m,n)+V2(l,m+1,n)-V2(l,m-1,n))*
-     &       Qvap0(n)/2.
+         aux=-(U2(l+1,m,n)-U2(l-1,m,n)+V2(l,m+1,n)-V2(l,m-1,n))*&
+            Qvap0(n)/2.
 
          escal=dqvap(1)*KM1+dqvap(2)*KM2+dqvap(3)*KM3
 
-         lapla=((Qvap1(l+1,m,n)+Qvap1(l-1,m,n))+(Qvap1(l,m+1,n)+
-     &         Qvap1(l,m-1,n)))+Qvap1(l,m,n+1)+Qvap1(l,m,n-1)-
-     &         6.*Qvap1(l,m,n)
+         lapla=((Qvap1(l+1,m,n)+Qvap1(l-1,m,n))+(Qvap1(l,m+1,n)+&
+              Qvap1(l,m-1,n)))+Qvap1(l,m,n+1)+Qvap1(l,m,n-1)-&
+              6.*Qvap1(l,m,n)
 
          lapla=lapla+(Qvap0(n+1)+Qvap0(n-1)-2.*Qvap0(n))
 
@@ -214,16 +214,16 @@
          dqllu(2)=Qllu1(l,m+1,n)-Qllu1(l,m-1,n)
          dqllu(3)=Qllu1(l,m,n+1)-Qllu1(l,m,n-1)
 
-         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qllu1(l+1,m,n)+Qllu1(l,m,n))
-     &         -(U2(l-1,m,n)+U2(l,m,n))*(Qllu1(l-1,m,n)+Qllu1(l,m,n)))/4.
+         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qllu1(l+1,m,n)+Qllu1(l,m,n))&
+              -(U2(l-1,m,n)+U2(l,m,n))*(Qllu1(l-1,m,n)+Qllu1(l,m,n)))/4.
          adv(1)=adv(1)+dqllu(1)/2.*UU(n)
 
-         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qllu1(l,m+1,n)+Qllu1(l,m,n))-
-     &        (V2(l,m-1,n)+V2(l,m,n))*(Qllu1(l,m-1,n)+Qllu1(l,m,n)))/4.
+         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qllu1(l,m+1,n)+Qllu1(l,m,n))-&
+             (V2(l,m-1,n)+V2(l,m,n))*(Qllu1(l,m-1,n)+Qllu1(l,m,n)))/4.
          adv(2)=adv(2)+dqllu(2)/2.*VV(n)
 
-         advllu2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*
-     &                (Qllu1(l,m,n)+Qllu1(l,m,n+1))/4.
+         advllu2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+                     (Qllu1(l,m,n)+Qllu1(l,m,n+1))/4.
 
          adv(3)=advllu2(l,m)-advllu1(l,m)
 
@@ -231,9 +231,9 @@
 
          escal=dqllu(1)*KM1+dqllu(2)*KM2+dqllu(3)*KM3
 
-         lapla=Qllu1(l+1,m,n)+Qllu1(l,m+1,n)+Qllu1(l,m,n+1)+
-     &         Qllu1(l-1,m,n)+Qllu1(l,m-1,n)+Qllu1(l,m,n-1)-
-     &         6.*Qllu1(l,m,n)
+         lapla=Qllu1(l+1,m,n)+Qllu1(l,m+1,n)+Qllu1(l,m,n+1)+&
+              Qllu1(l-1,m,n)+Qllu1(l,m-1,n)+Qllu1(l,m,n-1)-&
+              6.*Qllu1(l,m,n)
 
          turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
@@ -287,16 +287,16 @@
          dqcri(2)=Qcri1(l,m+1,n)-Qcri1(l,m-1,n)
          dqcri(3)=Qcri1(l,m,n+1)-Qcri1(l,m,n-1)
 
-         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qcri1(l+1,m,n)+Qcri1(l,m,n))
-     &         -(U2(l-1,m,n)+U2(l,m,n))*(Qcri1(l-1,m,n)+Qcri1(l,m,n)))/4.
+         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qcri1(l+1,m,n)+Qcri1(l,m,n))&
+              -(U2(l-1,m,n)+U2(l,m,n))*(Qcri1(l-1,m,n)+Qcri1(l,m,n)))/4.
          adv(1)=adv(1)+dqcri(1)/2.*UU(n)
 
-         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qcri1(l,m+1,n)+Qcri1(l,m,n))-
-     &        (V2(l,m-1,n)+V2(l,m,n))*(Qcri1(l,m-1,n)+Qcri1(l,m,n)))/4.
+         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qcri1(l,m+1,n)+Qcri1(l,m,n))-&
+             (V2(l,m-1,n)+V2(l,m,n))*(Qcri1(l,m-1,n)+Qcri1(l,m,n)))/4.
          adv(2)=adv(2)+dqcri(2)/2.*VV(n)
 
-         advcri2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*
-     &                (Qcri1(l,m,n)+Qcri1(l,m,n+1))/4.
+         advcri2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+                     (Qcri1(l,m,n)+Qcri1(l,m,n+1))/4.
 
          adv(3)=advcri2(l,m)-advcri1(l,m)
 
@@ -304,9 +304,9 @@
 
          escal=dqcri(1)*KM1+dqcri(2)*KM2+dqcri(3)*KM3
 
-         lapla=Qcri1(l+1,m,n)+Qcri1(l,m+1,n)+Qcri1(l,m,n+1)+
-     &         Qcri1(l-1,m,n)+Qcri1(l,m-1,n)+Qcri1(l,m,n-1)-
-     &         6.*Qcri1(l,m,n)
+         lapla=Qcri1(l+1,m,n)+Qcri1(l,m+1,n)+Qcri1(l,m,n+1)+&
+              Qcri1(l-1,m,n)+Qcri1(l,m-1,n)+Qcri1(l,m,n-1)-&
+              6.*Qcri1(l,m,n)
 
          turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
@@ -343,16 +343,16 @@
          dqnie(2)=Qnie1(l,m+1,n)-Qnie1(l,m-1,n)
          dqnie(3)=Qnie1(l,m,n+1)-Qnie1(l,m,n-1)
 
-         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qnie1(l+1,m,n)+Qnie1(l,m,n))
-     &         -(U2(l-1,m,n)+U2(l,m,n))*(Qnie1(l-1,m,n)+Qnie1(l,m,n)))/4.
+         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qnie1(l+1,m,n)+Qnie1(l,m,n))&
+              -(U2(l-1,m,n)+U2(l,m,n))*(Qnie1(l-1,m,n)+Qnie1(l,m,n)))/4.
          adv(1)=adv(1)+dqnie(1)/2.*UU(n)
 
-         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qnie1(l,m+1,n)+Qnie1(l,m,n))-
-     &        (V2(l,m-1,n)+V2(l,m,n))*(Qnie1(l,m-1,n)+Qnie1(l,m,n)))/4.
+         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qnie1(l,m+1,n)+Qnie1(l,m,n))-&
+             (V2(l,m-1,n)+V2(l,m,n))*(Qnie1(l,m-1,n)+Qnie1(l,m,n)))/4.
          adv(2)=adv(2)+dqnie(2)/2.*VV(n)
 
-         advnie2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*
-     &                (Qnie1(l,m,n)+Qnie1(l,m,n+1))/4.
+         advnie2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+                     (Qnie1(l,m,n)+Qnie1(l,m,n+1))/4.
 
          adv(3)=advnie2(l,m)-advnie1(l,m)
 
@@ -360,9 +360,9 @@
 
          escal=dqnie(1)*KM1+dqnie(2)*KM2+dqnie(3)*KM3
 
-         lapla=Qnie1(l+1,m,n)+Qnie1(l,m+1,n)+Qnie1(l,m,n+1)+
-     &         Qnie1(l-1,m,n)+Qnie1(l,m-1,n)+Qnie1(l,m,n-1)-
-     &         6.*Qnie1(l,m,n)
+         lapla=Qnie1(l+1,m,n)+Qnie1(l,m+1,n)+Qnie1(l,m,n+1)+&
+              Qnie1(l-1,m,n)+Qnie1(l,m-1,n)+Qnie1(l,m,n-1)-&
+              6.*Qnie1(l,m,n)
 
          turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
@@ -405,16 +405,16 @@
          dqgra(2)=Qgra1(l,m+1,n)-Qgra1(l,m-1,n)
          dqgra(3)=Qgra1(l,m,n+1)-Qgra1(l,m,n-1)
 
-         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qgra1(l+1,m,n)+Qgra1(l,m,n))
-     &         -(U2(l-1,m,n)+U2(l,m,n))*(Qgra1(l-1,m,n)+Qgra1(l,m,n)))/4.
+         adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qgra1(l+1,m,n)+Qgra1(l,m,n))&
+              -(U2(l-1,m,n)+U2(l,m,n))*(Qgra1(l-1,m,n)+Qgra1(l,m,n)))/4.
          adv(1)=adv(1)+dqgra(1)/2.*UU(n)
 
-         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qgra1(l,m+1,n)+Qgra1(l,m,n))-
-     &        (V2(l,m-1,n)+V2(l,m,n))*(Qgra1(l,m-1,n)+Qgra1(l,m,n)))/4.
+         adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qgra1(l,m+1,n)+Qgra1(l,m,n))-&
+             (V2(l,m-1,n)+V2(l,m,n))*(Qgra1(l,m-1,n)+Qgra1(l,m,n)))/4.
          adv(2)=adv(2)+dqgra(2)/2.*VV(n)
 
-         advgra2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*
-     &                (Qgra1(l,m,n)+Qgra1(l,m,n+1))/4.
+         advgra2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+                     (Qgra1(l,m,n)+Qgra1(l,m,n+1))/4.
 
          adv(3)=advgra2(l,m)-advgra1(l,m)
 
@@ -422,9 +422,9 @@
 
          escal=dqgra(1)*KM1+dqgra(2)*KM2+dqgra(3)*KM3
 
-         lapla=Qgra1(l+1,m,n)+Qgra1(l,m+1,n)+Qgra1(l,m,n+1)+
-     &         Qgra1(l-1,m,n)+Qgra1(l,m-1,n)+Qgra1(l,m,n-1)-
-     &         6.*Qgra1(l,m,n)
+         lapla=Qgra1(l+1,m,n)+Qgra1(l,m+1,n)+Qgra1(l,m,n+1)+&
+              Qgra1(l-1,m,n)+Qgra1(l,m-1,n)+Qgra1(l,m,n-1)-&
+              6.*Qgra1(l,m,n)
 
          turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
