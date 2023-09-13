@@ -43,10 +43,8 @@
 !        si ini=1 el calculo recomienza desde algun paso
 
          if (ini.eq.0) then
-!&&
             call condi
          else
-
             open(unit=13,file='outputdata/inis.da')
             open(unit=14,file='outputdata/velos.da',status='unknown',form='unformatted')
             rewind 14
@@ -191,7 +189,7 @@
             aert4=0.
             totnuc=0.
             totmic=0.
-
+! Advección de vapores
             do 15 i=0,nx1+1
                do 15 j=0,nx1+1
                   advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.

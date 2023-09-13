@@ -56,3 +56,7 @@ fort.7
 outputdata/*
 outputdata1/*
 .vscode/settings.json
+
+img.png
+__pycache__/constants.cpython-310.pyc
+callgrind.out.30406
