@@ -31,32 +31,18 @@
 *.out
 *.app
 
-
 # Generated files
 *.sal
 *.sa
 *.da
 nube*
+img/
+outputdata/
+outputdata1/
 
-ae3101
-ccc
-est3101
-esta3101
-fort.6
-go3101
-pr3101
-prog
-ti3101
-u23101
-v23101
-va3101
-vara3101
-w23101
-fort.7
-outputdata/*
-outputdata1/*
+
+
 .vscode/settings.json
-
-img.png
 __pycache__/constants.cpython-310.pyc
 callgrind.out.30406
+Fortran77-Cloud-Model.code-workspace
