@@ -25,24 +25,25 @@ def get_file_list(data_path):
     binary_files = list(
         filter(reg.search, files)
     )  # Create iterator using filter, cast to list
+    binary_files.sort()
     return binary_files
 
 
 def cloud_binary_comparison():
-    if os.path.exists(output_data_path):
+    if os.path.exists(output_data_path) and os.path.exists(cmp_output_data_path):
         file1_list = get_file_list(output_data_path)
         file2_list = get_file_list(cmp_output_data_path)
         diff = True
         for file1 in file1_list:
             if file1 in file2_list:
                 comparison = Popen(
-                    ["cmp", "outputdata/" + file1, "outputdata1/" + file1], stdout=PIPE
+                    ["cmp", "outputdata/" + file1, "outputdata1/" + file1, "-b"],
+                    stdout=PIPE,
                 )
-                if comparison.stdout.read() != b"":
+                cmp_result = comparison.stdout.read()  # needs to be saved to a variable
+                if cmp_result != b"":
                     print("The binaries are different in: " + file1)
-                    print(
-                        "d" + str(comparison.stdout.read())
-                    )  # FIXME - Wont show the difference
+                    print(cmp_result)
                     diff = False
         if diff:
             print("All the binaries are the same")
