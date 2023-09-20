@@ -57,8 +57,9 @@
 
       ini=0                                !inicio por vez primera= 0
       t1=0                                 !paso a inicio (si ini=0->t1=0)
+      ltt = 250.
 !      ltt=25.*3.*60.                      !tiempo total de simulacion
-      ltt=15.*6.*60.                       !tiempo total de simulacion
+!      ltt=15.*6.*60.                       !tiempo total de simulacion
 !      ltt=3.*60.                          !tiempo total de simulacion
 !      ltt=2.*2.                           !tiempo total de simulacion
 !      ltg=3*60.                           !tiempo de grabacion
