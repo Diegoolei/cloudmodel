@@ -1,5 +1,6 @@
 from scipy.io import FortranFile
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, FFMpegWriter
 from constants import *
 import numpy as np
 import os
@@ -17,6 +18,7 @@ var_structure = (biased_nx1, biased_nx1, biased_nz1)  # structure of the variabl
 
 compare_binaries = input("Compare binaries? (Y/N): ").upper()
 generate_cloud_status_image = input("Generate cloud status image? (Y/N): ").upper()
+generate_cloud_animation = input("Generate cloud animation? (Y/N): ").upper()
 
 
 def get_file_list(data_path):
@@ -55,6 +57,63 @@ if compare_binaries == "Y":
     cloud_binary_comparison()
 
 
+def plot_style(variable):
+    plt.grid(False)
+    plt.imshow(variable[:, :, plot_center])
+    plt.style.use("fivethirtyeight")
+    # plt.colorbar() # Generates infinite loop bug
+    plt.xlabel("X")
+    plt.ylabel("Y")
+
+
+def get_var_from_data(data, var_iterator):
+    return data[var_iterator: var_iterator + var_structure_size].reshape(
+        (var_structure[0], var_structure[1], var_structure[2]), order="F"
+    )
+
+
+def generate_image(i, var_number, binary_files):
+    file = binary_files[i]
+    f = FortranFile("outputdata/" + file, "r")
+    data = f.read_reals(var_datatype)
+    # directory = "img/" + str(file_counter) + file.split(".")[0] + "/"
+    var_iterator = var_number * var_structure_size
+    variable = get_var_from_data(data, var_iterator)
+    plt.title(str(var_number) + " " + nube31_var_list[var_number] + " " + str(i))
+    plot_style(variable)
+
+
+def animate_variable():
+    fargs = []
+    var_number = int(input("Enter a variable number: "))
+    fargs.append(var_number)
+    binary_files = get_file_list(output_data_path)
+    fargs.append(binary_files)
+    # FuncAnimation will call generate_image with the arguments in fargs
+    anim = FuncAnimation(
+        plt.gcf(),
+        generate_image,
+        interval=1000,
+        frames=len(binary_files),
+        fargs=fargs,
+        repeat=False,
+    )
+    plt.tight_layout()
+    # If the user wants to save the animation as mp4 before showing it
+    # Will get segfault because of plt.show() implementation closing the figure
+    if input("Save animation as mp4:").upper() == "Y":
+        writervideo = FFMpegWriter(fps=2)
+        if not os.path.exists("vid/"):
+            os.makedirs("vid/")
+        anim.save("vid/" + nube31_var_list[var_number] + ".mp4", writer=writervideo)
+    if input("Show animation?: ").upper() == "Y":
+        plt.show()
+
+
+if generate_cloud_animation == "Y":
+    animate_variable()
+
+
 def generate_cloud_status_img():
     if os.path.exists(output_data_path):
         if not os.path.exists("img/"):
@@ -78,11 +137,10 @@ def generate_cloud_status_img():
                 # TODO - Fix F77 filename strings, then replace file_counter with directory
                 os.makedirs("img/" + str(file_counter) + "/")
             var_iterator = 0
-            for i in range(0, len(data), var_structure_size):
-                variable = data[i : i + var_structure_size].reshape(
-                    (var_structure[0], var_structure[1], var_structure[2]), order="F"
-                )
-                plt.imshow(variable[:, :, plot_center])
+            for structure_iterator in range(0, len(data), var_structure_size):
+                variable = get_var_from_data(data, structure_iterator)
+                plt.title(str(file_counter) + " " + nube31_var_list[var_iterator])
+                plot_style(variable)
                 plt.savefig(
                     "img/"
                     + str(file_counter)
@@ -90,7 +148,7 @@ def generate_cloud_status_img():
                     + nube31_var_list[var_iterator]
                     + ".png"
                 )
-                plt.close()
+                # plt.show()    # Uncomment to show the image
                 if var_iterator < var_amount:
                     var_iterator += 1
                 else:

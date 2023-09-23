@@ -35,12 +35,14 @@
 *.sal
 *.sa
 *.da
+*.mp4
+*.png
 nube*
 img/
 img1/
 outputdata/
 outputdata1/
-
+vid/
 
 
 .vscode/settings.json
