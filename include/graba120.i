@@ -1,10 +1,10 @@
-      open(unit=40,file='outputdata/inis.da')
+      open(unit=40,file='outputdata/inis.da',status='unknown',form='unformatted')
       open(unit=41,file='outputdata/velos.da',status='unknown',form='unformatted')
       rewind 41
       open(unit=42,file='outputdata/varconz.da',status='unknown',form='unformatted')
       rewind 42
 
-      write(40,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
+      write(40) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
 !$$
       write(41) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,&
                Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
