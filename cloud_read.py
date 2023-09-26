@@ -117,9 +117,9 @@ def plot_style(variable, data_dimension):
     elif data_dimension == 2:
         plt.imshow(variable[:, plot_center])
     elif data_dimension == 1:
-        plt.plot(variable)
+        plt.plot(variable[3:-3])  # Cleans trash data
     plt.style.use("fivethirtyeight")
-    # plt.colorbar() # Generates infinite loop bug
+    # plt.colorbar() # Generates infinite colorbars in animation
     plt.xlabel("X")
     plt.ylabel("Y")
 
@@ -212,7 +212,7 @@ def generate_cloud_status_img():
                     + selected_file.var_list[var_iterator]
                     + ".png"
                 )
-                # plt.show()    # Uncomment to show the image
+                plt.close()  # If not closed, images will be superimposed
                 if var_iterator < selected_file.var_amount:
                     var_iterator += 1
                 else:
