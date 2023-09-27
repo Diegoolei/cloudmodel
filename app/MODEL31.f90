@@ -1129,7 +1129,7 @@ program modelo
 !       include 'graba231.i'
 !     grabacion 3D
          write(*,*) 'graba320'
-         include 'graba320.i'
+         call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, t1, tie, bre)
       endif
 
 !*    grabacion de todas las diferentes cantidades
