@@ -1,15 +1,11 @@
 !     include para la microfisica
 
 !     cantidades
-      real els,ess,Lvl,Lvs,Lsl,T,Fcal,Dv,nu,daer2,Naer
-      real Lsl00
-      real Eaucn,Eaccn,Eacng
 
 !     variables auxiliares
-      integer l,m,n,yy
       real*8 qauxl,qauxs,aux,qauxl0
 !$$
-      real*8 qlluaux,qgotaux,qvapaux,qcriaux,qnieaux,qgraaux,Naux
+      real*8 Naux
 
 !     variables de procesos microfisicos
 !$$

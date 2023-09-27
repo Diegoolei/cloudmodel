@@ -12,11 +12,11 @@
 subroutine condi
    USE cant01
    USE dimen
+   USE permic
+   USE perdim
+   USE const
+   USE estbas
    implicit none
-   include 'permic.i'
-   include 'perdim.i'
-   include 'const.i'
-   include 'estbas.i'
    include 'inicio11.i'
 
 !**** comienzo de la rutina

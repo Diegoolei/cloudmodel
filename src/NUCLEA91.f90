@@ -3,10 +3,14 @@
 subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,auxl,auxs)
    USE cant01
    USE dimen
+   USE const
    implicit none
-   include 'const.i'
    include 'nuclea61.i'
 
+   real, intent(in) ::  Naer, rhoa, rs, Lvl, Lvs
+   real, intent(inout) :: Qliq, Qvap, TT, e1, esl, ess, rl
+   real, intent(inout) :: Naux, auxl, auxs   !     Numero de aesosoles
+   integer, intent(in) :: l, m, n
 
    B=Lvl/Rv
    auxl=0.

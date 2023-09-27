@@ -2,11 +2,13 @@
 subroutine turbu1(kk)
    USE cant01
    USE dimen
+   USE perdim
+   USE const
    implicit none
-   include 'const.i'
-   include 'perdim.i'
    include 'turbvar1.i'
    include 'turbu1.i'
+
+   integer, intent(in) :: kk
 
    k=kk+1
    do 10 i=0,nx1+1

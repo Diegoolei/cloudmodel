@@ -9,6 +9,8 @@ subroutine filtro(varia1,facx,facy,facz)
    character*50 text
    include 'filtro01.i'
 
+   !REAL, DIMENSION(-3:NX1+3,-3:NX1+3,-2:NZ1+2), intent(in) :: varia1
+   !real, intent(in) :: facx,facy,facz
    fact=1.-(facx+facy+facz)
 
    if (fact.lt.0.25) then

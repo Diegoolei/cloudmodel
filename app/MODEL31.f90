@@ -21,14 +21,13 @@ program modelo
 
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
+   USE advecs
+   USE lmngot
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
-!&&
-   include 'permic.i'
-   include 'advecs.i'
-   include 'lmngot.i'
    include 'lmnllu.i'
    include 'lmncri.i'
    include 'lmnnie.i'
@@ -44,7 +43,7 @@ program modelo
    if (ini.eq.0) then
       call condi
    else
-      open(unit=13,file='outputdata/inis.da')
+      open(unit=13,file='outputdata/inis.da',status='unknown',form='unformatted')
       open(unit=14,file='outputdata/velos.da',status='unknown',form='unformatted')
       rewind 14
       open(unit=30,file='outputdata/varconz.da',status='unknown',form='unformatted')

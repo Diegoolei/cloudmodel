@@ -3,10 +3,9 @@
 !     revisada 28/01/99
 subroutine corgot
    USE dimen
+   USE permic
+   USE lmngot
    implicit none
-
-   include 'permic.i'
-   include 'lmngot.i'
    include 'corgot.i'
 
    write(*,*) 'dentro de corgot'
@@ -60,9 +59,8 @@ end
 !     revisada 8/01/99
 subroutine corllu
    USE dimen
+   USE permic
    implicit none
-
-   include 'permic.i'
    include 'lmnllu.i'
    include 'corgot.i'
 
@@ -114,9 +112,8 @@ end
 !     revisada 8/01/99
 subroutine corcri
    USE dimen
+   USE permic
    implicit none
-
-   include 'permic.i'
    include 'lmncri.i'
    include 'corgot.i'
 
@@ -169,9 +166,9 @@ end
 !     revisada 11/01/99
 subroutine cornie
    USE dimen
+   USE permic
    implicit none
 
-   include 'permic.i'
    include 'lmnnie.i'
    include 'corgot.i'
 
@@ -228,9 +225,9 @@ end
 !     revisada 2/02/99
 subroutine corgra
    USE dimen
+   USE permic
    implicit none
 
-   include 'permic.i'
    include 'lmngra.i'
    include 'corgot.i'
 
@@ -283,12 +280,12 @@ end
 !     revisada 8/01/99
 subroutine corvap(Qvapneg)
    USE dimen
+   USE permic
+   USE estbas
    implicit none
-
-   include 'permic.i'
-   include 'estbas.i'
    include 'corvap.i'
 
+   real*8, intent(in) :: Qvapneg
    write(*,*) 'dentro de corvap',Qvap2(15,17,22),Qvap0(22)
 
    do 10 k=1,nz1
@@ -312,12 +309,12 @@ end
 !     revisada 14/09/99
 subroutine coraer(aerneg)
    USE dimen
+   USE permic
+   USE estbas
    implicit none
-
-   include 'permic.i'
-   include 'estbas.i'
    include 'coraer.i'
 
+   real*8, intent(in) :: aerneg
    write(*,*) 'dentro de coraer'
 
    do 10 k=1,nz1

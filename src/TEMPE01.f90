@@ -6,13 +6,16 @@
 subroutine tempot(i,j,k,dden0z,Fcal)
    USE cant01
    USE dimen
+   USE perdim
+   USE const
+   USE estbas
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
    include 'turbvar.i'
    include 'tempe01.i'
 
+   real, intent(in) :: dden0z,Fcal
+   integer, intent(in) :: i,j,k
+   
    adv(1)=(U2(i,j,k)+UU(k))*(Titaa1(i+1,j,k)-Titaa1(i-1,j,k))
    adv(2)=(V2(i,j,k)+VV(k))*(Titaa1(i,j+1,k)-Titaa1(i,j-1,k))
    adv(3)=W2(i,j,k)*(Titaa1(i,j,k+1)-Titaa1(i,j,k-1))

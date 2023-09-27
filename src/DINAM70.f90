@@ -2,15 +2,16 @@
 subroutine daeros(l,m,n)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
+   USE advecs
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
-   include 'permic.i'
-   include 'advecs.i'
    include 'turbvar.i'
    include 'daeros.i'
 
+   integer, intent(in) :: l,m,n
 
    daer(1)=aer1(l+1,m,n)-aer1(l-1,m,n)
    daer(2)=aer1(l,m+1,n)-aer1(l,m-1,n)
@@ -75,14 +76,16 @@ end
 subroutine dgotit(l,m,n)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
+   USE advecs
    implicit none
-   include 'const.i'
-   include 'perdim.i'
-   include 'permic.i'
-   include 'estbas.i'
-   include 'advecs.i'
    include 'turbvar.i'
    include 'dgotit.i'
+
+   integer, intent(in) :: l,m,n
 
    dqgot(1)=Qgot1(l+1,m,n)-Qgot1(l-1,m,n)
    dqgot(2)=Qgot1(l,m+1,n)-Qgot1(l,m-1,n)
@@ -131,14 +134,16 @@ end
 subroutine dvapor(l,m,n)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
+   USE advecs
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
-   include 'permic.i'
-   include 'advecs.i'
    include 'turbvar.i'
    include 'dvapor.i'
+
+   integer, intent(in) :: l,m,n
 
    dqvap(1)=Qvap1(l+1,m,n)-Qvap1(l-1,m,n)
    dqvap(2)=Qvap1(l,m+1,n)-Qvap1(l,m-1,n)
@@ -203,14 +208,16 @@ end
 subroutine dlluvi(l,m,n)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
+   USE advecs
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
-   include 'permic.i'
-   include 'advecs.i'
    include 'turbvar.i'
    include 'dlluvi.i'
+
+   integer, intent(in) :: l,m,n
 
    dqllu(1)=Qllu1(l+1,m,n)-Qllu1(l-1,m,n)
    dqllu(2)=Qllu1(l,m+1,n)-Qllu1(l,m-1,n)
@@ -275,14 +282,16 @@ end
 subroutine dcrist(l,m,n)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
+   USE advecs
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
-   include 'permic.i'
-   include 'advecs.i'
    include 'turbvar.i'
    include 'dcrist.i'
+
+   integer, intent(in) :: l,m,n
 
    dqcri(1)=Qcri1(l+1,m,n)-Qcri1(l-1,m,n)
    dqcri(2)=Qcri1(l,m+1,n)-Qcri1(l,m-1,n)
@@ -330,14 +339,16 @@ end
 subroutine dnieve(l,m,n)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
+   USE advecs
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
-   include 'permic.i'
-   include 'advecs.i'
    include 'turbvar.i'
    include 'dnieve.i'
+
+   integer, intent(in) :: l,m,n
 
    dqnie(1)=Qnie1(l+1,m,n)-Qnie1(l-1,m,n)
    dqnie(2)=Qnie1(l,m+1,n)-Qnie1(l,m-1,n)
@@ -391,14 +402,16 @@ end
 subroutine dgrani(l,m,n)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
+   USE advecs
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
-   include 'permic.i'
-   include 'advecs.i'
    include 'turbvar.i'
    include 'dgrani.i'
+
+   integer, intent(in) :: l,m,n
 
    dqgra(1)=Qgra1(l+1,m,n)-Qgra1(l-1,m,n)
    dqgra(2)=Qgra1(l,m+1,n)-Qgra1(l,m-1,n)

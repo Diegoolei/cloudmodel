@@ -8,10 +8,10 @@
 subroutine velpre
    USE cant01
    USE dimen
+   USE perdim
+   USE const
+   USE estbas
    implicit none
-   include 'const.i'
-   include 'perdim.i'
-   include 'estbas.i'
    include 'p3v3.i'
    include 'fuvw.i'
    include 'velpre01.i'

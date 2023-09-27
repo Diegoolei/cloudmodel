@@ -13,13 +13,17 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
    qgraaux,Naer,daer2,nu,yy)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
    implicit none
-   include 'const.i'
-   include 'perdim.i'
-   include 'permic.i'
 
    include 'microf05.i'
 
+   real, intent(in) :: els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Naer,nu
+   real, intent(inout) :: Fcal,daer2
+   real*8, intent(inout) :: qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,qgraaux
+   integer, intent(in) :: l,m,n,yy
 !*    Parametros comunes
 
    Nsc=nu/Dv

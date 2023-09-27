@@ -3,15 +3,18 @@
 subroutine inomo(i,j,k,dden0z)
    USE cant01
    USE dimen
+   USE perdim
+   USE permic
+   USE const
+   USE estbas
    implicit none
-   include 'const.i'
-   include 'estbas.i'
-   include 'perdim.i'
-   include 'permic.i'
    include 'turbvar.i'
    include 'fuvw.i'
    include 'inomo.i'
 
+   integer, intent(in) :: i,j,k
+   real, intent(in) :: dden0z
+   
    dvelxx=(U2(i-2,j,k)-U2(i+2,j,k))+8.*(U2(i+1,j,k)-U2(i-1,j,k))
    dvelxy=(U2(i,j-2,k)-U2(i,j+2,k))+8.*(U2(i,j+1,k)-U2(i,j-1,k))
    dvelxz=(U2(i,j,k-2)-U2(i,j,k+2))+8.*(U2(i,j,k+1)-U2(i,j,k-1))
