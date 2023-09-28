@@ -11,8 +11,8 @@
 
 subroutine turbu2(i,j,k)
    USE dimen
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'turbvar1.i'
    include 'turbu2.i'
    real aux

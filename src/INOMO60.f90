@@ -7,8 +7,8 @@ subroutine inomo(i,j,k,dden0z)
    USE permic
    USE const
    USE estbas
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'fuvw.i'
    include 'inomo.i'
 

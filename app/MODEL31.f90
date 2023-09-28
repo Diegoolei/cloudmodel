@@ -27,15 +27,14 @@ program modelo
    USE estbas
    USE advecs
    USE lmngot
+   USE lmnllu
+   USE lmncri
+   USE lmnnie
+   USE lmngra
+   USE turbvar
    implicit none
-   include 'lmnllu.i'
-   include 'lmncri.i'
-   include 'lmnnie.i'
-   include 'lmngra.i'
-   include 'turbvar.i'
 
-   include 'mode20.i'   !include del modelo
-
+   include 'mode20.i'
 !******************************************************************
 !*    Condiciones iniciales. Si ini=0 el calculo empieza por primera,
 !        si ini=1 el calculo recomienza desde algun paso

@@ -60,8 +60,8 @@ end
 subroutine corllu
    USE dimen
    USE permic
+   USE lmnllu
    implicit none
-   include 'lmnllu.i'
    include 'corgot.i'
 
 !      write(*,*) 'dentro de corllu'
@@ -113,8 +113,8 @@ end
 subroutine corcri
    USE dimen
    USE permic
+   USE lmncri
    implicit none
-   include 'lmncri.i'
    include 'corgot.i'
 
 !      write(*,*) 'dentro de corcri'
@@ -167,9 +167,9 @@ end
 subroutine cornie
    USE dimen
    USE permic
+   USE lmnnie
    implicit none
 
-   include 'lmnnie.i'
    include 'corgot.i'
 
 !      write(*,*) 'dentro de cornie'
@@ -226,9 +226,9 @@ end
 subroutine corgra
    USE dimen
    USE permic
+   USE lmngra
    implicit none
 
-   include 'lmngra.i'
    include 'corgot.i'
 
 !      write(*,*) 'dentro de corgra'

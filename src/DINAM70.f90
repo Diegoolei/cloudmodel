@@ -7,8 +7,8 @@ subroutine daeros(l,m,n)
    USE const
    USE estbas
    USE advecs
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'daeros.i'
 
    integer, intent(in) :: l,m,n
@@ -81,8 +81,8 @@ subroutine dgotit(l,m,n)
    USE const
    USE estbas
    USE advecs
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'dgotit.i'
 
    integer, intent(in) :: l,m,n
@@ -139,8 +139,8 @@ subroutine dvapor(l,m,n)
    USE const
    USE estbas
    USE advecs
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'dvapor.i'
 
    integer, intent(in) :: l,m,n
@@ -213,8 +213,8 @@ subroutine dlluvi(l,m,n)
    USE const
    USE estbas
    USE advecs
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'dlluvi.i'
 
    integer, intent(in) :: l,m,n
@@ -287,8 +287,8 @@ subroutine dcrist(l,m,n)
    USE const
    USE estbas
    USE advecs
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'dcrist.i'
 
    integer, intent(in) :: l,m,n
@@ -344,8 +344,8 @@ subroutine dnieve(l,m,n)
    USE const
    USE estbas
    USE advecs
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'dnieve.i'
 
    integer, intent(in) :: l,m,n
@@ -407,8 +407,8 @@ subroutine dgrani(l,m,n)
    USE const
    USE estbas
    USE advecs
+   USE turbvar
    implicit none
-   include 'turbvar.i'
    include 'dgrani.i'
 
    integer, intent(in) :: l,m,n
