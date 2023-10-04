@@ -56,30 +56,26 @@ class File_style:
 def check_path(path, selected_file_name):
     if not os.path.exists(path):
         os.makedirs(path)
-    else:
-        if not os.path.exists(path + selected_file_name + "/"):
-            os.makedirs(path + selected_file_name + "/")
+    elif os.path.exists(path + selected_file_name + "/"):
+        print(
+            path
+            + selected_file_name
+            + "folder already exists, files will be overwritten"
+        )
+        user_input = input("Press Y to continue or any other key to exit: ").upper()
+        if user_input != "Y":
+            exit()
         else:
-            print(
-                path
-                + selected_file_name
-                + "folder already exists, files will be overwritten"
-            )
-            user_input = input("Press Y to continue or any other key to exit: ").upper()
-            if user_input != "Y":
-                exit()
-            else:
-                os.system("rm -rf " + path + selected_file_name + "/*")
+            os.system(f"rm -rf {path}{selected_file_name}/*")
+
+    else:
+        os.makedirs(path + selected_file_name + "/")
 
 
 def get_file_list(data_path, binary_regex):
     files = os.listdir(data_path)  # List all files in the outputdata folder
     reg = re.compile(binary_regex)  # Compile the regex to match binary files
-    binary_files = list(
-        filter(reg.search, files)
-    )  # Create iterator using filter, cast to list
-    binary_files.sort()
-    return binary_files
+    return sorted(filter(reg.search, files))
 
 
 def cloud_binary_comparison():
@@ -92,12 +88,17 @@ def cloud_binary_comparison():
         for file1 in file1_list:
             if file1 in file2_list:
                 comparison = Popen(
-                    ["cmp", "outputdata/" + file1, "outputdata1/" + file1, "-b"],
+                    [
+                        "cmp",
+                        f"outputdata/{file1}",
+                        f"outputdata1/{file1}",
+                        "-b",
+                    ],
                     stdout=PIPE,
                 )
                 cmp_result = comparison.stdout.read()  # needs to be saved to a variable
                 if cmp_result != b"":
-                    print("The binaries are different in: " + file1)
+                    print(f"The binaries are different in: {file1}")
                     print(cmp_result)
                     diff = False
         if diff:
@@ -132,21 +133,19 @@ def get_var_from_data(data, var_iterator, selected_file: File_style):
 
 def generate_image(i, var_number, selected_file: File_style, binary_files):
     file = binary_files[i]
-    f = FortranFile("outputdata/" + file, "r")
+    f = FortranFile(f"outputdata/{file}", "r")
     data = f.read_reals(selected_file.var_datatype)
     # directory = "img/" + str(file_counter) + file.split(".")[0] + "/"
     var_iterator = var_number * selected_file.var_structure_size
     variable = get_var_from_data(data, var_iterator, selected_file)
-    plt.title(nube31_var_list[var_number] + " " + str(2 * i) + "s")
+    plt.title(f"{nube31_var_list[var_number]} {str(2 * i)}s")
     plot_style(variable, selected_file.data_dimension)
 
 
 def animate_variable():
-    fargs = []
     var_number = int(input("Enter a variable number: "))
-    fargs.append(var_number)
     selected_file = File_style()
-    fargs.append(selected_file)
+    fargs = [var_number, selected_file]
     file_regex = selected_file.binary_regex
     binary_files = get_file_list(output_data_path, file_regex)
     fargs.append(binary_files)
@@ -166,7 +165,7 @@ def animate_variable():
     if input("Save animation as mp4? (Y/N):").upper() == "Y":
         writervideo = FFMpegWriter(fps=2)
         check_path("vid/", nube31_var_list[var_number])
-        anim.save("vid/" + nube31_var_list[var_number] + ".mp4", writer=writervideo)
+        anim.save(f"vid/{nube31_var_list[var_number]}.mp4", writer=writervideo)
     if input("Show animation? (Y/N): ").upper() == "Y":
         plt.show()
 
@@ -178,39 +177,34 @@ if generate_cloud_animation == "Y":
 def generate_cloud_status_img():
     if os.path.exists(output_data_path):
         selected_file = File_style()
+        selected_file_name = f"{selected_file.file_name}/"
         path = "img/"
-        selected_file_name = selected_file.file_name + "/"
         check_path(path, selected_file_name)
         file_regex = selected_file.binary_regex
         binary_files = get_file_list(output_data_path, file_regex)
-        file_counter = 0
-        for file in binary_files:
-            f = FortranFile("outputdata/" + file, "r")
-            data = f.read_reals(selected_file.var_datatype)
-            # directory = "img/" + str(file_counter) + file.split(".")[0] + "/"
-            file_counter += 1
+        for file_counter, file in enumerate(binary_files, start=1):
+            with FortranFile(f"outputdata/{file}", "r") as f:
+                data = f.read_reals(selected_file.var_datatype)
             if not os.path.exists(
-                "img/" + selected_file.file_name + "/" + str(file_counter) + "/"
+                f"img/{selected_file.file_name}/{str(file_counter)}/"
             ):
                 # TODO - Fix F77 filename strings, then replace file_counter with directory
-                os.makedirs(
-                    "img/" + selected_file.file_name + "/" + str(file_counter) + "/"
-                )
+                os.makedirs(f"img/{selected_file.file_name}/{str(file_counter)}/")
+            np.savetxt(
+                f"img/{selected_file.file_name}/{str(file_counter)}/{selected_file.file_name}{str(file_counter)}.txt",
+                data,
+                newline=", ",
+                header=f"File: {file}\n Variable: {selected_file.file_name}\n File number: {str(file_counter)}\n",
+            )
             var_iterator = 0
             for structure_iterator in range(
                 0, len(data), selected_file.var_structure_size
             ):
                 variable = get_var_from_data(data, structure_iterator, selected_file)
-                plt.title(str(file_counter) + " " + selected_file.var_list[var_iterator])
+                plt.title(f"{str(file_counter)} {selected_file.var_list[var_iterator]}")
                 plot_style(variable, selected_file.data_dimension)
                 plt.savefig(
-                    "img/"
-                    + selected_file.file_name
-                    + "/"
-                    + str(file_counter)
-                    + "/"
-                    + selected_file.var_list[var_iterator]
-                    + ".png"
+                    f"img/{selected_file.file_name}/{str(file_counter)}/{selected_file.var_list[var_iterator]}.png"
                 )
                 plt.close()  # If not closed, images will be superimposed
                 if var_iterator < selected_file.var_amount:
