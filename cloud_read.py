@@ -11,10 +11,11 @@ output_data_path = "outputdata/"  # original data path
 cmp_output_data_path = "outputdata1/"  # comparison data path
 plot_center = 10  # center of the plot
 
+
 compare_binaries = input("Compare binaries? (Y/N): ").upper()
 generate_cloud_status_image = input("Generate cloud status image? (Y/N): ").upper()
 generate_cloud_animation = input("Generate cloud animation? (Y/N): ").upper()
-
+generate_cloud_text_files = input("Generate cloud text files? (Y/N): ").upper()
 
 class File_style:
     def __init__(self):
@@ -174,7 +175,23 @@ if generate_cloud_animation == "Y":
     animate_variable()
 
 
-def generate_cloud_status_img():
+def generate_cloud_status_img(data, selected_file: File_style, file_counter):
+    var_iterator = 0
+    for structure_iterator in range(0, len(data), selected_file.var_structure_size):
+        variable = get_var_from_data(data, structure_iterator, selected_file)
+        plt.title(f"{str(file_counter)} {selected_file.var_list[var_iterator]}")
+        plot_style(variable, selected_file.data_dimension)
+        plt.savefig(
+            f"img/{selected_file.file_name}/{str(file_counter)}/{selected_file.var_list[var_iterator]}.png"
+        )
+        plt.close()  # If not closed, images will be superimposed
+        if var_iterator < selected_file.var_amount:
+            var_iterator += 1
+        else:
+            var_iterator = 0
+
+
+def parse_bin_data():
     if os.path.exists(output_data_path):
         selected_file = File_style()
         selected_file_name = f"{selected_file.file_name}/"
@@ -185,35 +202,23 @@ def generate_cloud_status_img():
         for file_counter, file in enumerate(binary_files, start=1):
             with FortranFile(f"outputdata/{file}", "r") as f:
                 data = f.read_reals(selected_file.var_datatype)
-            if not os.path.exists(
-                f"img/{selected_file.file_name}/{str(file_counter)}/"
-            ):
+            full_path = f"{path}{selected_file_name}/{str(file_counter)}/"
+            
+            if not os.path.exists(full_path):
                 # TODO - Fix F77 filename strings, then replace file_counter with directory
-                os.makedirs(f"img/{selected_file.file_name}/{str(file_counter)}/")
-            np.savetxt(
-                f"img/{selected_file.file_name}/{str(file_counter)}/{selected_file.file_name}{str(file_counter)}.txt",
-                data,
-                newline=", ",
-                header=f"File: {file}\n Variable: {selected_file.file_name}\n File number: {str(file_counter)}\n",
-            )
-            var_iterator = 0
-            for structure_iterator in range(
-                0, len(data), selected_file.var_structure_size
-            ):
-                variable = get_var_from_data(data, structure_iterator, selected_file)
-                plt.title(f"{str(file_counter)} {selected_file.var_list[var_iterator]}")
-                plot_style(variable, selected_file.data_dimension)
-                plt.savefig(
-                    f"img/{selected_file.file_name}/{str(file_counter)}/{selected_file.var_list[var_iterator]}.png"
+                os.makedirs(full_path)
+            if generate_cloud_text_files == "Y":
+                check_path(f"img/{selected_file_name}{str(file_counter)}/", "")
+                np.savetxt(
+                    f"img/{selected_file_name}{str(file_counter)}/{str(file_counter)}.txt",
+                    data,
+                    newline=", ",
+                    header=f"File: {file}\n Variable: {selected_file_name}\n File number: {str(file_counter)}",
                 )
-                plt.close()  # If not closed, images will be superimposed
-                if var_iterator < selected_file.var_amount:
-                    var_iterator += 1
-                else:
-                    var_iterator = 0
+            if generate_cloud_status_image == "Y":
+                check_path(full_path, selected_file_name)
+                generate_cloud_status_img(data, selected_file, file_counter)
     else:
         print("The outputdata folder does not exist")
 
-
-if generate_cloud_status_image == "Y":
-    generate_cloud_status_img()
+parse_bin_data()
