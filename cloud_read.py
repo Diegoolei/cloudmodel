@@ -267,6 +267,7 @@ def parse_bin_data(
         if generate_cloud_text_files == "Y":
             txt_path = "txt/"
             check_path(txt_path, selected_file_name)
+            check_path(txt_path, selected_file_name)
         for file_counter, file in enumerate(binary_files, start=1):
             with FortranFile(f"outputdata/{file}", "r") as f:
                 data = f.read_reals(selected_file.var_datatype)
