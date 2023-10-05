@@ -31,3 +31,7 @@ inis_var_list = [
     "UU",
     "VV",
 ]
+
+output_data_path = "outputdata/"  # original data path
+cmp_output_data_path = "outputdata1/"  # comparison data path
+plot_center = 10  # center of the plot

@@ -38,11 +38,15 @@
 *.mp4
 *.png
 nube*
+
+# Generated directories
 img/
 img1/
 outputdata/
 outputdata1/
 vid/
+txt/
+txt1/
 
 
 .vscode/settings.json
