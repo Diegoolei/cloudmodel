@@ -10,15 +10,50 @@ from filecmp import cmpfiles
 
 
 def main():
-    selected_file = File_style(
+    selected_file_original_noopt = File_style(
         chosen_file=1,
-        output_data_path="outputdata/",
+        output_data_path="outputdata_original_noopt/",
         cmp_output_data_path="outputdata1/",
         img_path="img/",
         txt_path="txt/",
         cmp_txt_path="txt1/",
         vid_path="vid/",
     )
+
+    selected_file_original_opt = File_style(
+        chosen_file=1,
+        output_data_path="outputdata_original_opt/",
+        cmp_output_data_path="outputdata/",
+        img_path="img/",
+        txt_path="txt/",
+        cmp_txt_path="txt1/",
+        vid_path="vid/",
+    )
+
+    selected_file_new_opt = File_style(
+        chosen_file=1,
+        output_data_path="outputdata_new_opt/",
+        cmp_output_data_path="outputdata/",
+        img_path="img/",
+        txt_path="txt/",
+        cmp_txt_path="txt1/",
+        vid_path="vid/",
+    )
+
+    selected_file_new_noopt = File_style(
+        chosen_file=1,
+        output_data_path="outputdata_new_noopt/",
+        cmp_output_data_path="outputdata/",
+        img_path="img/",
+        txt_path="txt/",
+        cmp_txt_path="txt1/",
+        vid_path="vid/",
+    )
+
+    data_comparison(selected_file_original_noopt, selected_file_original_opt)
+    # data_comparison(selected_file_new_noopt, selected_file_new_opt)
+    # data_comparison(selected_file_original_noopt, selected_file_new_noopt)
+    # data_comparison(selected_file_original_opt, selected_file_new_opt)
     # selected_file.cloud_binary_comparison()
     # selected_file.animate_variable()
     # selected_file.cloud_text_comparison()
@@ -85,14 +120,15 @@ class File_style:
     def get_data(self):
         selected_files = self.get_file_list(self.output_data_path, self.binary_regex)
         for file in selected_files:
-            with FortranFile(f"outputdata/{file}", "r") as f:
+            with FortranFile(f"{self.output_data_path}{file}", "r") as f:
                 self.data.append(f.read_reals(self.var_datatype))
 
-    def get_var_from_data(self, data, var_number):
-        return data[var_number : var_number + self.var_structure_size].reshape(
-            self.var_structure, order="F"
-        )
-    
+    def get_var_from_data(self, var_number):
+        actual_file_data = self.data[var_number]
+        return actual_file_data[
+            var_number : var_number + self.var_structure_size
+        ].reshape(self.var_structure, order="F")
+
     def check_path(self, path, selected_file_name=""):
         """Checks if the path exists, if not, creates it
         If the path exists, checks if the selected_file_name folder exists, if not, creates it
@@ -166,28 +202,22 @@ class File_style:
         plt.xlabel("X")
         plt.ylabel("Y")
 
-    def generate_image(self, i, var_number, filtered_output_files):
-        file = filtered_output_files[i]
-        f = FortranFile(f"outputdata/{file}", "r")
-        data = f.read_reals(self.var_datatype)
+    def generate_image(self, i, var_number):
         # directory = "img/" + str(file_counter) + file.split(".")[0] + "/"
-        variable = self.get_var_from_data(data, var_number)
+        variable = self.get_var_from_data(i, var_number)
         plt.title(f"{nube31_var_list[var_number]} {str(2 * i)}s")
         self.plot_style(variable, self.data_dimension)
 
     def animate_variable(self):
-        #TODO Expand to animate the variable in all the files, not only in one time step
+        # TODO Expand to animate the variable in all the files, not only in one time step
         var_number = int(input("Enter a variable number: "))
         fargs = [var_number]
-        file_regex = self.binary_regex
-        filtered_output_files = self.get_file_list(self.output_data_path, file_regex)
-        fargs.append(filtered_output_files)
         # FuncAnimation will call generate_image with the arguments in fargs
         anim = FuncAnimation(
             plt.gcf(),
             self.generate_image,
             interval=1000,
-            frames=len(filtered_output_files),
+            frames=len(self.get_file_list(self.output_data_path, self.binary_regex)),
             fargs=fargs,
             repeat=False,
         )
@@ -198,7 +228,9 @@ class File_style:
         if input("Save animation as mp4? (Y/N):").upper() == "Y":
             writervideo = FFMpegWriter(fps=2)
             self.check_path({self.vid_path})
-            anim.save(f"{self.vid_path}{nube31_var_list[var_number]}.mp4", writer=writervideo)
+            anim.save(
+                f"{self.vid_path}{nube31_var_list[var_number]}.mp4", writer=writervideo
+            )
         if input("Show animation? (Y/N): ").upper() == "Y":
             plt.show()
 
@@ -277,6 +309,35 @@ class File_style:
             np.savetxt(
                 file_name, self.data[file_counter], newline=", \n", header=header
             )
+
+
+def format_data(data):
+    return data.reshape(3, biased_nx1, biased_nx1, nube31_biased_nz1, order="F")
+
+
+def data_comparison(original_data: File_style, cmp_data: File_style):
+    for iterator in range(len(original_data.data)):
+        if not np.allclose(
+            original_data.data[iterator],
+            cmp_data.data[iterator],
+            rtol=1e-05,
+            atol=3e-06,
+        ):
+            print(f"Data is different in data[{iterator}]: ")
+            for it_var in range(len(original_data.var_list)):
+                var = original_data.get_var_from_data(it_var)
+                cmp_var = cmp_data.get_var_from_data(it_var)
+                if not np.allclose(
+                    var,
+                    cmp_var
+                ):
+                    print(f"Variable {original_data.var_list[it_var]} is different ")
+                    print(
+                        f"Max difference: {np.max(np.abs(var - cmp_var))}\n"
+                    )
+
+            # formated_data = format_data(original_data.data[iterator])
+            # formated_cmpdata = format_data(cmp_data.data[iterator])
 
 
 main()
