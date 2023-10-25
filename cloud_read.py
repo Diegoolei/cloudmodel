@@ -7,7 +7,7 @@ import os
 import re  # Add the re import declaration to use regex
 from subprocess import Popen, PIPE
 from filecmp import cmpfiles
-
+from datetime import datetime
 
 def main():
     selected_file_original_noopt = File_style(
@@ -49,16 +49,29 @@ def main():
         cmp_txt_path="txt1/",
         vid_path="vid/",
     )
-
-    data_comparison(selected_file_original_noopt, selected_file_original_opt)
+    # data_comparison(selected_file_original_opt, selected_file_new_opt)
+    assert data_comparison(selected_file_new_opt, selected_file_new_opt)
+    # data_comparison(selected_file_original_noopt, selected_file_original_opt)
     # data_comparison(selected_file_new_noopt, selected_file_new_opt)
     # data_comparison(selected_file_original_noopt, selected_file_new_noopt)
     # data_comparison(selected_file_original_opt, selected_file_new_opt)
-    # selected_file.cloud_binary_comparison()
-    # selected_file.animate_variable()
-    # selected_file.cloud_text_comparison()
-    # selected_file.parse_status_img()
-    # selected_file.parse_text_files()
+    # selected_file_original_opt.cloud_binary_comparison()
+    # selected_file_original_opt.animate_variable(
+    #     var_to_animate=1, save_animation=True, show_animation=False
+    # )
+    # selected_file_original_opt.animate_variables()
+    # selected_file_original_opt.cloud_text_comparison()
+    # selected_file_original_opt.parse_status_img()
+    # selected_file_original_opt.parse_text_files()
+
+def time_it(func):
+    '''Log the date and time of a function'''
+
+    def wrapper(*args, **kwargs):
+        print(f'Function: {func.__name__}\nRun on: {datetime.today().strftime("%Y-%m-%d %H:%M:%S")}')
+        print(f'{"-"*30}')
+        func(*args, **kwargs)
+    return wrapper
 
 
 class File_style:
@@ -123,8 +136,8 @@ class File_style:
             with FortranFile(f"{self.output_data_path}{file}", "r") as f:
                 self.data.append(f.read_reals(self.var_datatype))
 
-    def get_var_from_data(self, var_number):
-        actual_file_data = self.data[var_number]
+    def get_var_from_data(self, file_number, var_number):
+        actual_file_data = self.data[file_number]
         return actual_file_data[
             var_number : var_number + self.var_structure_size
         ].reshape(self.var_structure, order="F")
@@ -202,36 +215,47 @@ class File_style:
         plt.xlabel("X")
         plt.ylabel("Y")
 
-    def generate_image(self, i, var_number):
+    def generate_image(self, frame, var_number):
         # directory = "img/" + str(file_counter) + file.split(".")[0] + "/"
-        variable = self.get_var_from_data(i, var_number)
-        plt.title(f"{nube31_var_list[var_number]} {str(2 * i)}s")
+        variable = self.get_var_from_data(frame, var_number)
+        plt.title(f"{nube31_var_list[var_number]} {str(2 * frame)}s")
         self.plot_style(variable, self.data_dimension)
 
-    def animate_variable(self):
-        # TODO Expand to animate the variable in all the files, not only in one time step
-        var_number = int(input("Enter a variable number: "))
-        fargs = [var_number]
+    def animate_variables(self, var_list=[], save_animation=True, show_animation=False):
+        if var_list == []:
+            var_list = range(self.var_amount)
+        self.check_path(self.vid_path)
+        for var in var_list:
+            self.animate_variable(var, save_animation, show_animation, check_path=False)
+
+    @time_it
+    def animate_variable(
+        self, var_to_animate, save_animation=True, show_animation=False, check_path=True
+    ):
+        fargs = [var_to_animate]
+        file_ammount = len(self.get_file_list(self.output_data_path, self.binary_regex))
         # FuncAnimation will call generate_image with the arguments in fargs
         anim = FuncAnimation(
             plt.gcf(),
             self.generate_image,
             interval=1000,
-            frames=len(self.get_file_list(self.output_data_path, self.binary_regex)),
+            frames=file_ammount,
             fargs=fargs,
             repeat=False,
         )
         plt.tight_layout()
         # If the user wants to save the animation as mp4 before showing it
         # Will get segfault because of plt.show() implementation closing the figure
-
-        if input("Save animation as mp4? (Y/N):").upper() == "Y":
+        if save_animation:
             writervideo = FFMpegWriter(fps=2)
-            self.check_path({self.vid_path})
+            if check_path:
+                self.check_path(self.vid_path)
             anim.save(
-                f"{self.vid_path}{nube31_var_list[var_number]}.mp4", writer=writervideo
+                f"{self.vid_path}{nube31_var_list[var_to_animate]}.mp4",
+                writer=writervideo,
             )
-        if input("Show animation? (Y/N): ").upper() == "Y":
+            plt.close()
+        if show_animation:
             plt.show()
 
     def parse_status_img(self):
@@ -244,7 +268,7 @@ class File_style:
                 0, len(self.data[file_iterator]), self.var_structure_size
             ):
                 variable = self.get_var_from_data(
-                    self.data[file_iterator], structure_iterator
+                    file_iterator, structure_iterator
                 )
                 plt.title(f"{str(file_iterator)} {self.var_list[var_iterator]}")
                 self.plot_style(variable, self.data_dimension)
@@ -323,21 +347,23 @@ def data_comparison(original_data: File_style, cmp_data: File_style):
             rtol=1e-05,
             atol=3e-06,
         ):
+            # return False
             print(f"Data is different in data[{iterator}]: ")
-            for it_var in range(len(original_data.var_list)):
-                var = original_data.get_var_from_data(it_var)
-                cmp_var = cmp_data.get_var_from_data(it_var)
-                if not np.allclose(
-                    var,
-                    cmp_var
-                ):
-                    print(f"Variable {original_data.var_list[it_var]} is different ")
-                    print(
-                        f"Max difference: {np.max(np.abs(var - cmp_var))}\n"
-                    )
+            # for it_var in range(len(original_data.var_list)):
+            #     var = original_data.get_var_from_data(iterator, it_var)
+            #     cmp_var = cmp_data.get_var_from_data(iterator, it_var)
+            #     if not np.allclose(
+            #         var,
+            #         cmp_var
+            #     ):
+            #         print(f"Variable {original_data.var_list[it_var]} is different ")
+            #         print(
+            #             f"Max difference: {np.max(np.abs(var - cmp_var))}\n"
+            #         )
 
-            # formated_data = format_data(original_data.data[iterator])
-            # formated_cmpdata = format_data(cmp_data.data[iterator])
+    return True
+    # formated_data = format_data(original_data.data[iterator])
+    # formated_cmpdata = format_data(cmp_data.data[iterator])
 
 
 main()
