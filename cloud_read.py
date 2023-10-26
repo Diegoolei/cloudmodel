@@ -50,7 +50,7 @@ def main():
         vid_path="vid/",
     )
     # data_comparison(selected_file_original_opt, selected_file_new_opt)
-    assert data_comparison(selected_file_new_opt, selected_file_new_opt)
+    print(data_comparison(selected_file_new_opt, selected_file_new_opt))
     # data_comparison(selected_file_original_noopt, selected_file_original_opt)
     # data_comparison(selected_file_new_noopt, selected_file_new_opt)
     # data_comparison(selected_file_original_noopt, selected_file_new_noopt)
