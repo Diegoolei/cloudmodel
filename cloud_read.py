@@ -10,47 +10,20 @@ from filecmp import cmpfiles
 from datetime import datetime
 
 def main():
-    selected_file_original_noopt = File_style(
-        chosen_file=1,
-        output_data_path="outputdata_original_noopt/",
+    
+    inis_data = File_style(
+        chosen_file=2,
+        output_data_path="outputdata/",
         cmp_output_data_path="outputdata1/",
         img_path="img/",
         txt_path="txt/",
         cmp_txt_path="txt1/",
         vid_path="vid/",
     )
-
-    selected_file_original_opt = File_style(
-        chosen_file=1,
-        output_data_path="outputdata_original_opt/",
-        cmp_output_data_path="outputdata/",
-        img_path="img/",
-        txt_path="txt/",
-        cmp_txt_path="txt1/",
-        vid_path="vid/",
-    )
-
-    selected_file_new_opt = File_style(
-        chosen_file=1,
-        output_data_path="outputdata_new_opt/",
-        cmp_output_data_path="outputdata/",
-        img_path="img/",
-        txt_path="txt/",
-        cmp_txt_path="txt1/",
-        vid_path="vid/",
-    )
-
-    selected_file_new_noopt = File_style(
-        chosen_file=1,
-        output_data_path="outputdata_new_noopt/",
-        cmp_output_data_path="outputdata/",
-        img_path="img/",
-        txt_path="txt/",
-        cmp_txt_path="txt1/",
-        vid_path="vid/",
-    )
+    inis_data.parse_status_img()
+    inis_data.multi_var_img(var_1=7, var_2=8)
     # data_comparison(selected_file_original_opt, selected_file_new_opt)
-    print(data_comparison(selected_file_new_opt, selected_file_new_opt))
+    # print(data_comparison(selected_file_new_opt, selected_file_new_opt))
     # data_comparison(selected_file_original_noopt, selected_file_original_opt)
     # data_comparison(selected_file_new_noopt, selected_file_new_opt)
     # data_comparison(selected_file_original_noopt, selected_file_new_noopt)
@@ -280,6 +253,24 @@ class File_style:
                     var_iterator += 1
                 else:
                     var_iterator = 0
+
+    def multi_var_img(self, var_1, var_2, file="inis.da"):
+        self.check_path(f"{self.img_path}{self.file_name}/multivar/")
+        print(len(self.data))
+        var_1_data = self.get_var_from_data(
+            0, var_1
+        )
+        var_2_data = self.get_var_from_data(
+            0, var_2
+        )
+        plt.title(f"{self.var_list[var_1]} vs {self.var_list[var_2]}")
+        # self.plot_style(variable, self.data_dimension)
+        plt.plot(var_1_data[10:-10], var_2_data[10:-10], ".b")
+        #plt.plot(var_1_data[::6], var_2_data[::6], "*")
+        plt.savefig(
+            f"{self.img_path}{self.file_name}/multivar/{self.var_list[var_1]}_{self.var_list[var_2]}.png"
+        )
+        plt.close()  # If not closed, images will be superimposed
 
     def show_file_diff(self, file):
         print(f"\n\n------------------- File: {file} -------------------\n")

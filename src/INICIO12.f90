@@ -62,8 +62,8 @@ subroutine condi
 !
       endif
 
-      UU(k)=UU(k)*.7
-      VV(k)=VV(k)*0.
+!      UU(k)=UU(k)*.7
+!      VV(k)=VV(k)*0.
 
 
 !##
