@@ -10,7 +10,7 @@
 !     revisado : 28/04/97
 
 subroutine turbu2(i,j,k)
-   USE constants
+   USE dimen
    USE turbvar
    USE turbvar1
    implicit none

@@ -1,7 +1,7 @@
 !     Revision 28/04/98
 subroutine daeros(l,m,n)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE permic
    USE const
@@ -75,7 +75,7 @@ end
 !     revisada 28/04/98
 subroutine dgotit(l,m,n)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE permic
    USE const
@@ -127,7 +127,7 @@ end
 !     Revision 28/04/98
 subroutine dvapor(l,m,n)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE permic
    USE const
@@ -201,7 +201,7 @@ end
 !     Revision 28/04/98
 subroutine dlluvi(l,m,n)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE permic
    USE const
@@ -275,7 +275,7 @@ end
 !     Revision 29/12/98
 subroutine dcrist(l,m,n)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE permic
    USE const
@@ -332,7 +332,7 @@ end
 !     Revision 7/06/99
 subroutine dnieve(l,m,n)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE permic
    USE const
@@ -395,7 +395,7 @@ end
 !     Revision 1/02/99
 subroutine dgrani(l,m,n)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE permic
    USE const

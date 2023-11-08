@@ -4,7 +4,7 @@
 !     pasando un polinomio de grado 4.
 
 subroutine filtro(varia1,facx,facy,facz)
-   USE constants
+   USE dimen
    implicit none
    character*50 text
    include 'filtro01.i'

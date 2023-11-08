@@ -1,7 +1,7 @@
 !     Esta subrutina calcula los Dnm para cada plano Z
 subroutine turbu1(kk)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE const
    USE turbvar1

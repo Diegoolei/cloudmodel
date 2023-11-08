@@ -20,7 +20,7 @@
 program modelo
 
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE permic
    USE const

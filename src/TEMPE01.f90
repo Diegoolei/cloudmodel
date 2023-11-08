@@ -5,7 +5,7 @@
 
 subroutine tempot(i,j,k,dden0z,Fcal)
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE const
    USE estbas

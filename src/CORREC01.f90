@@ -2,7 +2,7 @@
 !     negativa la cantidad de gotitas
 !     revisada 28/01/99
 subroutine corgot
-   USE constants
+   USE dimen
    USE permic
    USE lmngot
    implicit none
@@ -58,7 +58,7 @@ end
 !     negativa la cantidad de gotas
 !     revisada 8/01/99
 subroutine corllu
-   USE constants
+   USE dimen
    USE permic
    USE lmnllu
    implicit none
@@ -111,7 +111,7 @@ end
 !     negativa la cantidad de cristales
 !     revisada 8/01/99
 subroutine corcri
-   USE constants
+   USE dimen
    USE permic
    USE lmncri
    implicit none
@@ -165,7 +165,7 @@ end
 !     negativa la cantidad de nieve
 !     revisada 11/01/99
 subroutine cornie
-   USE constants
+   USE dimen
    USE permic
    USE lmnnie
    implicit none
@@ -224,7 +224,7 @@ end
 !     negativa la cantidad de granizos
 !     revisada 2/02/99
 subroutine corgra
-   USE constants
+   USE dimen
    USE permic
    USE lmngra
    implicit none
@@ -279,7 +279,7 @@ end
 !     negativa la cantidad de vapor
 !     revisada 8/01/99
 subroutine corvap(Qvapneg)
-   USE constants
+   USE dimen
    USE permic
    USE estbas
    implicit none
@@ -308,7 +308,7 @@ end
 !     negativa la cantidad de aerosoles
 !     revisada 14/09/99
 subroutine coraer(aerneg)
-   USE constants
+   USE dimen
    USE permic
    USE estbas
    implicit none

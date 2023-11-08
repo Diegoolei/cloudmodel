@@ -1,21 +1,19 @@
-!23456789*123456789*123456789*123456789*123456789*123456789*123456789*
-!     revisado 28/04/98
-!     Esta subrutina calcula la evolucion del la presion y las
-!     velocidades con un paso de tiempo menor lt3
-!     Las cantidades 1 son las presentes en el paso grande
-!     y las 2 son las del paso futuro, las 3 son auxiliares
-!     Le resta la perturbacion promedio
+!> Calcula la evolucion del la presion y las velocidades con un paso de tiempo menor lt3
+!> Las cantidades 1 son las presentes en el paso grande y las 2 son las del paso futuro, las 3 son auxiliares
+!> Le resta la perturbacion promedio
+
 subroutine velpre
    USE cant01
-   USE constants
+   USE dimen
    USE perdim
    USE const
    USE estbas
+   USE velpre01
    implicit none
    include 'p3v3.i'
    include 'fuvw.i'
-   include 'velpre01.i'
 
+   call velpre01_init
 
    write(*,*) cc2(1)
 
