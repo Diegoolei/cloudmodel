@@ -2,7 +2,7 @@
 !     Esta subrutina calcula los terminos inomogeneos para las velocidades
 subroutine inomo(i,j,k,dden0z)
    USE cant01
-   USE dimen
+   USE constants
    USE perdim
    USE permic
    USE const

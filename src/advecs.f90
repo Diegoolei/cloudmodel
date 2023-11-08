@@ -1,6 +1,6 @@
 !     Include para los terminos de adveccion 29/12/98
 module advecs
-      USE dimen
+      USE constants
       real, dimension(-2:nx1+2,-2:nx1+2) :: advaer1,advaer2
       real, dimension(-2:nx1+2,-2:nx1+2) :: advgot1,advgot2
       real, dimension(-2:nx1+2,-2:nx1+2) :: advllu1,advllu2

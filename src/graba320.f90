@@ -1,5 +1,5 @@
 subroutine graba320(U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1,t1,tie,bre)
-   USE dimen
+   USE constants
    implicit none
 
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1

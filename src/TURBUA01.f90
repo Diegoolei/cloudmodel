@@ -1,11 +1,11 @@
 !     Esta subrutina calcula los Dnm para cada plano Z
 subroutine turbu1(kk)
    USE cant01
-   USE dimen
+   USE constants
    USE perdim
    USE const
+   USE turbvar1
    implicit none
-   include 'turbvar1.i'
    include 'turbu1.i'
 
    integer, intent(in) :: kk

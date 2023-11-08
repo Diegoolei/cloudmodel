@@ -7,7 +7,7 @@
 !     Le resta la perturbacion promedio
 subroutine velpre
    USE cant01
-   USE dimen
+   USE constants
    USE perdim
    USE const
    USE estbas

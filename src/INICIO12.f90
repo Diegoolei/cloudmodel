@@ -11,7 +11,7 @@
 
 subroutine condi
    USE cant01
-   USE dimen
+   USE constants
    USE permic
    USE perdim
    USE const
@@ -370,7 +370,7 @@ end
 
 !*****************************************************
 subroutine PP2(G,dx,Den0,Pres00,Pres0)
-   USE dimen
+   USE constants
 
    integer k
    real Pres00(-3:nz1+3)

@@ -10,10 +10,10 @@
 !     revisado : 28/04/97
 
 subroutine turbu2(i,j,k)
-   USE dimen
+   USE constants
    USE turbvar
+   USE turbvar1
    implicit none
-   include 'turbvar1.i'
    include 'turbu2.i'
    real aux
 

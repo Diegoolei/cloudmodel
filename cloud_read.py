@@ -4,15 +4,15 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 from constants import *
 import numpy as np
 import os
-import re  # Add the re import declaration to use regex
+import re
 from subprocess import Popen, PIPE
 from filecmp import cmpfiles
 from datetime import datetime
 
 def main():
     
-    inis_data = File_style(
-        chosen_file=2,
+    data = File_style(
+        chosen_file=1,
         output_data_path="outputdata/",
         cmp_output_data_path="outputdata1/",
         img_path="img/",
@@ -20,22 +20,16 @@ def main():
         cmp_txt_path="txt1/",
         vid_path="vid/",
     )
-    inis_data.parse_status_img()
-    inis_data.multi_var_img(var_1=7, var_2=8)
-    # data_comparison(selected_file_original_opt, selected_file_new_opt)
-    # print(data_comparison(selected_file_new_opt, selected_file_new_opt))
-    # data_comparison(selected_file_original_noopt, selected_file_original_opt)
-    # data_comparison(selected_file_new_noopt, selected_file_new_opt)
-    # data_comparison(selected_file_original_noopt, selected_file_new_noopt)
-    # data_comparison(selected_file_original_opt, selected_file_new_opt)
-    # selected_file_original_opt.cloud_binary_comparison()
-    # selected_file_original_opt.animate_variable(
-    #     var_to_animate=1, save_animation=True, show_animation=False
-    # )
-    # selected_file_original_opt.animate_variables()
-    # selected_file_original_opt.cloud_text_comparison()
-    # selected_file_original_opt.parse_status_img()
-    # selected_file_original_opt.parse_text_files()
+    data1 = File_style(
+        chosen_file=1,
+        output_data_path="outputdata1/",
+        cmp_output_data_path="outputdata1/",
+        img_path="img/",
+        txt_path="txt/",
+        cmp_txt_path="txt1/",
+        vid_path="vid/",
+    )
+    print(f"data is equal: {data_comparison(data, data1)}")
 
 def time_it(func):
     '''Log the date and time of a function'''
