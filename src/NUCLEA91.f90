@@ -4,8 +4,8 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
    USE cant01
    USE dimen
    USE const
+   USE nuclea61
    implicit none
-   include 'nuclea61.i'
 
    real, intent(in) ::  Naer, rhoa, rs, Lvl, Lvs
    real, intent(inout) :: Qliq, Qvap, TT, e1, esl, ess, rl

@@ -1,3 +1,10 @@
+
+module dimen
+    !> Numero de puntos y los intervalos temporales y espaciales
+       integer, parameter :: nx1 = 50, nz1 = 45, nz = 64
+       real, parameter :: dx1 = 300., dt1 = 2., dt2 = 1., dt3 = .2
+end module dimen
+    
 module const
 !> Constantes matematicas y fisicas para precipitacion
    real, parameter :: pi = 3.1415926, gam1p8 = .9134, gam2p8 = 1.6765, gam3p8 = 4.6941742, &
@@ -12,10 +19,4 @@ module const
       , Av0 = 1455., Vtnie0 = .5, Efcol = .8, Efcolgn = .7
    real, dimension(210:320) :: Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, Eautcn, Eacrcn
 end module const
-
-module dimen
-!> Numero de puntos y los intervalos temporales y espaciales
-   integer, parameter :: nx1 = 50, nz1 = 45, nz = 64
-   real, parameter :: dx1 = 300., dt1 = 2., dt2 = 1., dt3 = .2
-end module dimen
 

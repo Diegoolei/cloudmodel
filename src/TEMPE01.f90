@@ -10,8 +10,8 @@ subroutine tempot(i,j,k,dden0z,Fcal)
    USE const
    USE estbas
    USE turbvar
+   USE tempe01
    implicit none
-   include 'tempe01.i'
 
    real, intent(in) :: dden0z,Fcal
    integer, intent(in) :: i,j,k

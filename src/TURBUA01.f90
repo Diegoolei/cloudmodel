@@ -5,8 +5,8 @@ subroutine turbu1(kk)
    USE perdim
    USE const
    USE turbvar1
+   USE turbu1_vars
    implicit none
-   include 'turbu1.i'
 
    integer, intent(in) :: kk
 

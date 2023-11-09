@@ -9,12 +9,13 @@
 !                      DDij: 1/dx2**2
 !     revisado : 28/04/97
 
-subroutine turbu2(i,j,k)
+subroutine turbu2(i,j)
    USE dimen
    USE turbvar
    USE turbvar1
+   USE turbu2_vars
    implicit none
-   include 'turbu2.i'
+   integer, intent(in) :: i,j
    real aux
 
 !     calculo de KM

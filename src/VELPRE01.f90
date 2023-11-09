@@ -9,11 +9,11 @@ subroutine velpre
    USE const
    USE estbas
    USE velpre01
+   USE p3v3
    implicit none
-   include 'p3v3.i'
    include 'fuvw.i'
 
-   call velpre01_init
+   call velpre01_init()
 
    write(*,*) cc2(1)
 
