@@ -8,9 +8,9 @@ subroutine inomo(i,j,k,dden0z)
    USE const
    USE estbas
    USE turbvar
+   USE fuvw
+   USE inomo_var
    implicit none
-   include 'fuvw.i'
-   include 'inomo.i'
 
    integer, intent(in) :: i,j,k
    real, intent(in) :: dden0z

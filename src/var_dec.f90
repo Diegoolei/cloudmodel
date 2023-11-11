@@ -132,3 +132,86 @@ module p3v3
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: W3
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: Pres3
 end module p3v3
+
+module daeros_vars
+   real daer(3)
+   real adv(3)
+   real advec,verti,escal,lapla,turbul
+   real aux
+end module daeros_vars
+
+module dcrist_vars
+   real dqcri(3)
+   real adv(3)
+   real advec,escal,lapla,turbul
+end module dcrist_vars
+
+module dgotit_vars
+   real dqgot(3)
+   real adv(3)
+   real advec,escal,lapla,turbul
+end module dgotit_vars
+
+module dgrani_vars
+   real dqgra(3)
+   real adv(3)
+   real advec,escal,lapla,turbul,sedim
+   real Qgras,Qgrai,Rms,Rmm,Rmi,Vtgras,Vtgrai
+end module dgrani_vars
+
+module dimlee_vars
+   integer nx2,ny2,nz2
+   parameter(nx2=32,ny2=32,nz2=32)
+end module dimlee_vars
+
+module dlluvi_vars
+   real dqllu(3)
+   real adv(3)
+   real advec,escal,lapla,turbul,sedim
+   real Qllus,Qllui,Rms,Rmm,Rmi,Vtllus,Vtllui
+end module dlluvi_vars
+
+module dnieve_vars
+   real dqnie(3)
+   real adv(3)
+   real advec,escal,lapla,turbul,sedim
+   real Qnies,Qniei
+end module dnieve_vars
+
+module dvapor_vars
+   real dqvap(3)
+   real adv(3)
+   real advec,verti,escal,lapla,turbul
+   real aux
+end module dvapor_vars
+
+module filtro01
+!> filtro01
+   USE dimen
+   real varia2(-5:nx1+5,-5:nx1+5,-4:nz1+4)
+   real varx,vary,varz
+   real fact
+   integer i,j,k
+end module filtro01
+
+module fuvw
+   USE dimen
+   real, dimension(-1:nx1+2,-1:nx1+2,-1:nz1+2) :: fu
+   real, dimension(-1:nx1+2,-1:nx1+2,-1:nz1+2) :: fv
+   real, dimension(-1:nx1+2,-1:nx1+2,-1:nz1+2) :: fw
+   real, dimension(-1:nx1+2,-1:nx1+2,-1:nz1+2) :: fp
+end module fuvw
+
+module inomo_var
+!> Inomo
+   real*8 dvelxx,dvelxy,dvelxz
+   real*8 dvelyx,dvelyy,dvelyz
+   real*8 dvelzx,dvelzy,dvelzz
+   real diverx,divery,diverz
+   real*8 a1,a2,a3
+   real*8 turbulx,turbuly,turbulz
+   real grave
+   real laplap
+end module inomo_var
+
+

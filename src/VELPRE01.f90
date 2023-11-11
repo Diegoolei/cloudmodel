@@ -10,8 +10,8 @@ subroutine velpre
    USE estbas
    USE velpre01
    USE p3v3
+   USE fuvw
    implicit none
-   include 'fuvw.i'
 
    call velpre01_init()
 

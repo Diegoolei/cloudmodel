@@ -5,9 +5,9 @@
 
 subroutine filtro(varia1,facx,facy,facz)
    USE dimen
+   USE filtro01
    implicit none
    character*50 text
-   include 'filtro01.i'
    REAL, DIMENSION(-3:NX1+3,-3:NX1+3,-2:NZ1+2), intent(inout) :: varia1
    real, intent(in) :: facx,facy,facz
    fact=1.-(facx+facy+facz)

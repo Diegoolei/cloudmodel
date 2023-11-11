@@ -8,8 +8,8 @@ subroutine daeros(l,m,n)
    USE estbas
    USE advecs
    USE turbvar
+   USE daeros_vars
    implicit none
-   include 'daeros.i'
 
    integer, intent(in) :: l,m,n
 
@@ -82,8 +82,8 @@ subroutine dgotit(l,m,n)
    USE estbas
    USE advecs
    USE turbvar
+   USE dgotit_vars
    implicit none
-   include 'dgotit.i'
 
    integer, intent(in) :: l,m,n
 
@@ -134,8 +134,8 @@ subroutine dvapor(l,m,n)
    USE estbas
    USE advecs
    USE turbvar
+   USE dvapor_vars
    implicit none
-   include 'dvapor.i'
 
    integer, intent(in) :: l,m,n
 
@@ -208,8 +208,8 @@ subroutine dlluvi(l,m,n)
    USE estbas
    USE advecs
    USE turbvar
+   USE dlluvi_vars
    implicit none
-   include 'dlluvi.i'
 
    integer, intent(in) :: l,m,n
 
@@ -282,8 +282,8 @@ subroutine dcrist(l,m,n)
    USE estbas
    USE advecs
    USE turbvar
+   USE dcrist_vars
    implicit none
-   include 'dcrist.i'
 
    integer, intent(in) :: l,m,n
 
@@ -339,8 +339,8 @@ subroutine dnieve(l,m,n)
    USE estbas
    USE advecs
    USE turbvar
+   USE dnieve_vars
    implicit none
-   include 'dnieve.i'
 
    integer, intent(in) :: l,m,n
 
@@ -402,9 +402,9 @@ subroutine dgrani(l,m,n)
    USE estbas
    USE advecs
    USE turbvar
+   USE dgrani_vars
    implicit none
-   include 'dgrani.i'
-
+   
    integer, intent(in) :: l,m,n
 
    dqgra(1)=Qgra1(l+1,m,n)-Qgra1(l-1,m,n)
