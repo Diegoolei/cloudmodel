@@ -214,4 +214,159 @@ module inomo_var
    real laplap
 end module inomo_var
 
+module permic
+   USE dimen
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: Qvap1,Qvap2,Qgot1,Qgot2,aer1,aer2,Qllu1,Qllu2,Qcri1,Qcri2,&
+      Qnie1,Qnie2,Qgra1,Qgra2
+   real, dimension(-3:2*nz1+5) :: Av,Vtnie,Vtgra0
+end module permic
 
+module perdim
+!> Perturbaciones de las variables dinamicas
+   USE dimen
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: U1,V1,W1,U2,V2,W2
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: Pres1,Pres2
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: Tempa1,Titaa1,Titaa2
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: Ktur,Fcalo
+end module perdim
+
+! EN DESUSO
+! module nuclea60
+! !> Nuclea
+!    real Qvap,TT1,TT2,Qliq1,Qliq,esl,ess,e1,Lvl,Lvs
+!    real B,TT,Tc,rhoa
+!    real Ti,ei,esli
+!    real F0,F0p
+!    real auxl,auxs,rs,rl,mcri,Rcri,caux
+!    integer l,m,n,hhh,s,xxx
+
+! !> Parametros de las particulas
+!    real Rgotmin,Acri,Bcri
+!    parameter (Rgotmin=7e-6,Acri=1e-11,Bcri=.6)   !A en cm^-3
+
+! !> Numero de aesosoles
+!    real Naer,Naux
+! end module nuclea60
+
+module microf05
+!     include para la microfisica
+
+!     cantidades
+
+!     variables auxiliares
+   real*8 qauxl,qauxs,aux,qauxl0
+!$$
+   real*8 Naux
+
+!     variables de procesos microfisicos
+!$$
+   real*8 coevgot,coevllu,coevcri,coevnie,coevgra
+   real*8 liqconv,hieconv,nieconv,acgollu
+   real*8 acgonie,accrnie,acgogra,acllgra,accrgra,acnigra
+   real*8 cfgotcri,cfllunie,cfllugra,fugrallu,libaer
+   real*8 coaergot,coaerllu,coaercri,coaernie,coaergra
+   real*8 ccnigra,colilc,coliln,congagua
+   real*8 mucrgrni,mucrgrgr
+   real*8 invapgot,invapllu,invapcri,invapnie,invapgra
+   real*8 ingotllu,ingotcri,ingotnie,ingotgra
+   real*8 incrinie,incrigra,inllunie,inllugra,inniegra
+   real*8 Intvap,Intgot,Intllu,Intcri,Intnie,Intgra,Intaer
+   real*8 cfln1,cfln2
+
+!     numero de cristales por colision
+   real Ncrgrni,Ncrgrgr
+   parameter (Ncrgrni=20.,Ncrgrgr=20.)
+
+!     variables para la evaporacion y la condensacion
+   real Qvls,Qvss,Qvls0
+
+!     parametros de las particulas
+!$$
+   real*8 Rgot,Ngot,Rllu,Nllu,Rcri,Ncri,Rnie,Nnie,Rgra,Ngra
+   real*8 Vtm,Vtgra,Nre,Nsc,A,fventl,fventn,fventgs,fventgl,Rgotmin
+   parameter (Rgotmin=5e-6)
+
+
+   integer s
+!$$
+   real*8 qvapaux1,qgotaux1,qlluaux1,qcriaux1,qnieaux1,qgraaux1
+
+!     variables para tgra
+   real Tg,agual,hielo,alfagra,fugra,Aalfa,Balfa
+   real A1,A2,A3,A3b,A4,B1,B2b,B3,B4,BB,CC2,CC3
+   real Q1,Q2,Q3,Q4,Qt,dQt,Qvaux,esaux,Taux
+   real Fcalgra
+   integer crecigra,i
+
+!     parametros para los cristales
+   real Acri,Bcri
+   parameter (Acri=1e-2,Bcri=.6)  !A en m^-3
+
+!     difusion de aerosoles
+   real Dfaer,Efcaer
+   parameter (Dfaer=1e-10,Efcaer=.01)
+end module microf05
+
+!> EN DESUSO
+! module microf04
+! !     include para la microfisica
+
+! !     cantidades
+!    real els,ess,Lvl,Lvs,Lsl,T,Fcal,Dv,nu,daer2,Naer
+!    real Lsl00
+!    real Eaucn,Eaccn,Eacng
+
+! !     variables auxiliares
+!    integer l,m,n,yy
+!    real*8 qauxl,qauxs,aux,qauxl0
+! !$$
+!    real*8 qlluaux,qgotaux,qvapaux,qcriaux,qnieaux,qgraaux,Naux
+
+! !     variables de procesos microfisicos
+! !$$
+!    real*8 coevgot,coevllu,coevcri,coevnie,coevgra
+!    real*8 liqconv,hieconv,nieconv,acgollu
+!    real*8 acgonie,accrnie,acgogra,acllgra,accrgra,acnigra
+!    real*8 cfgotcri,cfllunie,cfllugra,fugrallu,libaer
+!    real*8 coaergot,coaerllu,coaercri,coaernie,coaergra
+!    real*8 ccnigra,colilc,coliln,congagua
+!    real*8 mucrgrni,mucrgrgr
+!    real*8 invapgot,invapllu,invapcri,invapnie,invapgra
+!    real*8 ingotllu,ingotcri,ingotnie,ingotgra
+!    real*8 incrinie,incrigra,inllunie,inllugra,inniegra
+!    real*8 Intvap,Intgot,Intllu,Intcri,Intnie,Intgra,Intaer
+!    real*8 cfln1,cfln2
+
+! !     numero de cristales por colision
+!    real Ncrgrni,Ncrgrgr
+!    parameter (Ncrgrni=20.,Ncrgrgr=20.)
+
+! !     variables para la evaporacion y la condensacion
+!    real Qvls,Qvss,Qvls0
+
+! !     parametros de las particulas
+! !$$
+!    real*8 Rgot,Ngot,Rllu,Nllu,Rcri,Ncri,Rnie,Nnie,Rgra,Ngra
+!    real*8 Vtm,Vtgra,Nre,Nsc,A,fventl,fventn,fventgs,fventgl,Rgotmin
+!    parameter (Rgotmin=7e-6)
+
+
+!    integer s
+! !$$
+!    real*8 qvapaux1,qgotaux1,qlluaux1,qcriaux1,qnieaux1,qgraaux1
+
+! !     variables para tgra
+!    real Tg,agual,hielo,alfagra,fugra,Aalfa,Balfa
+!    real A1,A2,A3,A3b,A4,B1,B2b,B3,B4,BB,CC2,CC3
+!    real Q1,Q2,Q3,Q4,Qt,dQt,Qvaux,esaux,Taux
+!    real Fcalgra
+!    integer crecigra,i
+
+! !     parametros para los cristales
+!    real Acri,Bcri
+!    parameter (Acri=1e-2,Bcri=.6)  !A en m^-3
+
+! !     difusion de aerosoles
+!    real Dfaer,Efcaer
+!    parameter (Dfaer=1e-10,Efcaer=.01)
+! end module microf04

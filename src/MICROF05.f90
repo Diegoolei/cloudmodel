@@ -16,9 +16,8 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
    USE perdim
    USE permic
    USE const
+   USE microf05
    implicit none
-
-   include 'microf05.i'
 
    real, intent(in) :: els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Naer,nu
    real, intent(inout) :: Fcal,daer2
