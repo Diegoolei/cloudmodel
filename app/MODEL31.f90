@@ -32,6 +32,7 @@ program modelo
    USE lmnnie
    USE lmngra
    USE turbvar
+   USE mein
    implicit none
 
    include 'mode20.i'

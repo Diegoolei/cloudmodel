@@ -4,7 +4,7 @@
       real G1,centx,centy,centz,cenaerx,cenaery,cenaerz
       real sigmat,sigmaa,radiomed,temper,aerper
 
-      real TT,elv1,rel1,tem1
+      real elv1,rel1,tem1
 
       integer i,j,k,n
 
