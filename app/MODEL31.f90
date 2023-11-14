@@ -1125,7 +1125,8 @@ program modelo
       if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
          t1=t1+1
 !     grabacion 2D
-!       include 'graba231.i'
+!        write(*,*) 'graba231'
+!        call graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, tie, bre)
 !     grabacion 3D
          write(*,*) 'graba320'
          call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, t1, tie, bre)
@@ -1134,7 +1135,10 @@ program modelo
 !*    grabacion de todas las diferentes cantidades
 
       if (tt/nint(ltb/dt1)*nint(ltb/dt1).eq.tt) then
-         include 'graba120.i'
+         call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
+         U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
+         Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo,&
+         Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
       endif
 
 
