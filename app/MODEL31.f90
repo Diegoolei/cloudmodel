@@ -35,6 +35,8 @@ program modelo
    USE mein
    USE mode20
    USE estad03
+   USE posnub02
+   USE corrinu2
    implicit none
 
    call mode20_init()
@@ -1119,8 +1121,8 @@ program modelo
          call estad03_init()
 !       desplazamiento de la nube
          tte=tte+1
-         include 'posnub02.i'
-         include 'corrinu2.i'
+         call posnub02_init()
+         call corrinu2_init()
          write(32,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),posxx,posyy
       endif
 

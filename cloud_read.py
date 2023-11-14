@@ -338,7 +338,7 @@ def data_comparison(original_data: File_style, cmp_data: File_style):
                 var = original_data.get_var_from_data(iterator, it_var)
                 cmp_var = cmp_data.get_var_from_data(iterator, it_var)
                 # Normalize var values
-                if not var.max() == 0:
+                if var.max() != 0:
                     norm_var = var / np.max(np.abs(var))
                     norm_cmp_var = cmp_var / np.max(np.abs(var))
                 else:
@@ -349,15 +349,12 @@ def data_comparison(original_data: File_style, cmp_data: File_style):
                     norm_cmp_var,
                     rtol=1e-05,
                     atol=3e-06
-                ):
+                    ):
                     print(f"Variable {original_data.var_list[it_var]} is different ")
                     print(
-                        f"Max difference in position: {np.argmax(np.abs(norm_var - norm_cmp_var))}\n"
+                        f"Max difference: {np.argmax(np.abs(var - cmp_var))}\n"
                     )
 
     return True
-    # formated_data = format_data(original_data.data[iterator])
-    # formated_cmpdata = format_data(cmp_data.data[iterator])
-
 
 main()

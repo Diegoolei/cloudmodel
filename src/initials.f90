@@ -68,57 +68,6 @@ contains
 
 end module aeroana
 
-module inicio11
-   USE dimen
-   implicit none
-
-   real :: equis, ygrie, zeta
-   real :: G1, centx, centy, centz, cenaerx, cenaery, cenaerz
-   real :: sigmat, sigmaa, radiomed, temper, aerper
-   real :: elv1, rel1, tem1
-
-   integer :: i, j, k, n
-
-   real :: a0, a1, a2, a3, a4, a5, a6
-   real :: b0, b1, b2, b3, b4, b5, b6
-   real :: aux, gam, Tk, Qvaptot, aertot
-   real :: vb, vc, vh, zeta1, zeta2
-
-contains
-
-   subroutine inicio11_init()
-      ! Initialize the variables with their respective values
-      centx = (nx1 + 1.) * dx1 / 2.
-      centy = (nx1 + 1.) * dx1 / 2.
-      centz = 0.
-      cenaerx = (nx1 + 1.) * dx1 / 2. + 4000.
-      cenaery = (nx1 + 1.) * dx1 / 2. + 1000.
-      cenaerz = 0.
-      sigmat = 2 * 1000.**2.
-      sigmaa = 200.**2.
-      radiomed = 2000.
-      temper = .7
-      aerper = 10000.
-
-      a0 = 6.10780
-      a1 = 4.43652e-1
-      a2 = 1.42895e-2
-      a3 = 2.65065e-4
-      a4 = 3.03124e-6
-      a5 = 2.03408e-8
-      a6 = 6.13682e-11
-
-      b0 = 6.10918
-      b1 = 5.03470e-1
-      b2 = 1.88601e-2
-      b3 = 4.17622e-4
-      b4 = 5.82472e-6
-      b5 = 4.83880e-8
-      b6 = 1.83883e-10
-   end subroutine inicio11_init
-
-end module inicio11
-
 module mode20
    implicit none
 
@@ -490,3 +439,412 @@ contains
 715   format(5i9)
    end subroutine estad03_init
 end module estad03
+
+
+module posnub02
+contains
+   subroutine posnub02_init()
+      USE mode20
+      USE lmngot
+      USE lmncri
+      USE permic
+      USE estbas
+      USE cant01
+!     desplazamientos horizontales a partir de la velocidad media de la nube
+!     calculo la altura media de la nube, la velocidad media de la nube
+!     es tomada como la velocidad del aire sin perturbar a esa altura
+!                  (1/3/2000)
+
+      if (ngot(2).ge.1 .or. ncri(2).gt.1) then
+
+         impx=0.
+         impy=0.
+         zmed=0.
+         Qaguat=0.
+         spos=1
+         Xnub(tte)=Xnub(tte-1)
+         Ynub(tte)=Ynub(tte-1)
+
+         laux1=min(lgot(1),lcri(1))
+         laux2=max(lgot(2),lcri(2))
+         maux1=min(mgot(1),mcri(1))
+         maux2=max(mgot(2),mcri(2))
+         naux2=max(ngot(2),ncri(2))
+
+         do 1300 k=1,naux2
+            do 1300 i=laux1,laux2
+               do 1300 j=maux1,maux2
+
+                  Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+&
+                     Qnie1(i,j,k)+Qgra1(i,j,k)
+                  Qagua=Qgot1(i,j,k)+Qllu1(i,j,k)+&
+                     (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
+                  zmed=zmed+k*Qagua
+                  Qaguat=Qaguat+Qagua
+
+1300     continue
+
+         if (Qaguat.gt.1e-3) then
+            zmed=zmed/Qaguat
+            Xnub(tte)=Xnub(tte)+UU(nint(zmed))*lte
+            Ynub(tte)=Ynub(tte)+VV(nint(zmed))*lte
+         endif
+
+      endif
+
+   end subroutine posnub02_init
+end module posnub02
+
+module corrinu2
+contains
+   subroutine corrinu2_init()
+      USE mode20
+      USE perdim
+      USE permic
+      !     movimiento de la nube (4/01/99)
+!     Redefine el valor de todas las variables (deberian
+!      ser las que se graban solamente)
+
+!     calculo de la posicion media de la nube, es decir de las gotitas
+!     el centro esta inicialmente en nx1/2+.5, nx1/2+.5
+!     posxx y posyy son siempre en modulo menores que dx1
+!     En posx y posy se guarda para cada tt la posicion en
+!     puntos de red
+
+      if (spos .eq. 1) then
+         posxx=Xnub(tte)
+         posyy=Ynub(tte)
+      else
+         posxx=0.
+         posyy=0.
+      endif
+
+      posx(tte)=posx(tte-1)
+      posy(tte)=posy(tte-1)
+
+!*    corrimiento en x
+
+      if (posxx.gt.dx1) then
+         posx(tte)=posx(tte)+1
+         Xnub(tte)=Xnub(tte)-dx1
+
+!##
+         write(*,*) 'corri en x pos'
+
+         do 1500 k=0,nz1+1
+            do 1501 j=0,nx1+1
+               do 1502 i=1,nx1+1
+                  U1(i-1,j,k)=U1(i,j,k)
+                  V1(i-1,j,k)=V1(i,j,k)
+                  W1(i-1,j,k)=W1(i,j,k)
+                  Pres1(i-1,j,k)=Pres1(i,j,k)
+                  U2(i-1,j,k)=U2(i,j,k)
+                  V2(i-1,j,k)=V2(i,j,k)
+                  W2(i-1,j,k)=W2(i,j,k)
+                  Pres2(i-1,j,k)=Pres2(i,j,k)
+                  Titaa1(i-1,j,k)=Titaa1(i,j,k)
+                  Qvap1(i-1,j,k)=Qvap1(i,j,k)
+                  Qgot1(i-1,j,k)=Qgot1(i,j,k)
+                  Qllu1(i-1,j,k)=Qllu1(i,j,k)
+                  Qcri1(i-1,j,k)=Qcri1(i,j,k)
+                  Aer1(i-1,j,k)=Aer1(i,j,k)
+                  Fcalo(i-1,j,k)=Fcalo(i,j,k)
+1502           continue
+               i=nx1+1
+               U1(i,j,k)=U1(i-1,j,k)
+               V1(i,j,k)=V1(i-1,j,k)
+               W1(i,j,k)=W1(i-1,j,k)
+               Pres1(i,j,k)=Pres1(i-1,j,k)
+               U2(i,j,k)=U2(i-1,j,k)
+               V2(i,j,k)=V2(i-1,j,k)
+               W2(i,j,k)=W2(i-1,j,k)
+               Pres2(i,j,k)=Pres2(i-1,j,k)
+               Titaa1(i,j,k)=Titaa1(i-1,j,k)
+               Qvap1(i,j,k)=Qvap1(i-1,j,k)
+               Qgot1(i,j,k)=Qgot1(i-1,j,k)
+               Qllu1(i,j,k)=Qllu1(i-1,j,k)
+               Qcri1(i,j,k)=Qcri1(i-1,j,k)
+               Aer1(i,j,k)=Aer1(i-1,j,k)
+               Fcalo(i,j,k)=0.
+1501        continue
+            i=nx1
+            j=0
+            U1(i,j,k)=(U1(i-1,j,k)+U1(i,j+1,k))/2.
+            V1(i,j,k)=(V1(i-1,j,k)+V1(i,j+1,k))/2.
+            W1(i,j,k)=(W1(i-1,j,k)+W1(i,j+1,k))/2.
+            Pres1(i,j,k)=(Pres1(i-1,j,k)+Pres1(i,j+1,k))/2.
+            U2(i,j,k)=(U2(i-1,j,k)+U2(i,j+1,k))/2.
+            V2(i,j,k)=(V2(i-1,j,k)+V2(i,j+1,k))/2.
+            W2(i,j,k)=(W2(i-1,j,k)+W2(i,j+1,k))/2.
+            Pres2(i,j,k)=(Pres2(i-1,j,k)+Pres2(i,j+1,k))/2.
+            Titaa1(i,j,k)=(Titaa1(i-1,j,k)+Titaa1(i,j+1,k))/2.
+            Qvap1(i,j,k)=(Qvap1(i-1,j,k)+Qvap1(i,j+1,k))/2.
+            Qgot1(i,j,k)=(Qgot1(i-1,j,k)+Qgot1(i,j+1,k))/2.
+            Qllu1(i,j,k)=(Qllu1(i-1,j,k)+Qllu1(i,j+1,k))/2.
+            Qcri1(i,j,k)=(Qcri1(i-1,j,k)+Qcri1(i,j+1,k))/2.
+            Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j+1,k))/2.
+            Fcalo(i,j,k)=0.
+            j=nx1+1
+            U1(i,j,k)=(U1(i-1,j,k)+U1(i,j-1,k))/2.
+            V1(i,j,k)=(V1(i-1,j,k)+V1(i,j-1,k))/2.
+            W1(i,j,k)=(W1(i-1,j,k)+W1(i,j-1,k))/2.
+            Pres1(i,j,k)=(Pres1(i-1,j,k)+Pres1(i,j-1,k))/2.
+            U2(i,j,k)=(U2(i-1,j,k)+U2(i,j-1,k))/2.
+            V2(i,j,k)=(V2(i-1,j,k)+V2(i,j-1,k))/2.
+            W2(i,j,k)=(W2(i-1,j,k)+W2(i,j-1,k))/2.
+            Pres2(i,j,k)=(Pres2(i-1,j,k)+Pres2(i,j-1,k))/2.
+            Titaa1(i,j,k)=(Titaa1(i-1,j,k)+Titaa1(i,j-1,k))/2.
+            Qvap1(i,j,k)=(Qvap1(i-1,j,k)+Qvap1(i,j-1,k))/2.
+            Qgot1(i,j,k)=(Qgot1(i-1,j,k)+Qgot1(i,j-1,k))/2.
+            Qllu1(i,j,k)=(Qllu1(i-1,j,k)+Qllu1(i,j-1,k))/2.
+            Qcri1(i,j,k)=(Qcri1(i-1,j,k)+Qcri1(i,j-1,k))/2.
+            Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j-1,k))/2.
+            Fcalo(i,j,k)=0.
+1500     continue
+      endif
+
+      if (posxx.lt.-dx1) then
+         posx(tte)=posx(tte)-1
+         Xnub(tte)=Xnub(tte)+dx1
+
+!##
+         write(*,*) 'corri en x neg'
+
+         do 1510 k=0,nz1+1
+            do 1511 j=0,nx1+1
+               do 1512 i=nx1,0,-1
+                  U1(i+1,j,k)=U1(i,j,k)
+                  V1(i+1,j,k)=V1(i,j,k)
+                  W1(i+1,j,k)=W1(i,j,k)
+                  Pres1(i+1,j,k)=Pres1(i,j,k)
+                  U2(i+1,j,k)=U2(i,j,k)
+                  V2(i+1,j,k)=V2(i,j,k)
+                  W2(i+1,j,k)=W2(i,j,k)
+                  Pres2(i+1,j,k)=Pres2(i,j,k)
+                  Titaa1(i+1,j,k)=Titaa1(i,j,k)
+                  Qvap1(i+1,j,k)=Qvap1(i,j,k)
+                  Qgot1(i+1,j,k)=Qgot1(i,j,k)
+                  Qllu1(i+1,j,k)=Qllu1(i,j,k)
+                  Qcri1(i+1,j,k)=Qcri1(i,j,k)
+                  Aer1(i+1,j,k)=Aer1(i,j,k)
+                  Fcalo(i+1,j,k)=Fcalo(i,j,k)
+1512           continue
+               i=0
+               U1(i,j,k)=U1(i+1,j,k)
+               V1(i,j,k)=V1(i+1,j,k)
+               W1(i,j,k)=W1(i+1,j,k)
+               Pres1(i,j,k)=Pres1(i+1,j,k)
+               U2(i,j,k)=U2(i+1,j,k)
+               V2(i,j,k)=V2(i+1,j,k)
+               W2(i,j,k)=W2(i+1,j,k)
+               Pres2(i,j,k)=Pres2(i+1,j,k)
+               Titaa1(i,j,k)=Titaa1(i+1,j,k)
+               Qvap1(i,j,k)=Qvap1(i+1,j,k)
+               Qgot1(i,j,k)=Qgot1(i+1,j,k)
+               Qllu1(i,j,k)=Qllu1(i+1,j,k)
+               Qcri1(i,j,k)=Qcri1(i+1,j,k)
+               Aer1(i,j,k)=Aer1(i+1,j,k)
+               Fcalo(i,j,k)=0.
+1511        continue
+            i=1
+            j=0
+            U1(i,j,k)=(U1(i+1,j,k)+U1(i,j+1,k))/2.
+            V1(i,j,k)=(V1(i+1,j,k)+V1(i,j+1,k))/2.
+            W1(i,j,k)=(W1(i+1,j,k)+W1(i,j+1,k))/2.
+            Pres1(i,j,k)=(Pres1(i+1,j,k)+Pres1(i,j+1,k))/2.
+            U2(i,j,k)=(U2(i+1,j,k)+U2(i,j+1,k))/2.
+            V2(i,j,k)=(V2(i+1,j,k)+V2(i,j+1,k))/2.
+            W2(i,j,k)=(W2(i+1,j,k)+W2(i,j+1,k))/2.
+            Pres2(i,j,k)=(Pres2(i+1,j,k)+Pres2(i,j+1,k))/2.
+            Titaa1(i,j,k)=(Titaa1(i+1,j,k)+Titaa1(i,j+1,k))/2.
+            Qvap1(i,j,k)=(Qvap1(i+1,j,k)+Qvap1(i,j+1,k))/2.
+            Qgot1(i,j,k)=(Qgot1(i+1,j,k)+Qgot1(i,j+1,k))/2.
+            Qllu1(i,j,k)=(Qllu1(i+1,j,k)+Qllu1(i,j+1,k))/2.
+            Qcri1(i,j,k)=(Qcri1(i+1,j,k)+Qcri1(i,j+1,k))/2.
+            Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j+1,k))/2.
+            Fcalo(i,j,k)=0.
+            j=nx1+1
+            U1(i,j,k)=(U1(i+1,j,k)+U1(i,j-1,k))/2.
+            V1(i,j,k)=(V1(i+1,j,k)+V1(i,j-1,k))/2.
+            W1(i,j,k)=(W1(i+1,j,k)+W1(i,j-1,k))/2.
+            Pres1(i,j,k)=(Pres1(i+1,j,k)+Pres1(i,j-1,k))/2.
+            U2(i,j,k)=(U2(i+1,j,k)+U2(i,j-1,k))/2.
+            V2(i,j,k)=(V2(i+1,j,k)+V2(i,j-1,k))/2.
+            W2(i,j,k)=(W2(i+1,j,k)+W2(i,j-1,k))/2.
+            Pres2(i,j,k)=(Pres2(i+1,j,k)+Pres2(i,j-1,k))/2.
+            Titaa1(i,j,k)=(Titaa1(i+1,j,k)+Titaa1(i,j-1,k))/2.
+            Qvap1(i,j,k)=(Qvap1(i+1,j,k)+Qvap1(i,j-1,k))/2.
+            Qgot1(i,j,k)=(Qgot1(i+1,j,k)+Qgot1(i,j-1,k))/2.
+            Qllu1(i,j,k)=(Qllu1(i+1,j,k)+Qllu1(i,j-1,k))/2.
+            Qcri1(i,j,k)=(Qcri1(i+1,j,k)+Qcri1(i,j-1,k))/2.
+            Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j-1,k))/2.
+            Fcalo(i,j,k)=0.
+1510     continue
+      endif
+
+!*    corrimiento en y
+
+      if (posyy.gt.dx1) then
+         posy(tte)=posy(tte)+1
+         Ynub(tte)=Ynub(tte)-dx1
+
+!##
+         write(*,*) 'corri en y pos'
+
+         do 1520 k=0,nz1+1
+            do 1521 i=0,nx1+1
+               do 1522 j=1,nx1+1
+                  U1(i,j-1,k)=U1(i,j,k)
+                  V1(i,j-1,k)=V1(i,j,k)
+                  W1(i,j-1,k)=W1(i,j,k)
+                  Pres1(i,j-1,k)=Pres1(i,j,k)
+                  U2(i,j-1,k)=U2(i,j,k)
+                  V2(i,j-1,k)=V2(i,j,k)
+                  W2(i,j-1,k)=W2(i,j,k)
+                  Pres2(i,j-1,k)=Pres2(i,j,k)
+                  Titaa1(i,j-1,k)=Titaa1(i,j,k)
+                  Qvap1(i,j-1,k)=Qvap1(i,j,k)
+                  Qgot1(i,j-1,k)=Qgot1(i,j,k)
+                  Qllu1(i,j-1,k)=Qllu1(i,j,k)
+                  Qcri1(i,j-1,k)=Qcri1(i,j,k)
+                  Aer1(i,j-1,k)=Aer1(i,j,k)
+                  Fcalo(i,j-1,k)=Fcalo(i,j,k)
+1522           continue
+               j=nx1+1
+               U1(i,j,k)=U1(i,j-1,k)
+               V1(i,j,k)=V1(i,j-1,k)
+               W1(i,j,k)=W1(i,j-1,k)
+               Pres1(i,j,k)=Pres1(i,j-1,k)
+               U2(i,j,k)=U2(i,j-1,k)
+               V2(i,j,k)=V2(i,j-1,k)
+               W2(i,j,k)=W2(i,j-1,k)
+               Pres2(i,j,k)=Pres2(i,j-1,k)
+               Titaa1(i,j,k)=Titaa1(i,j-1,k)
+               Qvap1(i,j,k)=Qvap1(i,j-1,k)
+               Qgot1(i,j,k)=Qgot1(i,j-1,k)
+               Qllu1(i,j,k)=Qllu1(i,j-1,k)
+               Qcri1(i,j,k)=Qcri1(i,j-1,k)
+               Aer1(i,j,k)=Aer1(i,j-1,k)
+               Fcalo(i,j,k)=0.
+1521        continue
+            j=nx1
+            i=0
+            U1(i,j,k)=(U1(i,j-1,k)+U1(i+1,j,k))/2.
+            V1(i,j,k)=(V1(i,j-1,k)+V1(i+1,j,k))/2.
+            W1(i,j,k)=(W1(i,j-1,k)+W1(i+1,j,k))/2.
+            Pres1(i,j,k)=(Pres1(i,j-1,k)+Pres1(i+1,j,k))/2.
+            U2(i,j,k)=(U2(i,j-1,k)+U2(i+1,j,k))/2.
+            V2(i,j,k)=(V2(i,j-1,k)+V2(i+1,j,k))/2.
+            W2(i,j,k)=(W2(i,j-1,k)+W2(i+1,j,k))/2.
+            Pres2(i,j,k)=(Pres2(i,j-1,k)+Pres2(i+1,j,k))/2.
+            Titaa1(i,j,k)=(Titaa1(i,j-1,k)+Titaa1(i+1,j,k))/2.
+            Qvap1(i,j,k)=(Qvap1(i,j-1,k)+Qvap1(i+1,j,k))/2.
+            Qgot1(i,j,k)=(Qgot1(i,j-1,k)+Qgot1(i+1,j,k))/2.
+            Qllu1(i,j,k)=(Qllu1(i,j-1,k)+Qllu1(i+1,j,k))/2.
+            Qcri1(i,j,k)=(Qcri1(i,j-1,k)+Qcri1(i+1,j,k))/2.
+            Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i+1,j,k))/2.
+            Fcalo(i,j,k)=0.
+            i=nx1+1
+            U1(i,j,k)=(U1(i,j-1,k)+U1(i-1,j,k))/2.
+            V1(i,j,k)=(V1(i,j-1,k)+V1(i-1,j,k))/2.
+            W1(i,j,k)=(W1(i,j-1,k)+W1(i-1,j,k))/2.
+            Pres1(i,j,k)=(Pres1(i,j-1,k)+Pres1(i-1,j,k))/2.
+            U2(i,j,k)=(U2(i,j-1,k)+U2(i-1,j,k))/2.
+            V2(i,j,k)=(V2(i,j-1,k)+V2(i-1,j,k))/2.
+            W2(i,j,k)=(W2(i,j-1,k)+W2(i-1,j,k))/2.
+            Pres2(i,j,k)=(Pres2(i,j-1,k)+Pres2(i-1,j,k))/2.
+            Titaa1(i,j,k)=(Titaa1(i,j-1,k)+Titaa1(i-1,j,k))/2.
+            Qvap1(i,j,k)=(Qvap1(i,j-1,k)+Qvap1(i-1,j,k))/2.
+            Qgot1(i,j,k)=(Qgot1(i,j-1,k)+Qgot1(i-1,j,k))/2.
+            Qllu1(i,j,k)=(Qllu1(i,j-1,k)+Qllu1(i-1,j,k))/2.
+            Qcri1(i,j,k)=(Qcri1(i,j-1,k)+Qcri1(i-1,j,k))/2.
+            Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i-1,j,k))/2.
+            Fcalo(i,j,k)=0.
+1520     continue
+      endif
+
+      if (posyy.lt.-dx1) then
+         posy(tte)=posy(tte)-1
+         Xnub(tte)=Xnub(tte)+dx1
+
+!##
+         write(*,*) 'corri en y neg'
+
+         do 1530 k=0,nz1+1
+            do 1531 i=0,nx1+1
+               do 1532 j=nx1,0,-1
+                  U1(i,j+1,k)=U1(i,j,k)
+                  V1(i,j+1,k)=V1(i,j,k)
+                  W1(i,j+1,k)=W1(i,j,k)
+                  Pres1(i,j+1,k)=Pres1(i,j,k)
+                  U2(i,j+1,k)=U2(i,j,k)
+                  V2(i,j+1,k)=V2(i,j,k)
+                  W2(i,j+1,k)=W2(i,j,k)
+                  Pres2(i,j+1,k)=Pres2(i,j,k)
+                  Titaa1(i,j+1,k)=Titaa1(i,j,k)
+                  Qvap1(i,j+1,k)=Qvap1(i,j,k)
+                  Qgot1(i,j+1,k)=Qgot1(i,j,k)
+                  Qllu1(i,j+1,k)=Qllu1(i,j,k)
+                  Qcri1(i,j+1,k)=Qcri1(i,j,k)
+                  Aer1(i,j+1,k)=Aer1(i,j,k)
+                  Fcalo(i,j+1,k)=Fcalo(i,j,k)
+1532           continue
+               j=0
+               U1(i,j,k)=U1(i,j-1,k)
+               V1(i,j,k)=V1(i,j-1,k)
+               W1(i,j,k)=W1(i,j-1,k)
+               Pres1(i,j,k)=Pres1(i,j-1,k)
+               U2(i,j,k)=U2(i,j-1,k)
+               V2(i,j,k)=V2(i,j-1,k)
+               W2(i,j,k)=W2(i,j-1,k)
+               Pres2(i,j,k)=Pres2(i,j-1,k)
+               Titaa1(i,j,k)=Titaa1(i,j-1,k)
+               Qvap1(i,j,k)=Qvap1(i,j-1,k)
+               Qgot1(i,j,k)=Qgot1(i,j-1,k)
+               Qllu1(i,j,k)=Qllu1(i,j-1,k)
+               Qcri1(i,j,k)=Qcri1(i,j-1,k)
+               Aer1(i,j,k)=Aer1(i,j-1,k)
+               Fcalo(i,j,k)=0.
+1531        continue
+            j=1
+            i=0
+            U1(i,j,k)=(U1(i,j+1,k)+U1(i+1,j,k))/2.
+            V1(i,j,k)=(V1(i,j+1,k)+V1(i+1,j,k))/2.
+            W1(i,j,k)=(W1(i,j+1,k)+W1(i+1,j,k))/2.
+            Pres1(i,j,k)=(Pres1(i,j+1,k)+Pres1(i+1,j,k))/2.
+            U2(i,j,k)=(U2(i,j+1,k)+U2(i+1,j,k))/2.
+            V2(i,j,k)=(V2(i,j+1,k)+V2(i+1,j,k))/2.
+            W2(i,j,k)=(W2(i,j+1,k)+W2(i+1,j,k))/2.
+            Pres2(i,j,k)=(Pres2(i,j+1,k)+Pres2(i+1,j,k))/2.
+            Titaa1(i,j,k)=(Titaa1(i,j+1,k)+Titaa1(i+1,j,k))/2.
+            Qvap1(i,j,k)=(Qvap1(i,j+1,k)+Qvap1(i+1,j,k))/2.
+            Qgot1(i,j,k)=(Qgot1(i,j+1,k)+Qgot1(i+1,j,k))/2.
+            Qllu1(i,j,k)=(Qllu1(i,j+1,k)+Qllu1(i+1,j,k))/2.
+            Qcri1(i,j,k)=(Qcri1(i,j+1,k)+Qcri1(i+1,j,k))/2.
+            Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i+1,j,k))/2.
+            Fcalo(i,j,k)=0.
+            i=nx1+1
+            U1(i,j,k)=(U1(i,j+1,k)+U1(i-1,j,k))/2.
+            V1(i,j,k)=(V1(i,j+1,k)+V1(i-1,j,k))/2.
+            W1(i,j,k)=(W1(i,j+1,k)+W1(i-1,j,k))/2.
+            Pres1(i,j,k)=(Pres1(i,j+1,k)+Pres1(i-1,j,k))/2.
+            U2(i,j,k)=(U2(i,j+1,k)+U2(i-1,j,k))/2.
+            V2(i,j,k)=(V2(i,j+1,k)+V2(i-1,j,k))/2.
+            W2(i,j,k)=(W2(i,j+1,k)+W2(i-1,j,k))/2.
+            Pres2(i,j,k)=(Pres2(i,j+1,k)+Pres2(i-1,j,k))/2.
+            Titaa1(i,j,k)=(Titaa1(i,j+1,k)+Titaa1(i-1,j,k))/2.
+            Qvap1(i,j,k)=(Qvap1(i,j+1,k)+Qvap1(i-1,j,k))/2.
+            Qgot1(i,j,k)=(Qgot1(i,j+1,k)+Qgot1(i-1,j,k))/2.
+            Qllu1(i,j,k)=(Qllu1(i,j+1,k)+Qllu1(i-1,j,k))/2.
+            Qcri1(i,j,k)=(Qcri1(i,j+1,k)+Qcri1(i-1,j,k))/2.
+            Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i-1,j,k))/2.
+            Fcalo(i,j,k)=0.
+1530     continue
+
+      endif
+
+      posxx=posx(tte)*dx1+Xnub(tte)
+      posyy=posy(tte)*dx1+Ynub(tte)
+
+   end subroutine corrinu2_init
+end module corrinu2
