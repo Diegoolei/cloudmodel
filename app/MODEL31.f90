@@ -33,9 +33,11 @@ program modelo
    USE lmngra
    USE turbvar
    USE mein
+   USE mode20
+   USE estad03
    implicit none
 
-   include 'mode20.i'
+   call mode20_init()
 !******************************************************************
 !*    Condiciones iniciales. Si ini=0 el calculo empieza por primera,
 !        si ini=1 el calculo recomienza desde algun paso
@@ -1114,7 +1116,7 @@ program modelo
 !*    grabacion normal de las diferentes cantidades
 !$$
       if (tt/nint(lte/dt1)*nint(lte/dt1).eq.tt) then
-         include 'estad03.i'
+         call estad03_init()
 !       desplazamiento de la nube
          tte=tte+1
          include 'posnub02.i'
