@@ -63,13 +63,6 @@ contains
 !
          endif
 
-!      UU(k)=UU(k)*.7
-!      VV(k)=VV(k)*0.
-
-
-!##
-!      write(*,*) 'vel0',zeta,UU(k),VV(k),zeta1,aux,vb
-!##
 
 5     continue
 
@@ -105,8 +98,6 @@ contains
             aux=Tlvs(220)/Rv*(1./220.-1./k)
             Tesvs(k)=Tesvs(220)*exp(aux)
          endif
-!        Eautcn(k)=.3*exp(.35*Tk)*(1.+4.*exp(-.4*(k-259.)**2.))
-!        Eacrcn(k)=.2*exp(.35*Tk)*(1.+4.*exp(-.4*(k-259.)**2.))
 !      cambio por las expresiones de Straka(17/01/99)
          Eautcn(k)=10.**(.035*(Tk)-.7)
          Eacrcn(k)=exp(.09*Tk)

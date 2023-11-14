@@ -644,31 +644,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
       qnieaux1=qnieaux+Intnie*dt2
       qgraaux1=qgraaux+Intgra*dt2
 
-!          write(*,*) 'de',qgotaux,qgotaux1,Intgot
-!          write(*,*) invapgot,ingotllu,ingotcri
-
    endif
-
-!##
-!        if(l.eq.15 .and. m.eq.17 .and. n.eq.22) then
-!          write(*,*) 'cri2',qcriaux,qcriaux1,invapcri,qvapaux,qvapaux1
-!          pause
-!        endif
-
-
-
-!      if (qcriaux.gt.0 .or. qgraaux.gt.0) then
-!      if (l.eq.17 .and. m.eq.17 .and. n.eq.10) then
-!        write(*,*) 'hielooooo',l,m,n,T
-!        write(*,*) qcriaux,qcriaux1,Intcri
-!        write(*,*) -invapcri,-ingotcri,incrinie,incrigra
-!        write(*,*) qgraaux,qgraaux1,Intgra
-!        write(*,*) -invapgra,-ingotgra,-inllugra,-incrigra,-inniegra
-!        pause
-!        stop
-!      endif
-
-
 
 !     prevencion de negativos
 !$$
@@ -692,23 +668,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
             ,inniegra,cfllunie,acgonie
          write(*,*) incrinie,hieconv,accrnie+mucrgrni*.8
 
-
-!        write(*,*) Intllu,invapllu,ingotllu,inllunie,inllugra
-
-!        write(*,*) inllugra,cfllugra,coliln,colilc,qlluaux,Nllu
-!     &             ,fugrallu
-!        write(*,*) colilc,gam3p8,Vtm,pi,Rllu,Nllu,Ncri,Efcol
-!        write(*,*) fugrallu,agual,alfagra,fugra,T,Tg
-
          stop
-!        write(*,*) inniegra
-
-!        write(*,*) invapgot,invapllu,ingotllu,inaergot,invapcri,
-!     &             ingotcri
-!        write(*,*) Rgot,Rllu,Rcri,liqconv,acgollu
-!        write(*,*) cteqgot,cteqllu,Ngot,Nllu,Ncri
-!        write(*,*) Qvls,qauxl,Intgot
-
       endif
       if (qgotaux1.lt.0) qgotaux1=0.
       if (qlluaux1.lt.0) qlluaux1=0.
@@ -726,41 +686,6 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
          Intgra
       stop
    endif
-
-
-!      if (l.eq.20.and.(m.eq.22.or.m.eq.22).and.(n.ge.28.and.n.le.28))
-!     &       then
-!        write(*,*) 'micro',n,Qvss,qauxs
-!        write(*,*) qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,qgraaux
-!        write(*,*) qvapaux1,qgotaux1,qlluaux1,qcriaux1,qnieaux1,
-!     &             qgraaux1
-!        write(*,*) Intvap,Intgot,Intllu,Intcri,Intnie,
-!     &             Intgra
-!        write(*,*) Intcri,-invapcri,-ingotcri,incrinie,incrigra,T
-!        write(*,*) incrinie,hieconv,accrnie,mucrgrni*.8
-
-!        write(*,*) incrigra,inllugra,colilc,coliln,hieconv
-!
-!        write(*,*) Intgot,invapgot,ingotllu,ingotcri,ingotnie,
-!     &             ingotgra
-!        write(*,*) 'mic',qgraaux,qgraaux1
-!        write(*,*) Intllu,-invapllu,-ingotllu,inllunie,inllugra
-!        write(*,*) Intgra,invapgra,ingotgra,inllugra,incrigra
-!     &             ,inniegra
-!        write(*,*) Ngra,Nnie,Tg,T
-!        write(*,*) inllugra,cfllugra,coliln,colilc,qlluaux,Nllu
-!     &             ,fugrallu
-!        write(*,*)  fugrallu,agual,alfagra,fugra,Fcalgra
-!        write(*,*)  Fcalgra,fugrallu,congagua,Cwl,Tg,T
-!        write(*,*)  Rcri,Ncri,Rllu,Nllu
-!        write(*,*) invapnie,ingotnie,inllunie,incrinie
-!        write(*,*) cfllunie,-colilc*qlluaux/Nllu,colilc
-!        write(*,*) qvapaux+qgotaux+qlluaux+qcriaux
-!        pause
-!        write(*,*) 'miaer',m,daer2,Intaer
-!        write(*,*) coevgot,yy,libaer,coevcri
-!      endif
-
 
    qvapaux=qvapaux1
    qgotaux=qgotaux1
@@ -781,19 +706,5 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
    endif
 
    if (T.lt.T0) Fcal=Fcal-inllunie*Cwl*(T-T0)*dt2
-
-
-!       if (qnieaux.gt.1e-10) then
-!       if(l.eq.16 .and. m.ge.16 .and. n.eq.13) then
-!         write(*,*) 'nie',l,m,n,T
-!         write(*,*) qvapaux,qgotaux,qlluaux,qcriaux,qnieaux
-!         write(*,*) Intnie,invapnie,ingotnie,incrinie,inllunie
-!         write(*,*) acgonie,Vtnie(2*n),Rnie,Nnie,Efcolgn
-!         write(*,*) cfln2,Kair,fventl,Cwl,cfln1
-!         pause
-!       endif
-!##
-
-
    return
 end
