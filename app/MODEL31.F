@@ -47,11 +47,13 @@
 	    call condi
       else
 
-      open(13,file='inis.da')
-      open(unit=14,file='velos.da',status='unknown',form='unformatted')
+      open(unit=13,file='f77_data/inis.da')
+      open(unit=14,file='f77_data/velos.da',status='unknown',
+     &       form='unformatted')
       rewind 14
-      open(unit=3,file='varconz.da',status='unknown',form='unformatted')
-      rewind 3
+      open(unit=30,file='f77_data/varconz.da',status='unknown',
+     &       form='unformatted')
+      rewind 30
 
 	  read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0
      &                  ,cc2,aer0,UU,VV
@@ -61,10 +63,10 @@
      &             Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,
      &             Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,
      &             aer1,aer2,Fcalo
-	  read(3)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
+	  read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,
      &             Qvaprel,aerrel,Eautcn,Eacrcn
 
-	close(3)
+	close(30)
 	close(13)
 	close(14)
 
@@ -101,19 +103,19 @@
       write(*,*) Tita0(20),Tita0(17),Tita0(18)
 !##
 
-      open(13,file='u2'//tie//bre(2*t1+1:2*t1+2))
-      open(14,file='v2'//tie//bre(2*t1+1:2*t1+2))
-      open(15,file='w2'//tie//bre(2*t1+1:2*t1+2))
-      open(16,file='va'//tie//bre(2*t1+1:2*t1+2))
-      open(17,file='go'//tie//bre(2*t1+1:2*t1+2))
-      open(18,file='ae'//tie//bre(2*t1+1:2*t1+2))
-      open(19,file='pr'//tie//bre(2*t1+1:2*t1+2))
-      open(20,file='ti'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=13,file='f77_data/u2'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=14,file='f77_data/v2'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=15,file='f77_data/w2'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=16,file='f77_data/va'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=17,file='f77_data/go'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=18,file='f77_data/ae'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=19,file='f77_data/pr'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=20,file='f77_data/ti'//tie//bre(2*t1+1:2*t1+2))
 
-      open(30,file='esta'//tie//bre(2*t1+1:2*t1+2))
-      open(31,file='vara'//tie//bre(2*t1+1:2*t1+2))
-      open(32,file='posnub'//tie//'.sa')
-      open(33,file='est'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=30,file='f77_data/esta'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=31,file='f77_data/vara'//tie//bre(2*t1+1:2*t1+2))
+      open(unit=32,file='f77_data/posnub'//tie//'.sa')
+      open(unit=33,file='f77_data/est'//tie//bre(2*t1+1:2*t1+2))
 
 !     write(*,*) ltt,dt1,lt1,lt2,lt3
 
@@ -1205,6 +1207,10 @@
 ! 2345 continue
 !#
 
+      write(*,*) ""
+      write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
+      write(*,*) ""
+      
     1 continue
  
 !********************************************************************
@@ -1232,9 +1238,9 @@
 !*******************************************************************
 !#
       write(*,*) 'termina'
-      open(3,file='termina')
-      write(3,*) '1'
-      close(3)
+      open(unit=30,file='f77_data/termina')
+      write(30,*) '1'
+      close(30)
 !#
 
 !********************************************************************

@@ -63,9 +63,6 @@
 !
         endif
 
-       UU(k)=UU(k)*.7
-       VV(k)=VV(k)*0.
-
 
 !##
 !      write(*,*) 'vel0',zeta,UU(k),VV(k),zeta1,aux,vb
@@ -76,7 +73,7 @@
 
 !**   calculo de 'constantes' que dependen de T
 
-      open(3,file='ccc')
+      open(unit=30,file='f77_data/ccc')
 
       do 400 k=313,210,-1
         
@@ -112,11 +109,11 @@
         Eacrcn(k)=exp(.09*Tk)
 
 
-        write(3,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k),Tesvs(k)
+        write(30,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k),Tesvs(k)
      &              ,Eautcn(k),Eacrcn(k)
 
   400 continue    	
-      close(3)
+      close(30)
 
 !**   condiciones de tiempo bueno
 
@@ -259,13 +256,13 @@
 
       call PP2(G,dx1,Den0,Presi0,P00)
 
-      open (7,file='inic03.sa')
+      open (70,file='f77_data/inic03.sa')
       do 100 k=0,nz1
 	Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
 	Pres00(k)=Temp0(k)/Tita0(k)
 	cc2(k)=Cp*Rd*Tita0(k)*Pres00(k)/Cv            
 
-	write(7,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),Den0(k),
+	write(70,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),Den0(k),
      &               aer0(k),Qvap0(k),UU(k),VV(k)
 
   100 continue
