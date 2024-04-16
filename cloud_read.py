@@ -13,12 +13,13 @@ def main():
     
     data = File_style(
         chosen_file=1,
-        output_data_path="outputdata/",
+        output_data_path="f77_data/",
         cmp_output_data_path="outputdata1/",
         img_path="img/",
         txt_path="txt/",
         cmp_txt_path="txt1/",
         vid_path="vid/",
+        img_option = 1,
     )
     data1 = File_style(
         chosen_file=1,
@@ -28,9 +29,10 @@ def main():
         txt_path="txt/",
         cmp_txt_path="txt1/",
         vid_path="vid/",
+        img_option = 2,
     )
     print(f"data is equal: {data_comparison(data, data1)}")
-
+    data.parse_status_img()
 def time_it(func):
     '''Log the date and time of a function'''
 
@@ -51,6 +53,7 @@ class File_style:
         txt_path="txt/",
         cmp_txt_path="txt1/",
         vid_path="vid/",
+        img_option = 1,
     ):
         if os.path.exists(output_data_path):
             self.output_data_path = output_data_path
@@ -60,6 +63,7 @@ class File_style:
             self.cmp_txt_path = cmp_txt_path
             self.vid_path = vid_path
             self.data = []
+            self.img_option = img_option
             if chosen_file == 0:
                 print("No file selected")
                 exit()
@@ -169,14 +173,23 @@ class File_style:
         else:
             print(f"There is no {self.cmp_output_data_path} folder to compare with")
 
-    def plot_style(self, variable, data_dimension):
+    def plot_style(self, variable, data_dimension, 
+        img_option):
         plt.grid(False)
-        if data_dimension == 3:
-            plt.imshow(variable[:, :, plot_center])
-        elif data_dimension == 2:
-            plt.imshow(variable[:, plot_center])
-        elif data_dimension == 1:
-            plt.plot(variable[3:-3])  # Cleans trash data
+        if img_option == 1:
+            if data_dimension == 3:
+                plt.imshow(variable[:, :, plot_center])
+            elif data_dimension == 2:
+                plt.imshow(variable[:, plot_center])
+            elif data_dimension == 1:
+                plt.plot(variable[3:-3])  # Cleans trash data
+        elif img_option == 2:
+            if data_dimension == 3:
+                plt.contourf(variable[:, :, plot_center])
+            elif data_dimension == 2:
+                plt.contourf(variable[:, plot_center])
+            elif data_dimension == 1:
+                plt.plot(variable[3:-3])  # Cleans trash data
         plt.style.use("fivethirtyeight")
         # plt.colorbar() # Generates infinite colorbars in animation
         plt.xlabel("X")
@@ -238,7 +251,7 @@ class File_style:
                     file_iterator, structure_iterator
                 )
                 plt.title(f"{str(file_iterator)} {self.var_list[var_iterator]}")
-                self.plot_style(variable, self.data_dimension)
+                self.plot_style(variable, self.data_dimension, self.img_option)
                 plt.savefig(
                     f"{self.img_path}{self.file_name}/{str(file_iterator)}/{self.var_list[var_iterator]}.png"
                 )
