@@ -54,8 +54,6 @@ program modelo
       rewind 30
 
       read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
-
-!$$
       read(14) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,&
          Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
          Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,&
@@ -69,8 +67,6 @@ program modelo
       do 5001 i=1,nx1
          do 5001 j=1,nx1
             do 5001 k=1,nz1
-!           aux=.7*exp(-((i-35)**2.+(j-25.5)**2.+(k-10)**2.)/50.)
-!           aux=1.*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
                aux=.8*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
                Titaa1(i,j,k)=Titaa1(i,j,k)+aux
                Titaa2(i,j,k)=Titaa2(i,j,k)+aux
@@ -81,8 +77,6 @@ program modelo
 
    Lsl00=Lsl0*4180.
 
-
-!##
    write(*,*) 'Qgot',Qgot1(32,34,0),Qgot1(32,34,1),Qgot1(32,34,2)
    write(*,*) 'Qcri',Qcri1(32,34,0),Qcri1(32,34,1),Qcri1(32,34,2)
    write(*,*) 'Qnie',Qnie1(32,34,0),Qnie1(32,34,1),Qnie1(32,34,2)
@@ -91,13 +85,10 @@ program modelo
    write(*,*) Qllu1(16,12,27),Qllu1(12,17,27)
 
 !**************************************************************
-
-!##
    write(*,*) 'des cond',Qvap1(20,20,8),Qvap0(8)
    write(*,*) Tita0(2),Tita0(3),Tita0(4)
    write(*,*) Tita0(9),Tita0(10),Tita0(11)
    write(*,*) Tita0(20),Tita0(17),Tita0(18)
-!##
 
    open(unit=13,file='outputdata/u2'//tie//bre(2*t1+1:2*t1+2))
    open(unit=14,file='outputdata/v2'//tie//bre(2*t1+1:2*t1+2))
@@ -112,8 +103,6 @@ program modelo
    open(unit=31,file='outputdata/vara'//tie//bre(2*t1+1:2*t1+2))
    open(unit=32,file='outputdata/posnub'//tie//'.sa')
    open(unit=33,file='outputdata/est'//tie//bre(2*t1+1:2*t1+2))
-
-!     write(*,*) ltt,dt1,lt1,lt2,lt3
 
    write(*,*) 'inis',Titaa1(16,16,4),Qvap1(16,16,4),Tita0(4),Qvap0(4)
 
@@ -133,7 +122,6 @@ program modelo
       aerneg=0.
       laerneg=0
       llluneg=0
-!$$
       lcrineg=0.
       lnieneg=0.
       lgraneg=0.
@@ -158,7 +146,6 @@ program modelo
       mllu(2)=0
       nllu(1)=nz1
       nllu(2)=0
-!$$
       lcri(1)=nx1
       lcri(2)=0
       mcri(1)=nx1
@@ -191,6 +178,7 @@ program modelo
       aert4=0.
       totnuc=0.
       totmic=0.
+
 ! Advección de vapores
       do 15 i=0,nx1+1
          do 15 j=0,nx1+1
@@ -203,7 +191,6 @@ program modelo
             if (W2(i,j,1).gt.0) advllu1(i,j)=0.
             advaer1(i,j)=W2(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
             if(W2(i,j,1).lt.0) advaer1(i,j)=advaer1(i,j)*1.5
-!$$
             advcri1(i,j)=0.
             advnie1(i,j)=W2(i,j,1)*Qnie1(i,j,1)
             if (W2(i,j,1).gt.0) advnie1(i,j)=0.
@@ -222,47 +209,26 @@ program modelo
             l=i
             do 20 j=1,nx1
                m=j
-
 !    calculo del coeficiente de turbulencia y derivadas
                call turbu2(l,m,n)
 
 !    calculo de las inhomogeneidades para las velocidades
-!$$
                call inomo(l,m,n,dden0z)
 
-!**     calculo de la energia cinetica
+!    calculo de la energia cinetica
                ener1=.5*Den0(k)*(U2(i,j,k)**2.+V2(i,j,k)**2.+W2(i,j,k)**2.)+ener1
-
-!      if(((i.eq.11.and.j.eq.3).or.(i.eq.3.and.j.eq.11)).and.k.eq.4)then
-!	  write(*,'(a3,i3,4g16.8)') 'kk',i,KMM,KM1,KM2,KM3
-!          write(*,*) 'ene',lll,ener1,Den0(k),W2(20,20,k)
-!	endif
-!**
-
 
 !     calculo de la temperatura potencial
                call tempot(l,m,n,dden0z,Fcalo(i,j,k))
                Fcalo(i,j,k)=0.
-!     dinamica del vapor y de las gotitas
 
+!     dinamica del vapor y de las gotitas
                call dvapor(l,m,n)
                advvap1(i,j)=advvap2(i,j)
-
                call dgotit(l,m,n)
                advgot1(i,j)=advgot2(i,j)
-
                call dlluvi(l,m,n)
-
-!     if (l.eq.16 .and.m.eq.16 .and.n.eq.13)then
-!        write(*,*) 'llu1',Qllu1(l,m,n),Qllu2(l,m,n),
-!     &              advllu1(i,j),advllu2(i,j)
-!      endif
-
                advllu1(i,j)=advllu2(i,j)
-
-
-!&&
-
                call dcrist(l,m,n)
                advcri1(i,j)=advcri2(i,j)
                call dnieve(l,m,n)
@@ -270,26 +236,12 @@ program modelo
                call dgrani(l,m,n)
                advgra1(i,j)=advgra2(i,j)
 
-!##
-!      if  (i.eq.16.and.(m.eq.16.or.m.eq.16).and. k.eq.25) then
                if  (i.eq.20.and.m.eq.22.and.(k.ge.27.and. k.le.28)) then
-!	write(*,*) 'got0',Qgot1(i,j,k),Qgot2(i,j,k)
                   write(*,*) 'cri0',k,Qcri1(i,j,k),Qcri2(i,j,k)
-!	write(*,*) 'nie0',Qnie1(i,j,k),Qnie2(i,j,k)
-!        write(*,'(a4,2g16.8)') 'tem',Titaa1(i,j,k),Titaa2(i,j,k)
-!        write(*,'(a5,2g16.8)') 'qvap',Qvap1(i,j,k),Qvap2(i,j,k)
                endif
-!##
 
                call daeros(l,m,n)
                advaer1(i,j)=advaer2(i,j)
-
-!##
-!       if(((l.eq.3.and.m.eq.11).or.(l.eq.11.and.m.eq.3)).and.n.eq.4)then
-!          write(*,*) 'ae1',l,m,n
-!          write(*,'(3g16.8)') aer2(l,m,n),aer1(l,m,n),aer1(l,m,n-1)
-!        endif
-!##
 
 !     limites de la nube
                if(Qgot2(i,j,k).ne.0) then
@@ -371,7 +323,6 @@ program modelo
 !*    correccion de negativos
       if(s.ge.1) call corgot
       if (llluneg.eq.1) call corllu
-!$$
       if (lcrineg.eq.1) call corcri
       if (lnieneg.eq.1) call cornie
       if (lgraneg.eq.1) call corgra
@@ -381,8 +332,6 @@ program modelo
       write(*,*) 'vap0',Qvap2(16,16,25),Qvap0(25)
       write(*,*) 'vap0',Qvap2(16,16,26),Qvap0(26)
       write(*,*) 'vap0',Qvap2(16,16,27),Qvap0(27)
-
-!      write(*,'(a5,2g16.8)') 'vap1',Qvap2(16,15,10),Qvap2(16,18,10)
 
 !#### primer calculo de agua (sin laterales)
       do 23 i=1,nx1
@@ -398,10 +347,8 @@ program modelo
                endif
 
 23    continue
-!###
 
       write(*,*) 'antes de microfis'
-!      write(*,'(2g16.8)') aer2(3,11,4),aer2(11,3,4)
 
 !********************************************************************
 
@@ -416,7 +363,6 @@ program modelo
                m=j
 
 !     calculo de T,P,Densi,Dv,Vis
-
                aux=Pres00(k)+Pres2(i,j,k)
                P=aux**ikapa*P00
                T=(Tita0(k)+Titaa2(i,j,k))*aux
@@ -427,7 +373,6 @@ program modelo
                Dv=Dv0*(T/273.15)**1.94*(P00/P)
 
 !     calculo de Vis, Lvl, Lsl, Lvs, elvs y  esvs
-
                iT=int(T)
                aux2=T-iT
                Vis=Tvis(iT)*(1-aux2)+Tvis(iT+1)*aux2
@@ -441,7 +386,7 @@ program modelo
                if (T.ge.T0) then
                   Eacng=1.
                else
-                  Eacng=exp(.08*(T-T0)) !mod 6/2/2000
+                  Eacng=exp(.08*(T-T0))
                endif
 
                nu=Vis/densi
@@ -457,8 +402,6 @@ program modelo
 
                if ((rl.gt.1e-3 .or. rs.gt.1e-3).and.Naer.gt.0) then
                   call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,rl,rs,Lvl,Lvs,l,m,n,daer,dqgot,dqcri)
-
-
                   Taux=T-Temp0(k)-Tempa1(i,j,k)
                   Titaa2(i,j,k)=T/aux-Tita0(k)
                   if (dqgot.gt.0) yy=1
@@ -475,10 +418,7 @@ program modelo
                vapt2=vapt2+Qvap2(i,j,k)
                gott2=gott2+Qgot2(i,j,k)
                aert2=aert2+aer2(i,j,k)
-
-!$$
                if (Qgot2(i,j,k).gt.0 .or. dqgot.gt.0 .or.Qllu2(i,j,k).gt.0 .or. Qcri2(i,j,k).gt.0 .or.Qnie2(i,j,k).gt.0) then
-
                   qgotaux=Qgot2(i,j,k)
                   if (Qgot2(i,j,k).eq.0) qgotaux=0d0
                   qvapaux=Qvap2(i,j,k)+Qvap0(k)
@@ -487,21 +427,13 @@ program modelo
                   qcriaux=Qcri2(i,j,k)
                   if (Qcri2(i,j,k).eq.0) then
                      qcriaux=0d0
-!            if (i.eq.17. and. m.eq.19 .and. n.eq.17)
-!     &         write(*,*) 'Crist',Qcri2(i,j,k),qcriaux
                   endif
-
                   qnieaux=Qnie2(i,j,k)
                   if (Qnie2(i,j,k).eq.0) qnieaux=0d0
                   qgraaux=Qgra2(i,j,k)
                   if (Qgra2(i,j,k).eq.0) qgraaux=0d0
                   Naer=aer2(i,j,k)+aer0(k)
                   T=Tempa1(i,j,k)+Temp0(k)
-
-!      if (i.eq.20.and.(j.eq.22.or.j.eq.22).and.k.eq.28) then
-!	write(*,*) 'cri1',dqgot,dqcri,qcriaux,Qcri2(i,j,k)
-!      endif
-
                   do 35 t2=1,lt2
                      qgotaux=qgotaux+dqgot/float(lt2)
                      qcriaux=qcriaux+dqcri/float(lt2)
@@ -510,65 +442,31 @@ program modelo
                      T=T+Taux/float(lt2)
 
 !     calculo de elvs y esvs
-
                      iT=int(T)
                      aux2=T-iT
                      elvs=Telvs(iT)*(1-aux2)+Telvs(iT+1)*aux2
                      esvs=Tesvs(iT)*(1-aux2)+Tesvs(iT+1)*aux2
-
-!##
-!       if (i.eq.20.and.(j.eq.22.or.j.eq.22).and. k.eq.28) then
-!         write(*,*) 'cri11',qcriaux,Qcri1(i,j,k),Qcri2(i,j,k),dqcri
-!         write(*,*) 'mivap',j,Naer,daer,yy
-!         write(*,*) rl,rs,Naer,dqgot,yy
-!       endif
-!$$
                      call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,&
                         Fcal,l,m,n,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
                         qgraaux,Naer,daer2,nu,yy)
-
                      Fcalo(l,m,n)=Fcalo(l,m,n)+Fcal/dt1/densi
                      Naer=Naer+daer2
-
                      totmic=totmic+daer2
-
                      if (i.eq.20.and.(j.eq.22.or.j.eq.22).and.k.eq.28) then
-!        write(*,'(a5,i3,2g16.8)') 'aer2',j,Naer,daer2
-!        write(*,'(a5,i3,g16.8)') 'vap2',j,qvapaux
                         write(*,*) qgotaux,qlluaux,qcriaux
                      endif
-
-
-!##
-!        if (i.eq.16 .and. j.eq.19 .and. k.eq.8) then
-!           write(*,*) 'mivap2',qvapaux,Qvap2(i,j,k)
-!     &                 ,Qvap0(k),qcriaux
-!          write(*,*) 'tem2',Fcalo(l,m,n),Fcal,densi
-!        endif
-!##
-
-!##
-!       if (i.eq.17 .and. j.eq.17 .and. k.eq.10) then
-!         write(*,*) 'got1',Qgot2(i,j,k),qgotaux,dqgot
-!         write(*,*) 'gra1',Qgra2(i,j,k),qgraaux
-!         pause
-!       endif
-
-
 35                continue
 
-!$$
                   Qgot2(i,j,k)=qgotaux
                   Qllu2(i,j,k)=qlluaux
                   Qcri2(i,j,k)=qcriaux
                   Qnie2(i,j,k)=qnieaux
                   Qgra2(i,j,k)=qgraaux
                   Qvap2(i,j,k)=qvapaux-Qvap0(k)
-                  aer2(i,j,k)=Naer-aer0(k) !mod 14/9/99
+                  aer2(i,j,k)=Naer-aer0(k)
                   Tempa1(i,j,k)=T-Temp0(k)
 
                endif
-
 
                if (Tita0(k).lt.abs(Titaa2(i,j,k))+200.or.Temp0(k).lt.abs(Tempa1(i,j,k))+200) then
                   write(*,*) 'problemas con la temperatura 2'
@@ -595,8 +493,6 @@ program modelo
                vapt3=vapt3+Qvap2(i,j,k)
                gott3=gott3+Qgot2(i,j,k)
                aert3=aert3+aer2(i,j,k)
-!###
-
 
 !**   calculo de la energia
                ener2=densi*G*k*dx1+ener2
@@ -606,32 +502,20 @@ program modelo
                qv=Qvap2(i,j,k)+qv
                qg=Qgot2(i,j,k)+qg
                daitot=densi+daitot
-!**
-
 30    continue
 !********************************************************************
       Qvap=(qv+qg)/nx1**2.*nz1*.1
-
       write(*,*) 'antes de las redefiniciones'
-!      write(*,*) 'cri32',Qcri1(20,22,28),Qcri2(20,22,28)
-!     &           ,Tempa1(20,22,28)
-!      write(*,*) 'llu2',Qllu1(16,16,13),Qllu2(16,16,13)
-!     &           ,Tempa1(16,16,13)
-!      write(*,'(2g16.8)') aer2(11,3,4),aer2(3,11,4)
-!      write(*,'(2g16.8)') Qvap2(16,15,10),Qvap2(16,18,10),
-!     &                    Qvap1(4,15,10),Qvap1(4,18,10)
 
 
 !**   calculo de los contornos laterales, piso y techo
-!*   1 contornos en el piso y en el techo
+!*    contornos en el piso y en el techo
 
       do 400 i=1,nx1
          do 400 j=1,nx1
-
             Titaa2(i,j,0)=-W2(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+Titaa1(i,j,0)
             Titaa2(i,j,nz1)=Titaa2(i,j,nz1-1)
 
-!   modificado 04/05/98
 !   suponemos que las velocidades horizontales a nivel de piso son
 !   iguales a 1/4 de la correspondiente en el nivel 1
 
@@ -655,7 +539,6 @@ program modelo
             Qllu2(i,j,0)=Qllu2(i,j,1)/2.
             Qllu2(i,j,nz1)=Qllu2(i,j,nz1-1)
 
-!$$
             Qnie2(i,j,0)=Qnie2(i,j,1)
             Qnie2(i,j,nz1)=Qnie2(i,j,nz1-1)
 
@@ -663,7 +546,6 @@ program modelo
             Qgra2(i,j,0)=Qgra2(i,j,1)/2.
             Qgra2(i,j,nz1)=Qgra2(i,j,nz1-1)
 
-!   modificado 04/05/98
 !   suponemos que las velocidades horizontales a nivel de piso son
 !   iguales a 1/4 de la correspondiente en el nivel 1
 
@@ -690,16 +572,11 @@ program modelo
 
             aer2(i,j,0)=aeraux+aer1(i,j,0)+turbu*lapla
 
-!      if (i.eq.15.and.(j.eq.16.or.j.eq.17))
-!     &   write(*,'(a2,i3,8g16.8)') 'p',j,aer2(i,j,0),aeraux,aer1(i,j,0)
-!     &                      ,turbu,lapla
-!     &                      ,auxx,auxy,auxz
-
             aer2(i,j,nz1)=aer2(i,j,nz1-1)
 
 400   continue
 
-!*  1 contornos laterales (mod. 7/02/99)
+!*  1 contornos laterales
       do 410 k=1,nz1-1
          do 410 j=1,nx1
 
@@ -719,7 +596,6 @@ program modelo
             Qllu2(nx1+1,j,k)=0.
             Qllu2(j,0,k)=0.
             Qllu2(j,nx1+1,k)=0.
-!$$
             Qcri2(0,j,k)=Qcri2(1,j,k)
             Qcri2(nx1+1,j,k)=Qcri2(nx1,j,k)
             Qcri2(j,0,k)=Qcri2(j,1,k)
@@ -739,12 +615,6 @@ program modelo
 
 410   continue
 
-!$$
-!        write(*,*) 'cris2',Qcri2(17,16,15)
-!        write(*,*) 'nie2',Qnie2(17,16,14)
-!        write(*,*) 'got2',Qgot2(17,17,10)
-!        write(*,*) 'gra2',Qgra2(17,17,10)
-
 !********************************************************************
 !**   calculo de la velocidad y la presion
 
@@ -752,12 +622,7 @@ program modelo
 
 !********************************************************************
 !**  contornos, redefiniciones y filtros
-!***#### modificada las condiciones en el piso (27/8/97)
-
-!      write(*,'(a5,2g16.8)') 'vap3',Qvap2(16,15,10),Qvap2(16,18,10)
-!      write(*,'(a5,2g16.8)') 'aer3',aer2(16,15,10),aer2(16,18,10)
-!      write(*,'(a5,2g16.8)') 'aer3',aer2(5,7,0),aer2(5,26,0)
-
+!*** modificada las condiciones en el piso
 !*     Redefinicion
       do 155 i=1,nx1
          do 155 j=1,nx1
@@ -774,7 +639,6 @@ program modelo
 
 
             if (abs(Qvap1(i,j,k)).lt.1e-10) Qvap1(i,j,k)=0
-!	if (Qvap0+Qvap1(i,j,k)).lt.0) Qvap1(i,j,k)=-Qvap0(k)
 
             Qgot1(i,j,k)=pro3*Qgot2(i,j,k)+&
                pro4*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+(Qgot2(i,j+1,k)+Qgot2(i,j-1,k)))
@@ -785,7 +649,6 @@ program modelo
 
             if (Qllu1(i,j,k).lt.1e-10) Qllu1(i,j,k)=0
 
-!$$
             Qcri1(i,j,k)=pro3*Qcri2(i,j,k)+&
                pro4*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+(Qcri2(i,j+1,k)+Qcri2(i,j-1,k)))
 
@@ -826,31 +689,12 @@ program modelo
                   (Qvap2(i,j+1,k)+Qvap2(i,j-1,k))+&
                   Qvap2(i,j,k+1)+Qvap2(i,j,k-1))
 
-
-!        if(i.eq.15 .and.(j.eq.15.or.j.eq.18).and.k.eq.10) then
-!          write(*,'(a9,i3,8g16.8)') 'redefino',j,Qvap1(i,j,k),
-!     &          Qvap2(i,j,k),Qvap2(i+1,j,k),
-!     &          Qvap2(i-1,j,k),Qvap2(i,j+1,k),Qvap2(i,j-1,k),
-!     &          Qvap2(i,j,k+1),Qvap2(i,j,k-1)
-!          pause
-!        endif
-
-
-
                if (abs(Qvap1(i,j,k)).lt.1e-10) Qvap1(i,j,k)=0
 
                Qgot1(i,j,k)=pro1*Qgot2(i,j,k)+&
                   pro2*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+&
                   (Qgot2(i,j+1,k)+Qgot2(i,j-1,k))+&
                   Qgot2(i,j,k+1)+Qgot2(i,j,k-1))
-
-
-!##
-!       if(i.eq.17 .and. j.eq.17 .and. k.eq.10)then
-!         write(*,*) 'got3',Qgot1(i,j,k),Qgot2(i,j,k),Qgot2(i+1,j,k)
-!     &       ,Qgot2(i-1,j,k),Qgot2(i,j+1,k),Qgot2(i,j-1,k)
-!     &       ,Qgot2(i,j,k+1),Qgot2(i,j,k-1)
-!       endif
 
                if (Qgot1(i,j,k).lt.1e-10) Qgot1(i,j,k)=0
 
@@ -860,27 +704,11 @@ program modelo
 
                if (Qllu1(i,j,k).lt.1e-10) Qllu1(i,j,k)=0
 
-!$$
                Qcri1(i,j,k)=pro1*Qcri2(i,j,k)+&
                   pro2*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+&
                   (Qcri2(i,j+1,k)+Qcri2(i,j-1,k))+Qcri2(i,j,k+1)+Qcri2(i,j,k-1))
 
-!##
-!      if (i.eq.17 .and. j.eq.16 .and. k.eq.14) then
-!        write(*,*) 'nie3',Qnie1(i,j,k),Qnie2(i,j,k),pro1,pro2
-!        write(*,*) Qnie2(i+1,j,k),Qnie2(i-1,j,k),Qnie2(i,j+1,k),
-!     &             Qnie2(i,j-1,k),Qnie2(i,j,k+1),Qnie2(i,j,k-1)
-!      endif
-
                if (Qcri1(i,j,k).lt.1e-10) Qcri1(i,j,k)=0
-
-!#
-!       if (Qcri1(i,j,k).gt.1e-9) then
-!         write(*,*) 'cristales aqui',i,j,k
-!         write(*,*) Qcri1(i,j,k)
-!         stop
-!       endif
-!#
 
                Qnie1(i,j,k)=pro1*Qnie2(i,j,k)+&
                   pro2*((Qnie2(i+1,j,k)+Qnie2(i-1,j,k))+&
@@ -894,13 +722,6 @@ program modelo
                   (Qgra2(i,j+1,k)+Qgra2(i,j-1,k))+&
                   Qgra2(i,j,k+1)+Qgra2(i,j,k-1))
 
-!##
-!       if(i.eq.17 .and. j.eq.17 .and. k.eq.10)then
-!         write(*,*) 'gra3',Qgra1(i,j,k),Qgra2(i,j,k),Qgra2(i+1,j,k)
-!     &       ,Qgra2(i-1,j,k),Qgra2(i,j+1,k),Qgra2(i,j-1,k)
-!     &       ,Qgra2(i,j,k+1),Qgra2(i,j,k-1)
-!       endif
-
                if (Qgra1(i,j,k).lt.1e-10) Qgra1(i,j,k)=0
 
                aer1(i,j,k)=pro1*aer2(i,j,k)+&
@@ -909,20 +730,9 @@ program modelo
 
 
                if (abs(aer1(i,j,k)).lt.1e-10) aer1(i,j,k)=0
-
-!      if(((i.eq.3.and.j.eq.11).or.(i.eq.11.and.j.eq.3)).and.k.eq.4)then
-!          write(*,'(a9,i3,8g16.8)') 'redefino',j,aer1(i,j,k),
-!     &          aer2(i,j,k),aer2(i+1,j,k),
-!     &          aer2(i-1,j,k),aer2(i,j+1,k),aer2(i,j-1,k),
-!     &          aer2(i,j,k+1),aer2(i,j,k-1)
-!          pause
-!        endif
-
-
 155   continue
 
-!*   2 contornos en el piso y en el techo
-
+!*   contornos en el piso y en el techo
       do 420 i=1,nx1
          do 420 j=1,nx1
             Titaa1(i,j,0)=Titaa1(i,j,0)
@@ -931,7 +741,7 @@ program modelo
 
             Titaa1(i,j,nz1)=Titaa1(i,j,nz1-1)
 
-!       corregido para el vapor (2/12/97)
+!       corregido para el vapor
             if (Qvap1(i,j,0).gt.Qvap0(0)*.5) then
                Qvap1(i,j,0)=.8*Qvap0(0)
             endif
@@ -944,7 +754,6 @@ program modelo
             Qgot1(i,j,nz1)=Qgot1(i,j,nz1-1)
             Qllu1(i,j,0)=Qllu1(i,j,0)
             Qllu1(i,j,nz1)=Qllu1(i,j,nz1-1)
-!$$
             Qcri1(i,j,0)=0.
             Qcri1(i,j,nz1)=Qcri1(i,j,nz1-1)
 
@@ -954,18 +763,14 @@ program modelo
             Qgra1(i,j,0)=Qgra1(i,j,0)
             Qgra1(i,j,nz1)=Qgra1(i,j,nz1-1)
 
-!       corregido para los aerosoles (04/05/98)
+!       corregido para los aerosoles
             if (-aer1(i,j,0).gt.0.8*aer0(0)) then
                aer1(i,j,0)=-.8*aer0(0)
             endif
             aer1(i,j,nz1)=aer1(i,j,nz1-1)
-
 420   continue
 
-!***####
-
-!*  2 contornos laterales  (mod 2/12/97)
-
+!*  contornos laterales
       do 430 k=1,nz1-1
          do 430 j=1,nx1
 
@@ -989,7 +794,6 @@ program modelo
             Qcri1(nx1+1,j,k)=Qcri1(nx1,j,k)
             Qcri1(j,0,k)=Qcri1(j,1,k)
             Qcri1(j,nx1+1,k)=Qcri1(j,nx1,k)
-!$$
             Qnie1(0,j,k)=Qnie1(1,j,k)
             Qnie1(nx1+1,j,k)=Qnie1(nx1,j,k)
             Qnie1(j,0,k)=Qnie1(j,1,k)
@@ -1006,54 +810,26 @@ program modelo
 
 430   continue
 
-!      write(*,'(a5,2g16.8)') 'vap4',Qvap1(16,15,10),Qvap1(16,18,10)
-
-
 !     filtro para Titaa1 Qvap1
       call filtro(Titaa1,.01,.01,.02)
-!	call filtro(Qvap1,.1,.1,.1)
-
-!      write(*,'(a5,2g16.8)') 'vap5',Qvap1(16,15,10),Qvap1(16,18,10)
 
 !     correccion de negativos para el vapor
-
       do 26 i=0,nx1+1
          do 26 j=0,nx1+1
             do 26 k=0,nz1
                if(Qvap1(i,j,k)+Qvap0(k).lt.0) then
                   Qvap1(i,j,k)=-Qvap0(k)
                   write(*,*) 'vapp',i,j,k,Qvap1(i,j,k)
-!          stop
                endif
 26    continue
-
-!###
-!###
 
 !********************************************************************
 
       lll=tt
       ener=ener1+ener2+ener3+ener4+ener5
-!       write(*,*) 'fin',lll,ener,ener1,ener2,ener3,ener4,ener5,qv
-!     &                 ,qg,daitot
-!        write(*,'(a4,i4,2g16.8)')'fin',lll,aer1(3,11,4),aer1(11,3,4)
       write(*,*) 'fin',lll,Qcri1(16,16,14),Qcri2(16,16,14)
-!        pause
-
-
       write(*,*) W1(20,22,30),W1(19,22,30),W1(21,22,30),W1(20,21,30),W1(20,23,30)
       write(*,*) W1(19,21,30),W1(21,21,30),W1(21,23,30),W1(19,23,30),W1(21,22,30)
-
-!       write(*,*) Qcri1(20,22,22),Qnie1(20,22,22),Qvap1(20,22,22)
-!     &           ,Qvap0(22),W1(20,22,22)
-!       write(*,*) Qcri1(20,22,23),Qnie1(20,22,23),Qvap1(20,22,23)
-!     &           ,Qvap0(23),W1(20,22,23)
-!       write(*,*) Qcri1(20,22,24),Qnie1(20,22,24),Qvap1(20,22,24)
-!     &           ,Qvap0(24),W1(20,22,24)
-!       write(*,*) Qcri1(20,22,25),Qnie1(20,22,25),Qvap1(20,22,25)
-!     &           ,Qvap0(25),W1(20,22,25)
-!       write(*,*) Qcri1(20,22,26),Qnie1(20,22,26),Qvap1(20,22,26)
-!     &           ,Qvap0(26),W1(20,22,26)
       write(*,*) Qcri1(20,22,27),Qnie1(20,22,27),Qvap1(20,22,27),Qvap0(27),W1(20,22,27)
       write(*,*) Qcri1(20,22,28),Qnie1(20,22,28),Qvap1(20,22,28),Qvap0(28),W1(20,22,28)
       write(*,*) Qcri1(20,22,29),Qnie1(20,22,29),Qvap1(20,22,29),Qvap0(29),W1(20,22,29)
@@ -1062,32 +838,7 @@ program modelo
       write(*,*) Qcri1(20,22,32),Qnie1(20,22,32),Qvap1(20,22,32),Qvap0(32),W1(20,22,32)
       write(*,*) Qcri1(20,22,33),Qnie1(20,22,33),Qvap1(20,22,33),Qvap0(33),W1(20,22,33)
 
-!      write(*,*) 'fin',lll
-!      write(*,*) 'llu2',Qllu1(16,16,13),Qllu2(16,16,13)
-
-!      write(*,*) U2(16,16,6),U2(16,17,6),U2(17,17,6),U2(17,16,6)
-!      write(*,*) V2(16,16,6),V2(16,17,6),V2(17,17,6),V2(17,16,6)
-!      write(*,*) W2(16,16,6),W2(16,17,6),W2(17,17,6),W2(17,16,6)
-!      write(*,*) Qvap2(16,15,10),Qvap2(16,18,10),Qvap2(18,17,10)
-!     &          ,Qvap2(18,16,10)
-!      write(*,*) Qgot2(16,15,10),Qgot2(16,18,10),Qgot2(18,17,10)
-!     &          ,Qgot2(18,16,10)
-!      write(*,*) aer2(16,16,6),aer2(16,17,6),aer2(17,17,6)
-!     &          ,aer2(17,16,6)
-!      write(*,*) Titaa2(16,16,6),Titaa2(16,17,6),Titaa2(17,17,6)
-!     &          ,Titaa2(17,16,6)
-!      write(*,*) Pres2(16,16,6),Pres2(16,17,6),Pres2(17,17,6)
-!     &          ,Pres2(17,16,6)
-!      write(*,'(4g16.8)') Titaa2(2,12,14),Titaa2(2,21,14),
-!     &                    Titaa1(2,12,14),Titaa1(2,21,14)
-!      write(*,'(4g16.8)') Qvap1(16,15,10),Qvap1(16,18,10),
-!     &                    Qvap1(17,18,10),Qvap1(18,16,10)
-!      write(*,'(4g16.8)') aer1(15,15,10),aer1(15,18,10),
-!     &                    aer1(18,18,10),aer1(18,15,10)
-
-
 !     Evolucion para puntos seleccionados
-
       write(13,44) U2(16,16,1),U2(17,17,1),U2(16,19,1),U2(17,19,1),U2(19,16,1),U2(19,17,1)
       write(14,44) V2(16,16,1),V2(17,17,1),V2(16,19,1),V2(17,19,1),V2(19,16,1),V2(19,17,1)
       write(15,44) W2(16,16,1),W2(17,17,1),W2(16,19,1),W2(17,19,1),W2(19,16,1),W2(19,17,1)
@@ -1109,8 +860,6 @@ program modelo
             aux3=aux3+aer1(i+nx1/2+6-posx(tt),j-posy(tt),0)
             aux4=aux4+aer1(j-posx(tt),i+nx1/2-10-posy(tt),0)
 810   continue
-
-!	write(22,44) aux1/16.,aux2/16.,aux3/16.,aux4/16.
 
       write(31,*)  tt,totnuc,totmic
 
@@ -1145,37 +894,6 @@ program modelo
          Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
       endif
 
-
-!      stop
-
-!#
-!      do 2345 i=1,nx1
-!      do 2345 j=1,nx1/2
-!      do 2345 k=1,nz1
-!        if((Qvap1(i,j,k).ne.Qvap1(i,nx1-j+1,k)).or.
-!     &      (Titaa1(i,j,k).ne.Titaa1(i,nx1-j+1,k)).or.
-!     &      (Titaa1(j,i,k).ne.Titaa1(nx1-j+1,i,k)).or.
-!     &      (U1(i,j,k).ne.U1(i,nx1-j+1,k)).or.
-!     &      (V1(i,j,k).ne.-V1(i,nx1-j+1,k)).or.
-!     &      (W1(i,j,k).ne.W1(i,nx1-j+1,k)).or.
-!     &      (W1(i,j,k).ne.W1(j,i,k)).or.
-!     &      (aer1(i,j,k).ne.aer1(i,nx1-j+1,k)).or.
-!     &      (aer1(i,j,k).ne.aer1(j,i,k))) then
-
-!           write(*,*) 'no iguales en model',i,j,nx1-j+1,k
-!           write(*,'(2g16.8)')  Qvap1(i,j,k),Qvap1(i,nx1-j+1,k)
-!           write(*,'(2g16.8)')  Titaa1(i,j,k),Titaa1(i,nx1-j+1,k)
-!           write(*,'(2g16.8)')  Titaa1(j,i,k),Titaa1(nx1-j+1,i,k)
-!           write(*,'(2g16.8)')  U1(i,j,k),U1(i,nx1-j+1,k)
-!           write(*,'(2g16.8)')  V1(i,j,k),V1(i,nx1-j+1,k)
-!           write(*,'(2g16.8)')  W1(i,j,k),W1(i,nx1-j+1,k)
-!           write(*,'(2g16.8)')  W1(i,j,k),W1(j,i,k)
-!           write(*,'(2g16.8)')  aer2(i,j,k),aer2(i,nx1-j+1,k)
-!           write(*,'(2g16.8)')  aer2(i,j,k),aer2(j,i,k)
-!           stop
-!        endif
-! 2345 continue
-!#
       write(*,*) ""
       write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
       write(*,*) ""
@@ -1193,25 +911,17 @@ program modelo
    close(18)
    close(19)
    close(20)
-
    close(30)
    close(31)
    close(32)
    close(33)
 
-
-!       stop
-
 !*******************************************************************
-!#
    write(*,*) 'termina'
    open(unit=30,file='outputdata/termina')
    write(30,*) '1'
    close(30)
-!#
-
 !********************************************************************
-
 
 3000 format(a10,6i4)
 4003 format(7g17.9)
@@ -1221,6 +931,5 @@ program modelo
 4007 format(2g17.9)
 
 44 format(6g16.8)
-
 
 end
