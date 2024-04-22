@@ -40,13 +40,13 @@ program modelo
    implicit none
 
    call mode20_init()
-!******************************************************************
-!*    Condiciones iniciales. Si ini=0 el calculo empieza por primera,
-!        si ini=1 el calculo recomienza desde algun paso
 
+!########### Condiciones iniciales ############
    if (ini.eq.0) then
+      !Si ini=0 el calculo empieza por primera###
       call condi
    else
+      !si ini=1 el calculo recomienza desde algun paso
       open(unit=13,file='outputdata/inis.da',status='unknown',form='unformatted')
       open(unit=14,file='outputdata/velos.da',status='unknown',form='unformatted')
       rewind 14
@@ -73,18 +73,13 @@ program modelo
 5001  continue
    endif
 
-!**   definicion de calores y presiones de vapor a 0 K
-
+   !definicion de calores y presiones de vapor a 0 K
    Lsl00=Lsl0*4180.
-
    write(*,*) 'Qgot',Qgot1(32,34,0),Qgot1(32,34,1),Qgot1(32,34,2)
    write(*,*) 'Qcri',Qcri1(32,34,0),Qcri1(32,34,1),Qcri1(32,34,2)
    write(*,*) 'Qnie',Qnie1(32,34,0),Qnie1(32,34,1),Qnie1(32,34,2)
    write(*,*) 'Qllu',Qllu1(32,34,0),Qllu1(32,34,1),Qllu1(32,34,2)
-
    write(*,*) Qllu1(16,12,27),Qllu1(12,17,27)
-
-!**************************************************************
    write(*,*) 'des cond',Qvap1(20,20,8),Qvap0(8)
    write(*,*) Tita0(2),Tita0(3),Tita0(4)
    write(*,*) Tita0(9),Tita0(10),Tita0(11)
@@ -105,17 +100,13 @@ program modelo
    open(unit=33,file='outputdata/est'//tie//bre(2*t1+1:2*t1+2))
 
    write(*,*) 'inis',Titaa1(16,16,4),Qvap1(16,16,4),Tita0(4),Qvap0(4)
-
    write(*,*) 'tem',Fcalo(21,16,5)
-!***********************************************************
-!     comienzo de la evolucion temporal
-!***********************************************************
-!****lazo temporal principal
+
+!#####################################################################
+!############### comienzo de la evolucion temporal ###################
+   !lazo temporal principal
    do 1 tt=1,lt1
-!      tt=1
-
-!*    inicializado para cada paso
-
+      !inicializado para cada paso
       s=0
       Qvapneg=0.
       lvapneg=0
@@ -179,14 +170,13 @@ program modelo
       totnuc=0.
       totmic=0.
 
-! Advección de vapores
+!######################## Advección de vapores #######################
+      
       do 15 i=0,nx1+1
          do 15 j=0,nx1+1
             advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
             advgot1(i,j)=0.
             advllu1(i,j)=W2(i,j,1)*Qllu1(i,j,1)
-
-!     modifique i,j,k por i,j,1 (11/01/99)
 
             if (W2(i,j,1).gt.0) advllu1(i,j)=0.
             advaer1(i,j)=W2(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
@@ -198,8 +188,7 @@ program modelo
             if (W2(i,j,1).gt.0) advgra1(i,j)=0.
 15    continue
 
-!********************************************************************
-!*    calculo de la dinamica y de la termodinamica
+!########### calculo de la dinamica y de la termodinamica ############
 
       do 20 k=1,nz1-1
          n=k
@@ -209,20 +198,20 @@ program modelo
             l=i
             do 20 j=1,nx1
                m=j
-!    calculo del coeficiente de turbulencia y derivadas
+               !calculo del coeficiente de turbulencia y derivadas
                call turbu2(l,m,n)
 
-!    calculo de las inhomogeneidades para las velocidades
+               !calculo de las inhomogeneidades para las velocidades
                call inomo(l,m,n,dden0z)
 
-!    calculo de la energia cinetica
+               !calculo de la energia cinetica
                ener1=.5*Den0(k)*(U2(i,j,k)**2.+V2(i,j,k)**2.+W2(i,j,k)**2.)+ener1
 
-!     calculo de la temperatura potencial
+               !calculo de la temperatura potencial
                call tempot(l,m,n,dden0z,Fcalo(i,j,k))
                Fcalo(i,j,k)=0.
 
-!     dinamica del vapor y de las gotitas
+               !dinamica del vapor y de las gotitas
                call dvapor(l,m,n)
                advvap1(i,j)=advvap2(i,j)
                call dgotit(l,m,n)
@@ -243,7 +232,7 @@ program modelo
                call daeros(l,m,n)
                advaer1(i,j)=advaer2(i,j)
 
-!     limites de la nube
+               !limites de la nube
                if(Qgot2(i,j,k).ne.0) then
                   if (i.lt.lgot(1)) lgot(1)=i
                   if (i.gt.lgot(2)) lgot(2)=i
@@ -254,7 +243,7 @@ program modelo
                   s=s+1
                endif
 
-!     limites de la lluvia
+               !limites de la lluvia
                if(Qllu2(i,j,k).ne.0) then
                   if (i.lt.lllu(1)) lllu(1)=i
                   if (i.gt.lllu(2)) lllu(2)=i
@@ -265,8 +254,7 @@ program modelo
                   llluneg=1
                endif
 
-!     limites de los cristales
-!$$
+               !limites de los cristales
                if(Qcri2(i,j,k).ne.0) then
                   if (i.lt.lcri(1)) lcri(1)=i
                   if (i.gt.lcri(2)) lcri(2)=i
@@ -277,7 +265,7 @@ program modelo
                   lcrineg=1
                endif
 
-!     limites de la nieve
+               !limites de la nieve
                if(Qnie2(i,j,k).ne.0) then
                   if (i.lt.lnie(1)) lnie(1)=i
                   if (i.gt.lnie(2)) lnie(2)=i
@@ -288,7 +276,7 @@ program modelo
                   lnieneg=1
                endif
 
-!     limites del granizo
+               !limites del granizo
                if(Qgra2(i,j,k).ne.0) then
                   if (i.lt.lgra(1)) lgra(1)=i
                   if (i.gt.lgra(2)) lgra(2)=i
@@ -304,7 +292,6 @@ program modelo
                   write(*,*) Qvap2(i,j,k),Qvap0(k),P,T,W2(i,j,k)
                   Qvapneg=Qvapneg+Qvap0(k)+Qvap2(i,j,k)
                   lvapneg=1
-!            pause
                endif
 
                if(aer0(k)+aer2(i,j,k).lt.0) then
@@ -312,15 +299,12 @@ program modelo
                   write(*,*) aer2(i,j,k),aer0(k),P,T,W2(i,j,k)
                   aerneg=aerneg+aer0(k)+aer2(i,j,k)
                   laerneg=1
-!            pause
                endif
-
 20    continue
 
       write(*,3000) 'limites',lnie(1),lnie(2),mnie(1),mnie(2),nnie(1),nnie(2)
 
-
-!*    correccion de negativos
+      !correccion de negativos
       if(s.ge.1) call corgot
       if (llluneg.eq.1) call corllu
       if (lcrineg.eq.1) call corcri
@@ -328,12 +312,11 @@ program modelo
       if (lgraneg.eq.1) call corgra
       if (lvapneg.eq.1) call corvap(Qvapneg)
       if (laerneg.eq.1) call coraer(aerneg)
-
       write(*,*) 'vap0',Qvap2(16,16,25),Qvap0(25)
       write(*,*) 'vap0',Qvap2(16,16,26),Qvap0(26)
       write(*,*) 'vap0',Qvap2(16,16,27),Qvap0(27)
 
-!#### primer calculo de agua (sin laterales)
+      !primer calculo de agua (sin laterales)
       do 23 i=1,nx1
          do 23 j=1,nx1
             do 23 k=1,nz1-1
@@ -345,16 +328,10 @@ program modelo
                   write(*,*) 'vapomoco',i,j,k,Qvap2(i,j,k),Qvap0(k),Qvap1(i,j,k)
                   stop
                endif
-
 23    continue
 
+!####################### Sublazo Microfísico #########################
       write(*,*) 'antes de microfis'
-
-!********************************************************************
-
-!********************************************************************
-!*    sublazo microfisico
-
       do 30 k=1,nz1-1
          n=k
          do 30 i=1,nx1
@@ -362,7 +339,7 @@ program modelo
             do 30 j=1,nx1
                m=j
 
-!     calculo de T,P,Densi,Dv,Vis
+               !calculo de T,P,Densi,Dv,Vis
                aux=Pres00(k)+Pres2(i,j,k)
                P=aux**ikapa*P00
                T=(Tita0(k)+Titaa2(i,j,k))*aux
@@ -372,7 +349,7 @@ program modelo
                densi=P/T/Rd-AA*Qvap
                Dv=Dv0*(T/273.15)**1.94*(P00/P)
 
-!     calculo de Vis, Lvl, Lsl, Lvs, elvs y  esvs
+               !calculo de Vis, Lvl, Lsl, Lvs, elvs y  esvs
                iT=int(T)
                aux2=T-iT
                Vis=Tvis(iT)*(1-aux2)+Tvis(iT+1)*aux2
@@ -391,7 +368,7 @@ program modelo
 
                nu=Vis/densi
 
-!*    nucleacion (de ser necesario tiene otro paso de tiempo)
+               !nucleacion (de ser necesario tiene otro paso de tiempo)
                lll=tt
 
                Qliq=Qgot2(i,j,k)
@@ -414,7 +391,7 @@ program modelo
 
                totnuc=totnuc+daer
 
-!#### segundo calculo de agua (sin laterales)
+               !segundo calculo de agua (sin laterales)
                vapt2=vapt2+Qvap2(i,j,k)
                gott2=gott2+Qgot2(i,j,k)
                aert2=aert2+aer2(i,j,k)
@@ -441,7 +418,7 @@ program modelo
                      Naer=Naer+daer/float(lt2)
                      T=T+Taux/float(lt2)
 
-!     calculo de elvs y esvs
+                     !calculo de elvs y esvs
                      iT=int(T)
                      aux2=T-iT
                      elvs=Telvs(iT)*(1-aux2)+Telvs(iT+1)*aux2
@@ -489,12 +466,12 @@ program modelo
                   aer2(i,j,k)=-aer0(k)
                endif
 
-!#### tercer calculo de agua (sin laterales)
+               !tercer calculo de agua (sin laterales)
                vapt3=vapt3+Qvap2(i,j,k)
                gott3=gott3+Qgot2(i,j,k)
                aert3=aert3+aer2(i,j,k)
 
-!**   calculo de la energia
+               !calculo de la energia
                ener2=densi*G*k*dx1+ener2
                ener3=densi*(Cp-Rd)*T+ener3
                ener4=P+ener4
@@ -503,22 +480,19 @@ program modelo
                qg=Qgot2(i,j,k)+qg
                daitot=densi+daitot
 30    continue
-!********************************************************************
+
+!####################### Contornos ##############################
       Qvap=(qv+qg)/nx1**2.*nz1*.1
       write(*,*) 'antes de las redefiniciones'
 
-
-!**   calculo de los contornos laterales, piso y techo
-!*    contornos en el piso y en el techo
-
+      !contornos en el piso y en el techo
       do 400 i=1,nx1
          do 400 j=1,nx1
             Titaa2(i,j,0)=-W2(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+Titaa1(i,j,0)
             Titaa2(i,j,nz1)=Titaa2(i,j,nz1-1)
 
-!   suponemos que las velocidades horizontales a nivel de piso son
-!   iguales a 1/4 de la correspondiente en el nivel 1
-
+            !suponemos que las velocidades horizontales a nivel de piso son
+            !iguales a 1/4 de la correspondiente en el nivel 1
             auxx=((U2(i+1,j,1)+U2(i,j,1))*(Qvap1(i+1,j,0)+Qvap1(i,j,0))&
                -(U2(i-1,j,1)+U2(i,j,1))*(Qvap1(i-1,j,0)+Qvap1(i,j,0)))&
                /4.*.25
@@ -535,19 +509,19 @@ program modelo
             Qcri2(i,j,0)=Qcri2(i,j,1)
             Qcri2(i,j,nz1)=Qcri2(i,j,nz1-1)
 
-!     Para que no se acumulen el piso
+            !Para que no se acumulen el piso
             Qllu2(i,j,0)=Qllu2(i,j,1)/2.
             Qllu2(i,j,nz1)=Qllu2(i,j,nz1-1)
 
             Qnie2(i,j,0)=Qnie2(i,j,1)
             Qnie2(i,j,nz1)=Qnie2(i,j,nz1-1)
 
-!     Para que no se acumulen el piso
+            !Para que no se acumulen el piso
             Qgra2(i,j,0)=Qgra2(i,j,1)/2.
             Qgra2(i,j,nz1)=Qgra2(i,j,nz1-1)
 
-!   suponemos que las velocidades horizontales a nivel de piso son
-!   iguales a 1/4 de la correspondiente en el nivel 1
+            !suponemos que las velocidades horizontales a nivel de piso son
+            !iguales a 1/4 de la correspondiente en el nivel 1
 
             auxx=((U2(i+1,j,1)+U2(i,j,1))*(aer1(i+1,j,0)+aer1(i,j,0))&
                -(U2(i-1,j,1)+U2(i,j,1))*(aer1(i-1,j,0)+aer1(i,j,0)))&
@@ -560,12 +534,12 @@ program modelo
             if (W2(i,j,0).gt.0) then
                aeraux=-((auxx+auxy)+2.*auxz)*dt1/dx1
             else
-!     se refleja un 25 % de los aerosoles que caen
+               !se refleja un 25 % de los aerosoles que caen
                aeraux=-((auxx+auxy)+.25*2.*auxz)*dt1/dx1
             endif
 
-!     agregamos un termino de turbulencia para los aerosoles
-!       a nivel de piso (6/5/98)
+            !agregamos un termino de turbulencia para los aerosoles
+            !a nivel de piso
             turbu=cks/dx1*.25*(abs(U2(i,j,1))+abs(V2(i,j,1))+2.*abs(W2(i,j,1)))
             lapla=((aer1(i+1,j,0)+aer1(i-1,j,0))+(aer1(i,j+1,0)+aer1(i,j-1,0)+aer1(i,j,1)))-5.*aer1(i,j,0)
             lapla=lapla+(aer0(1)-aer0(0))
@@ -573,10 +547,9 @@ program modelo
             aer2(i,j,0)=aeraux+aer1(i,j,0)+turbu*lapla
 
             aer2(i,j,nz1)=aer2(i,j,nz1-1)
-
 400   continue
 
-!*  1 contornos laterales
+      !contornos laterales
       do 410 k=1,nz1-1
          do 410 j=1,nx1
 
@@ -615,15 +588,13 @@ program modelo
 
 410   continue
 
-!********************************************************************
-!**   calculo de la velocidad y la presion
-
+!############### calculo de la velocidad y la presion ################
       call velpre
 
-!********************************************************************
+!#####################################################################
 !**  contornos, redefiniciones y filtros
 !*** modificada las condiciones en el piso
-!*     Redefinicion
+      !Redefinicion
       do 155 i=1,nx1
          do 155 j=1,nx1
 
@@ -665,7 +636,7 @@ program modelo
 
             aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
 
-!     correccion cambiando la absorcion de aerosoles (07/04/00)
+            !correccion cambiando la absorcion de aerosoles
             if ((Qllu1(i,j,1)+Qgra1(i,j,1)).gt.1e-6 .and.W2(i,j,1).lt.0) then
                aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
                aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
@@ -732,7 +703,7 @@ program modelo
                if (abs(aer1(i,j,k)).lt.1e-10) aer1(i,j,k)=0
 155   continue
 
-!*   contornos en el piso y en el techo
+      !contornos en el piso y en el techo
       do 420 i=1,nx1
          do 420 j=1,nx1
             Titaa1(i,j,0)=Titaa1(i,j,0)
@@ -741,7 +712,7 @@ program modelo
 
             Titaa1(i,j,nz1)=Titaa1(i,j,nz1-1)
 
-!       corregido para el vapor
+            !corregido para el vapor
             if (Qvap1(i,j,0).gt.Qvap0(0)*.5) then
                Qvap1(i,j,0)=.8*Qvap0(0)
             endif
@@ -763,14 +734,14 @@ program modelo
             Qgra1(i,j,0)=Qgra1(i,j,0)
             Qgra1(i,j,nz1)=Qgra1(i,j,nz1-1)
 
-!       corregido para los aerosoles
+            !corregido para los aerosoles
             if (-aer1(i,j,0).gt.0.8*aer0(0)) then
                aer1(i,j,0)=-.8*aer0(0)
             endif
             aer1(i,j,nz1)=aer1(i,j,nz1-1)
 420   continue
 
-!*  contornos laterales
+      !contornos laterales
       do 430 k=1,nz1-1
          do 430 j=1,nx1
 
@@ -810,10 +781,10 @@ program modelo
 
 430   continue
 
-!     filtro para Titaa1 Qvap1
+      !filtro para Titaa1 Qvap1
       call filtro(Titaa1,.01,.01,.02)
 
-!     correccion de negativos para el vapor
+      !correccion de negativos para el vapor
       do 26 i=0,nx1+1
          do 26 j=0,nx1+1
             do 26 k=0,nz1
@@ -823,7 +794,7 @@ program modelo
                endif
 26    continue
 
-!********************************************************************
+!############################# Prints ################################
 
       lll=tt
       ener=ener1+ener2+ener3+ener4+ener5
@@ -863,12 +834,12 @@ program modelo
 
       write(31,*)  tt,totnuc,totmic
 
-!********************************************************************
-!*    grabacion normal de las diferentes cantidades
-!$$
+
+!#####################################################################
+!grabacion normal de las diferentes cantidades
       if (tt/nint(lte/dt1)*nint(lte/dt1).eq.tt) then
          call estad03_init()
-!       desplazamiento de la nube
+         !desplazamiento de la nube
          tte=tte+1
          call posnub02_init()
          call corrinu2_init()
@@ -877,16 +848,16 @@ program modelo
 
       if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
          t1=t1+1
-!     grabacion 2D
-!        write(*,*) 'graba231'
-!        call graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, tie, bre)
-!     grabacion 3D
+         
+!############################ Grabación 2D ###########################
+         !call graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, tie, bre)
+         
+!############################ Grabación 3D ###########################
          write(*,*) 'graba320'
          call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, t1, tie, bre)
       endif
 
-!*    grabacion de todas las diferentes cantidades
-
+!######################### Grabación Backup ##########################
       if (tt/nint(ltb/dt1)*nint(ltb/dt1).eq.tt) then
          call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
          U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
@@ -899,9 +870,9 @@ program modelo
       write(*,*) ""
 1  continue
 
-!********************************************************************
-!***  fin lazo temporal principal
-!*******************************************
+
+!############### Fin de la evolucion temporal ########################
+!#####################################################################
 
    close(13)
    close(14)
@@ -915,13 +886,6 @@ program modelo
    close(31)
    close(32)
    close(33)
-
-!*******************************************************************
-   write(*,*) 'termina'
-   open(unit=30,file='outputdata/termina')
-   write(30,*) '1'
-   close(30)
-!********************************************************************
 
 3000 format(a10,6i4)
 4003 format(7g17.9)
