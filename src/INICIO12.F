@@ -63,6 +63,9 @@
 !
         endif
 
+       UU(k)=UU(k)*.7
+       VV(k)=VV(k)*0.
+ 
 
 !##
 !      write(*,*) 'vel0',zeta,UU(k),VV(k),zeta1,aux,vb
