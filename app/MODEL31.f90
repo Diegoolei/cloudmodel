@@ -37,20 +37,21 @@ program modelo
    USE estad03
    USE posnub02
    USE corrinu2
+   USE io
+   USE config
    implicit none
 
    call mode20_init()
-
 !########### Condiciones iniciales ############
    if (ini.eq.0) then
       !Si ini=0 el calculo empieza por primera###
       call condi
    else
       !si ini=1 el calculo recomienza desde algun paso
-      open(unit=13,file='outputdata/inis.da',status='unknown',form='unformatted')
-      open(unit=14,file='outputdata/velos.da',status='unknown',form='unformatted')
+      open(unit=13,file=output_directory//"inis.da",status='unknown',form='unformatted')
+      open(unit=14,file=output_directory//"velos.da",status='unknown',form='unformatted')
       rewind 14
-      open(unit=30,file='outputdata/varconz.da',status='unknown',form='unformatted')
+      open(unit=30,file=output_directory//"varconz.da",status='unknown',form='unformatted')
       rewind 30
 
       read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
@@ -85,19 +86,19 @@ program modelo
    write(*,*) Tita0(9),Tita0(10),Tita0(11)
    write(*,*) Tita0(20),Tita0(17),Tita0(18)
 
-   open(unit=13,file='outputdata/u2'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=14,file='outputdata/v2'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=15,file='outputdata/w2'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=16,file='outputdata/va'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=17,file='outputdata/go'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=18,file='outputdata/ae'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=19,file='outputdata/pr'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=20,file='outputdata/ti'//tie//bre(2*t1+1:2*t1+2))
+   open(unit=13,file=output_directory//"u2"//file_number)
+   open(unit=14,file=output_directory//"v2"//file_number)
+   open(unit=15,file=output_directory//"w2"//file_number)
+   open(unit=16,file=output_directory//"va"//file_number)
+   open(unit=17,file=output_directory//"go"//file_number)
+   open(unit=18,file=output_directory//"ae"//file_number)
+   open(unit=19,file=output_directory//"pr"//file_number)
+   open(unit=20,file=output_directory//"ti"//file_number)
 
-   open(unit=30,file='outputdata/esta'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=31,file='outputdata/vara'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=32,file='outputdata/posnub'//tie//'.sa')
-   open(unit=33,file='outputdata/est'//tie//bre(2*t1+1:2*t1+2))
+   open(unit=30,file=output_directory//"esta"//file_number)
+   open(unit=31,file=output_directory//"vara"//file_number)
+   open(unit=32,file=output_directory//"posnub"//'.sa')
+   open(unit=33,file=output_directory//"est"//file_number)
 
    write(*,*) 'inis',Titaa1(16,16,4),Qvap1(16,16,4),Tita0(4),Qvap0(4)
    write(*,*) 'tem',Fcalo(21,16,5)
@@ -848,13 +849,14 @@ program modelo
 
       if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
          t1=t1+1
+         file_number = str_gen(t1)
          
 !############################ Grabación 2D ###########################
-         !call graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, tie, bre)
+         !call graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, file_number,output_directory)
          
 !############################ Grabación 3D ###########################
          write(*,*) 'graba320'
-         call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, t1, tie, bre)
+         call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, file_number)
       endif
 
 !######################### Grabación Backup ##########################
@@ -862,7 +864,7 @@ program modelo
          call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
          U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
          Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo,&
-         Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
+         Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn,output_directory)
       endif
 
       write(*,*) ""

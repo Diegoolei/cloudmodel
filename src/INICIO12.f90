@@ -17,6 +17,7 @@ contains
       USE perdim
       USE const
       USE estbas
+      USE config
       implicit none
       
       real equis,ygrie,zeta
@@ -102,13 +103,15 @@ contains
 !
          endif
 
-
+         UU(k)=UU(k)*.7
+         VV(k)=VV(k)*0.
+  
 5     continue
 
 
 !**   calculo de 'constantes' que dependen de T
 
-      open(unit=30,file='outputdata/ccc')
+      open(unit=30,file=output_directory//"ccc")
 
       do 400 k=313,210,-1
 
@@ -288,7 +291,7 @@ contains
 
       call PP2(G,dx1,Den0,Presi0,P00)
 
-      open(unit=70,file='outputdata/inic03.sa')
+      open(unit=70,file=output_directory//"inic03.sa")
       do 100 k=0,nz1
          Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
          Pres00(k)=Temp0(k)/Tita0(k)

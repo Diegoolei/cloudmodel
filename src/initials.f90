@@ -98,9 +98,8 @@ module mode20
    real :: posxx, posyy, zmed
    integer :: posx(-3:5000), posy(-3:5000), spos
 
-   character(len=50) :: bre
+   character(len=3) :: file_number
    character(len=12) :: nombre
-   character(len=2) :: tie
 
    integer :: laux1, laux2, maux1, maux2, naux2
    integer :: umax, umin, vmax, vmin, wmax, wmin, titamax, titamin
@@ -126,15 +125,18 @@ contains
       USE cant01
       USE dimen
       USE const
-      bre = '01020304050607080910111213141516171819202122232425'
-      tie = '31'
+      USE io
+      USE config
 
-      ini = 0                                !inicio por vez primera= 0
-      t1 = 0                                 !paso a inicio (si ini=0->t1=0)
-      ltt = 250.
-      ltg = 10.                              !tiempo de grabacion
-      lte = 30.                              !tiempo de grabacion estadistica
-      ltb = 10.                              !tiempo de grabacion de backup
+      CALL init_config()
+
+      ini = 0                                ! Inicio por vez primera= 0
+      t1 = 0                                 ! Paso a inicio (si ini=0->t1=0)
+      ltt = sim_time_minutes * 60. * 2.      ! Tiempo lazo físico
+      ltg = save_lapse_minutes * 60. *2/3    ! Tiempo de grabacion
+      lte = 45. * 60.                        ! Tiempo de grabacion estadistica
+      ltb = 45. * 60.                        ! Tiempo de grabacion de backup
+      file_number = "0"
 
       ctur = 0.5
 
@@ -144,7 +146,7 @@ contains
       pro4 = (1. - pro1) / 4.
 
       lt1 = nint(ltt / dt1)
-      lt2 = nint(dt1 / dt2)
+      lt2 = nint(dt1 / dt2)                  ! Proporción Física/Microfísica
       lt3 = 2 * nint(dt1 / dt3)
       cteturb = ctur / 2.**.5
 
