@@ -49,26 +49,21 @@
       integer lqniemax,mqniemax,nqniemax
       integer lqgramax,mqgramax,nqgramax
       integer qgottot,qllutot,qcritot,qnietot,qgratot
-
+      real sim_time_minutes,save_time_minutes
       real cks,turbu,lapla      
 
       bre='01020304050607080910111213141516171819202122232425'
       tie='31'      
       
-      ini=0                            !inicio por vez primera= 0
-      t1=0                             !paso a inicio (si ini=0->t1=0)
-      ltt = 45. * 60.
-!      ltt=25.*3.*60.                      !tiempo total de simulacion
-!      ltt=15.*6.*60.                       !tiempo total de simulacion
-!      ltt=3.*60.                          !tiempo total de simulacion
-!      ltt=2.*2.                           !tiempo total de simulacion
-!      ltg=3*60.                           !tiempo de grabacion
-!      ltg=6.*60.                          !tiempo de grabacion
-      ltg= 3. * 60.                              !tiempo de grabacion
-      lte= 45. * 60.                             !tiempo de grabacion estadistica
-!      lte=2.                              !tiempo de grabacion estadistica
-!      ltb=3*60.                           ! tiempo de grabacion de backup
-      ltb= 45. * 60.     
+      sim_time_minutes=45.                 !tiempo de simulacion en minutos
+      save_time_minutes=3.                 !tiempo de grabacion en minutos
+
+      ini=0                                !inicio por vez primera= 0
+      t1=0                                 !paso a inicio (si ini=0->t1=0)
+      ltt = sim_time_minutes * 60. * 2.    !tiempo total de simulacion
+      ltg= save_time_minutes * 60. * 2    !tiempo de grabacion
+      lte= 3. * 60.                        !tiempo de grabacion estadistica
+      ltb= 3. * 60.     
 
 
       ctur=0.5

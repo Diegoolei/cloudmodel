@@ -46,8 +46,8 @@
 !&&
 	    call condi
       else
-
-      open(unit=13,file='f77_data/inis.da')
+      open(unit=13,file = 'f77_data/inis.da', status = 'unknown'
+     &      ,form = 'unformatted')
       open(unit=14,file='f77_data/velos.da',status='unknown',
      &       form='unformatted')
       rewind 14
@@ -55,7 +55,7 @@
      &       form='unformatted')
       rewind 30
 
-	  read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0
+	  read(13) Den0,Temp0,Tita0,Pres00,Qvap0
      &                  ,cc2,aer0,UU,VV
 
 !$$
@@ -1172,7 +1172,7 @@
 !*    grabacion de todas las diferentes cantidades
 
       if (tt/nint(ltb/dt1)*nint(ltb/dt1).eq.tt) then
-	include 'graba120.i'
+	      include 'graba120.i'
       endif
 
 
