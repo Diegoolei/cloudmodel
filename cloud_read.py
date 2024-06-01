@@ -13,26 +13,15 @@ def main():
     
     data = File_style(
         chosen_file=1,
-        output_data_path="f77_data/",
+        output_data_path="Data/new_code/",
         cmp_output_data_path="outputdata1/",
-        img_path="img/",
-        txt_path="txt/",
-        cmp_txt_path="txt1/",
-        vid_path="vid/",
-        img_option = 1,
-    )
-    data1 = File_style(
-        chosen_file=1,
-        output_data_path="outputdata1/",
-        cmp_output_data_path="outputdata1/",
-        img_path="img/",
+        img_path="img/new_code/",
         txt_path="txt/",
         cmp_txt_path="txt1/",
         vid_path="vid/",
         img_option = 2,
-    )
-    print(f"data is equal: {data_comparison(data, data1)}")
-    data.parse_status_img()
+    ).parse_status_img()
+    
 def time_it(func):
     '''Log the date and time of a function'''
 
@@ -184,12 +173,13 @@ class File_style:
             elif data_dimension == 1:
                 plt.plot(variable[3:-3])  # Cleans trash data
         elif img_option == 2:
+            fig, ax = plt.subplots()
             if data_dimension == 3:
-                plt.contourf(variable[:, :, plot_center])
+                CS = ax.contour(variable[:, :, plot_center], linewidths= 0.3, colors='k')
+                ax.clabel(CS, fontsize=6, inline=True)
             elif data_dimension == 2:
-                plt.contourf(variable[:, plot_center])
-            elif data_dimension == 1:
-                plt.plot(variable[3:-3])  # Cleans trash data
+                CS = ax.contour(variable[:, plot_center], linewidths= 0.3, colors='k')
+                ax.clabel(CS, fontsize=6, inline=True)
         plt.style.use("fivethirtyeight")
         # plt.colorbar() # Generates infinite colorbars in animation
         plt.xlabel("X")

@@ -129,12 +129,12 @@ contains
       bre = '01020304050607080910111213141516171819202122232425'
       tie = '31'
 
-      ini = 0                                !inicio por vez primera= 0
-      t1 = 0                                 !paso a inicio (si ini=0->t1=0)
-      ltt = 250.
-      ltg = 10.                              !tiempo de grabacion
-      lte = 30.                              !tiempo de grabacion estadistica
-      ltb = 10.                              !tiempo de grabacion de backup
+      ini=0                                  !inicio por vez primera= 0
+      t1=0                                   !paso a inicio (si ini=0->t1=0)
+      ltt = 45. * 60. * 2.                   !tiempo total de simulacion
+      ltg= 3. * 60. * 2.                     !tiempo de grabacion
+      lte= 3. * 60. * 2.                     !tiempo de grabacion estadistica
+      ltb= 3. * 60. * 2.                     !tiempo de backup
 
       ctur = 0.5
 
