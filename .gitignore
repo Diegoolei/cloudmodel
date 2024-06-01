@@ -42,8 +42,7 @@ nube*
 # Generated directories
 img/
 img1/
-outputdata*
-f77_data*
+Data/
 vid/
 txt/
 txt1/
