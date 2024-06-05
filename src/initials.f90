@@ -98,9 +98,8 @@ module mode20
    real :: posxx, posyy, zmed
    integer :: posx(-3:5000), posy(-3:5000), spos
 
-   character(len=50) :: bre
+   character(len=3) :: file_number
    character(len=12) :: nombre
-   character(len=2) :: tie
 
    integer :: laux1, laux2, maux1, maux2, naux2
    integer :: umax, umin, vmax, vmin, wmax, wmin, titamax, titamin
@@ -126,16 +125,15 @@ contains
       USE cant01
       USE dimen
       USE const
-      bre = '01020304050607080910111213141516171819202122232425'
-      tie = '31'
+      USE config
 
-      ini=0                                  !inicio por vez primera= 0
-      t1=0                                   !paso a inicio (si ini=0->t1=0)
-      ltt = 45. * 60. * 2.                   !tiempo total de simulacion
-      ltg= 3. * 60. * 2.                     !tiempo de grabacion
-      lte= 3. * 60. * 2.                     !tiempo de grabacion estadistica
-      ltb= 3. * 60. * 2.                     !tiempo de backup
-
+      call init_config()
+      ini = 0                                   !inicio por vez primera= 0
+      t1 = 0                                    !paso a inicio (si ini=0->t1=0)
+      ltt = sim_time_minutes * 60. * 2.         !tiempo total de simulacion
+      ltg = save_lapse_minutes * 60. * 2.       !tiempo de grabacion
+      lte = 3. * 60. * 2.                       !tiempo de grabacion estadistica
+      ltb = 3. * 60. * 2.                       !tiempo de backup
       ctur = 0.5
 
       pro1 = 1. - 2e-2 * (dt1 / 5.)
@@ -346,11 +344,6 @@ contains
                   lqcrimax=i
                   mqcrimax=j
                   nqcrimax=k
-
-
-!            write(*,*) qcrimax,Qcri1(i,j,k),i,j,k
-!            pause
-
                endif
                qcritot=qcritot+Qcri1(i,j,k)*1e6
 
@@ -389,11 +382,6 @@ contains
                qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
                qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
                qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
-
-
-!        write(*,*) qcrimax,Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k),
-!     &             lqcrimax+i,mqcrimax+j,nqcrimax+k
-
 
 719   continue
 
@@ -528,9 +516,6 @@ contains
          posx(tte)=posx(tte)+1
          Xnub(tte)=Xnub(tte)-dx1
 
-!##
-         write(*,*) 'corri en x pos'
-
          do 1500 k=0,nz1+1
             do 1501 j=0,nx1+1
                do 1502 i=1,nx1+1
@@ -606,9 +591,6 @@ contains
       if (posxx.lt.-dx1) then
          posx(tte)=posx(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
-
-!##
-         write(*,*) 'corri en x neg'
 
          do 1510 k=0,nz1+1
             do 1511 j=0,nx1+1
@@ -688,8 +670,6 @@ contains
          posy(tte)=posy(tte)+1
          Ynub(tte)=Ynub(tte)-dx1
 
-!##
-         write(*,*) 'corri en y pos'
 
          do 1520 k=0,nz1+1
             do 1521 i=0,nx1+1
@@ -766,9 +746,6 @@ contains
       if (posyy.lt.-dx1) then
          posy(tte)=posy(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
-
-!##
-         write(*,*) 'corri en y neg'
 
          do 1530 k=0,nz1+1
             do 1531 i=0,nx1+1

@@ -37,6 +37,8 @@ program modelo
    USE estad03
    USE posnub02
    USE corrinu2
+   USE io, only: str_gen
+   USE config
    implicit none
 
    call mode20_init()
@@ -47,10 +49,10 @@ program modelo
       call condi
    else
       !si ini=1 el calculo recomienza desde algun paso
-      open(unit=13,file='outputdata/inis.da',status='unknown',form='unformatted')
-      open(unit=14,file='outputdata/velos.da',status='unknown',form='unformatted')
+      open(unit=13,file=output_directory//"inis.da",status='unknown',form='unformatted')
+      open(unit=14,file=output_directory//"velos.da",status='unknown',form='unformatted')
       rewind 14
-      open(unit=30,file='outputdata/varconz.da',status='unknown',form='unformatted')
+      open(unit=30,file=output_directory//"varconz.da",status='unknown',form='unformatted')
       rewind 30
 
       read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
@@ -75,32 +77,19 @@ program modelo
 
    !definicion de calores y presiones de vapor a 0 K
    Lsl00=Lsl0*4180.
-   write(*,*) 'Qgot',Qgot1(32,34,0),Qgot1(32,34,1),Qgot1(32,34,2)
-   write(*,*) 'Qcri',Qcri1(32,34,0),Qcri1(32,34,1),Qcri1(32,34,2)
-   write(*,*) 'Qnie',Qnie1(32,34,0),Qnie1(32,34,1),Qnie1(32,34,2)
-   write(*,*) 'Qllu',Qllu1(32,34,0),Qllu1(32,34,1),Qllu1(32,34,2)
-   write(*,*) Qllu1(16,12,27),Qllu1(12,17,27)
-   write(*,*) 'des cond',Qvap1(20,20,8),Qvap0(8)
-   write(*,*) Tita0(2),Tita0(3),Tita0(4)
-   write(*,*) Tita0(9),Tita0(10),Tita0(11)
-   write(*,*) Tita0(20),Tita0(17),Tita0(18)
+   open(unit=13,file=output_directory//"u2"//file_number)
+   open(unit=14,file=output_directory//"v2"//file_number)
+   open(unit=15,file=output_directory//"w2"//file_number)
+   open(unit=16,file=output_directory//"va"//file_number)
+   open(unit=17,file=output_directory//"go"//file_number)
+   open(unit=18,file=output_directory//"ae"//file_number)
+   open(unit=19,file=output_directory//"pr"//file_number)
+   open(unit=20,file=output_directory//"ti"//file_number)
 
-   open(unit=13,file='outputdata/u2'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=14,file='outputdata/v2'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=15,file='outputdata/w2'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=16,file='outputdata/va'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=17,file='outputdata/go'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=18,file='outputdata/ae'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=19,file='outputdata/pr'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=20,file='outputdata/ti'//tie//bre(2*t1+1:2*t1+2))
-
-   open(unit=30,file='outputdata/esta'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=31,file='outputdata/vara'//tie//bre(2*t1+1:2*t1+2))
-   open(unit=32,file='outputdata/posnub'//tie//'.sa')
-   open(unit=33,file='outputdata/est'//tie//bre(2*t1+1:2*t1+2))
-
-   write(*,*) 'inis',Titaa1(16,16,4),Qvap1(16,16,4),Tita0(4),Qvap0(4)
-   write(*,*) 'tem',Fcalo(21,16,5)
+   open(unit=30,file=output_directory//"esta"//file_number)
+   open(unit=31,file=output_directory//"vara"//file_number)
+   open(unit=32,file=output_directory//"posnub"//'.sa')
+   open(unit=33,file=output_directory//"est"//file_number)
 
 !#####################################################################
 !############### comienzo de la evolucion temporal ###################
@@ -225,9 +214,6 @@ program modelo
                call dgrani(l,m,n)
                advgra1(i,j)=advgra2(i,j)
 
-               if  (i.eq.20.and.m.eq.22.and.(k.ge.27.and. k.le.28)) then
-                  write(*,*) 'cri0',k,Qcri1(i,j,k),Qcri2(i,j,k)
-               endif
 
                call daeros(l,m,n)
                advaer1(i,j)=advaer2(i,j)
@@ -288,21 +274,15 @@ program modelo
                endif
 
                if(Qvap0(k)+Qvap2(i,j,k).lt.0) then
-                  write(*,*) 'moco con el vapor',l,m,n,Qvap0(k)+Qvap2(i,j,k)
-                  write(*,*) Qvap2(i,j,k),Qvap0(k),P,T,W2(i,j,k)
                   Qvapneg=Qvapneg+Qvap0(k)+Qvap2(i,j,k)
                   lvapneg=1
                endif
 
                if(aer0(k)+aer2(i,j,k).lt.0) then
-                  write(*,*) 'moco con aerosoles',l,m,n,aer0(k)+aer2(i,j,k)
-                  write(*,*) aer2(i,j,k),aer0(k),P,T,W2(i,j,k)
                   aerneg=aerneg+aer0(k)+aer2(i,j,k)
                   laerneg=1
                endif
 20    continue
-
-      write(*,3000) 'limites',lnie(1),lnie(2),mnie(1),mnie(2),nnie(1),nnie(2)
 
       !correccion de negativos
       if(s.ge.1) call corgot
@@ -312,9 +292,6 @@ program modelo
       if (lgraneg.eq.1) call corgra
       if (lvapneg.eq.1) call corvap(Qvapneg)
       if (laerneg.eq.1) call coraer(aerneg)
-      write(*,*) 'vap0',Qvap2(16,16,25),Qvap0(25)
-      write(*,*) 'vap0',Qvap2(16,16,26),Qvap0(26)
-      write(*,*) 'vap0',Qvap2(16,16,27),Qvap0(27)
 
       !primer calculo de agua (sin laterales)
       do 23 i=1,nx1
@@ -325,13 +302,11 @@ program modelo
                aert1=aert1+aer2(i,j,k)
 
                if(Qvap2(i,j,k)+Qvap0(k).lt.0) then
-                  write(*,*) 'vapomoco',i,j,k,Qvap2(i,j,k),Qvap0(k),Qvap1(i,j,k)
                   stop
                endif
 23    continue
 
 !####################### Sublazo Microfísico #########################
-      write(*,*) 'antes de microfis'
       do 30 k=1,nz1-1
          n=k
          do 30 i=1,nx1
@@ -429,9 +404,6 @@ program modelo
                      Fcalo(l,m,n)=Fcalo(l,m,n)+Fcal/dt1/densi
                      Naer=Naer+daer2
                      totmic=totmic+daer2
-                     if (i.eq.20.and.(j.eq.22.or.j.eq.22).and.k.eq.28) then
-                        write(*,*) qgotaux,qlluaux,qcriaux
-                     endif
 35                continue
 
                   Qgot2(i,j,k)=qgotaux
@@ -446,20 +418,12 @@ program modelo
                endif
 
                if (Tita0(k).lt.abs(Titaa2(i,j,k))+200.or.Temp0(k).lt.abs(Tempa1(i,j,k))+200) then
-                  write(*,*) 'problemas con la temperatura 2'
-                  write(*,*) i,j,k,Titaa2(i,j,k),Tita0(k),Tempa1(i,j,k),Temp0(k)
-                  write(*,*) T,Titaa2(i,j,k),aux
                   stop
                endif
 
                if(aer2(i,j,k)+aer0(k).le.0) then
 
                   if (aer2(i,j,k)+aer0(k).lt.-aer0(k)*.05) then
-
-                     write(*,*) 'problemas con los aerosoles'
-                     write(*,*) i,j,k,aer1(i,j,k),aer2(i,j,k),aer0(k),daer
-
-                     write(*,*) 'sin aerosoles',W2(i,j,k)
                      stop
                   endif
 
@@ -483,7 +447,6 @@ program modelo
 
 !####################### Contornos ##############################
       Qvap=(qv+qg)/nx1**2.*nz1*.1
-      write(*,*) 'antes de las redefiniciones'
 
       !contornos en el piso y en el techo
       do 400 i=1,nx1
@@ -790,7 +753,6 @@ program modelo
             do 26 k=0,nz1
                if(Qvap1(i,j,k)+Qvap0(k).lt.0) then
                   Qvap1(i,j,k)=-Qvap0(k)
-                  write(*,*) 'vapp',i,j,k,Qvap1(i,j,k)
                endif
 26    continue
 
@@ -798,17 +760,6 @@ program modelo
 
       lll=tt
       ener=ener1+ener2+ener3+ener4+ener5
-      write(*,*) 'fin',lll,Qcri1(16,16,14),Qcri2(16,16,14)
-      write(*,*) W1(20,22,30),W1(19,22,30),W1(21,22,30),W1(20,21,30),W1(20,23,30)
-      write(*,*) W1(19,21,30),W1(21,21,30),W1(21,23,30),W1(19,23,30),W1(21,22,30)
-      write(*,*) Qcri1(20,22,27),Qnie1(20,22,27),Qvap1(20,22,27),Qvap0(27),W1(20,22,27)
-      write(*,*) Qcri1(20,22,28),Qnie1(20,22,28),Qvap1(20,22,28),Qvap0(28),W1(20,22,28)
-      write(*,*) Qcri1(20,22,29),Qnie1(20,22,29),Qvap1(20,22,29),Qvap0(29),W1(20,22,29)
-      write(*,*) Qcri1(20,22,30),Qnie1(20,22,30),Qvap1(20,22,30),Qvap0(30),W1(20,22,30)
-      write(*,*) Qcri1(20,22,31),Qnie1(20,22,31),Qvap1(20,22,31),Qvap0(31),W1(20,22,31)
-      write(*,*) Qcri1(20,22,32),Qnie1(20,22,32),Qvap1(20,22,32),Qvap0(32),W1(20,22,32)
-      write(*,*) Qcri1(20,22,33),Qnie1(20,22,33),Qvap1(20,22,33),Qvap0(33),W1(20,22,33)
-
 !     Evolucion para puntos seleccionados
       write(13,44) U2(16,16,1),U2(17,17,1),U2(16,19,1),U2(17,19,1),U2(19,16,1),U2(19,17,1)
       write(14,44) V2(16,16,1),V2(17,17,1),V2(16,19,1),V2(17,19,1),V2(19,16,1),V2(19,17,1)
@@ -832,9 +783,6 @@ program modelo
             aux4=aux4+aer1(j-posx(tt),i+nx1/2-10-posy(tt),0)
 810   continue
 
-      write(31,*)  tt,totnuc,totmic
-
-
 !#####################################################################
 !grabacion normal de las diferentes cantidades
       if (tt/nint(lte/dt1)*nint(lte/dt1).eq.tt) then
@@ -843,18 +791,15 @@ program modelo
          tte=tte+1
          call posnub02_init()
          call corrinu2_init()
-         write(32,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),posxx,posyy
       endif
 
       if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
-         t1=t1+1
-         
+         file_number = str_gen(t1)
 !############################ Grabación 2D ###########################
-         !call graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, tie, bre)
-         
+         !call graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
 !############################ Grabación 3D ###########################
-         write(*,*) 'graba320'
-         call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, t1, tie, bre)
+         call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1,file_number)
+         t1=t1+1
       endif
 
 !######################### Grabación Backup ##########################
@@ -865,9 +810,7 @@ program modelo
          Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
       endif
 
-      write(*,*) ""
       write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
-      write(*,*) ""
 1  continue
 
 

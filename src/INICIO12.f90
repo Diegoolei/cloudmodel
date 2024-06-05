@@ -17,6 +17,8 @@ contains
       USE perdim
       USE const
       USE estbas
+      USE config
+
       implicit none
       
       real equis,ygrie,zeta
@@ -73,32 +75,22 @@ contains
             UU(k)=0.
             VV(k)=0.
 
-!
-            write(*,*) '0',zeta,UU(k),VV(k)
-!
-
          elseif (zeta .le. 2000.) then
             zeta1=zeta-500.
             aux=4.*(zeta1/1500.)**2.
             UU(k)=aux
             VV(k)=0.
-!
-            write(*,*) '1',zeta,UU(k),VV(k),vb
 
          elseif (zeta .le. 9000.) then
             zeta1=zeta-2000.
             vb=zeta1/7000.
             UU(k)=4.-10.*vb**2.
             VV(k)=3.*vb**.5
-
-            write(*,*) '3',zeta,UU(k),VV(k),vb
 !
          else
             zeta1=zeta-9000.
             UU(k)=-6.+4.*(zeta1/9000.)**2.
             VV(k)=3.-5.*(zeta1/9000.)**.5
-!
-            write(*,*) '4',zeta,UU(k),VV(k),vb
 !
          endif
 
@@ -110,7 +102,7 @@ contains
 
 !**   calculo de 'constantes' que dependen de T
 
-      open(unit=30,file='outputdata/ccc')
+open(unit=30,file=output_directory//"ccc")
 
       do 400 k=313,210,-1
 
@@ -143,8 +135,6 @@ contains
          Eautcn(k)=10.**(.035*(Tk)-.7)
          Eacrcn(k)=exp(.09*Tk)
 
-
-         write(30,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k),Tesvs(k),Eautcn(k),Eacrcn(k)
 
 400   continue
       close(30)
@@ -247,9 +237,6 @@ contains
          aux=Tem1-n
          elv1=Telvs(n)*(1-aux)+Telvs(n+1)*aux
 
-         write(*,*) k,Rv,Tem1
-
-
          Qvap0(k)=rel1*elv1/Rv/Tem1
 
 !     recalculo de la densidad
@@ -277,10 +264,6 @@ contains
 
       do 475 k=1,nz1+1
          Vtgra0(2*k-1)=(Vtgra0(2*k-2)+Vtgra0(2*k))/2.  ! punto intermedio
-         write(*,*) 'vt',k,&
-            Vtgra0(2*k-2)*5e-3**.8,&
-            Vtgra0(2*k-1)*5e-3**.8,&
-            Tvis(Temp0(k-1)),Den0(k-1)
 475   continue
 
 !**************************************************************
@@ -290,7 +273,7 @@ contains
 
       call PP2(G,dx1,Den0,Presi0,P00)
 
-      open(unit=70,file='outputdata/inic03.sa')
+      open(unit=70,file=output_directory//"inic03.sa")
       do 100 k=0,nz1
          Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
          Pres00(k)=Temp0(k)/Tita0(k)

@@ -4,6 +4,7 @@ subroutine graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
    Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
    
    USE dimen
+   USE config
    implicit none
    real, dimension(-3:nz1+3), intent(in) :: Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: U1, U2, V1, V2, W1, W2, Titaa1,Titaa2
@@ -16,10 +17,10 @@ subroutine graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
    real, dimension(-3:2*nz1+5), intent(in) :: Av,Vtnie,Vtgra0
    real, dimension(nz1), intent(in)  :: Qvaprel,aerrel
 
-   open(unit=40,file='outputdata/inis.da',status='unknown',form='unformatted')
-   open(unit=41,file='outputdata/velos.da',status='unknown',form='unformatted')
+   open(unit=40,file=output_directory//"inis.da",status='unknown',form='unformatted')
+   open(unit=41,file=output_directory//"velos.da",status='unknown',form='unformatted')
    rewind 41
-   open(unit=42,file='outputdata/varconz.da',status='unknown',form='unformatted')
+   open(unit=42,file=output_directory//"varconz.da",status='unknown',form='unformatted')
    rewind 42
 
    write(40) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
@@ -33,49 +34,48 @@ subroutine graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
    close(40)
 end subroutine graba120
 
-subroutine graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, tie, bre)
+subroutine graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, file_number)
    USE dimen
+   USE config
    implicit none
-
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1
    real, dimension(-3:nz1+3), intent(in) :: Qvap0, aer0
    integer, intent(in) :: k, t1
-   character(len=2), intent(in) :: tie
-   character(len=50), intent(in) :: bre
-   character(len=60) :: nombre
+   character(len=3), intent(in) :: file_number
+   character(len=100) :: nombre
    integer :: i,j
-   nombre='W2'//tie//bre(2*t1-1:2*t1)//'.m'
+   nombre=output_directory//'W2'//file_number//'.m'
    open(unit=30,file=nombre)
    do 360 i=1,nx1
       write(30,2000) (W2(i,j,1),j=1,nx1)
 360 continue
    close(30)
-   nombre='Tita'//tie//bre(2*t1-1:2*t1)//'.m'
+   nombre=output_directory//'Tita'//file_number//'.m'
    open(unit=30,file=nombre)
    do 370 i=1,nx1
       write(30,2000) (Titaa1(i,j,0),j=1,nx1)
 370 continue
    close(30)
-   nombre='Qvap'//tie//bre(2*t1-1:2*t1)//'.m'
+   nombre=output_directory//'Qvap'//file_number//'.m'
    open(unit=30,file=nombre)
    do 380 i=1,nx1
       write(30,2000) ((Qvap1(i,j,k)+Qvap0(k)),j=1,nx1)
 380 continue
    close(30)
-   nombre='Qllu'//tie//bre(2*t1-1:2*t1)//'.m'
+   nombre=output_directory//'Qllu'//file_number//'.m'
    open(unit=30,file=nombre)
    do 395 i=1,nx1
       write(30,2000) (Qllu1(i,j,1),j=1,nx1)
 395 continue
    close(30)
-   nombre='Aero'//tie//bre(2*t1-1:2*t1)//'.m'
+   nombre=output_directory//'Aero'//file_number//'.m'
    open(unit=30,file=nombre)
    do 385 i=1,nx1
       write(30,2000) (aer1(i,j,0)+aer0(0),j=1,nx1)
 385 continue
    close(30)
 
-   nombre='Qgra'//tie//bre(2*t1-1:2*t1)//'.m'
+   nombre=output_directory//'Qgra'//file_number//'.m'
    open(unit=30,file=nombre)
    do 525 i=1,nx1
       write(30,2000) (Qgra1(i,j,1),j=1,nx1)
@@ -87,17 +87,16 @@ subroutine graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, t
 
 end subroutine graba231
 
-subroutine graba320(U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1,t1,tie,bre)
+subroutine graba320(U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1,file_number)
    USE dimen
+   USE config
    implicit none
 
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1
-   integer, intent(in) :: t1
-   character(len=2), intent(in) :: tie
-   character(len=50), intent(in) :: bre
-   character(len=80) :: file_name
+   character(len=3), intent(in) :: file_number
+   character(len=30) :: file_name
 
-   file_name = "outputdata/nube"//tie//bre(2*t1-1:2*t1)//'.sal'
+   file_name = output_directory//"nube"//trim(file_number)//'.sal'
    open(unit=60,file= file_name,status='unknown',form='unformatted')
    ! U1 - Pres1 : perdim.i
    ! Qvap1 - aer1 : permic.i
