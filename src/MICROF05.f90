@@ -182,18 +182,13 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
 !*    cristales a nieve
 
    if (T.lt.T0) then
-      aux=20./3.*Eaucn*5e-3*.25*6.      !(22/01/99)
+      aux=20./3.*Eaucn*5e-3*.25*6.
       hieconv=-aux/Rcri/rhocri*qcriaux**2.
 
       if (qcriaux.gt.5e-4) then
-         hieconv=hieconv-2.*qcriaux**2. !mod 11/12/99
+         hieconv=hieconv-2.*qcriaux**2.
       endif
-!##
-!        if(l.eq.21 .and. m.eq.36 .and. n.ge.23)
-!     &     write(*,*) 'cri1',n,qcriaux,hieconv
-
-
-      if (Ncri.gt.100.) then    !mod (7/12/99)
+      if (Ncri.gt.100.) then
          aux=Acri*exp(Bcri*(T0-T))
          if (aux.lt.100.) aux=100.
          hieconv=hieconv-1e-6*qcriaux*Ncri/aux
@@ -206,23 +201,10 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
       hieconv=0.
    endif
 
-!##
-!       if(l.eq.21 .and. m.eq.36 .and. n.ge.23)
-!    &     write(*,*) 'cri2',n,qcriaux,hieconv
-
-!*    nieve a cristales (solo cuando hay evaporacion) !19/12/99)
-
    if (qauxs.lt.0 .and.T.le.T0 .and.qcriaux.lt.5e-4) then
-      hieconv=hieconv+1e-2*qnieaux          !mod 27/2/2000
+      hieconv=hieconv+1e-2*qnieaux
    endif
-!##
-!        if(l.eq.21 .and. m.eq.36 .and. n.ge.23) then
-!          write(*,*) 'cri3',n,qcriaux,qnieaux,hieconv,coevcri
-!          pause
-!        endif
 
-
-!*    nieve a granizos (mod 10/12/99)
    aux=exp(.09*(T-T0))
    if(aux.lt.0.2) aux=.2
    if (qnieaux .gt. 5e-4) then
@@ -326,23 +308,6 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
       cfllugra=0.
    endif
 
-!##
-!     if (l.eq.16.and.m.eq.17.and.n.eq.13) then
-!       write(*,*) 'congll',aux,T,qlluaux,cfllugra
-!       write(*,*) Qvls,Qvls0,Qvss,Qvapaux
-!       write(*,*) qauxl,qauxl0,qauxs
-!     endif
-!##
-
-
-!##
-!      if (cfgotcri.lt.0) then
-!        write(*,*) 'aqui congela',l,m,n,T,qgotaux,cfgotcri
-!        pause
-!      endif
-!*#
-
-!*    fusion de cristales
    if (T.ge.T0 .and. Rcri.gt.0) then
       cfgotcri=.95*qcriaux
    else
@@ -375,9 +340,6 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
    endif
 
    if (cfllunie.lt.0) then
-      write(*,*) 'moco con la fusion de la niev'
-      write(*,*) l,m,n,cfllunie,cfln1,cfln2
-      write(*,*) Rnie,coevnie,acgonie,qnieaux
       stop
    endif
 
@@ -530,7 +492,6 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
             Q4=A4-B4*Tg
             Qt=Q1+Q2+Q3+Q4
             fugra=-Qt/Lsl00
-            if (fugra.gt.0) write(*,*) 'moco con la fusion'
 !       para que no den cantidades de granizo fundiendo
             if (-fugra.gt.qgraaux/dt2*.8) fugra=-qgraaux/dt2*.8
          endif
@@ -619,11 +580,6 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
 !     Correccion de gotas negativas
 !$$
    if (qgotaux1.lt.0) then
-
-!          write(*,*) 'aqui',l,m,n
-!          write(*,*) qgotaux,qgotaux1,Intgot
-!          write(*,*) invapgot,ingotllu,ingotcri
-
       invapgot=invapgot*(1.-qgotaux1/(Intgot*dt2))
       ingotllu=ingotllu*(1.-qgotaux1/(Intgot*dt2))
       ingotcri=ingotcri*(1.-qgotaux1/(Intgot*dt2))
@@ -654,20 +610,6 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
       if (qgotaux1.lt.-1e-10 .or. qlluaux1.lt.-1e-10 .or. &
          qcriaux1.lt.-1e-10 .or.&
          qnieaux1.lt.-1e-10 .or. qgraaux1.lt.-1e-10) then
-
-         write(*,*) 'prob con microfis',l,m,n,T
-         write(*,*) coevgot,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
-            qgraaux
-         write(*,*) qvapaux1,qgotaux1,qlluaux1,qcriaux1,qnieaux1,&
-            qgraaux1
-         write(*,*) 'cri',Intcri,invapcri,ingotcri,incrinie,incrigra
-         write(*,*) incrinie,hieconv,accrnie,mucrgrni,&
-            -colilc*qcriaux/Ncri
-
-         write(*,*) 'nie',Intnie,invapnie,ingotnie,inllunie,incrinie&
-            ,inniegra,cfllunie,acgonie
-         write(*,*) incrinie,hieconv,accrnie+mucrgrni*.8
-
          stop
       endif
       if (qgotaux1.lt.0) qgotaux1=0.
@@ -681,9 +623,6 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
 
    aux=Intvap+Intgot+Intllu+Intcri+Intnie+Intgra
    if (aux.gt.1e-9) then
-      write(*,*) 'no conserva la masa',l,m,n
-      write(*,*) aux,Intvap,Intgot,Intllu,Intcri,Intnie,&
-         Intgra
       stop
    endif
 

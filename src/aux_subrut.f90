@@ -47,14 +47,6 @@ subroutine tempot(i,j,k,dden0z,Fcal)
 
    !     control de locura
    if (abs(Titaa2(i,j,k)).gt.30) then
-      write(*,*) 'tita loca',i,j,k,Titaa2(i,j,k),advec,&
-         verti,turbul,calor,Titaa1(i,j,k)
-      write(*,*) adv(3),W2(i,j,k),Titaa1(i,j,k+1)&
-         ,Titaa1(i,j,k-1),Titaa1(i,j,k)
-      write(*,*) adv(1),U2(i+1,j,k),Titaa1(i+1,j,k)&
-         , U2(i-1,j,k),Titaa1(i-1,j,k)
-      write(*,*) adv(2),V2(i,j+1,k),Titaa1(i,j+1,k)&
-         , V2(i,j-1,k),Titaa1(i,j-1,k)
       stop
    endif
 
@@ -75,8 +67,6 @@ subroutine corgot
    USE corgot_vars
    implicit none
 
-   write(*,*) 'dentro de corgot'
-
    neg1=0.
    pos1=0.
    do 10 n=ngot(1),ngot(2)
@@ -91,7 +81,6 @@ subroutine corgot
 10 continue
 
    if(pos1.le.-neg1) then
-      write(*,*) 'problemas con las gotas',pos1,neg1
       do 20 l=lgot(1),lgot(2)
          do 20 m=mgot(1),mgot(2)
             do 20 n=ngot(1),ngot(2)
@@ -99,7 +88,6 @@ subroutine corgot
 20    continue
 
       if (-neg1.gt.1e-3) then
-         write(*,*) 'problemas graves'
          stop
       endif
    else
@@ -129,8 +117,6 @@ subroutine corllu
    USE corgot_vars
    implicit none
 
-   !      write(*,*) 'dentro de corllu'
-
    neg1=0.
    pos1=0.
    do 10 n=nllu(1),nllu(2)
@@ -145,7 +131,6 @@ subroutine corllu
 10 continue
 
    if(pos1.le.-neg1) then
-      write(*,*) 'problemas con las lluvia',pos1,neg1
       do 20 l=lllu(1),lllu(2)
          do 20 m=mllu(1),mllu(2)
             do 20 n=nllu(1),nllu(2)
@@ -153,7 +138,6 @@ subroutine corllu
 20    continue
 
       if (-neg1.gt.1e-3) then
-         write(*,*) 'problemas graves'
          stop
       endif
    else
@@ -195,7 +179,6 @@ subroutine corcri
 10 continue
 
    if(pos1.le.-neg1) then
-      write(*,*) 'problemas con las cristales',pos1,neg1
       do 20 l=lcri(1),lcri(2)
          do 20 m=mcri(1),mcri(2)
             do 20 n=ncri(1),ncri(2)
@@ -203,7 +186,6 @@ subroutine corcri
 20    continue
 
       if (-neg1.gt.1e-3) then
-         write(*,*) 'problemas graves'
          stop
       endif
    else
@@ -246,7 +228,6 @@ subroutine cornie
 10 continue
 
    if(pos1.le.-neg1) then
-      write(*,*) 'problemas con las nieve',pos1,neg1
       do 20 l=lnie(1),lnie(2)
          do 20 m=mnie(1),mnie(2)
             do 20 n=nnie(1),nnie(2)
@@ -254,7 +235,6 @@ subroutine cornie
 20    continue
 
       if (-neg1.gt.1e-3) then
-         write(*,*) 'problemas graves'
          stop
       endif
    else
@@ -296,7 +276,6 @@ subroutine corgra
 10 continue
 
    if(pos1.le.-neg1) then
-      write(*,*) 'problemas con las granizos',pos1,neg1
       do 20 l=lgra(1),lgra(2)
          do 20 m=mgra(1),mgra(2)
             do 20 n=ngra(1),ngra(2)
@@ -304,7 +283,6 @@ subroutine corgra
 20    continue
 
       if (-neg1.gt.1e-3) then
-         write(*,*) 'problemas graves'
          stop
       endif
    else
@@ -335,7 +313,6 @@ subroutine corvap(Qvapneg)
    implicit none
 
    real*8, intent(in) :: Qvapneg
-   write(*,*) 'dentro de corvap',Qvap2(15,17,22),Qvap0(22)
 
    do 10 k=1,nz1
       dq=Qvapneg*Qvaprel(k)/nx1**2.
@@ -345,8 +322,6 @@ subroutine corvap(Qvapneg)
             if (Qvap2(i,j,k)+Qvap0(k).lt.0) Qvap2(i,j,k)=-Qvap0(k)
 15    continue
 10 continue
-
-   write(*,*) Qvap2(15,17,22),Qvap0(22)
 
    return
 end
@@ -364,7 +339,6 @@ subroutine coraer(aerneg)
    implicit none
 
    real*8, intent(in) :: aerneg
-   write(*,*) 'dentro de coraer'
 
    do 10 k=1,nz1
       dq=aerneg*aerrel(k)/nx1**2.
@@ -816,8 +790,6 @@ subroutine velpre
 
    call velpre01_init()
 
-   write(*,*) cc2(1)
-
    do 10 i=0,nx1+1
       do 10 j=0,nx1+1
          do 10 k=0,nz1
@@ -958,9 +930,6 @@ subroutine velpre
    !**********************************************************
    !*    suavizado
 
-   write(*,500) Pres2(9,2,2),Pres2(9,31,2)&
-      ,Pres2(9,2,2),Pres2(9,31,2)
-
    call filtro(Pres1,.15,.15,.1)
 
    call filtro(Pres2,.15,.15,.1)
@@ -971,9 +940,6 @@ subroutine velpre
    call filtro(V2,facx,facy,facz)
    call filtro(W1,facx,facy,facz)
    call filtro(W2,facx,facy,facz)
-
-   write(*,500) Pres1(9,2,1),Pres1(9,31,1)&
-      ,Pres2(9,2,1),Pres2(9,31,1)
 
 500 format(4g16.8)
 501 format(i3,5g16.8)
@@ -1251,7 +1217,6 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
          e1=(Qvap-auxl)*Rv*TT2
          hhh=1
          if (s.eq.1) then
-            write(*,*) 'moco en nuclea',l,m,n
             stop
          endif
       endif
@@ -1268,7 +1233,6 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
 
       !*     control de mocos
       if (auxl.lt.0 .or. auxs.lt.0) then
-         write(*,*) 'Mocazo en nuclea',auxl,auxs,l,m,n
          stop
       endif
 
@@ -1374,9 +1338,6 @@ subroutine filtro(varia1,facx,facy,facz)
    fact=1.-(facx+facy+facz)
 
    if (fact.lt.0.25) then
-      write(*,*) '              Moco, fact= ',fact
-      text = 'El valor de la variable no debe ser menor a 0.25'
-      write(*,*) text
       stop
    endif
 

@@ -17,7 +17,6 @@ module io
       else
           str_out = str_out_mid
       end if
-      write(*,*) str_out
     end function str_gen
 
     function str_gen_aux(int_in) result(str_out)
