@@ -40,7 +40,7 @@ program modelo
    USE io, only: str_gen
    USE config
    implicit none
-
+   integer :: unit_number
    call mode20_init()
 
 !########### Condiciones iniciales ############
@@ -49,22 +49,22 @@ program modelo
       call condi
    else
       !si ini=1 el calculo recomienza desde algun paso
-      open(unit=13,file=output_directory//"inis.da",status='unknown',form='unformatted')
-      open(unit=14,file=output_directory//"velos.da",status='unknown',form='unformatted')
-      rewind 14
-      open(unit=30,file=output_directory//"varconz.da",status='unknown',form='unformatted')
-      rewind 30
+      open(newunit=unit_number,file=output_directory//"inis.da",status='unknown',form='unformatted')
+      read(unit_number,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
+      close(unit_number)
 
-      read(13,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
-      read(14) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,&
+      open(newunit=unit_number,file=output_directory//"velos.da",status='unknown',form='unformatted')
+      rewind unit_number
+      read(unit_number) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,&
          Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
          Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,&
          aer1,aer2,Fcalo
-      read(30)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
+      close(unit_number)
 
-      close(30)
-      close(13)
-      close(14)
+      open(unit=unit_number,file=output_directory//"varconz.da",status='unknown',form='unformatted')
+      rewind unit_number
+      read(unit_number)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
+      close(unit_number)
 
       do 5001 i=1,nx1
          do 5001 j=1,nx1
@@ -77,19 +77,6 @@ program modelo
 
    !definicion de calores y presiones de vapor a 0 K
    Lsl00=Lsl0*4180.
-   open(unit=13,file=output_directory//"u2"//file_number)
-   open(unit=14,file=output_directory//"v2"//file_number)
-   open(unit=15,file=output_directory//"w2"//file_number)
-   open(unit=16,file=output_directory//"va"//file_number)
-   open(unit=17,file=output_directory//"go"//file_number)
-   open(unit=18,file=output_directory//"ae"//file_number)
-   open(unit=19,file=output_directory//"pr"//file_number)
-   open(unit=20,file=output_directory//"ti"//file_number)
-
-   open(unit=30,file=output_directory//"esta"//file_number)
-   open(unit=31,file=output_directory//"vara"//file_number)
-   open(unit=32,file=output_directory//"posnub"//'.sa')
-   open(unit=33,file=output_directory//"est"//file_number)
 
 !#####################################################################
 !############### comienzo de la evolucion temporal ###################
@@ -160,7 +147,7 @@ program modelo
       totmic=0.
 
 !######################## Advección de vapores #######################
-      
+
       do 15 i=0,nx1+1
          do 15 j=0,nx1+1
             advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
@@ -761,14 +748,37 @@ program modelo
       lll=tt
       ener=ener1+ener2+ener3+ener4+ener5
 !     Evolucion para puntos seleccionados
-      write(13,44) U2(16,16,1),U2(17,17,1),U2(16,19,1),U2(17,19,1),U2(19,16,1),U2(19,17,1)
-      write(14,44) V2(16,16,1),V2(17,17,1),V2(16,19,1),V2(17,19,1),V2(19,16,1),V2(19,17,1)
-      write(15,44) W2(16,16,1),W2(17,17,1),W2(16,19,1),W2(17,19,1),W2(19,16,1),W2(19,17,1)
-      write(16,44) Qvap1(16,16,1),Qvap1(17,17,1),Qvap1(16,19,1),Qvap1(17,19,1),Qvap1(19,16,1),Qvap1(19,17,1)
-      write(17,44) Qgot1(16,16,1),Qgot1(17,17,1),Qgot1(16,19,1),Qgot1(17,19,1),Qgot1(19,16,1),Qgot1(19,17,1)
-      write(18,44) aer1(16,16,1),aer1(17,17,1),aer1(16,19,1),aer1(17,19,1),aer1(19,16,1),aer1(19,17,1)
-      write(19,44) Pres2(16,16,1),Pres2(17,17,1),Pres2(16,19,1),Pres2(17,19,1),Pres2(19,16,1),Pres2(19,17,1)
-      write(20,44) Titaa1(16,16,1),Titaa1(17,17,1),Titaa1(16,19,1),Titaa1(17,19,1),Titaa1(19,16,1),Titaa1(19,17,1)
+      open(newunit=unit_number,file=output_directory//"u2", ACCESS="append")
+      write(unit_number,44) U2(16,16,1),U2(17,17,1),U2(16,19,1),U2(17,19,1),U2(19,16,1),U2(19,17,1)
+      close(unit_number)
+
+      open(newunit=unit_number,file=output_directory//"v2", ACCESS="append")
+      write(unit_number,44) V2(16,16,1),V2(17,17,1),V2(16,19,1),V2(17,19,1),V2(19,16,1),V2(19,17,1)
+      close(unit_number)
+
+      open(newunit=unit_number,file=output_directory//"w2", ACCESS="append")
+      write(unit_number,44) W2(16,16,1),W2(17,17,1),W2(16,19,1),W2(17,19,1),W2(19,16,1),W2(19,17,1)
+      close(unit_number)
+
+      open(newunit=unit_number,file=output_directory//"va", ACCESS="append")
+      write(unit_number,44) Qvap1(16,16,1),Qvap1(17,17,1),Qvap1(16,19,1),Qvap1(17,19,1),Qvap1(19,16,1),Qvap1(19,17,1)
+      close(unit_number)
+
+      open(newunit=unit_number,file=output_directory//"go", ACCESS="append")
+      write(unit_number,44) Qgot1(16,16,1),Qgot1(17,17,1),Qgot1(16,19,1),Qgot1(17,19,1),Qgot1(19,16,1),Qgot1(19,17,1)
+      close(unit_number)
+
+      open(newunit=unit_number,file=output_directory//"ae", ACCESS="append")
+      write(unit_number,44) aer1(16,16,1),aer1(17,17,1),aer1(16,19,1),aer1(17,19,1),aer1(19,16,1),aer1(19,17,1)
+      close(unit_number)
+
+      open(newunit=unit_number,file=output_directory//"pr", ACCESS="append")
+      write(unit_number,44) Pres2(16,16,1),Pres2(17,17,1),Pres2(16,19,1),Pres2(17,19,1),Pres2(19,16,1),Pres2(19,17,1)
+      close(unit_number)
+
+      open(newunit=unit_number,file=output_directory//"ti", ACCESS="append")
+      write(unit_number,44) Titaa1(16,16,1),Titaa1(17,17,1),Titaa1(16,19,1),Titaa1(17,19,1),Titaa1(19,16,1),Titaa1(19,17,1)
+      close(unit_number)
 
 !     este es el unico que interesa
       aux1=0.
@@ -783,6 +793,10 @@ program modelo
             aux4=aux4+aer1(j-posx(tt),i+nx1/2-10-posy(tt),0)
 810   continue
 
+      open(newunit=unit_number,file= output_directory//"vara"//file_number, ACCESS="append")
+      write(unit_number,*) tt,totnuc,totmic
+      close(unit_number)
+
 !#####################################################################
 !grabacion normal de las diferentes cantidades
       if (tt/nint(lte/dt1)*nint(lte/dt1).eq.tt) then
@@ -791,6 +805,10 @@ program modelo
          tte=tte+1
          call posnub02_init()
          call corrinu2_init()
+
+         open(newunit=unit_number,file=output_directory//"posnub"//'.sa', ACCESS="append")
+         write(unit_number,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),posxx,posyy
+         close(unit_number)
       endif
 
       if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
@@ -805,9 +823,9 @@ program modelo
 !######################### Grabación Backup ##########################
       if (tt/nint(ltb/dt1)*nint(ltb/dt1).eq.tt) then
          call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
-         U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
-         Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo,&
-         Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
+            U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
+            Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo,&
+            Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
       endif
 
       write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
@@ -816,26 +834,6 @@ program modelo
 
 !############### Fin de la evolucion temporal ########################
 !#####################################################################
-
-   close(13)
-   close(14)
-   close(15)
-   close(16)
-   close(17)
-   close(18)
-   close(19)
-   close(20)
-   close(30)
-   close(31)
-   close(32)
-   close(33)
-
-3000 format(a10,6i4)
-4003 format(7g17.9)
-4004 format(6g17.9)
-4005 format(4g17.9)
-4006 format(4g17.9)
-4007 format(2g17.9)
 
 44 format(6g16.8)
 

@@ -176,6 +176,8 @@ contains
       USE mode20
       USE permic
       USE perdim
+      USE config
+      integer :: unit_number
       umax=0.
       lumax=0
       mumax=0
@@ -404,8 +406,8 @@ contains
       qnietot=qnietot/1000
       qgratot=qgratot/1000
 
-!$$
-      write(30,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin&
+      open(newunit=unit_number,file=output_directory//"esta", ACCESS="append")
+      write(unit_number,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin&
          ,qvapmax,qvapmin,qgotmax,qllumax,qcrimax,qniemax&
          ,qgramax,aermax&
          ,lumax,mumax,numax,lumin,mumin,numin&
@@ -420,9 +422,9 @@ contains
          ,lqgramax,mqgramax,nqgramax&
          ,laermax,maermax,naermax
 
-
-      write(33,715) qgottot,qllutot,qcritot,qnietot,qgratot
-
+      open(newunit=unit_number,file=output_directory//"est", ACCESS="append")
+      write(unit_number,715) qgottot,qllutot,qcritot,qnietot,qgratot
+      close(unit_number)
 710   format(16i5,48i4)
 715   format(5i9)
    end subroutine estad03_init
