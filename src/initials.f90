@@ -125,19 +125,15 @@ contains
       USE cant01
       USE dimen
       USE const
-      USE io
       USE config
 
-      CALL init_config()
-
-      ini = 0                                ! Inicio por vez primera= 0
-      t1 = 0                                 ! Paso a inicio (si ini=0->t1=0)
-      ltt = sim_time_minutes * 60. * 2.      ! Tiempo lazo físico
-      ltg = save_lapse_minutes * 60. *2/3    ! Tiempo de grabacion
-      lte = 45. * 60.                        ! Tiempo de grabacion estadistica
-      ltb = 45. * 60.                        ! Tiempo de grabacion de backup
-      file_number = "0"
-
+      call init_config()
+      ini = 0                                   !inicio por vez primera= 0
+      t1 = 0                                    !paso a inicio (si ini=0->t1=0)
+      ltt = sim_time_minutes * 60. * 2.         !tiempo total de simulacion
+      ltg = save_lapse_minutes * 60. * 2.       !tiempo de grabacion
+      lte = 3. * 60. * 2.                       !tiempo de grabacion estadistica
+      ltb = 3. * 60. * 2.                       !tiempo de backup
       ctur = 0.5
 
       pro1 = 1. - 2e-2 * (dt1 / 5.)
@@ -180,6 +176,8 @@ contains
       USE mode20
       USE permic
       USE perdim
+      USE config
+      integer :: unit_number
       umax=0.
       lumax=0
       mumax=0
@@ -348,11 +346,6 @@ contains
                   lqcrimax=i
                   mqcrimax=j
                   nqcrimax=k
-
-
-!            write(*,*) qcrimax,Qcri1(i,j,k),i,j,k
-!            pause
-
                endif
                qcritot=qcritot+Qcri1(i,j,k)*1e6
 
@@ -392,11 +385,6 @@ contains
                qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
                qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
 
-
-!        write(*,*) qcrimax,Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k),
-!     &             lqcrimax+i,mqcrimax+j,nqcrimax+k
-
-
 719   continue
 
       qgotmax=qgotmax/27.
@@ -418,8 +406,8 @@ contains
       qnietot=qnietot/1000
       qgratot=qgratot/1000
 
-!$$
-      write(30,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin&
+      open(newunit=unit_number,file=output_directory//"esta", ACCESS="append")
+      write(unit_number,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin&
          ,qvapmax,qvapmin,qgotmax,qllumax,qcrimax,qniemax&
          ,qgramax,aermax&
          ,lumax,mumax,numax,lumin,mumin,numin&
@@ -434,9 +422,9 @@ contains
          ,lqgramax,mqgramax,nqgramax&
          ,laermax,maermax,naermax
 
-
-      write(33,715) qgottot,qllutot,qcritot,qnietot,qgratot
-
+      open(newunit=unit_number,file=output_directory//"est", ACCESS="append")
+      write(unit_number,715) qgottot,qllutot,qcritot,qnietot,qgratot
+      close(unit_number)
 710   format(16i5,48i4)
 715   format(5i9)
    end subroutine estad03_init
@@ -530,9 +518,6 @@ contains
          posx(tte)=posx(tte)+1
          Xnub(tte)=Xnub(tte)-dx1
 
-!##
-         write(*,*) 'corri en x pos'
-
          do 1500 k=0,nz1+1
             do 1501 j=0,nx1+1
                do 1502 i=1,nx1+1
@@ -608,9 +593,6 @@ contains
       if (posxx.lt.-dx1) then
          posx(tte)=posx(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
-
-!##
-         write(*,*) 'corri en x neg'
 
          do 1510 k=0,nz1+1
             do 1511 j=0,nx1+1
@@ -690,8 +672,6 @@ contains
          posy(tte)=posy(tte)+1
          Ynub(tte)=Ynub(tte)-dx1
 
-!##
-         write(*,*) 'corri en y pos'
 
          do 1520 k=0,nz1+1
             do 1521 i=0,nx1+1
@@ -768,9 +748,6 @@ contains
       if (posyy.lt.-dx1) then
          posy(tte)=posy(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
-
-!##
-         write(*,*) 'corri en y neg'
 
          do 1530 k=0,nz1+1
             do 1531 i=0,nx1+1

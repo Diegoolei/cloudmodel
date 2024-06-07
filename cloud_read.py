@@ -1,49 +1,55 @@
-from scipy.io import FortranFile
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, FFMpegWriter
-from constants import *
-import numpy as np
 import os
 import re
-from subprocess import Popen, PIPE
-from filecmp import cmpfiles
 from datetime import datetime
+from filecmp import cmpfiles
+from subprocess import PIPE, Popen
+
+from cloud_model.constants import (
+    biased_nx1,
+    inis_biased_nz1,
+    inis_var_list,
+    nube31_biased_nz1,
+    nube31_var_list,
+    plot_center,
+)
+
+import matplotlib.pyplot as plt
+from matplotlib.animation import FFMpegWriter, FuncAnimation
+
+import numpy as np
+
+from scipy.io import FortranFile
+
 
 def main():
-    
-    data = File_style(
+
+    data = FileStyle(
         chosen_file=1,
-        output_data_path="f77_data/",
+        output_data_path="Data/new_code/",
         cmp_output_data_path="outputdata1/",
-        img_path="img/",
+        img_path="img/new_code/",
         txt_path="txt/",
         cmp_txt_path="txt1/",
         vid_path="vid/",
-        img_option = 1,
+        img_option=2,
     )
-    data1 = File_style(
-        chosen_file=1,
-        output_data_path="outputdata1/",
-        cmp_output_data_path="outputdata1/",
-        img_path="img/",
-        txt_path="txt/",
-        cmp_txt_path="txt1/",
-        vid_path="vid/",
-        img_option = 2,
-    )
-    print(f"data is equal: {data_comparison(data, data1)}")
+
     data.parse_status_img()
+
+
 def time_it(func):
-    '''Log the date and time of a function'''
+    """Log the date and time of a function"""
 
     def wrapper(*args, **kwargs):
-        print(f'Function: {func.__name__}\nRun on: {datetime.today().strftime("%Y-%m-%d %H:%M:%S")}')
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Function: {func.__name__}\nRun on: {date}")
         print(f'{"-"*30}')
         func(*args, **kwargs)
+
     return wrapper
 
 
-class File_style:
+class FileStyle:
     def __init__(
         self,
         chosen_file=0,
@@ -53,53 +59,51 @@ class File_style:
         txt_path="txt/",
         cmp_txt_path="txt1/",
         vid_path="vid/",
-        img_option = 1,
+        img_option=1,
     ):
-        if os.path.exists(output_data_path):
-            self.output_data_path = output_data_path
-            self.cmp_output_data_path = cmp_output_data_path
-            self.img_path = img_path
-            self.txt_path = txt_path
-            self.cmp_txt_path = cmp_txt_path
-            self.vid_path = vid_path
-            self.data = []
-            self.img_option = img_option
-            if chosen_file == 0:
-                print("No file selected")
-                exit()
-            elif chosen_file == 1:
-                self.var_list = nube31_var_list  # list of variables to plot
-                self.var_amount = len(
-                    nube31_var_list
-                )  # amount of variables to plot per file
-                self.binary_regex = r".sal$"  # regex to match binary files
-                self.data_dimension = 3  # dimension of the data
-                self.var_datatype = np.float32  # datatype of the variables
-                self.var_structure_size = (
-                    biased_nx1 * biased_nx1 * nube31_biased_nz1
-                )  # size of the variables
-                self.var_structure = (
-                    biased_nx1,
-                    biased_nx1,
-                    nube31_biased_nz1,
-                )  # structure of the variables
-                self.file_name = "sal"
-            elif chosen_file == 2:
-                self.var_list = inis_var_list
-                self.var_amount = len(inis_var_list)
-                self.binary_regex = r"inis.da$"
-                self.data_dimension = 1
-                self.var_datatype = np.float32  # datatype of the variables
-                self.var_structure_size = inis_biased_nz1  # size of the variables
-                self.var_structure = inis_biased_nz1  # structure of the variables
-                self.file_name = "inis"
-            else:
-                print("Invalid file option")
-                exit()
-
-            self.get_data()
+        assert os.path.exists(output_data_path), "output_data_path does not exist"
+        self.output_data_path = output_data_path
+        self.cmp_output_data_path = cmp_output_data_path
+        self.img_path = img_path
+        self.txt_path = txt_path
+        self.cmp_txt_path = cmp_txt_path
+        self.vid_path = vid_path
+        self.data = []
+        self.img_option = img_option
+        if chosen_file == 0:
+            print("No file selected")
+            exit()
+        elif chosen_file == 1:
+            self.var_list = nube31_var_list  # list of variables to plot
+            self.var_amount = len(
+                nube31_var_list
+            )  # amount of variables to plot per file
+            self.binary_regex = r".sal$"  # regex to match binary files
+            self.data_dimension = 3  # dimension of the data
+            self.var_datatype = np.float32  # datatype of the variables
+            self.var_structure_size = (
+                biased_nx1 * biased_nx1 * nube31_biased_nz1
+            )  # size of the variables
+            self.var_structure = (
+                biased_nx1,
+                biased_nx1,
+                nube31_biased_nz1,
+            )  # structure of the variables
+            self.file_name = "sal"
+        elif chosen_file == 2:
+            self.var_list = inis_var_list
+            self.var_amount = len(inis_var_list)
+            self.binary_regex = r"inis.da$"
+            self.data_dimension = 1
+            self.var_datatype = np.float32  # datatype of the variables
+            self.var_structure_size = inis_biased_nz1  # var size
+            self.var_structure = inis_biased_nz1  # var structure
+            self.file_name = "inis"
         else:
-            print("The outputdata folder does not exist, please run the model first")
+            print("Invalid file option")
+            exit()
+
+        self.get_data()
 
     def get_data(self):
         selected_files = self.get_file_list(self.output_data_path, self.binary_regex)
@@ -115,9 +119,12 @@ class File_style:
 
     def check_path(self, path, selected_file_name=""):
         """Checks if the path exists, if not, creates it
-        If the path exists, checks if the selected_file_name folder exists, if not, creates it
-        If the selected_file_name folder exists, asks the user if he wants to overwrite the files
-        If no selected_file_name is given, it will only check if the path exists"""
+        If the path exists, checks if the selected_file_name folder exists,
+        if not, creates it
+        If the selected_file_name folder exists, asks the user if he wants
+        to overwrite the files
+        If no selected_file_name is given, it will only check if the path
+        exists"""
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -130,7 +137,7 @@ class File_style:
                 + " folder already exists, files will be overwritten"
             )
             user_input = input(
-                "Press C to continue, R to remove the existent folder or any other key to exit: "
+                "'C' continue, 'R' remove existent folder, any other key exit:"
             ).upper()
             if user_input == "C":
                 return
@@ -140,8 +147,8 @@ class File_style:
                 exit()
 
     def get_file_list(self, data_path, binary_regex):
-        files = os.listdir(data_path)  # List all files in the outputdata folder
-        reg = re.compile(binary_regex)  # Compile the regex to match binary files
+        files = os.listdir(data_path)  # List all files in outputdata folder
+        reg = re.compile(binary_regex)  # Compile regex to match binary files
         return sorted(filter(reg.search, files))
 
     def cloud_binary_comparison(self):
@@ -173,23 +180,25 @@ class File_style:
         else:
             print(f"There is no {self.cmp_output_data_path} folder to compare with")
 
-    def plot_style(self, variable, data_dimension, 
-        img_option):
+    def plot_style(self, variable, data_dimension, img_option):
         plt.grid(False)
         if img_option == 1:
             if data_dimension == 3:
-                plt.imshow(variable[:, :, plot_center])
+                plt.imshow(np.flipud(variable[:, :, plot_center]))
             elif data_dimension == 2:
                 plt.imshow(variable[:, plot_center])
             elif data_dimension == 1:
                 plt.plot(variable[3:-3])  # Cleans trash data
         elif img_option == 2:
+            fig, ax = plt.subplots()
             if data_dimension == 3:
-                plt.contourf(variable[:, :, plot_center])
+                cs = ax.contour(
+                    np.flipud(variable[:, :, 10]), linewidths=0.3, colors="k"
+                )
+                ax.clabel(cs, fontsize=6, inline=True)
             elif data_dimension == 2:
-                plt.contourf(variable[:, plot_center])
-            elif data_dimension == 1:
-                plt.plot(variable[3:-3])  # Cleans trash data
+                cs = ax.contour(variable[:, plot_center], linewidths=0.3, colors="k")
+                ax.clabel(cs, fontsize=6, inline=True)
         plt.style.use("fivethirtyeight")
         # plt.colorbar() # Generates infinite colorbars in animation
         plt.xlabel("X")
@@ -247,9 +256,7 @@ class File_style:
             for structure_iterator in range(
                 0, len(self.data[file_iterator]), self.var_structure_size
             ):
-                variable = self.get_var_from_data(
-                    file_iterator, structure_iterator
-                )
+                variable = self.get_var_from_data(file_iterator, structure_iterator)
                 plt.title(f"{str(file_iterator)} {self.var_list[var_iterator]}")
                 self.plot_style(variable, self.data_dimension, self.img_option)
                 plt.savefig(
@@ -264,16 +271,12 @@ class File_style:
     def multi_var_img(self, var_1, var_2, file="inis.da"):
         self.check_path(f"{self.img_path}{self.file_name}/multivar/")
         print(len(self.data))
-        var_1_data = self.get_var_from_data(
-            0, var_1
-        )
-        var_2_data = self.get_var_from_data(
-            0, var_2
-        )
+        var_1_data = self.get_var_from_data(0, var_1)
+        var_2_data = self.get_var_from_data(0, var_2)
         plt.title(f"{self.var_list[var_1]} vs {self.var_list[var_2]}")
         # self.plot_style(variable, self.data_dimension)
         plt.plot(var_1_data[10:-10], var_2_data[10:-10], ".b")
-        #plt.plot(var_1_data[::6], var_2_data[::6], "*")
+        # plt.plot(var_1_data[::6], var_2_data[::6], "*")
         plt.savefig(
             f"{self.img_path}{self.file_name}/multivar/{self.var_list[var_1]}_{self.var_list[var_2]}.png"
         )
@@ -337,7 +340,7 @@ def format_data(data):
     return data.reshape(3, biased_nx1, biased_nx1, nube31_biased_nz1, order="F")
 
 
-def data_comparison(original_data: File_style, cmp_data: File_style):
+def data_comparison(original_data: FileStyle, cmp_data: FileStyle):
     for iterator in range(len(original_data.data)):
         if not np.allclose(
             original_data.data[iterator],
@@ -357,17 +360,11 @@ def data_comparison(original_data: File_style, cmp_data: File_style):
                 else:
                     norm_var = var
                     norm_cmp_var = cmp_var
-                if not np.allclose(
-                    norm_var,
-                    norm_cmp_var,
-                    rtol=1e-05,
-                    atol=3e-06
-                    ):
+                if not np.allclose(norm_var, norm_cmp_var, rtol=1e-05, atol=3e-06):
                     print(f"Variable {original_data.var_list[it_var]} is different ")
-                    print(
-                        f"Max difference: {np.argmax(np.abs(var - cmp_var))}\n"
-                    )
+                    print(f"Max difference: {np.argmax(np.abs(var - cmp_var))}\n")
 
     return True
+
 
 main()
