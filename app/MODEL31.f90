@@ -746,38 +746,6 @@ program modelo
 
       lll=tt
       ener=ener1+ener2+ener3+ener4+ener5
-!     Evolucion para puntos seleccionados
-      open(newunit=unit_number,file=output_directory//"u2", ACCESS="append")
-      write(unit_number,44) U2(16,16,1),U2(17,17,1),U2(16,19,1),U2(17,19,1),U2(19,16,1),U2(19,17,1)
-      close(unit_number)
-
-      open(newunit=unit_number,file=output_directory//"v2", ACCESS="append")
-      write(unit_number,44) V2(16,16,1),V2(17,17,1),V2(16,19,1),V2(17,19,1),V2(19,16,1),V2(19,17,1)
-      close(unit_number)
-
-      open(newunit=unit_number,file=output_directory//"w2", ACCESS="append")
-      write(unit_number,44) W2(16,16,1),W2(17,17,1),W2(16,19,1),W2(17,19,1),W2(19,16,1),W2(19,17,1)
-      close(unit_number)
-
-      open(newunit=unit_number,file=output_directory//"va", ACCESS="append")
-      write(unit_number,44) Qvap1(16,16,1),Qvap1(17,17,1),Qvap1(16,19,1),Qvap1(17,19,1),Qvap1(19,16,1),Qvap1(19,17,1)
-      close(unit_number)
-
-      open(newunit=unit_number,file=output_directory//"go", ACCESS="append")
-      write(unit_number,44) Qgot1(16,16,1),Qgot1(17,17,1),Qgot1(16,19,1),Qgot1(17,19,1),Qgot1(19,16,1),Qgot1(19,17,1)
-      close(unit_number)
-
-      open(newunit=unit_number,file=output_directory//"ae", ACCESS="append")
-      write(unit_number,44) aer1(16,16,1),aer1(17,17,1),aer1(16,19,1),aer1(17,19,1),aer1(19,16,1),aer1(19,17,1)
-      close(unit_number)
-
-      open(newunit=unit_number,file=output_directory//"pr", ACCESS="append")
-      write(unit_number,44) Pres2(16,16,1),Pres2(17,17,1),Pres2(16,19,1),Pres2(17,19,1),Pres2(19,16,1),Pres2(19,17,1)
-      close(unit_number)
-
-      open(newunit=unit_number,file=output_directory//"ti", ACCESS="append")
-      write(unit_number,44) Titaa1(16,16,1),Titaa1(17,17,1),Titaa1(16,19,1),Titaa1(17,19,1),Titaa1(19,16,1),Titaa1(19,17,1)
-      close(unit_number)
 
 !     este es el unico que interesa
       aux1=0.
@@ -791,10 +759,6 @@ program modelo
             aux3=aux3+aer1(i+nx1/2+6-posx(tt),j-posy(tt),0)
             aux4=aux4+aer1(j-posx(tt),i+nx1/2-10-posy(tt),0)
 810   continue
-
-      open(newunit=unit_number,file= output_directory//"vara"//file_number, ACCESS="append")
-      write(unit_number,*) tt,totnuc,totmic
-      close(unit_number)
 
 !#####################################################################
 !grabacion normal de las diferentes cantidades
