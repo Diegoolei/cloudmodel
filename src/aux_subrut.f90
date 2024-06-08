@@ -312,7 +312,7 @@ subroutine corvap(Qvapneg)
    USE corvap_vars
    implicit none
 
-   real*8, intent(in) :: Qvapneg
+   real(8), intent(in) :: Qvapneg
 
    do 10 k=1,nz1
       dq=Qvapneg*Qvaprel(k)/nx1**2.
@@ -338,7 +338,7 @@ subroutine coraer(aerneg)
    USE coraer_vars
    implicit none
 
-   real*8, intent(in) :: aerneg
+   real(8), intent(in) :: aerneg
 
    do 10 k=1,nz1
       dq=aerneg*aerrel(k)/nx1**2.
@@ -941,12 +941,6 @@ subroutine velpre
    call filtro(W1,facx,facy,facz)
    call filtro(W2,facx,facy,facz)
 
-500 format(4g16.8)
-501 format(i3,5g16.8)
-502 format(a3,i3,4g16.8)
-505 format(2g16.8)
-510 format(7g16.8)
-
    do 200 i=1,nx1
       do 200 j=1,nx1
          Pres1(i,j,0)=Pres1(i,j,1)
@@ -1400,9 +1394,6 @@ subroutine filtro(varia1,facx,facy,facz)
       do 120 j=1,nx1
          varia1(i,j,nz1)=varia1(i,j,nz1-1)
 120 continue
-
-500 format(a4,i3,5g16.8)
-501 format(a4,4g16.8)
    !**********************************************************
 
    return

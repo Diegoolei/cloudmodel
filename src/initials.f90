@@ -1,12 +1,8 @@
 module velpre01
-   integer :: t
-   real :: dvx, dvy, dvz, diver
-   real :: dprex, dprey, dprez
-   real :: vel0, vel1, vel2, vel3
-   real :: presi, presix, presiy, presiz
-   real :: facx, facy, facz
-   integer :: i, j, k
-   real :: prom1, prom, kkk, presprom, nnn
+   integer :: t, i, j, k
+   real :: dvx, dvy, dvz, diver, dprex, dprey, dprez, vel0, vel1, vel2,&
+      vel3, presi, presix, presiy, presiz, facx, facy, facz, prom1, prom,&
+      kkk, presprom, nnn
 contains
    subroutine velpre01_init()
       USE dimen
@@ -26,25 +22,15 @@ end module velpre01
 module aeroana
 !> Variables de aeroana
    USE dimen
-   integer tt,t1,t2,n,m,l,i,j,k,lll,s,iT,tte
-   integer lvapneg,llluneg,lcrineg,laerneg,lnieneg,lgraneg,yy
-   real T,P
-   real Dv,Lvl,Lvs,Lsl,Vis,Qvap,Qliq,densi,nu
-   real Lsl00
-   real Eaucn,Eaccn,Eacng
-   real*8 qgotaux,qvapaux,qlluaux,qcriaux,qnieaux,qgraaux,aeraux
-   real*8 auxx,auxy,auxz
-   real*8 Taux,Qvapneg,aerneg
-   real Naer,dqgot,dqcri,daer,daer2
-   real Fcal
-   real elvs,esvs,e1,rl,rs,dden0z
-   real aux,aux1,aux2,aux3,aux4
-   real*8 ener,ener1,ener2,ener3,ener4,ener5,qv,qg,daitot
-   real*8 vapt1,vapt2,vapt3,vapt4
-   real*8 gott1,gott2,gott3,gott4
-   real*8 aert1,aert2,aert3,aert4
-   real*8 totnuc,totmic
-   real cks,turbu,lapla
+   integer tt,t1,t2,n,m,l,i,j,k,lll,s,iT,tte, lvapneg,llluneg,lcrineg,&
+      laerneg,lnieneg,lgraneg,yy
+   real T,P, Dv,Lvl,Lvs,Lsl,Vis,Qvap,Qliq,densi,nu, Lsl00, Eaucn,Eaccn,&
+      Eacng, Naer,dqgot,dqcri,daer,daer2, Fcal, elvs,esvs,e1,rl,rs,dden0z,&
+      aux,aux1,aux2,aux3,aux4, cks,turbu,lapla
+   real(8) qgotaux,qvapaux,qlluaux,qcriaux,qnieaux,qgraaux,aeraux, auxx,auxy,&
+      auxz, Taux,Qvapneg,aerneg, ener,ener1,ener2,ener3,ener4,ener5,qv,qg,&
+      daitot,vapt1,vapt2,vapt3,vapt4, gott1,gott2,gott3,gott4, aert1,aert2,&
+      aert3,aert4,totnuc,totmic
    real aerdif(-3:nx1+3,-3:nx1+3,-3:nz1+3)
 
 contains
@@ -71,53 +57,35 @@ end module aeroana
 module mode20
    implicit none
 
-   integer :: tt, t1, t2, n, m, l, i, j, k, lll, s, iT, tte
-   integer :: lvapneg, llluneg, lcrineg, laerneg, lnieneg, lgraneg, yy
+   real :: T, P, Dv, Lvl, Lvs, Lsl, Vis, Qvap, Qliq, densi, nu, Lsl00, Eaucn,&
+      Eaccn, Eacng, Naer, dqgot, dqcri, daer, daer2, Fcal, elvs, esvs, e1, rl,&
+      rs, dden0z, aux, aux1, aux2, aux3, aux4, posxx, posyy, zmed,cks, turbu, lapla
 
-   real :: T, P
-   real :: Dv, Lvl, Lvs, Lsl, Vis, Qvap, Qliq, densi, nu
-   real :: Lsl00
-   real :: Eaucn, Eaccn, Eacng
+   real(8) :: qgotaux, qvapaux, qlluaux, qcriaux, qnieaux, qgraaux, aeraux,&
+      auxx, auxy, auxz, Taux, Qvapneg, aerneg, ener, ener1, ener2, ener3,&
+      ener4, ener5, qv, qg, daitot, vapt1, vapt2, vapt3, vapt4, gott1, gott2,&
+      gott3, gott4, aert1, aert2, aert3, aert4, totnuc, totmic, impx, impy,&
+      Qagua, Qaguat
 
-   real(8) :: qgotaux, qvapaux, qlluaux, qcriaux, qnieaux, qgraaux, aeraux
-   real(8) :: auxx, auxy, auxz
-   real(8) :: Taux, Qvapneg, aerneg
-   real :: Naer, dqgot, dqcri, daer, daer2
-   real :: Fcal
-   real :: elvs, esvs, e1, rl, rs, dden0z
-   real :: aux, aux1, aux2, aux3, aux4
-   real(8) :: ener, ener1, ener2, ener3, ener4, ener5, qv, qg, daitot
-
-   real(8) :: vapt1, vapt2, vapt3, vapt4
-   real(8) :: gott1, gott2, gott3, gott4
-   real(8) :: aert1, aert2, aert3, aert4
-   real(8) :: totnuc, totmic
-
-   real(8) :: impx, impy, Qagua, Qaguat
    real(8) :: Xnub(5000), Ynub(5000)
-   real :: posxx, posyy, zmed
    integer :: posx(-3:5000), posy(-3:5000), spos
 
    character(len=3) :: file_number
    character(len=12) :: nombre
 
-   integer :: laux1, laux2, maux1, maux2, naux2
-   integer :: umax, umin, vmax, vmin, wmax, wmin, titamax, titamin
-   integer :: qvapmax, qvapmin, qgotmax, qllumax, qcrimax, qniemax, qgramax
-   integer :: aermax
-   integer :: lumax, mumax, numax, lumin, mumin, numin
-   integer :: lvmax, mvmax, nvmax, lvmin, mvmin, nvmin
-   integer :: lwmax, mwmax, nwmax, lwmin, mwmin, nwmin
-   integer :: ltitamax, mtitamax, ntitamax, ltitamin, mtitamin
-   integer :: ntitamin, lqvapmax, mqvapmax, nqvapmax, lqvapmin
-   integer :: mqvapmin, nqvapmin, lqgotmax, mqgotmax, nqgotmax
-   integer :: lqllumax, mqllumax, nqllumax, laermax, maermax, naermax
-   integer :: lqcrimax, mqcrimax, nqcrimax
-   integer :: lqniemax, mqniemax, nqniemax
-   integer :: lqgramax, mqgramax, nqgramax
-   integer :: qgottot, qllutot, qcritot, qnietot, qgratot
+   integer :: tt, t1, t2, n, m, l, i, j, k, lll, s, iT, tte, lvapneg,&
+      llluneg, lcrineg, laerneg, lnieneg, lgraneg, yy, laux1, laux2, &
+      maux1, maux2, naux2, umax, umin, vmax, vmin, wmax, wmin, titamax,&
+      titamin, qvapmax, qvapmin, qgotmax, qllumax, qcrimax, qniemax,&
+      qgramax, aermax, lumax, mumax, numax,lumin, mumin, numin, lvmax,&
+      mvmax, nvmax, lvmin, mvmin, nvmin, lwmax, mwmax, nwmax, lwmin,&
+      mwmin, nwmin, ltitamax, mtitamax, ntitamax, ltitamin, mtitamin,&
+      ntitamin, lqvapmax, mqvapmax, nqvapmax, lqvapmin, mqvapmin, nqvapmin,&
+      lqgotmax,mqgotmax, nqgotmax, lqllumax, mqllumax, nqllumax, laermax,&
+      maermax, naermax, lqcrimax, mqcrimax, nqcrimax, lqniemax, mqniemax,&
+      nqniemax, lqgramax, mqgramax, nqgramax, qgottot, qllutot, qcritot,&
+      qnietot, qgratot
 
-   real :: cks, turbu, lapla
 
 contains
 
@@ -210,7 +178,6 @@ contains
       lqcrimax=0
       mqcrimax=0
       nqcrimax=0
-!$$
       qniemax=0.
       lqniemax=0
       mqniemax=0
@@ -223,7 +190,6 @@ contains
       laermax=0
       maermax=0
       naermax=0
-
       umin=0.
       lumin=0
       mumin=0
@@ -244,7 +210,6 @@ contains
       lqvapmin=0
       mqvapmin=0
       nqvapmin=0
-
       qgottot=0.
       qllutot=0.
       qcritot=0.

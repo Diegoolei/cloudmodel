@@ -60,7 +60,7 @@ program modelo
          aer1,aer2,Fcalo
       close(unit_number)
 
-      open(unit=unit_number,file=output_directory//"varconz.da",status='unknown',form='unformatted')
+      open(newunit=unit_number,file=output_directory//"varconz.da",status='unknown',form='unformatted')
       rewind unit_number
       read(unit_number)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
       close(unit_number)
@@ -384,8 +384,8 @@ program modelo
                      aux2=T-iT
                      elvs=Telvs(iT)*(1-aux2)+Telvs(iT+1)*aux2
                      esvs=Tesvs(iT)*(1-aux2)+Tesvs(iT+1)*aux2
-                     call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,&
-                        Fcal,l,m,n,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
+                     call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,&
+                        Lsl00,Fcal,n,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
                         qgraaux,Naer,daer2,nu,yy)
                      Fcalo(l,m,n)=Fcalo(l,m,n)+Fcal/dt1/densi
                      Naer=Naer+daer2
@@ -777,7 +777,7 @@ program modelo
       if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
          file_number = str_gen(t1)
 !############################ Grabación 2D ###########################
-         !call graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
+         !call graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
 !############################ Grabación 3D ###########################
          call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1,file_number)
          t1=t1+1

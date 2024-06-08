@@ -20,19 +20,11 @@ contains
       USE config
 
       implicit none
-      
-      real equis,ygrie,zeta
-      real G1,centx,centy,centz,cenaerx,cenaery,cenaerz
-      real sigmat,sigmaa,radiomed,temper,aerper
 
-      real elv1,rel1,tem1
-
-      integer i,j,k,n
-
-      real a0,a1,a2,a3,a4,a5,a6
-      real b0,b1,b2,b3,b4,b5,b6
-      real aux,gam,Tk,Qvaptot,aertot
-      real vb,vc,vh,zeta1
+      real equis,ygrie,zeta,G1,centx,centy,centz,cenaerx,cenaery,cenaerz,sigmat&
+         ,sigmaa,radiomed,temper,aerper,elv1,rel1,tem1,a0,a1,a2,a3,a4,a5,a6&
+         ,b0,b1,b2,b3,b4,b5,b6,aux,gam,Tk,Qvaptot,aertot,vb,vc,vh,zeta1
+      integer i,j,k,n,unit
 
       centx=(nx1+1.)*dx1/2.           !Coord x de la perturbacion inicial
       centy=(nx1+1.)*dx1/2.           !Coord y de la perturbacion inicial
@@ -102,7 +94,7 @@ contains
 
 !**   calculo de 'constantes' que dependen de T
 
-open(unit=30,file=output_directory//"ccc")
+      open(newunit=unit,file=output_directory//"ccc", access='append')
 
       do 400 k=313,210,-1
 
@@ -135,9 +127,10 @@ open(unit=30,file=output_directory//"ccc")
          Eautcn(k)=10.**(.035*(Tk)-.7)
          Eacrcn(k)=exp(.09*Tk)
 
-
+         write(unit,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k),Tesvs(k),&
+            Eautcn(k),Eacrcn(k)
 400   continue
-      close(30)
+      close(unit)
 
 !**   condiciones de tiempo bueno
 
@@ -273,17 +266,17 @@ open(unit=30,file=output_directory//"ccc")
 
       call PP2(G,dx1,Den0,Presi0,P00)
 
-      open(unit=70,file=output_directory//"inic03.sa")
+      open(newunit=unit,file=output_directory//"inic03.sa", access='append')
       do 100 k=0,nz1
          Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
          Pres00(k)=Temp0(k)/Tita0(k)
          cc2(k)=Cp*Rd*Tita0(k)*Pres00(k)/Cv
 
-         write(70,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),&
+         write(unit,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),&
             Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
 
 100   continue
-      close(70)
+      close(unit)
 
 
       Tita0(-1)=Tita0(0)

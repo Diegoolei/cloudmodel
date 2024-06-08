@@ -7,10 +7,8 @@
 !     revisado 24/09/00
 
 !$$
-subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
-   Eacng,Lsl00,Fcal,l,m,n,&
-   qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
-   qgraaux,Naer,daer2,nu,yy)
+subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
+   qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,qgraaux,Naer,daer2,nu,yy)
    USE cant01
    USE dimen
    USE perdim
@@ -21,14 +19,13 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
 
    real, intent(in) :: els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Naer,nu
    real, intent(inout) :: Fcal,daer2
-   real*8, intent(inout) :: qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,qgraaux
-   integer, intent(in) :: l,m,n,yy
-!*    Parametros comunes
+   real(8), intent(inout) :: qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,qgraaux
+   integer, intent(in) :: n,yy
 
+!*    Parametros comunes
    Nsc=nu/Dv
 
 !*    parametros de las distribuciones y variables relacionadas
-
 !     Gotitas
    Rgot=(qgotaux/cteqgot)**(1/6.)
    Ngot=2./27.*N0got*Rgot**3.
@@ -46,7 +43,6 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,&
    endif
 
 !     Cristales
-
    Rcri=5e-5
    if(T.lt.T0) Rcri=Rcri-4e-5*(T0-T)/40.
    if(Rcri.lt.1e-5) Rcri=1e-5
