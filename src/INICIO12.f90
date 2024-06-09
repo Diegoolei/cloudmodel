@@ -57,7 +57,7 @@ contains
 
       call PP(G,Rd,dx1,nz,Presi0,P00)
 
-!**   viento de corte
+      !**   viento de corte
       vc=1.5/3000**2.
       vh=5000./pi
 
@@ -78,12 +78,12 @@ contains
             vb=zeta1/7000.
             UU(k)=4.-10.*vb**2.
             VV(k)=3.*vb**.5
-!
+            !
          else
             zeta1=zeta-9000.
             UU(k)=-6.+4.*(zeta1/9000.)**2.
             VV(k)=3.-5.*(zeta1/9000.)**.5
-!
+            !
          endif
 
          UU(k)=UU(k)*.7
@@ -91,7 +91,7 @@ contains
       end do
 
 
-!**   calculo de 'constantes' que dependen de T
+      !**   calculo de 'constantes' que dependen de T
 
       open(newunit=unit,file=output_directory//"ccc", access='append')
       do k=313,210,-1
@@ -130,13 +130,13 @@ contains
       end do
       close(unit)
 
-!**   condiciones de tiempo bueno
+      !**   condiciones de tiempo bueno
 
       do k=-1,nz1+2
          do i=-1,nx1+2
             do j=-1,nx1+1
 
-!     cantidades primas
+               !     cantidades primas
                U1(i,j,k)=0.
                U2(i,j,k)=0.
                V1(i,j,k)=0.
@@ -153,7 +153,6 @@ contains
                Qgot2(i,j,k)=0.
                Qllu1(i,j,k)=0.
                Qllu2(i,j,k)=0.
-!$$
                Qcri1(i,j,k)=0.
                Qcri2(i,j,k)=0.
                Qnie1(i,j,k)=0.
@@ -224,21 +223,21 @@ contains
 
          !recalculo de la densidad
          Den0(k)=Den0(k)+Qvap0(k)
-      end do   
+      end do
 
-!**   Velocidad terminal para gota de lluvia, cte que depende de P
+      !**   Velocidad terminal para gota de lluvia, cte que depende de P
       do k=1,nz1+1
          Av(2*k-1)=Av0*((P00/Presi0(k-1))**.286+(P00/Presi0(k))**.286)/2. !puntos intermedios
          Av(2*k)=Av0*(P00/Presi0(k))**.286
       end do
 
-!**   Velocidad terminal para la nieve, cte que depende de P
+      !**   Velocidad terminal para la nieve, cte que depende de P
       do k=1,nz1+1
          Vtnie(2*k-1)=Vtnie0*((P00/Presi0(k-1))**.3+(P00/Presi0(k))**.3)/2. !puntos intermedios&
          Vtnie(2*k)=Vtnie0*(P00/Presi0(k))**.3
       end do
 
-!**   Velocidad terminal para el granizo, cte que depende de z
+      !**   Velocidad terminal para el granizo, cte que depende de z
       do k=0,nz1+1
          aux=2.754*rhogra**.605
          Vtgra0(2*k)=aux/Tvis(Temp0(k))**.21/Den0(k)**.395
@@ -248,10 +247,10 @@ contains
          Vtgra0(2*k-1)=(Vtgra0(2*k-2)+Vtgra0(2*k))/2.  ! punto intermedio
       end do
 
-!**************************************************************
-!    Recalculo de la Presion y de Tita
+      !**************************************************************
+      !    Recalculo de la Presion y de Tita
 
-!    Recalculo de la Presion a partir de la densidad
+      !    Recalculo de la Presion a partir de la densidad
 
       call PP2(G,dx1,Den0,Presi0,P00)
 
@@ -285,7 +284,7 @@ contains
          end do
       end do
 
-!     calculo del Qvaprel
+      !     calculo del Qvaprel
       Qvaptot=0.
       do k=1,nz1
          Qvaptot=Qvaptot+Qvap0(k)
@@ -294,7 +293,7 @@ contains
          Qvaprel(k)=Qvap0(k)/Qvaptot
       end do
 
-!     calculo del aerrel
+      !     calculo del aerrel
       aertot=0.
       do k=1,nz1
          aertot=aertot+aer0(k)
@@ -308,7 +307,7 @@ contains
 
    end subroutine condi
 
-!*********************************************************
+   !*********************************************************
 
    function TT_f (zeta)
       real :: a, xx, TT_f
@@ -331,7 +330,7 @@ contains
          TT_f = a - 77.5 + 50. * (xx / 9000.)**2.
       endif
    end function TT_f
-!*****************************************************
+   !*****************************************************
    subroutine PP(G,Rd,dx,nz1,Pres,Pres0)
       integer k,nz1,nx4
       parameter (nx4=500)
@@ -362,7 +361,7 @@ contains
       return
    end subroutine PP
 
-!*****************************************************
+   !*****************************************************
    subroutine PP2(G,dx,Den0,Pres00,Pres0)
       USE dimen
       integer k

@@ -196,7 +196,9 @@ class FileStyle:
         match self.img_option:
             case ImageStyle.IMAGE.value:
                 if self.data_dimension == 3:
-                    plt.imshow(np.flipud(variable[:, :, plot_center]))
+                    plt.imshow(
+                        #np.flipud(variable[:, :, plot_center])
+                        variable[:, :, plot_center])
                 elif self.data_dimension == 2:
                     plt.imshow(variable[:, plot_center])
                 elif self.data_dimension == 1:
@@ -205,7 +207,8 @@ class FileStyle:
                 fig, ax = plt.subplots()
                 if self.data_dimension == 3:
                     cs = ax.contour(
-                        np.flipud(variable[:, :, plot_center]),
+                        #np.flipud(variable[:, :, plot_center]),
+                        variable[:, :, plot_center],
                         linewidths=0.3,
                         colors="k",
                     )

@@ -49,6 +49,6 @@ txt1/
 Data/
 
 .vscode/settings.json
-__pycache__/constants.cpython-310.pyc
+__pycache__/*
 callgrind.out.30406
 Fortran77-Cloud-Model.code-workspace

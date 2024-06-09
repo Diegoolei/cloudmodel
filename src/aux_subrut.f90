@@ -4,7 +4,7 @@
 
 
 subroutine tempot(i,j,k,dden0z,Fcal)
-!> Fcalo es el calor liberado por cambio de fase, por unidad de masa de aire
+   !> Fcalo es el calor liberado por cambio de fase, por unidad de masa de aire
    USE cant01
    USE dimen
    USE perdim
@@ -53,13 +53,13 @@ subroutine tempot(i,j,k,dden0z,Fcal)
    return
 end
 
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!> CORREC01
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !> CORREC01
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-!     Esta subrutina corrige los lugares en donde la dinamica da
-!     negativa la cantidad de gotitas
-!     revisada 28/01/99
+ !     Esta subrutina corrige los lugares en donde la dinamica da
+ !     negativa la cantidad de gotitas
+ !     revisada 28/01/99
 subroutine corgot
    USE dimen
    USE permic
@@ -384,10 +384,10 @@ subroutine coraer(aerneg)
 end
 
 
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!     Revision 28/04/98
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !     Revision 28/04/98
 subroutine daeros(l,m,n)
    USE cant01
    USE dimen
@@ -804,9 +804,9 @@ end
  !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-!> Calcula la evolucion del la presion y las velocidades con un paso de tiempo menor lt3
-!> Las cantidades 1 son las presentes en el paso grande y las 2 son las del paso futuro, las 3 son auxiliares
-!> Le resta la perturbacion promedio
+ !> Calcula la evolucion del la presion y las velocidades con un paso de tiempo menor lt3
+ !> Las cantidades 1 son las presentes en el paso grande y las 2 son las del paso futuro, las 3 son auxiliares
+ !> Le resta la perturbacion promedio
 
 subroutine velpre
    USE cant01
@@ -991,12 +991,12 @@ subroutine velpre
    return
 end
 
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!> TURBUA01
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !> TURBUA01
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 subroutine turbu1(kk)
-!> Esta subrutina calcula los Dnm para cada plano Z
+   !> Esta subrutina calcula los Dnm para cada plano Z
    USE cant01
    USE dimen
    USE perdim
@@ -1094,20 +1094,20 @@ subroutine turbu1(kk)
 end
 
 
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!> TURBUB70
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !> TURBUB70
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-!      Esta subrutina calcula las cantidades referida a los terminos de
-!      turbulencia: K, DK, DDij
-!      Dij viene de turbu1
-!     En realidad para tener los valores de las 4 cantidades falta
-!     multiplicarlas por:
-!                      KMM : cteturb*dx1/2
-!                      DK  : cteturb/4
-!                      Dij : 1/dx2 (simetrico)
-!                      DDij: 1/dx2**2
-!     revisado : 28/04/97
+ !      Esta subrutina calcula las cantidades referida a los terminos de
+ !      turbulencia: K, DK, DDij
+ !      Dij viene de turbu1
+ !     En realidad para tener los valores de las 4 cantidades falta
+ !     multiplicarlas por:
+ !                      KMM : cteturb*dx1/2
+ !                      DK  : cteturb/4
+ !                      Dij : 1/dx2 (simetrico)
+ !                      DDij: 1/dx2**2
+ !     revisado : 28/04/97
 
 subroutine turbu2(i,j)
    USE dimen
@@ -1185,9 +1185,9 @@ subroutine suma(sum,a1,a2,a3)
    return
 end
 
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!> NUCLEA91
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !> NUCLEA91
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,auxl,auxs)
    USE cant01
@@ -1247,7 +1247,7 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
       esli=esl
       auxl=0.
       caux=B*esli/Ti
-!TODO: Check this loop
+      !TODO: Check this loop
 10    continue
       F0=Lvl/Rv*(esl/TT1-ei/Ti)+Cp*rhoa*(TT1-Ti)
       F0p=Cp*rhoa+B/TT1**2.*caux
@@ -1295,12 +1295,12 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
    return
 end
 
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!> INOMO60
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !> INOMO60
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-!     revisado 12/02/99
-!     Esta subrutina calcula los terminos inomogeneos para las velocidades
+ !     revisado 12/02/99
+ !     Esta subrutina calcula los terminos inomogeneos para las velocidades
 subroutine inomo(i,j,k,dden0z)
    USE cant01
    USE dimen
@@ -1365,14 +1365,14 @@ subroutine inomo(i,j,k,dden0z)
    return
 end
 
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!> FILTRO01
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ !> FILTRO01
+ !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-!     Esta subrutina filtra componentes de alta frecuencia espacial.
-!     El valor de la variable del punto j se filtra con los valores
-!     extrapolados linalmente de los puntos j-3 y j-1 y similares,
-!     pasando un polinomio de grado 4.
+ !     Esta subrutina filtra componentes de alta frecuencia espacial.
+ !     El valor de la variable del punto j se filtra con los valores
+ !     extrapolados linalmente de los puntos j-3 y j-1 y similares,
+ !     pasando un polinomio de grado 4.
 
 subroutine filtro(varia1,facx,facy,facz)
    USE dimen
@@ -1457,5 +1457,3 @@ subroutine filtro(varia1,facx,facy,facz)
 
    return
 end
-
-
