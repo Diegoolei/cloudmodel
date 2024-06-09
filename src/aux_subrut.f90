@@ -69,36 +69,42 @@ subroutine corgot
 
    neg1=0.
    pos1=0.
-   do 10 n=ngot(1),ngot(2)
-      do 10 l=lgot(1),lgot(2)
-         do 10 m=mgot(1),mgot(2)
+   do n=ngot(1),ngot(2)
+      do l=lgot(1),lgot(2)
+         do m=mgot(1),mgot(2)
             if (Qgot2(l,m,n).lt.0.) then
                neg1=neg1+Qgot2(l,m,n)
                Qgot2(l,m,n)=0
             else
                pos1=pos1+Qgot2(l,m,n)
             endif
-10 continue
+         end do
+      end do
+   end do
 
    if(pos1.le.-neg1) then
-      do 20 l=lgot(1),lgot(2)
-         do 20 m=mgot(1),mgot(2)
-            do 20 n=ngot(1),ngot(2)
+      do l=lgot(1),lgot(2)
+         do m=mgot(1),mgot(2)
+            do n=ngot(1),ngot(2)
                Qgot2(l,m,n)=0.
-20    continue
+            end do
+         end do
+      end do
 
       if (-neg1.gt.1e-3) then
          stop
       endif
    else
       aux1=neg1/pos1
-      do 25 l=lgot(1),lgot(2)
-         do 25 m=mgot(1),mgot(2)
-            do 25 n=ngot(1),ngot(2)
+      do l=lgot(1),lgot(2)
+         do m=mgot(1),mgot(2)
+            do n=ngot(1),ngot(2)
                if(Qgot2(l,m,n).gt.0) then
                   Qgot2(l,m,n)=Qgot2(l,m,n)*(1.+aux1)
                endif
-25    continue
+            end do
+         end do
+      end do
 
    endif
 
@@ -119,36 +125,41 @@ subroutine corllu
 
    neg1=0.
    pos1=0.
-   do 10 n=nllu(1),nllu(2)
-      do 10 l=lllu(1),lllu(2)
-         do 10 m=mllu(1),mllu(2)
+   do n=nllu(1),nllu(2)
+      do l=lllu(1),lllu(2)
+         do m=mllu(1),mllu(2)
             if (Qllu2(l,m,n).lt.0.) then
                neg1=neg1+Qllu2(l,m,n)
                Qllu2(l,m,n)=0
             else
                pos1=pos1+Qllu2(l,m,n)
             endif
-10 continue
-
+         end do
+      end do
+   end do
    if(pos1.le.-neg1) then
-      do 20 l=lllu(1),lllu(2)
-         do 20 m=mllu(1),mllu(2)
-            do 20 n=nllu(1),nllu(2)
+      do l=lllu(1),lllu(2)
+         do m=mllu(1),mllu(2)
+            do n=nllu(1),nllu(2)
                Qllu2(l,m,n)=0.
-20    continue
+            end do
+         end do
+      end do
 
       if (-neg1.gt.1e-3) then
          stop
       endif
    else
       aux1=neg1/pos1
-      do 25 l=lllu(1),lllu(2)
-         do 25 m=mllu(1),mllu(2)
-            do 25 n=nllu(1),nllu(2)
+      do l=lllu(1),lllu(2)
+         do m=mllu(1),mllu(2)
+            do n=nllu(1),nllu(2)
                if(Qllu2(l,m,n).gt.0) then
                   Qllu2(l,m,n)=Qllu2(l,m,n)*(1.+aux1)
                endif
-25    continue
+            end do
+         end do
+      end do
 
    endif
 
@@ -167,36 +178,42 @@ subroutine corcri
    implicit none
    neg1=0.
    pos1=0.
-   do 10 n=ncri(1),ncri(2)
-      do 10 l=lcri(1),lcri(2)
-         do 10 m=mcri(1),mcri(2)
+   do n=ncri(1),ncri(2)
+      do l=lcri(1),lcri(2)
+         do m=mcri(1),mcri(2)
             if (Qcri2(l,m,n).lt.0.) then
                neg1=neg1+Qcri2(l,m,n)
                Qcri2(l,m,n)=0
             else
                pos1=pos1+Qcri2(l,m,n)
             endif
-10 continue
+         end do
+      end do
+   end do
 
    if(pos1.le.-neg1) then
-      do 20 l=lcri(1),lcri(2)
-         do 20 m=mcri(1),mcri(2)
-            do 20 n=ncri(1),ncri(2)
+      do l=lcri(1),lcri(2)
+         do m=mcri(1),mcri(2)
+            do n=ncri(1),ncri(2)
                Qcri2(l,m,n)=0.
-20    continue
+            end do
+         end do
+      end do
 
       if (-neg1.gt.1e-3) then
          stop
       endif
    else
       aux1=neg1/pos1
-      do 25 l=lcri(1),lcri(2)
-         do 25 m=mcri(1),mcri(2)
-            do 25 n=ncri(1),ncri(2)
+      do l=lcri(1),lcri(2)
+         do m=mcri(1),mcri(2)
+            do n=ncri(1),ncri(2)
                if(Qcri2(l,m,n).gt.0) then
                   Qcri2(l,m,n)=Qcri2(l,m,n)*(1.+aux1)
                endif
-25    continue
+            end do
+         end do
+      end do
 
    endif
 
@@ -216,36 +233,42 @@ subroutine cornie
    implicit none
    neg1=0.
    pos1=0.
-   do 10 n=nnie(1),nnie(2)
-      do 10 l=lnie(1),lnie(2)
-         do 10 m=mnie(1),mnie(2)
+   do n=nnie(1),nnie(2)
+      do l=lnie(1),lnie(2)
+         do m=mnie(1),mnie(2)
             if (Qnie2(l,m,n).lt.0.) then
                neg1=neg1+Qnie2(l,m,n)
                Qnie2(l,m,n)=0
             else
                pos1=pos1+Qnie2(l,m,n)
             endif
-10 continue
+         end do
+      end do
+   end do
 
    if(pos1.le.-neg1) then
-      do 20 l=lnie(1),lnie(2)
-         do 20 m=mnie(1),mnie(2)
-            do 20 n=nnie(1),nnie(2)
+      do l=lnie(1),lnie(2)
+         do m=mnie(1),mnie(2)
+            do n=nnie(1),nnie(2)
                Qnie2(l,m,n)=0.
-20    continue
+            end do
+         end do
+      end do
 
       if (-neg1.gt.1e-3) then
          stop
       endif
    else
       aux1=neg1/pos1
-      do 25 l=lnie(1),lnie(2)
-         do 25 m=mnie(1),mnie(2)
-            do 25 n=nnie(1),nnie(2)
+      do l=lnie(1),lnie(2)
+         do m=mnie(1),mnie(2)
+            do n=nnie(1),nnie(2)
                if(Qnie2(l,m,n).gt.0) then
                   Qnie2(l,m,n)=Qnie2(l,m,n)*(1.+aux1)
                endif
-25    continue
+            end do
+         end do
+      end do
 
    endif
 
@@ -264,36 +287,42 @@ subroutine corgra
    implicit none
    neg1=0.
    pos1=0.
-   do 10 n=ngra(1),ngra(2)
-      do 10 l=lgra(1),lgra(2)
-         do 10 m=mgra(1),mgra(2)
+   do n=ngra(1),ngra(2)
+      do l=lgra(1),lgra(2)
+         do m=mgra(1),mgra(2)
             if (Qgra2(l,m,n).lt.0.) then
                neg1=neg1+Qgra2(l,m,n)
                Qgra2(l,m,n)=0
             else
                pos1=pos1+Qgra2(l,m,n)
             endif
-10 continue
+         end do
+      end do
+   end do
 
    if(pos1.le.-neg1) then
-      do 20 l=lgra(1),lgra(2)
-         do 20 m=mgra(1),mgra(2)
-            do 20 n=ngra(1),ngra(2)
+      do l=lgra(1),lgra(2)
+         do m=mgra(1),mgra(2)
+            do n=ngra(1),ngra(2)
                Qgra2(l,m,n)=0.
-20    continue
+            end do
+         end do
+      end do
 
       if (-neg1.gt.1e-3) then
          stop
       endif
    else
       aux1=neg1/pos1
-      do 25 l=lgra(1),lgra(2)
-         do 25 m=mgra(1),mgra(2)
-            do 25 n=ngra(1),ngra(2)
+      do l=lgra(1),lgra(2)
+         do m=mgra(1),mgra(2)
+            do n=ngra(1),ngra(2)
                if(Qgra2(l,m,n).gt.0) then
                   Qgra2(l,m,n)=Qgra2(l,m,n)*(1.+aux1)
                endif
-25    continue
+            end do
+         end do
+      end do
 
    endif
 
@@ -314,14 +343,15 @@ subroutine corvap(Qvapneg)
 
    real(8), intent(in) :: Qvapneg
 
-   do 10 k=1,nz1
+   do k=1,nz1
       dq=Qvapneg*Qvaprel(k)/nx1**2.
-      do 15 i=1,nx1
-         do 15 j=1,nx1
+      do i=1,nx1
+         do j=1,nx1
             Qvap2(i,j,k)=Qvap2(i,j,k)+dq
             if (Qvap2(i,j,k)+Qvap0(k).lt.0) Qvap2(i,j,k)=-Qvap0(k)
-15    continue
-10 continue
+         end do
+      end do
+   end do
 
    return
 end
@@ -340,14 +370,15 @@ subroutine coraer(aerneg)
 
    real(8), intent(in) :: aerneg
 
-   do 10 k=1,nz1
+   do k=1,nz1
       dq=aerneg*aerrel(k)/nx1**2.
-      do 15 i=1,nx1
-         do 15 j=1,nx1
+      do i=1,nx1
+         do j=1,nx1
             aer2(i,j,k)=aer2(i,j,k)+dq
             if (aer2(i,j,k)+aer0(k).lt.0) aer2(i,j,k)=-aer0(k)
-15    continue
-10 continue
+         end do
+      end do
+   end do
 
    return
 end
@@ -790,25 +821,27 @@ subroutine velpre
 
    call velpre01_init()
 
-   do 10 i=0,nx1+1
-      do 10 j=0,nx1+1
-         do 10 k=0,nz1
+   do i=0,nx1+1
+      do j=0,nx1+1
+         do k=0,nz1
             U2(i,j,k)=U1(i,j,k)
             V2(i,j,k)=V1(i,j,k)
             W2(i,j,k)=W1(i,j,k)
             Pres2(i,j,k)=Pres1(i,j,k)
-10 continue
+         end do
+      end do
+   end do
 
-   do 20 t=1,lt3
+   do t=1,lt3
       presprom=0.
-      do 30 k=1,nz1-1
+      do k=1,nz1-1
          presi=-Cp*Tita0(k)*(1.+.61*Qvap0(k)/Den0(k))
          vel0=Tita0(k)*(Den0(k)+.61*Qvap0(k))
          vel1=Tita0(k-1)*(Den0(k-1)+.61*Qvap0(k-1))
          vel2=Tita0(k+1)*(Den0(k+1)+.61*Qvap0(k+1))
          vel3=cc2(k)/presi/vel0
-         do 30 i=1,nx1
-            do 30 j=1,nx1
+         do i=1,nx1
+            do j=1,nx1
 
                dprex=Pres2(i+1,j,k)-Pres2(i-1,j,k)
                dprey=Pres2(i,j+1,k)-Pres2(i,j-1,k)
@@ -836,27 +869,29 @@ subroutine velpre
 
                !      modificado para agrega turbulencia en la P 23/8/97
                Pres3(i,j,k)=dt3*(diver+fp(i,j,k))+Pres2(i,j,k)
-
-
-30    continue
+            end do
+         end do
+      end do
 
       !*      redefiniciones y contornos
-      do 35 i=1,nx1
-         do 35 j=1,nx1
+      do i=1,nx1
+         do j=1,nx1
             Pres3(i,j,0)=Pres3(i,j,1)
             Pres3(i,j,nz1)=Pres3(i,j,nz1-1)
-35    continue
-      do 37 i=1,nx1
-         do 37 k=0,nz1
+         end do
+      end do
+      do i=1,nx1
+         do k=0,nz1
             Pres3(i,0,k)=Pres3(i,1,k)
             Pres3(i,nx1+1,k)=Pres3(i,nx1,k)
             Pres3(0,i,k)=Pres3(1,i,k)
             Pres3(nx1+1,i,k)=Pres3(nx1,i,k)
-37    continue
+         end do
+      end do
 
-      do 40 i=1,nx1
-         do 40 j=1,nx1
-            do 50 k=1,nz1-1
+      do i=1,nx1
+         do j=1,nx1
+            do k=1,nz1-1
                if (k.eq.1) then
                   U2(i,j,k)=U3(i,j,k)-kkk*&
                      (2.*U3(i,j,k)-U3(i,j,k+1))
@@ -874,9 +909,8 @@ subroutine velpre
                   (Pres3(i,j+1,k)+Pres3(i,j-1,k)))+&
                   Pres3(i,j,k+1)+Pres3(i,j,k-1))
                presprom=Pres2(i,j,k)+presprom
+            end do
 
-
-50          continue
             U2(i,j,0)=0
             V2(i,j,0)=0
             W2(i,j,0)=0
@@ -885,9 +919,10 @@ subroutine velpre
             V2(i,j,nz1)=V2(i,j,nz1-1)
             W2(i,j,nz1)=W2(i,j,nz1-1)
             Pres2(i,j,nz1)=Pres2(i,j,nz1-1)
-40    continue
-      do 60 i=1,nx1
-         do 60 k=0,nz1
+         end do
+      end do
+      do i=1,nx1
+         do k=0,nz1
             U2(0,i,k)=U2(1,i,k)
             V2(0,i,k)=V2(1,i,k)
             W2(0,i,k)=W2(1,i,k)
@@ -904,28 +939,32 @@ subroutine velpre
             V2(i,nx1+1,k)=V2(i,nx1,k)
             W2(i,nx1+1,k)=W2(i,nx1,k)
             Pres2(i,nx1+1,k)=Pres2(i,nx1,k)
-60    continue
+         end do
+      end do
 
       presprom=presprom/nnn
-      do 70 i=0,nx1+1
-         do 70 j=0,nx1+1
-            do 70 k=0,nz1
+      do i=0,nx1+1
+         do j=0,nx1+1
+            do k=0,nz1
                Pres2(i,j,k)=Pres2(i,j,k)-presprom
-
-70    continue
+            end do
+         end do
+      end do
 
       if (t.eq.lt3/2) then
-         do 80 i=0,nx1+1
-            do 80 j=0,nx1+1
-               do 80 k=0,nz1
+         do i=0,nx1+1
+            do j=0,nx1+1
+               do k=0,nz1
                   U1(i,j,k)=U2(i,j,k)
                   V1(i,j,k)=V2(i,j,k)
                   W1(i,j,k)=W2(i,j,k)
                   Pres1(i,j,k)=Pres2(i,j,k)
-80       continue
+               end do
+            end do
+         end do
       endif
 
-20 continue
+   end do
 
    !**********************************************************
    !*    suavizado
@@ -941,11 +980,12 @@ subroutine velpre
    call filtro(W1,facx,facy,facz)
    call filtro(W2,facx,facy,facz)
 
-   do 200 i=1,nx1
-      do 200 j=1,nx1
+   do i=1,nx1
+      do j=1,nx1
          Pres1(i,j,0)=Pres1(i,j,1)
          Pres2(i,j,0)=Pres2(i,j,1)
-200 continue
+      end do
+   end do
    !**********************************************************
 
    return
@@ -968,78 +1008,87 @@ subroutine turbu1(kk)
    integer, intent(in) :: kk
 
    k=kk+1
-   do 10 i=0,nx1+1
-      do 10 j=0,nx1+1
+   do i=0,nx1+1
+      do j=0,nx1+1
 
          if (kk.eq.1) then
-            do 20 n=1,2
-               do 20 m=1,n
+            do n=1,2
+               do m=1,n
                   D(n,m,i,j,1)=0.
-20          continue
+               end do
+            end do
             D(3,1,i,j,1)=U2(i,j,1)
             D(3,2,i,j,1)=V2(i,j,1)
             D(3,3,i,j,1)=W2(i,j,1)*2./3.
-            do 25 n=1,3
-               do 25 m=1,n
+            do n=1,3
+               do m=1,n
                   D(m,n,i,j,1)=D(n,m,i,j,1)
-25          continue
-            do 30 lx=-1,1
-               do 30 ly=-1,1
-                  do 30 lz=-1,1
+               end do
+            end do
+            do lx=-1,1
+               do ly=-1,1
+                  do lz=-1,1
                      ldis=abs(lx)+abs(ly)+abs(lz)
                      if (ldis.le.1) then
                         vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+1)
                         vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+1)
                         vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+1)
                      endif
-30          continue
+                  end do
+               end do
+            end do
             !     calculo de Dij
-            do 40 n=1,3
+            do n=1,3
                dv(n,1)=vel(n,1,0,0)-vel(n,-1,0,0)
                dv(n,2)=vel(n,0,1,0)-vel(n,0,-1,0)
                dv(n,3)=vel(n,0,0,1)-vel(n,0,0,-1)
-40          continue
-            do 50 n=1,3
-               do 50 m=1,n
+            end do
+            do n=1,3
+               do m=1,n
                   D(n,m,i,j,2)=(dv(n,m)+dv(m,n))
                   D(m,n,i,j,2)=D(n,m,i,j,2)
                   if (n.eq.m) D(n,n,i,j,2)=2./3.*D(n,n,i,j,2)
-50          continue
+               end do
+            end do
          else
-            do 60 n=1,3
-               do 60 m=1,3
-                  do 60 lz=1,2
+            do n=1,3
+               do m=1,3
+                  do lz=1,2
                      D(n,m,i,j,lz)=D(n,m,i,j,lz+1)
-60          continue
+                  end do
+               end do
+            end do
          endif
          !*********************************************************
 
          !     Lectura de las velocidades necesarias
-         do 100 lx=-1,1
-            do 100 ly=-1,1
-               do 100 lz=-1,1
+         do lx=-1,1
+            do ly=-1,1
+               do lz=-1,1
                   ldis=abs(lx)+abs(ly)+abs(lz)
                   if (ldis.le.1) then
                      vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+k)
                      vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+k)
                      vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+k)
                   endif
-100      continue
+               end do
+            end do
+         end do
          !     calculo de Dij
-         do 130 n=1,3
+         do n=1,3
             dv(n,1)=vel(n,1,0,0)-vel(n,-1,0,0)
             dv(n,2)=vel(n,0,1,0)-vel(n,0,-1,0)
             dv(n,3)=vel(n,0,0,1)-vel(n,0,0,-1)
-130      continue
-         do 140 n=1,3
-            do 140 m=1,n
+         end do
+         do n=1,3
+            do m=1,n
                D(n,m,i,j,3)=(dv(n,m)+dv(m,n))
                D(m,n,i,j,3)=D(n,m,i,j,3)
                if (n.eq.m) D(n,n,i,j,3)=2./3.*D(n,n,i,j,3)
-140      continue
-
-
-10 continue
+            end do
+         end do
+      end do
+   end do
 
    return
 end
@@ -1070,9 +1119,9 @@ subroutine turbu2(i,j)
    real aux
 
    !     calculo de KM
-   do 20 lx=-1,1
-      do 20 ly=-1,1
-         do 20 lz=-1,1
+   do lx=-1,1
+      do ly=-1,1
+         do lz=-1,1
             ldis=abs(lx)+abs(ly)+abs(lz)
             if (ldis.le.2) then
                call suma(aux,&
@@ -1088,8 +1137,9 @@ subroutine turbu2(i,j)
 
                KM(lx,ly,lz)=sum**.5
             endif
-
-20 continue
+         end do
+      end do
+   end do
 
 
 
@@ -1097,16 +1147,17 @@ subroutine turbu2(i,j)
    KM1=KM(1,0,0)-KM(-1,0,0)
    KM2=KM(0,1,0)-KM(0,-1,0)
    KM3=KM(0,0,1)-KM(0,0,-1)
-   do 100 n=1,3
+   do n=1,3
       D1(n)=D(n,1,i+1,j,2)-D(n,1,i-1,j,2)
       D2(n)=D(n,2,i,j+1,2)-D(n,2,i,j-1,2)
       D3(n)=D(n,3,i,j,3)-D(n,3,i,j,1)
-100 continue
+   end do
    KMM=KM(0,0,0)
-   do 110 n=1,3
-      do 110 m=1,3
+   do n=1,3
+      do m=1,3
          DD(n,m)=D(n,m,i,j,2)
-110 continue
+      end do
+   end do
 
    return
 end
@@ -1117,7 +1168,7 @@ subroutine suma(sum,a1,a2,a3)
    real a1,a2,a3,sum,aux
    integer j
 
-   do 10 j=1,2
+   do j=1,2
       if (a1.gt.a2) then
          aux=a1
          a1=a2
@@ -1128,7 +1179,7 @@ subroutine suma(sum,a1,a2,a3)
          a2=a3
          a3=aux
       endif
-10 continue
+   end do
 
    sum=(a1+a2)+a3
    return
@@ -1196,6 +1247,7 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
       esli=esl
       auxl=0.
       caux=B*esli/Ti
+!TODO: Check this loop
 10    continue
       F0=Lvl/Rv*(esl/TT1-ei/Ti)+Cp*rhoa*(TT1-Ti)
       F0p=Cp*rhoa+B/TT1**2.*caux
@@ -1220,7 +1272,7 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
       TT1=TT2
       rl=abs(e1-esl)/esl
       xxx=xxx+1
-      if (rl.gt.1e-3  .and. hhh.eq.0) goto 10
+      if (rl.gt.1e-3 .and. hhh.eq.0) goto 10
 
       Qvap=Qvap-auxl
       Qliq=Qliq+auxl
@@ -1338,14 +1390,16 @@ subroutine filtro(varia1,facx,facy,facz)
    !**********************************************************
    !     Redefiniciones y contornos
 
-   do 10 i=0,nx1+1
-      do 10 j=0,nx1+1
-         do 10 k=0,nz1
+   do i=0,nx1+1
+      do j=0,nx1+1
+         do k=0,nz1
             varia2(i,j,k)=varia1(i,j,k)
-10 continue
+         end do
+      end do
+   end do
 
-   do 20 k=0,nz1
-      do 20 i=0,nx1
+   do k=0,nz1
+      do i=0,nx1
          varia2(i,-1,k)=varia2(i,1,k)
          varia2(i,-2,k)=varia2(i,1,k)
          varia2(i,nx1+2,k)=varia2(i,nx1,k)
@@ -1354,22 +1408,24 @@ subroutine filtro(varia1,facx,facy,facz)
          varia2(-2,i,k)=varia2(1,i,k)
          varia2(nx1+2,i,k)=varia2(nx1,i,k)
          varia2(nx1+3,i,k)=varia2(nx1,i,k)
-20 continue
+      end do
+   end do
 
-   do 30 i=1,nx1
-      do 30 j=1,nx1
+   do i=1,nx1
+      do j=1,nx1
          varia2(i,j,-1)=varia2(i,j,0)
          varia2(i,j,-2)=varia2(i,j,0)
          varia2(i,j,nz1+1)=varia2(i,j,nz1)
          varia2(i,j,nz1+2)=varia2(i,j,nz1)
-30 continue
+      end do
+   end do
 
    !**********************************************************
    !     Filtro
 
-   do 100 i=1,nx1
-      do 100 j=1,nx1
-         do 100 k=1,nz1-1
+   do i=1,nx1
+      do j=1,nx1
+         do k=1,nz1-1
             varx=(9.*(varia2(i-1,j,k)+varia2(i+1,j,k))-&
                (varia2(i-3,j,k)+varia2(i+3,j,k)))/16.
             vary=(9.*(varia2(i,j-1,k)+varia2(i,j+1,k))-&
@@ -1379,21 +1435,24 @@ subroutine filtro(varia1,facx,facy,facz)
 
             varia1(i,j,k)=((facx*varx+facy*vary)+facz*varz)+&
                fact*varia2(i,j,k)
+         end do
+      end do
+   end do
 
-100 continue
-
-   do 110 k=1,nz1-1
-      do 110 i=1,nx1
+   do k=1,nz1-1
+      do i=1,nx1
          varia1(i,0,k)=varia1(i,1,k)
          varia1(i,nx1+1,k)=varia1(i,nx1,k)
          varia1(0,i,k)=varia1(1,i,k)
          varia1(nx1+1,i,k)=varia1(nx1,i,k)
-110 continue
+      end do
+   end do
 
-   do 120 i=1,nx1
-      do 120 j=1,nx1
+   do i=1,nx1
+      do j=1,nx1
          varia1(i,j,nz1)=varia1(i,j,nz1-1)
-120 continue
+      end do
+   end do
    !**********************************************************
 
    return

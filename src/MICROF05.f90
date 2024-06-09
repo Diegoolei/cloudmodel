@@ -457,7 +457,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
          esaux=esvs0*exp(Lvs0/Rv*(1./T0-1./Tg))
          dQt=-BB+CC2*esaux/Tg**2.-CC3/Tg**3.
          Taux=Tg-Qt/dQt
-         do 10 i=1,10
+         do i=1,10
             if (abs(Taux-Tg) .gt. .05) then
                Taux=Tg
                Qvaux=esaux/Rv/Taux
@@ -470,7 +470,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
                Tg=Taux-Qt/dQt
                esaux=esvs0*exp(Lvs0/Rv*(1./T0-1./Tg))
             endif
-10       continue
+         end do
 
          if (Tg .le. T0)  then
             crecigra=2          ! crecimiento seco

@@ -216,10 +216,9 @@ contains
       qnietot=0.
       qgratot=0.
 
-      do 700 k=1,nz1
-         do 700 i=1,nx1
-            do 700 j=1,nx1
-
+      do k=1,nz1
+         do i=1,nx1
+            do j=1,nx1
                if (umax.lt.U1(i,j,k)*100) then
                   umax=U1(i,j,k)*100
                   lumax=i
@@ -314,7 +313,6 @@ contains
                endif
                qcritot=qcritot+Qcri1(i,j,k)*1e6
 
-!$$
                if (qniemax.lt.Qnie1(i,j,k)*1e6) then
                   qniemax=Qnie1(i,j,k)*1e6
                   lqniemax=i
@@ -337,20 +335,22 @@ contains
                   maermax=j
                   naermax=k
                endif
-700   continue
-
+            end do
+         end do
+      end do
 
       qgotmax=0.
       qcrimax=0.
       qniemax=0.
-      do 719 i=-1,1
-         do 719 j=-1,1
-            do 719 k=-1,1
+      do i=-1,1
+         do j=-1,1
+            do k=-1,1
                qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
                qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
                qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
-
-719   continue
+            end do
+         end do
+      end do
 
       qgotmax=qgotmax/27.
       qcrimax=qcrimax/27.
@@ -372,20 +372,14 @@ contains
       qgratot=qgratot/1000
 
       open(newunit=unit_number,file=output_directory//"esta", ACCESS="append")
-      write(unit_number,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin&
-         ,qvapmax,qvapmin,qgotmax,qllumax,qcrimax,qniemax&
-         ,qgramax,aermax&
-         ,lumax,mumax,numax,lumin,mumin,numin&
-         ,lvmax,mvmax,nvmax,lvmin,mvmin,nvmin&
-         ,lwmax,mwmax,nwmax,lwmin,mwmin,nwmin&
-         ,ltitamax,mtitamax,ntitamax,ltitamin,mtitamin&
-         ,ntitamin,lqvapmax,mqvapmax,nqvapmax,lqvapmin&
-         ,mqvapmin,nqvapmin,lqgotmax,mqgotmax,nqgotmax&
-         ,lqllumax,mqllumax,nqllumax&
-         ,lqcrimax,mqcrimax,nqcrimax&
-         ,lqniemax,mqniemax,nqniemax&
-         ,lqgramax,mqgramax,nqgramax&
-         ,laermax,maermax,naermax
+      write(unit_number,710) umax,umin,vmax,vmin,wmax,wmin,titamax,titamin,&
+         qvapmax,qvapmin,qgotmax,qllumax,qcrimax,qniemax,qgramax,aermax,&
+         lumax,mumax,numax,lumin,mumin,numin,lvmax,mvmax,nvmax,lvmin,mvmin,&
+         nvmin,lwmax,mwmax,nwmax,lwmin,mwmin,nwmin,ltitamax,mtitamax,ntitamax,&
+         ltitamin,mtitamin,ntitamin,lqvapmax,mqvapmax,nqvapmax,lqvapmin,mqvapmin,&
+         nqvapmin,lqgotmax,mqgotmax,nqgotmax,lqllumax,mqllumax,nqllumax,lqcrimax,&
+         mqcrimax,nqcrimax,lqniemax,mqniemax,nqniemax,lqgramax,mqgramax,nqgramax,&
+         laermax,maermax,naermax
 
       open(newunit=unit_number,file=output_directory//"est", ACCESS="append")
       write(unit_number,715) qgottot,qllutot,qcritot,qnietot,qgratot
@@ -426,9 +420,9 @@ contains
          maux2=max(mgot(2),mcri(2))
          naux2=max(ngot(2),ncri(2))
 
-         do 1300 k=1,naux2
-            do 1300 i=laux1,laux2
-               do 1300 j=maux1,maux2
+         do k=1,naux2
+            do i=laux1,laux2
+               do j=maux1,maux2
 
                   Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+&
                      Qnie1(i,j,k)+Qgra1(i,j,k)
@@ -436,8 +430,9 @@ contains
                      (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
                   zmed=zmed+k*Qagua
                   Qaguat=Qaguat+Qagua
-
-1300     continue
+               end do
+            end do
+         end do
 
          if (Qaguat.gt.1e-3) then
             zmed=zmed/Qaguat
@@ -483,9 +478,9 @@ contains
          posx(tte)=posx(tte)+1
          Xnub(tte)=Xnub(tte)-dx1
 
-         do 1500 k=0,nz1+1
-            do 1501 j=0,nx1+1
-               do 1502 i=1,nx1+1
+         do k=0,nz1+1
+            do j=0,nx1+1
+               do i=1,nx1+1
                   U1(i-1,j,k)=U1(i,j,k)
                   V1(i-1,j,k)=V1(i,j,k)
                   W1(i-1,j,k)=W1(i,j,k)
@@ -501,7 +496,7 @@ contains
                   Qcri1(i-1,j,k)=Qcri1(i,j,k)
                   Aer1(i-1,j,k)=Aer1(i,j,k)
                   Fcalo(i-1,j,k)=Fcalo(i,j,k)
-1502           continue
+               end do
                i=nx1+1
                U1(i,j,k)=U1(i-1,j,k)
                V1(i,j,k)=V1(i-1,j,k)
@@ -518,7 +513,7 @@ contains
                Qcri1(i,j,k)=Qcri1(i-1,j,k)
                Aer1(i,j,k)=Aer1(i-1,j,k)
                Fcalo(i,j,k)=0.
-1501        continue
+            end do
             i=nx1
             j=0
             U1(i,j,k)=(U1(i-1,j,k)+U1(i,j+1,k))/2.
@@ -552,16 +547,16 @@ contains
             Qcri1(i,j,k)=(Qcri1(i-1,j,k)+Qcri1(i,j-1,k))/2.
             Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j-1,k))/2.
             Fcalo(i,j,k)=0.
-1500     continue
+         end do
       endif
 
       if (posxx.lt.-dx1) then
          posx(tte)=posx(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
 
-         do 1510 k=0,nz1+1
-            do 1511 j=0,nx1+1
-               do 1512 i=nx1,0,-1
+         do k=0,nz1+1
+            do j=0,nx1+1
+               do i=nx1,0,-1
                   U1(i+1,j,k)=U1(i,j,k)
                   V1(i+1,j,k)=V1(i,j,k)
                   W1(i+1,j,k)=W1(i,j,k)
@@ -577,7 +572,7 @@ contains
                   Qcri1(i+1,j,k)=Qcri1(i,j,k)
                   Aer1(i+1,j,k)=Aer1(i,j,k)
                   Fcalo(i+1,j,k)=Fcalo(i,j,k)
-1512           continue
+               end do
                i=0
                U1(i,j,k)=U1(i+1,j,k)
                V1(i,j,k)=V1(i+1,j,k)
@@ -594,7 +589,7 @@ contains
                Qcri1(i,j,k)=Qcri1(i+1,j,k)
                Aer1(i,j,k)=Aer1(i+1,j,k)
                Fcalo(i,j,k)=0.
-1511        continue
+            end do
             i=1
             j=0
             U1(i,j,k)=(U1(i+1,j,k)+U1(i,j+1,k))/2.
@@ -628,7 +623,7 @@ contains
             Qcri1(i,j,k)=(Qcri1(i+1,j,k)+Qcri1(i,j-1,k))/2.
             Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j-1,k))/2.
             Fcalo(i,j,k)=0.
-1510     continue
+         end do
       endif
 
 !*    corrimiento en y
@@ -638,9 +633,9 @@ contains
          Ynub(tte)=Ynub(tte)-dx1
 
 
-         do 1520 k=0,nz1+1
-            do 1521 i=0,nx1+1
-               do 1522 j=1,nx1+1
+         do k=0,nz1+1
+            do i=0,nx1+1
+               do j=1,nx1+1
                   U1(i,j-1,k)=U1(i,j,k)
                   V1(i,j-1,k)=V1(i,j,k)
                   W1(i,j-1,k)=W1(i,j,k)
@@ -656,7 +651,7 @@ contains
                   Qcri1(i,j-1,k)=Qcri1(i,j,k)
                   Aer1(i,j-1,k)=Aer1(i,j,k)
                   Fcalo(i,j-1,k)=Fcalo(i,j,k)
-1522           continue
+               end do
                j=nx1+1
                U1(i,j,k)=U1(i,j-1,k)
                V1(i,j,k)=V1(i,j-1,k)
@@ -673,7 +668,7 @@ contains
                Qcri1(i,j,k)=Qcri1(i,j-1,k)
                Aer1(i,j,k)=Aer1(i,j-1,k)
                Fcalo(i,j,k)=0.
-1521        continue
+            end do
             j=nx1
             i=0
             U1(i,j,k)=(U1(i,j-1,k)+U1(i+1,j,k))/2.
@@ -707,16 +702,16 @@ contains
             Qcri1(i,j,k)=(Qcri1(i,j-1,k)+Qcri1(i-1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i-1,j,k))/2.
             Fcalo(i,j,k)=0.
-1520     continue
+         end do
       endif
 
       if (posyy.lt.-dx1) then
          posy(tte)=posy(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
 
-         do 1530 k=0,nz1+1
-            do 1531 i=0,nx1+1
-               do 1532 j=nx1,0,-1
+         do k=0,nz1+1
+            do i=0,nx1+1
+               do j=nx1,0,-1
                   U1(i,j+1,k)=U1(i,j,k)
                   V1(i,j+1,k)=V1(i,j,k)
                   W1(i,j+1,k)=W1(i,j,k)
@@ -732,7 +727,7 @@ contains
                   Qcri1(i,j+1,k)=Qcri1(i,j,k)
                   Aer1(i,j+1,k)=Aer1(i,j,k)
                   Fcalo(i,j+1,k)=Fcalo(i,j,k)
-1532           continue
+               end do
                j=0
                U1(i,j,k)=U1(i,j-1,k)
                V1(i,j,k)=V1(i,j-1,k)
@@ -749,7 +744,7 @@ contains
                Qcri1(i,j,k)=Qcri1(i,j-1,k)
                Aer1(i,j,k)=Aer1(i,j-1,k)
                Fcalo(i,j,k)=0.
-1531        continue
+            end do
             j=1
             i=0
             U1(i,j,k)=(U1(i,j+1,k)+U1(i+1,j,k))/2.
@@ -783,7 +778,7 @@ contains
             Qcri1(i,j,k)=(Qcri1(i,j+1,k)+Qcri1(i-1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i-1,j,k))/2.
             Fcalo(i,j,k)=0.
-1530     continue
+         end do
 
       endif
 

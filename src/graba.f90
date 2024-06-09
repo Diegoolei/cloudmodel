@@ -49,44 +49,44 @@ subroutine graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, file_
 
    nombre=output_directory//'W2'//file_number//'.m'
    open(newunit=unit_number,file=nombre)
-   do 360 i=1,nx1
+   do i=1,nx1
       write(unit_number,2000) (W2(i,j,1),j=1,nx1)
-360 continue
+   end do
    close(unit_number)
 
    nombre=output_directory//'Tita'//file_number//'.m'
    open(newunit=unit_number,file=nombre)
-   do 370 i=1,nx1
+   do i=1,nx1
       write(unit_number,2000) (Titaa1(i,j,0),j=1,nx1)
-370 continue
+   end do
    close(unit_number)
 
    nombre=output_directory//'Qvap'//file_number//'.m'
    open(newunit=unit_number,file=nombre)
-   do 380 i=1,nx1
+   do i=1,nx1
       write(unit_number,2000) ((Qvap1(i,j,k)+Qvap0(k)),j=1,nx1)
-380 continue
+   end do
    close(unit_number)
 
    nombre=output_directory//'Qllu'//file_number//'.m'
    open(newunit=unit_number,file=nombre)
-   do 395 i=1,nx1
+   do i=1,nx1
       write(unit_number,2000) (Qllu1(i,j,1),j=1,nx1)
-395 continue
+   end do
    close(unit_number)
 
    nombre=output_directory//'Aero'//file_number//'.m'
    open(newunit=unit_number,file=nombre)
-   do 385 i=1,nx1
+   do i=1,nx1
       write(unit_number,2000) (aer1(i,j,0)+aer0(0),j=1,nx1)
-385 continue
+   end do
    close(unit_number)
 
    nombre=output_directory//'Qgra'//file_number//'.m'
    open(newunit=unit_number,file=nombre)
-   do 525 i=1,nx1
+   do i=1,nx1
       write(unit_number,2000) (Qgra1(i,j,1),j=1,nx1)
-525 continue
+   end do
    close(unit_number)
 
 
