@@ -147,7 +147,7 @@ program modelo
       totnuc=0.
       totmic=0.
 
-!######################## Advección de vapores #######################
+!######################## Adveccion de vapores #######################
 
       do i=0,nx1+1
          do j=0,nx1+1
@@ -299,7 +299,7 @@ program modelo
          end do
       end do
 
-!####################### Sublazo Microfísico #########################
+!####################### Sublazo Microfisico #########################
       do k=1,nz1-1
          n=k
          do i=1,nx1
@@ -791,14 +791,14 @@ program modelo
 
       if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
          file_number = str_gen(t1)
-!############################ Grabación 2D ###########################
+!############################ Grabacion 2D ###########################
          !call graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
-!############################ Grabación 3D ###########################
+!############################ Grabacion 3D ###########################
          call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1,file_number)
          t1=t1+1
       endif
 
-!######################### Grabación Backup ##########################
+!######################### Grabacion Backup ##########################
       if (tt/nint(ltb/dt1)*nint(ltb/dt1).eq.tt) then
          call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
             U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&

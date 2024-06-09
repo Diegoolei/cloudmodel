@@ -110,7 +110,7 @@ contains
       pro4 = (1. - pro1) / 4.
 
       lt1 = nint(ltt / dt1)
-      lt2 = nint(dt1 / dt2)                  ! Proporción Física/Microfísica
+      lt2 = nint(dt1 / dt2)                  ! Proporcion Fisica/Microfisica
       lt3 = 2 * nint(dt1 / dt3)
       cteturb = ctur / 2.**.5
 
