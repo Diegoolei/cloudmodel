@@ -95,7 +95,6 @@ contains
       USE const
       USE config
 
-      call init_config()
       ini = 0                                   !inicio por vez primera= 0
       t1 = 0                                    !paso a inicio (si ini=0->t1=0)
       ltt = sim_time_minutes * 60. * 2.         !tiempo total de simulacion
@@ -380,6 +379,7 @@ contains
          nqvapmin,lqgotmax,mqgotmax,nqgotmax,lqllumax,mqllumax,nqllumax,lqcrimax,&
          mqcrimax,nqcrimax,lqniemax,mqniemax,nqniemax,lqgramax,mqgramax,nqgramax,&
          laermax,maermax,naermax
+      close(unit_number)
 
       open(newunit=unit_number,file=output_directory//"est", ACCESS="append")
       write(unit_number,715) qgottot,qllutot,qcritot,qnietot,qgratot

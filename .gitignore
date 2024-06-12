@@ -37,7 +37,6 @@
 *.da
 *.mp4
 *.png
-nube*
 
 # Generated directories
 img/

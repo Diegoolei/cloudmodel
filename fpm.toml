@@ -17,7 +17,7 @@ library = true
 [[executable]]
 name = "MODEL31"
 source-dir = "app"
-main = "MODEL31.f90"
+main = "main.f90"
 
 [fortran]
 implicit-typing = true
