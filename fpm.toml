@@ -1,4 +1,4 @@
-name = "Fortran77-Cloud-Model"
+name = "cloudsim"
 version = "0.1.0"
 license = "license"
 author = "Federico E. Benelli"
@@ -12,7 +12,7 @@ auto-examples = true
 module-naming = false
 
 [install]
-library = false
+library = true
 
 [[executable]]
 name = "MODEL31"
