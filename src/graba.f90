@@ -36,6 +36,7 @@ subroutine graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
 end subroutine graba120
 
 subroutine graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, file_number)
+   !### Grabacion 2D ###
    USE dimen
    USE config
    implicit none
@@ -95,6 +96,7 @@ subroutine graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, file_
 end subroutine graba231
 
 subroutine graba320(U1,V1,W1,Titaa1,Pres1,Qvap1,Qgot1,Qllu1,Qcri1,Qnie1,Qgra1,aer1,file_number)
+   !### Grabacion 3D ###
    USE dimen
    USE config
    implicit none

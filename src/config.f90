@@ -11,11 +11,5 @@ contains
       sim_time_minutes = sim_time
       save_lapse_minutes = save_lapse
       output_directory = directory
-      call create_directory(output_directory)
    end subroutine init_config
-
-   subroutine create_directory(directory)
-      character(len=*), intent(in) :: directory
-      call system("mkdir " // directory)
-   end subroutine create_directory
 end module config

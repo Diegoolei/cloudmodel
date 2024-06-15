@@ -1,8 +1,3 @@
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!> TEMPE01
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
 subroutine tempot(i,j,k,dden0z,Fcal)
    !> Fcalo es el calor liberado por cambio de fase, por unidad de masa de aire
    USE cant01
@@ -53,13 +48,8 @@ subroutine tempot(i,j,k,dden0z,Fcal)
    return
 end
 
- !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- !> CORREC01
- !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de gotitas
- !     revisada 28/01/99
 subroutine corgot
    USE dimen
    USE permic
@@ -111,11 +101,8 @@ subroutine corgot
    return
 end
 
- !********************************************************************
-
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de gotas
- !     revisada 8/01/99
 subroutine corllu
    USE dimen
    USE permic
@@ -166,10 +153,8 @@ subroutine corllu
    return
 end
 
- !********************************************************************
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de cristales
- !     revisada 8/01/99
 subroutine corcri
    USE dimen
    USE permic
@@ -220,11 +205,8 @@ subroutine corcri
    return
 end
 
- !********************************************************************
- !$$
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de nieve
- !     revisada 11/01/99
 subroutine cornie
    USE dimen
    USE permic
@@ -275,10 +257,8 @@ subroutine cornie
    return
 end
 
- !********************************************************************
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de granizos
- !     revisada 2/02/99
 subroutine corgra
    USE dimen
    USE permic
@@ -329,11 +309,8 @@ subroutine corgra
    return
 end
 
- !********************************************************************
-
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de vapor
- !     revisada 8/01/99
 subroutine corvap(Qvapneg)
    USE dimen
    USE permic
@@ -356,11 +333,8 @@ subroutine corvap(Qvapneg)
    return
 end
 
- !********************************************************************
-
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de aerosoles
- !     revisada 14/09/99
 subroutine coraer(aerneg)
    USE dimen
    USE permic
@@ -383,11 +357,6 @@ subroutine coraer(aerneg)
    return
 end
 
-
- !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- !     Revision 28/04/98
 subroutine daeros(l,m,n)
    USE cant01
    USE dimen
@@ -425,7 +394,6 @@ subroutine daeros(l,m,n)
    verti=-((W2(l,m,n+1)+W2(l,m,n))*(aer0(n+1)+aer0(n))-&
       (W2(l,m,n-1)+W2(l,m,n))*(aer0(n-1)+aer0(n)))/4.
 
-   !## agregado
    aux=-((U2(l+1,m,n)-U2(l-1,m,n))+(V2(l,m+1,n)-V2(l,m-1,n)))*&
       aer0(n)/2.
 
@@ -448,8 +416,6 @@ subroutine daeros(l,m,n)
    return
 end
 
- !********************************************************************
- !     revisada 28/04/98
 subroutine dgotit(l,m,n)
    USE cant01
    USE dimen
@@ -500,8 +466,7 @@ subroutine dgotit(l,m,n)
 
    return
 end
- !********************************************************************
- !     Revision 28/04/98
+
 subroutine dvapor(l,m,n)
    USE cant01
    USE dimen
@@ -532,7 +497,6 @@ subroutine dvapor(l,m,n)
       (Qvap1(l,m-1,n)+Qvap1(l,m,n))))/4.
    adv(2)=adv(2)+dqvap(2)/2.*VV(n)
 
-
    advvap2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
       (Qvap1(l,m,n)+Qvap1(l,m,n+1))/4.
 
@@ -543,7 +507,6 @@ subroutine dvapor(l,m,n)
    verti=-((W2(l,m,n+1)+W2(l,m,n))*(Qvap0(n+1)+Qvap0(n))-&
       (W2(l,m,n-1)+W2(l,m,n))*(Qvap0(n-1)+Qvap0(n)))/4.
 
-   !## agregado
    aux=-(U2(l+1,m,n)-U2(l-1,m,n)+V2(l,m+1,n)-V2(l,m-1,n))*&
       Qvap0(n)/2.
 
@@ -557,7 +520,6 @@ subroutine dvapor(l,m,n)
 
    turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
-   !      Qvap2(l,m,n)=dt1*((advec+verti)/dx1+turbul)+Qvap1(l,m,n)
    Qvap2(l,m,n)=dt1*((advec+verti+aux)/dx1+turbul)+Qvap1(l,m,n)
 
    aux=dt1/dx1
@@ -565,8 +527,7 @@ subroutine dvapor(l,m,n)
 
    return
 end
- !**********************************************************
- !     Revision 28/04/98
+
 subroutine dlluvi(l,m,n)
    USE cant01
    USE dimen
@@ -623,14 +584,11 @@ subroutine dlluvi(l,m,n)
    endif
 
    sedim=gam4p8/6.*(Qllus*Vtllus-Qllui*Vtllui)
-   !***
 
    Qllu2(l,m,n)=dt1*((advec+sedim)/dx1+turbul)+Qllu1(l,m,n)
    return
 end
 
- !**********************************************************
- !     Revision 29/12/98
 subroutine dcrist(l,m,n)
    USE cant01
    USE dimen
@@ -676,9 +634,7 @@ subroutine dcrist(l,m,n)
 
    return
 end
- !**********************************************************
- !$$
- !     Revision 7/06/99
+
 subroutine dnieve(l,m,n)
    USE cant01
    USE dimen
@@ -726,14 +682,11 @@ subroutine dnieve(l,m,n)
    Qniei=(Qnie1(l,m,n-1)+Qnie1(l,m,n))/2.
 
    sedim=Vtnie(2*n+1)*Qnies-Vtnie(2*n-1)*Qniei
-   !***
-
    Qnie2(l,m,n)=dt1*((advec+sedim)/dx1+turbul)+Qnie1(l,m,n)
 
    return
 end
- !**********************************************************
- !     Revision 1/02/99
+
 subroutine dgrani(l,m,n)
    USE cant01
    USE dimen

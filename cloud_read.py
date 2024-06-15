@@ -143,8 +143,6 @@ class FileStyle:
         """Checks if the path exists, if not, creates it
         If the path exists, checks if the selected_file_name folder exists,
         if not, creates it
-        If the selected_file_name folder exists, asks the user if he wants
-        to overwrite the files
         If no selected_file_name is given, it will only check if the path
         exists"""
 

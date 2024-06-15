@@ -2,7 +2,7 @@ from cloud_read import FileStyle
 import numpy as np
 import nubepy.nubepy as nb
 
-nb.c_interface.run_model_python(45,3)
+
 def main():
     iniciales = FileStyle(
         chosen_file="Inis",
@@ -27,6 +27,9 @@ def main():
         img_option="Contour",
         folder_handle="Delete",
     )
+    nubes.check_path(nubes.output_data_path)
+    nb.c_interface.run_model_python(45,3)
+
     iniciales.parse_status_img()
     nubes.parse_status_img()
 
