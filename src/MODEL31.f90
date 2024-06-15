@@ -1,5 +1,3 @@
-!23456789*123456789*123456789*123456789*123456789*123456789*123456789*
-!     Revision 8/04/00
 !     Incluye microfisica con vapor, gotitas, lluvia, cristales, nieve
 !      y granizos (por unidad de volumen)
 !     Con viento de corte.
@@ -18,85 +16,46 @@
 
 module cloud_model
 contains
-
    subroutine model()
-      USE cant01
-      USE dimen
-      USE perdim
-      USE permic
-      USE const
-      USE estbas
-      USE advecs
-      USE lmngot
-      USE lmnllu
-      USE lmncri
-      USE lmnnie
-      USE lmngra
-      USE turbvar
-      USE mein
-      USE mode20
-      USE estad03
-      USE posnub02
-      USE corrinu2
+      USE perdim, only: W2, U2, V2, Fcalo, Titaa2, Titaa1, Pres2, Pres1, U1, V1,&
+         W1, Tempa1
+      USE permic, only: aer1, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2,&
+         Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, Av, Vtgra0, Vtnie
+      USE estbas, only: Den0, Qvap0, aer0, Tita0, Temp0, Pres00, aerrel, cc2,&
+         Qvaprel, UU, VV
+      USE const, only: Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs, Eacrcn, Eautcn, Cp,&
+         Dv0, G, Lsl0, P00, Rd, Rv, T0
+      USE cant01, only: AA, dx2, ikapa, lt1, lt2, ltb, lte, ltg, pro1, pro2,&
+         pro3, pro4
+      USE model_var, only: aert1, aert2, aert3, totnuc, aeraux, aux,&
+         aux1, aux2, aux3, aux4, auxx, auxy, auxz, cks, daer, daer2, daitot, &
+         densi, dqcri, dqgot, Dv, e1, Eaccn, Eacng, Eaucn, elvs, ener,&
+         ener1, ener2, ener3, ener4, ener5, esvs, Fcal, file_number, gott1,&
+         gott2, gott3, i, iT, j, k, l, lapla, lll, Lsl, Lsl00, Lvl, Lvs,&
+         m, n, Naer, nu, P, posxx, posyy, qcriaux, qg, qgotaux, qgraaux, Qliq,&
+         qlluaux, qnieaux, qv, Qvap, qvapaux, rl, rs, T, t1, t2, Taux, totmic,&
+         tt, tte, turbu, vapt1, vapt2, vapt3, Vis, yy, posx, posy, Xnub,&
+         Ynub
+      USE dimen, only: dt1, dx1, nx1, nz1
+      USE model_initialization, only: initialize_model, statistics_init, cloud_movement_init,&
+         cloud_position_init
+      USE model_aux, only: vapor_advection, dinamics, negative_correction
       USE io, only: str_gen
       USE config, only: output_directory
       implicit none
       integer :: unit_number
 
-      call mode20_init()
-!########### Condiciones iniciales ############
-      if (ini.eq.0) then
-         !Si ini=0 el calculo empieza por primera###
-         call condi
-      else
-         !si ini=1 el calculo recomienza desde algun paso
-         open(newunit=unit_number,file=output_directory//"inis.da",status='unknown',form='unformatted')
-         read(unit_number,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
-         close(unit_number)
+      call initialize_model()
 
-         open(newunit=unit_number,file=output_directory//"velos.da",status='unknown',form='unformatted')
-         rewind unit_number
-         read(unit_number) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,&
-            Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
-            Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,&
-            aer1,aer2,Fcalo
-         close(unit_number)
-
-         open(newunit=unit_number,file=output_directory//"varconz.da",status='unknown',form='unformatted')
-         rewind unit_number
-         read(unit_number)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
-         close(unit_number)
-
-         do i=1,nx1
-            do j=1,nx1
-               do k=1,nz1
-                  aux=.8*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
-                  Titaa1(i,j,k)=Titaa1(i,j,k)+aux
-                  Titaa2(i,j,k)=Titaa2(i,j,k)+aux
-               end do
-            end do
-         end do
-      endif
-
-      !definicion de calores y presiones de vapor a 0 K
-      Lsl00=Lsl0*4180.
-
-!#####################################################################
 !############### comienzo de la evolucion temporal ###################
       !lazo temporal principal
       do tt=1,lt1
          !inicializado para cada paso
-         s=0
-         Qvapneg=0.
-         lvapneg=0
-         aerneg=0.
-         laerneg=0
-         llluneg=0
-         lcrineg=0.
-         lnieneg=0.
-         lgraneg=0.
-         ener=0.
-         ener1=0.
+
+         call vapor_advection()
+         call dinamics()
+         call negative_correction()
+
          ener2=0.
          ener3=0.
          ener4=0.
@@ -104,188 +63,17 @@ contains
          qv=0.
          qg=0.
          daitot=0.
-         lgot(1)=nx1
-         lgot(2)=0
-         mgot(1)=nx1
-         mgot(2)=0
-         ngot(1)=nz1
-         ngot(2)=0
-         lllu(1)=nx1
-         lllu(2)=0
-         mllu(1)=nx1
-         mllu(2)=0
-         nllu(1)=nz1
-         nllu(2)=0
-         lcri(1)=nx1
-         lcri(2)=0
-         mcri(1)=nx1
-         mcri(2)=0
-         ncri(1)=nz1
-         ncri(2)=0
-         lnie(1)=nx1
-         lnie(2)=0
-         mnie(1)=nx1
-         mnie(2)=0
-         nnie(1)=nz1
-         nnie(2)=0
-         lgra(1)=nx1
-         lgra(2)=0
-         mgra(1)=nx1
-         mgra(2)=0
-         ngra(1)=nz1
-         ngra(2)=0
          vapt1=0.
          vapt2=0.
          vapt3=0.
-         vapt4=0.
          gott1=0.
          gott2=0.
          gott3=0.
-         gott4=0.
          aert1=0.
          aert2=0.
          aert3=0.
-         aert4=0.
          totnuc=0.
          totmic=0.
-
-!######################## Adveccion de vapores #######################
-
-         do i=0,nx1+1
-            do j=0,nx1+1
-               advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
-               advgot1(i,j)=0.
-               advllu1(i,j)=W2(i,j,1)*Qllu1(i,j,1)
-
-               if (W2(i,j,1).gt.0) advllu1(i,j)=0.
-               advaer1(i,j)=W2(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
-               if(W2(i,j,1).lt.0) advaer1(i,j)=advaer1(i,j)*1.5
-               advcri1(i,j)=0.
-               advnie1(i,j)=W2(i,j,1)*Qnie1(i,j,1)
-               if (W2(i,j,1).gt.0) advnie1(i,j)=0.
-               advgra1(i,j)=W2(i,j,1)*Qgra1(i,j,1)
-               if (W2(i,j,1).gt.0) advgra1(i,j)=0.
-            end do
-         end do
-
-!########### calculo de la dinamica y de la termodinamica ############
-
-         do k=1,nz1-1
-            n=k
-            dden0z=(Den0(k+1)-Den0(k-1))/Den0(k)
-            call turbu1(n)
-            do i=1,nx1
-               l=i
-               do j=1,nx1
-                  m=j
-                  !calculo del coeficiente de turbulencia y derivadas
-                  call turbu2(l,m,n)
-
-                  !calculo de las inhomogeneidades para las velocidades
-                  call inomo(l,m,n,dden0z)
-
-                  !calculo de la energia cinetica
-                  ener1=.5*Den0(k)*(U2(i,j,k)**2.+V2(i,j,k)**2.+W2(i,j,k)**2.)+ener1
-
-                  !calculo de la temperatura potencial
-                  call tempot(l,m,n,dden0z,Fcalo(i,j,k))
-                  Fcalo(i,j,k)=0.
-
-                  !dinamica del vapor y de las gotitas
-                  call dvapor(l,m,n)
-                  advvap1(i,j)=advvap2(i,j)
-                  call dgotit(l,m,n)
-                  advgot1(i,j)=advgot2(i,j)
-                  call dlluvi(l,m,n)
-                  advllu1(i,j)=advllu2(i,j)
-                  call dcrist(l,m,n)
-                  advcri1(i,j)=advcri2(i,j)
-                  call dnieve(l,m,n)
-                  advnie1(i,j)=advnie2(i,j)
-                  call dgrani(l,m,n)
-                  advgra1(i,j)=advgra2(i,j)
-
-
-                  call daeros(l,m,n)
-                  advaer1(i,j)=advaer2(i,j)
-
-                  !limites de la nube
-                  if(Qgot2(i,j,k).ne.0) then
-                     if (i.lt.lgot(1)) lgot(1)=i
-                     if (i.gt.lgot(2)) lgot(2)=i
-                     if (j.lt.mgot(1)) mgot(1)=j
-                     if (j.gt.mgot(2)) mgot(2)=j
-                     if (k.lt.ngot(1)) ngot(1)=k
-                     if (k.gt.ngot(2)) ngot(2)=k
-                     s=s+1
-                  endif
-
-                  !limites de la lluvia
-                  if(Qllu2(i,j,k).ne.0) then
-                     if (i.lt.lllu(1)) lllu(1)=i
-                     if (i.gt.lllu(2)) lllu(2)=i
-                     if (j.lt.mllu(1)) mllu(1)=j
-                     if (j.gt.mllu(2)) mllu(2)=j
-                     if (k.lt.nllu(1)) nllu(1)=k
-                     if (k.gt.nllu(2)) nllu(2)=k
-                     llluneg=1
-                  endif
-
-                  !limites de los cristales
-                  if(Qcri2(i,j,k).ne.0) then
-                     if (i.lt.lcri(1)) lcri(1)=i
-                     if (i.gt.lcri(2)) lcri(2)=i
-                     if (j.lt.mcri(1)) mcri(1)=j
-                     if (j.gt.mcri(2)) mcri(2)=j
-                     if (k.lt.ncri(1)) ncri(1)=k
-                     if (k.gt.ncri(2)) ncri(2)=k
-                     lcrineg=1
-                  endif
-
-                  !limites de la nieve
-                  if(Qnie2(i,j,k).ne.0) then
-                     if (i.lt.lnie(1)) lnie(1)=i
-                     if (i.gt.lnie(2)) lnie(2)=i
-                     if (j.lt.mnie(1)) mnie(1)=j
-                     if (j.gt.mnie(2)) mnie(2)=j
-                     if (k.lt.nnie(1)) nnie(1)=k
-                     if (k.gt.nnie(2)) nnie(2)=k
-                     lnieneg=1
-                  endif
-
-                  !limites del granizo
-                  if(Qgra2(i,j,k).ne.0) then
-                     if (i.lt.lgra(1)) lgra(1)=i
-                     if (i.gt.lgra(2)) lgra(2)=i
-                     if (j.lt.mgra(1)) mgra(1)=j
-                     if (j.gt.mgra(2)) mgra(2)=j
-                     if (k.lt.ngra(1)) ngra(1)=k
-                     if (k.gt.ngra(2)) ngra(2)=k
-                     lgraneg=1
-                  endif
-
-                  if(Qvap0(k)+Qvap2(i,j,k).lt.0) then
-                     Qvapneg=Qvapneg+Qvap0(k)+Qvap2(i,j,k)
-                     lvapneg=1
-                  endif
-
-                  if(aer0(k)+aer2(i,j,k).lt.0) then
-                     aerneg=aerneg+aer0(k)+aer2(i,j,k)
-                     laerneg=1
-                  endif
-               end do
-            end do
-         end do
-
-         !correccion de negativos
-         if(s.ge.1) call corgot
-         if (llluneg.eq.1) call corllu
-         if (lcrineg.eq.1) call corcri
-         if (lnieneg.eq.1) call cornie
-         if (lgraneg.eq.1) call corgra
-         if (lvapneg.eq.1) call corvap(Qvapneg)
-         if (laerneg.eq.1) call coraer(aerneg)
-
          !primer calculo de agua (sin laterales)
          do i=1,nx1
             do j=1,nx1
@@ -301,14 +89,13 @@ contains
             end do
          end do
 
-!####################### Sublazo Microfisico #########################
+         !####################### Sublazo Microfisico #########################
          do k=1,nz1-1
             n=k
             do i=1,nx1
                l=i
                do j=1,nx1
                   m=j
-
                   !calculo de T,P,Densi,Dv,Vis
                   aux=Pres00(k)+Pres2(i,j,k)
                   P=aux**ikapa*P00
@@ -707,7 +494,6 @@ contains
          !contornos laterales
          do k=1,nz1-1
             do j=1,nx1
-
                Titaa1(0,j,k)=Titaa1(1,j,k)
                Titaa1(nx1+1,j,k)=Titaa1(nx1,j,k)
                Titaa1(j,0,k)=Titaa1(j,1,k)
@@ -762,8 +548,6 @@ contains
 
          lll=tt
          ener=ener1+ener2+ener3+ener4+ener5
-
-!     este es el unico que interesa
          aux1=0.
          aux2=0.
          aux3=0.
@@ -777,14 +561,12 @@ contains
             end do
          end do
 
-!#####################################################################
-!grabacion normal de las diferentes cantidades
+! ### Grabacion Backup ###
          if (tt/nint(lte/dt1)*nint(lte/dt1).eq.tt) then
-            call estad03_init()
-            !desplazamiento de la nube
+            call statistics_init()
             tte=tte+1
-            call posnub02_init()
-            call corrinu2_init()
+            call cloud_position_init()
+            call cloud_movement_init()
 
             open(newunit=unit_number,file=output_directory//"posnub"//'.sa', ACCESS="append")
             write(unit_number,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),posxx,posyy
@@ -793,14 +575,11 @@ contains
 
          if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
             file_number = str_gen(t1)
-!############################ Grabacion 2D ###########################
             !call graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
-!############################ Grabacion 3D ###########################
             call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1,file_number)
             t1=t1+1
          endif
 
-!######################### Grabacion Backup ##########################
          if (tt/nint(ltb/dt1)*nint(ltb/dt1).eq.tt) then
             call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
                U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
@@ -811,11 +590,6 @@ contains
          write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
       end do
 
-
 !############### Fin de la evolucion temporal ########################
-!#####################################################################
-
-44    format(6g16.8)
-
    end subroutine model
 end module cloud_model
