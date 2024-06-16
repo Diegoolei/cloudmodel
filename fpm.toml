@@ -15,7 +15,7 @@ module-naming = false
 library = true
 
 [[executable]]
-name = "MODEL31"
+name = "model"
 source-dir = "app"
 main = "main.f90"
 

@@ -29,5 +29,6 @@ xcode-select --install
 ## F2Py
 
 ```console
-f2py -c app/MODEL31.f90 -m cloud_model -Ibuild/gfortran_AC789FC96BC46CEE -Isrc
+cd interphase
+make
 ```
