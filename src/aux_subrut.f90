@@ -760,8 +760,8 @@ end
  !> Calcula la evolucion del la presion y las velocidades con un paso de tiempo menor lt3
  !> Las cantidades 1 son las presentes en el paso grande y las 2 son las del paso futuro, las 3 son auxiliares
  !> Le resta la perturbacion promedio
-
-subroutine velpre
+!############### calculo de la velocidad y la presion ################
+subroutine speed_pressure()
    USE cant01
    USE dimen
    USE perdim
@@ -942,7 +942,7 @@ subroutine velpre
    !**********************************************************
 
    return
-end
+end subroutine speed_pressure
 
  !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  !> TURBUA01
@@ -1328,6 +1328,7 @@ end
  !     pasando un polinomio de grado 4.
 
 subroutine filtro(varia1,facx,facy,facz)
+   !filtro para Titaa1 Qvap1
    USE dimen
    USE filtro01
    implicit none
