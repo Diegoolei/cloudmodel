@@ -36,7 +36,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
    Vtm=Av(2*n)*Rllu**.8
    Nre=2.*Vtm*Rllu/nu
    A=Nre**(1/2.)*Nsc**(1/3.)
-   if (A .le. 1.4) then
+   if (A  <=  1.4) then
       fventl=1.+.108*A**2.
    else
       fventl=.78+.308*A
@@ -44,15 +44,15 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 
 !     Cristales
    Rcri=5e-5
-   if(T.lt.T0) Rcri=Rcri-4e-5*(T0-T)/40.
-   if(Rcri.lt.1e-5) Rcri=1e-5
+   if(T < T0) Rcri=Rcri-4e-5*(T0-T)/40.
+   if(Rcri < 1e-5) Rcri=1e-5
    Ncri=qcriaux/(pi*Rcri**3./10*rhocri)
 
 !     Nieve
    Rnie=(qnieaux/cteqnie)**(1/4.)
    Nnie=N0nie*Rnie
    Nre=2.*Vtnie(2*n)*Rnie/nu
-   if (T.le.T0) then
+   if (T <= T0) then
       fventn=.78+.308*Nsc**(1./3.)*Nre**.5
    else
       fventn=.86+.28*Nsc**(1./3.)*Nre**.5
@@ -86,41 +86,41 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 
 !*    Gotitas
 
-   if(Rgot.gt.0 .and. yy.eq.0) then
+   if(Rgot > 0 .and. yy == 0) then
       coevgot=-4.*pi*Dv*Rgot*Ngot*qauxl
 !     para que no de cantidades negativas de gotas evaporando
-      if (coevgot.gt. .95*qgotaux/dt2) then
+      if (coevgot >  .95*qgotaux/dt2) then
          coevgot=qgotaux/dt2*.95
          s=1
       endif
 !     para el vapor no se pase del de saturacion
-      if (abs(coevgot).gt.abs(.95*qauxl/dt2)) coevgot=-.95*qauxl/dt2
+      if (abs(coevgot) > abs(.95*qauxl/dt2)) coevgot=-.95*qauxl/dt2
    else
       coevgot=0.
    endif
 
 !*    Lluvia
 
-   if(Rllu.gt.0 .and. yy.eq.0) then
+   if(Rllu > 0 .and. yy == 0) then
       coevllu=-4.*pi*Dv*qauxl*Rllu*Nllu*fventl
 !     para que no de cantidades negativas de gotas evaporando
-      if (coevllu.gt. .95*qlluaux/dt2) coevllu=qlluaux/dt2*.95
+      if (coevllu >  .95*qlluaux/dt2) coevllu=qlluaux/dt2*.95
 !     para el vapor no se pase del de saturacion
-      if (abs(coevllu).gt.abs(.95*qauxl/dt2)) coevllu=-.95*qauxl/dt2
+      if (abs(coevllu) > abs(.95*qauxl/dt2)) coevllu=-.95*qauxl/dt2
    else
       coevllu=0.
    endif
 
 !*    Cristales
 
-   If (qcriaux.gt.0 .and. T.lt.T0) then
+   If (qcriaux > 0 .and. T < T0) then
 
       coevcri=-8.*Dv*qauxs*Rcri*Ncri
 
 !     para que no de cantidades negativas de cristales evaporando
-      if (coevcri.gt. .95*qcriaux/dt2) coevcri=qcriaux/dt2*.95
+      if (coevcri >  .95*qcriaux/dt2) coevcri=qcriaux/dt2*.95
 !     para el vapor no se pase del de saturacion
-      if (abs(coevcri).gt.abs(.95*qauxs/dt2)) coevcri=-.95*qauxs/dt2
+      if (abs(coevcri) > abs(.95*qauxs/dt2)) coevcri=-.95*qauxs/dt2
    else
       coevcri=0.
    endif
@@ -128,8 +128,8 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 !$$
 !*    Nieve
 
-   if(Rnie.gt.0) then
-      if (T.lt.T0) then
+   if(Rnie > 0) then
+      if (T < T0) then
 
          coevnie=-8.*Dv*qauxs*Rnie*Nnie*fventn
       else
@@ -137,30 +137,30 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
       endif
 
 !     para que no de cantidades negativas de nieve evaporando
-      if (coevnie.gt. .95*qnieaux/dt2) coevnie=qnieaux/dt2*.95
+      if (coevnie >  .95*qnieaux/dt2) coevnie=qnieaux/dt2*.95
 !     para el vapor no se pase del de saturacion
-      if (abs(coevnie).gt.abs(.95*qauxs/dt2)) coevnie=-.95*qauxs/dt2
+      if (abs(coevnie) > abs(.95*qauxs/dt2)) coevnie=-.95*qauxs/dt2
    else
       coevnie=0.
    endif
 
 !*    para granizos (sup crecimiento humedo, se verifica en Tgra)
-   if (Rgra.gt.0) then
+   if (Rgra > 0) then
       coevgra=-4.*pi*Dv*qauxl0*Rgra*Ngra*fventgl
 !     para el vapor no se pase del de saturacion
-      if (abs(coevgra).gt.abs(.95*qauxl0/dt2)) coevgra=-.95*qauxl0/dt2
+      if (abs(coevgra) > abs(.95*qauxl0/dt2)) coevgra=-.95*qauxl0/dt2
    else
       coevgra=0.
    endif
 
 !*    para aerosoles
-   if (coevgot.gt.0 .and. yy.eq.0) then
+   if (coevgot > 0 .and. yy == 0) then
       aux=max(Rgot,Rgotmin)
       libaer=coevgot/(4./3.*pi*rhow*aux**3.)
    else
       libaer=0.
    endif
-   if (coevcri.gt.0) then
+   if (coevcri > 0) then
       libaer=libaer+coevcri/(pi*rhocri*Rcri**3./10.)*.5 !mod(2/4/00)
    endif
 !**********************************************************
@@ -169,7 +169,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 
 !*    gotitas a lluvia
 
-   if (qgotaux.gt.2e-3) then !(mod 7/11/99)
+   if (qgotaux > 2e-3) then !(mod 7/11/99)
       liqconv=-1e-3*qgotaux
    else
       liqconv=0.
@@ -177,33 +177,33 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 
 !*    cristales a nieve
 
-   if (T.lt.T0) then
+   if (T < T0) then
       aux=20./3.*Eaucn*5e-3*.25*6.
       hieconv=-aux/Rcri/rhocri*qcriaux**2.
 
-      if (qcriaux.gt.5e-4) then
+      if (qcriaux > 5e-4) then
          hieconv=hieconv-2.*qcriaux**2.
       endif
-      if (Ncri.gt.100.) then
+      if (Ncri > 100.) then
          aux=Acri*exp(Bcri*(T0-T))
-         if (aux.lt.100.) aux=100.
+         if (aux < 100.) aux=100.
          hieconv=hieconv-1e-6*qcriaux*Ncri/aux
       endif
 
       aux=(qcriaux-coevcri*dt2)*.9
-      if (-hieconv.gt.aux) hieconv=-aux
+      if (-hieconv > aux) hieconv=-aux
 
    else
       hieconv=0.
    endif
 
-   if (qauxs.lt.0 .and.T.le.T0 .and.qcriaux.lt.5e-4) then
+   if (qauxs < 0 .and.T <= T0 .and.qcriaux < 5e-4) then
       hieconv=hieconv+1e-2*qnieaux
    endif
 
    aux=exp(.09*(T-T0))
-   if(aux.lt.0.2) aux=.2
-   if (qnieaux .gt. 5e-4) then
+   if(aux < 0.2) aux=.2
+   if (qnieaux  >  5e-4) then
       aux=aux*qnieaux/5e-4
       nieconv=-1e-2*qnieaux*aux
    else
@@ -216,68 +216,68 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 !**   Acrecion
 
 !*    gotitas por lluvia
-   if (Rgot.gt.0 .and. Rllu.gt.0 .and. s.eq.0) then
+   if (Rgot > 0 .and. Rllu > 0 .and. s == 0) then
       acgollu=-gam3p8*qgotaux*Vtm*pi*Rllu**2.*Nllu*Efcol
 !     para que no de cantidades negativas de gotas siendo colectadas
-      if (acgollu.gt.qgotaux/dt2*.98) acgollu=qgotaux/dt2*.98
+      if (acgollu > qgotaux/dt2*.98) acgollu=qgotaux/dt2*.98
    else
       acgollu=0.
    endif
 
 !*    gotitas por nieve
-   if (Rgot.gt.0 .and. Rnie.gt.0 .and. s.eq.0) then
+   if (Rgot > 0 .and. Rnie > 0 .and. s == 0) then
       acgonie=-2.*qgotaux*Vtnie(2*n)*pi*Rnie**2.*Nnie*Efcolgn
 !     para que no de cantidades negativas de gotas siendo colectadas
-      if (acgonie.gt.qgotaux/dt2*.98) acgonie=qgotaux/dt2*.98
+      if (acgonie > qgotaux/dt2*.98) acgonie=qgotaux/dt2*.98
    else
       acgonie=0.
    endif
 
 !*    cristales por nieve
-   if (Ncri.gt.0 .and. Rnie.gt.0 .and. T.lt.T0) then
+   if (Ncri > 0 .and. Rnie > 0 .and. T < T0) then
       accrnie=-2.*qcriaux*Vtnie(2*n)*pi*(Rnie+Rcri)**2.*Nnie*Eaccn !mod 7/2/2000)
 !     para que no de cantidades negativas de cristales siendo colectados
-      if (accrnie.gt.qcriaux/dt2*.98) accrnie=qcriaux/dt2*.98
+      if (accrnie > qcriaux/dt2*.98) accrnie=qcriaux/dt2*.98
    else
       accrnie=0.
    endif
 
 !*    gotitas por granizo
-   if (Rgot.gt.0 .and. Rgra.gt.0 .and. s.eq.0) then
+   if (Rgot > 0 .and. Rgra > 0 .and. s == 0) then
       acgogra=-gam3p8*qgotaux*Vtgra*pi*Rgra**2.*Ngra*Efcol
 !     para que no de cantidades negativas de gotas siendo colectadas
-      if (acgogra.gt.qgotaux/dt2*.98) acgogra=qgotaux/dt2*.98
+      if (acgogra > qgotaux/dt2*.98) acgogra=qgotaux/dt2*.98
    else
       acgogra=0.
    endif
 
 !*    lluvia por granizo
-   if (Rllu.gt.0 .and. Rgra.gt.0 .and. s.eq.0 .and.Vtgra.gt.Vtm) then
+   if (Rllu > 0 .and. Rgra > 0 .and. s == 0 .and.Vtgra > Vtm) then
       acllgra=-pi*Efcol*Ngra*qlluaux*&
          (gam3p8*(Vtgra*Rgra**2.-Vtm*Rllu**2.)+&
          2.*gam2p8*Rgra*Rllu*(Vtgra-Vtm)+&
          2.*gam1p8*(Vtgra*Rllu**2.-Vtm*Rgra**2.))
 !     para que no de cantidades negativas de lluvia siendo colectada
-      if (acllgra.gt.qlluaux/dt2*.98) acllgra=qlluaux/dt2*.98
+      if (acllgra > qlluaux/dt2*.98) acllgra=qlluaux/dt2*.98
    else
       acllgra=0.
    endif
 
 !*    cristales por granizo (sup aqui crecimiento humedo, si es seco se corrige en Tgra)
-   if (Ncri.gt.0 .and. Rgra.gt.0 .and. s.eq.0 .and. T.lt.T0) then
+   if (Ncri > 0 .and. Rgra > 0 .and. s == 0 .and. T < T0) then
       accrgra=-gam3p8*qcriaux*Vtgra*pi*Rgra**2.*Ngra*Efcol
 !     para que no de cantidades negativas de critales siendo colectados
-      if (accrgra.gt.qcriaux/dt2*.98) accrgra=qcriaux/dt2*.98
+      if (accrgra > qcriaux/dt2*.98) accrgra=qcriaux/dt2*.98
    else
       accrgra=0.
    endif
 
 !*    nieve por granizo
-   if (Rnie.gt.0 .and. Rgra.gt.0 .and. s.eq.0) then
+   if (Rnie > 0 .and. Rgra > 0 .and. s == 0) then
       ccnigra=gam3p8*Vtgra*pi*Rgra**2.*Ngra*Nnie
       acnigra=-ccnigra*qnieaux/Nnie*Eacng
 !     para que no de cantidades negativas de nieve siendo colectados
-      if (acnigra.gt.qnieaux/dt2*.98) acnigra=qnieaux/dt2*.98
+      if (acnigra > qnieaux/dt2*.98) acnigra=qnieaux/dt2*.98
    else
       ccnigra=0.
       acnigra=0.
@@ -287,44 +287,44 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 !**   Congelacion-Fusion de gotas y cristales, mod(14/4/99)
 
 !*    congelacion homogenea de gotitas
-   if (T.lt.238. .and. Rgot.gt.0) then
+   if (T < 238. .and. Rgot > 0) then
       aux=exp((238.-T)/8.)-1.
-      if (T.lt.233) aux=exp(5./8.)-1.
+      if (T < 233) aux=exp(5./8.)-1.
       cfgotcri=-aux*qgotaux
    else
       cfgotcri=0.
    endif
 
 !*    congelacion homogenea de lluvia
-   if (T.lt.T0 .and. Rllu.gt.0) then
+   if (T < T0 .and. Rllu > 0) then
       aux=-6.7e-8*(exp(.66*(T0-T))-1.)
-      if (aux.lt.-.9) aux=-.9
+      if (aux < -.9) aux=-.9
       cfllugra=aux*qlluaux
    else
       cfllugra=0.
    endif
 
-   if (T.ge.T0 .and. Rcri.gt.0) then
+   if (T >= T0 .and. Rcri > 0) then
       cfgotcri=.95*qcriaux
    else
       cfgotcri=0.
    endif
 
 !*    fusion de la nieve
-   if (Rnie.gt.0) then
+   if (Rnie > 0) then
       cfln1=-acgonie
-      if (T.le.T0) then
+      if (T <= T0) then
          cfln2=-coevnie*Lvs/Lsl
-         if(T.lt.T0-10.) cfln2=0. !mod 11/12/99
+         if(T < T0-10.) cfln2=0. !mod 11/12/99
       else
          cfln2=-coevnie*Lvl0/Lsl00+&
             (8.*Kair*fventl*Rnie*Nnie+Cwl*cfln1)*(T-T0)/Lsl00
       endif
-      if (cfln2.lt.0) cfln2=0.
+      if (cfln2 < 0) cfln2=0.
       cfllunie=cfln1+cfln2
 
 !     para que no de cantidades negativas nieve fundiendose
-      if (cfln2.gt.qnieaux/dt2-coevnie) then
+      if (cfln2 > qnieaux/dt2-coevnie) then
          cfln2=(qnieaux/dt2-coevnie)*.9
          cfllunie=cfln1+cfln2
       endif
@@ -335,14 +335,14 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
       cfln2=0.
    endif
 
-   if (cfllunie.lt.0) then
+   if (cfllunie < 0) then
       stop
    endif
 
 !**   colision entre lluvia y nieve o cristales que forman granizos (o nieve)
 
 !*    lluvia con cristales     (mod 22/6/99)
-   if(T.lt.T0.and.Rllu.gt.5e-5.and.Ncri.gt.0) then
+   if(T < T0.and.Rllu > 5e-5.and.Ncri > 0) then
       colilc=gam3p8*Vtm*pi*Rllu**2.*Nllu*Ncri*Efcol    !numero de colisiones
       colilc=min(colilc,Nllu*.3,Ncri*.3)
       congagua=colilc*(qcriaux/Ncri+qlluaux/Nllu)
@@ -352,7 +352,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
    endif
 
 !*    lluvia con nieve     (mod 10/12/99)
-   if(T.lt.T0.and.(Rllu.gt.5e-5.and.Rnie.gt.0))then
+   if(T < T0.and.(Rllu > 5e-5.and.Rnie > 0))then
       coliln=pi*Efcol*Nllu*Nnie*(Vtm*&
          (gam3p8*Rllu**2.+gam1p8*2.*Rnie**2.+2.*gam2p8*Rnie*Rllu)&
          -Vtnie(2*n)*2.*(Rllu**2.+Rnie**2.+Rnie*Rllu))
@@ -390,7 +390,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 !     Si alfagra>1 el crecimiento es seco.
 !     Si alfagra<0 o Tg>T0 hay melting
 
-   if (Rgra.gt.0) then
+   if (Rgra > 0) then
       Qvaux=Qvls0
       Tg=T0
       alfagra=1.
@@ -410,9 +410,9 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
       Aalfa=A1+A2+A3b+A4
       Balfa=(B1+B4)*Tg+B2b*Qvls0
 
-      if (agual.gt.0) then
+      if (agual > 0) then
          alfagra=-(Aalfa-Balfa)/agual/(Lsl00+Cwi*(T0-Tg))
-         if (alfagra.ge.0 .and. alfagra.le.1) then ! crecimiento humedo
+         if (alfagra >= 0 .and. alfagra <= 1) then ! crecimiento humedo
             crecigra=0
             A3=agual*(Cwl*(T-T0)+alfagra*(Lsl00+Cwi*T0))
             B3=agual*alfagra*Cwi
@@ -422,7 +422,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
             Q4=A4-B4*Tg
             Qt=Q1+Q2+Q3+Q4
          endif
-         if (alfagra.lt.0) then                          !fusion
+         if (alfagra < 0) then                          !fusion
             crecigra=1
             alfagra=0.
             A3=agual*(Cwl*(T-T0)+alfagra*(Lsl00+Cwi*T0))
@@ -434,11 +434,11 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
             Qt=Q1+Q2+Q3+Q4
             fugra=-Qt/Lsl00
 !       para que no den cantidades de granizo fundiendo
-            if (-fugra.gt.qgraaux/dt2) fugra=-qgraaux/dt2*.9
+            if (-fugra > qgraaux/dt2) fugra=-qgraaux/dt2*.9
          endif
       endif
 
-      if (alfagra.gt.1. .or. agual.eq.0) then
+      if (alfagra > 1. .or. agual == 0) then
          alfagra=1.
          accrgra=accrgra/8.
          hielo=-accrgra-acnigra
@@ -458,7 +458,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
          dQt=-BB+CC2*esaux/Tg**2.-CC3/Tg**3.
          Taux=Tg-Qt/dQt
          do i=1,10
-            if (abs(Taux-Tg) .gt. .05) then
+            if (abs(Taux-Tg)  >  .05) then
                Taux=Tg
                Qvaux=esaux/Rv/Taux
                Q1=A1-B1*Taux
@@ -472,7 +472,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
             endif
          end do
 
-         if (Tg .le. T0)  then
+         if (Tg  <=  T0)  then
             crecigra=2          ! crecimiento seco
             Qvaux=esvs0/Rv/Tg*exp(Lvs0/Rv*(1./T0-1./Tg))
             coevgra=-4.*pi*Dv*Rgra*Ngra*fventgs*&
@@ -489,7 +489,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
             Qt=Q1+Q2+Q3+Q4
             fugra=-Qt/Lsl00
 !       para que no den cantidades de granizo fundiendo
-            if (-fugra.gt.qgraaux/dt2*.8) fugra=-qgraaux/dt2*.8
+            if (-fugra > qgraaux/dt2*.8) fugra=-qgraaux/dt2*.8
          endif
       endif
       fugrallu=-agual*(1.-alfagra)+fugra
@@ -503,10 +503,10 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 !**   multiplicacion de cristales por colisiones
 !*     colisiones entre granizo con nieve
    mucrgrni=ccnigra*Ncrgrni*pi*Rcri**3./10.*rhocri
-   if (T.gt.T0) mucrgrni=0.
+   if (T > T0) mucrgrni=0.
 
 !*     colisiones entre granizo con granizos
-   if (Rgra.gt.0 .and. T.gt.0) then
+   if (Rgra > 0 .and. T > 0) then
       aux=4.*pi*Rgra**2.*Vtgra*.25*Ngra**2.
       mucrgrgr=aux*Ncrgrgr*pi*Rcri**3./10.*rhocri
    else
@@ -533,18 +533,18 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
    inllugra=cfllugra-fugrallu
    inniegra=nieconv
 
-   if (Rllu.gt.1e-4 .and. Ncri.gt.0 .and. T.lt.T0) then !mod 10/12/99
+   if (Rllu > 1e-4 .and. Ncri > 0 .and. T < T0) then !mod 10/12/99
       incrigra=incrigra-colilc*qcriaux/Ncri
       inllugra=inllugra-colilc*qlluaux/Nllu
       Fcal=colilc*qlluaux/Nllu*Lsl*dt2
    endif
-   if (Rllu.gt.5e-5.and.Rllu.le.1e-4.and.Ncri.gt.0.and.T.lt.T0)then !mod 10/12/99
+   if (Rllu > 5e-5.and.Rllu <= 1e-4.and.Ncri > 0.and.T < T0)then !mod 10/12/99
       incrinie=incrinie-colilc*qcriaux/Ncri
       inllunie=inllunie-colilc*qlluaux/Nllu
       Fcal=colilc*qlluaux/Nllu*Lsl*dt2
    endif
 
-   if (Rllu.gt.5e-5 .and. Rnie.gt.0.) then !mod 10/12/99
+   if (Rllu > 5e-5 .and. Rnie > 0.) then !mod 10/12/99
       inllugra=inllugra-coliln*qlluaux/Nllu
       inniegra=inniegra-coliln*qnieaux/Nnie
       Fcal=Fcal+coliln*qlluaux/Nllu*Lsl*dt2
@@ -568,14 +568,14 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
    qgraaux1=qgraaux+Intgra*dt2
 
 !     Correccion de lluvia negativa
-   if (qlluaux1.lt.0 .and. T.lt.253) then
+   if (qlluaux1 < 0 .and. T < 253) then
       qgraaux1=qgraaux1+qlluaux1
       qlluaux1=0.
    endif
 
 !     Correccion de gotas negativas
 !$$
-   if (qgotaux1.lt.0) then
+   if (qgotaux1 < 0) then
       invapgot=invapgot*(1.-qgotaux1/(Intgot*dt2))
       ingotllu=ingotllu*(1.-qgotaux1/(Intgot*dt2))
       ingotcri=ingotcri*(1.-qgotaux1/(Intgot*dt2))
@@ -600,25 +600,25 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 
 !     prevencion de negativos
 !$$
-   if (qgotaux1.lt.0 .or. qlluaux1.lt.0 .or. qcriaux1.lt.0 .or.&
-      qnieaux1.lt.0 .or. qgraaux1.lt.0) then
+   if (qgotaux1 < 0 .or. qlluaux1 < 0 .or. qcriaux1 < 0 .or.&
+      qnieaux1 < 0 .or. qgraaux1 < 0) then
 
-      if (qgotaux1.lt.-1e-10 .or. qlluaux1.lt.-1e-10 .or. &
-         qcriaux1.lt.-1e-10 .or.&
-         qnieaux1.lt.-1e-10 .or. qgraaux1.lt.-1e-10) then
+      if (qgotaux1 < -1e-10 .or. qlluaux1 < -1e-10 .or. &
+         qcriaux1 < -1e-10 .or.&
+         qnieaux1 < -1e-10 .or. qgraaux1 < -1e-10) then
          stop
       endif
-      if (qgotaux1.lt.0) qgotaux1=0.
-      if (qlluaux1.lt.0) qlluaux1=0.
-      if (qcriaux1.lt.0) qcriaux1=0.
-      if (qnieaux1.lt.0) qnieaux1=0.
-      if (qgraaux1.lt.0) qgraaux1=0.
+      if (qgotaux1 < 0) qgotaux1=0.
+      if (qlluaux1 < 0) qlluaux1=0.
+      if (qcriaux1 < 0) qcriaux1=0.
+      if (qnieaux1 < 0) qnieaux1=0.
+      if (qgraaux1 < 0) qgraaux1=0.
 
 !	stop
    endif
 
    aux=Intvap+Intgot+Intllu+Intcri+Intnie+Intgra
-   if (aux.gt.1e-9) then
+   if (aux > 1e-9) then
       stop
    endif
 
@@ -636,10 +636,10 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
    Fcal=Fcal+(-(invapgot+invapllu)*Lvl-&
       ingotcri*Lsl-invapcri*Lvs+Fcalgra)*dt2
 
-   if (invapnie.gt.0 .or. T.lt.T0-10.) then !mod11/12/99
+   if (invapnie > 0 .or. T < T0-10.) then !mod11/12/99
       Fcal=Fcal-invapnie*Lvs*dt2
    endif
 
-   if (T.lt.T0) Fcal=Fcal-inllunie*Cwl*(T-T0)*dt2
+   if (T < T0) Fcal=Fcal-inllunie*Cwl*(T-T0)*dt2
    return
 end

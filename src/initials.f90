@@ -82,17 +82,17 @@ module model_initial_conditions
    
          do k=0,nz1
             zeta=k*dx1
-            if (zeta .le. 500.) then
+            if (zeta  <=  500.) then
                UU(k)=0.
                VV(k)=0.
    
-            elseif (zeta .le. 2000.) then
+            elseif (zeta  <=  2000.) then
                zeta1=zeta-500.
                aux=4.*(zeta1/1500.)**2.
                UU(k)=aux
                VV(k)=0.
    
-            elseif (zeta .le. 9000.) then
+            elseif (zeta  <=  9000.) then
                zeta1=zeta-2000.
                vb=zeta1/7000.
                UU(k)=4.-10.*vb**2.
@@ -118,7 +118,7 @@ module model_initial_conditions
             Tk=k-T0
    
             Tvis(k)=4.9e-8*Tk+Vis0
-            if (k.lt.273.15) Tvis(k)=Tvis(k)-1.2e-10*Tk**2.
+            if (k < 273.15) Tvis(k)=Tvis(k)-1.2e-10*Tk**2.
    
             !calores latentes de evaporacion, fusion y sublimacion
             gam=.167+3.67e-4*k
@@ -134,7 +134,7 @@ module model_initial_conditions
             aux=b3+Tk*(b4+Tk*(b5+Tk*b6))
             aux=b0+Tk*(b1+Tk*(b2+Tk*aux))
             Tesvs(k)=aux*100.
-            if (k.lt.220) then
+            if (k < 220) then
                aux=Tlvl(220)/Rv*(1./220.-1./k)
                Telvs(k)=Telvs(220)*exp(aux)
                aux=Tlvs(220)/Rv*(1./220.-1./k)
@@ -211,7 +211,7 @@ module model_initial_conditions
    
                   Titaa1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
    
-                  if (Titaa1(i,j,k).lt.1e-5) Titaa1(i,j,k)=0.
+                  if (Titaa1(i,j,k) < 1e-5) Titaa1(i,j,k)=0.
    
                   G1=exp(-((cenaerx-equis)**2.+(cenaery-ygrie)**2.)*.5&
                      /radiomed**2.)
@@ -223,15 +223,15 @@ module model_initial_conditions
             !vapor base
             Tem1=Temp0(k)
    
-            if (zeta.le.500) then
+            if (zeta <= 500) then
                rel1=.55+.05*zeta/500.
-            else if (zeta.le. 1500.) then
+            else if (zeta <=  1500.) then
                rel1=.6
-            else if (zeta.le.4000) then
+            else if (zeta <= 4000) then
                rel1=.6-(zeta-1500)/2500.*.25
-            else if (zeta.le.7000) then
+            else if (zeta <= 7000) then
                rel1=.35-(zeta-4000.)/3000.*.25
-            else if(zeta.gt.7000) then
+            else if(zeta > 7000) then
                rel1=.1-(zeta-7000)/3000.*.02
             endif
             n=int(Tem1)
@@ -331,18 +331,18 @@ module model_initial_conditions
       function TT_f (zeta)
          real :: a, xx, TT_f
          a = 298.15
-         if (zeta.le.2000) then
+         if (zeta <= 2000) then
             TT_f = a - 9.e-3 * zeta
-         elseif (zeta.le.5500) then
+         elseif (zeta <= 5500) then
             xx = zeta - 2000.
             TT_f = a - 18. - xx * (9.e-3 - 2e-3 * xx / 3500. / 2.)
-         elseif (zeta.le.9000) then
+         elseif (zeta <= 9000) then
             xx = zeta - 5500.
             TT_f = a - 46. - 7e-3 * xx
-         elseif (zeta.le.11000) then
+         elseif (zeta <= 11000) then
             xx = zeta - 9000
             TT_f = a - 70.5 - 7e-3 * xx + 1.75e-6 * xx**2.
-         elseif (zeta.le.12000) then
+         elseif (zeta <= 12000) then
             TT_f = a - 77.5
          else
             xx = zeta - 12000
@@ -507,7 +507,7 @@ contains
       posy(0) = 0
       tte = 0
 
-      if (ini.eq.0) then
+      if (ini == 0) then
          !Si ini=0 el calculo empieza por primera###
          call initial_conditions()
       else
@@ -625,77 +625,77 @@ contains
       do k=1,nz1
          do i=1,nx1
             do j=1,nx1
-               if (umax.lt.U1(i,j,k)*100) then
+               if (umax < U1(i,j,k)*100) then
                   umax=U1(i,j,k)*100
                   lumax=i
                   mumax=j
                   numax=k
                endif
 
-               if (umin.gt.U1(i,j,k)*100) then
+               if (umin > U1(i,j,k)*100) then
                   umin=U1(i,j,k)*100
                   lumin=i
                   mumin=j
                   numin=k
                endif
 
-               if (vmax.lt.V1(i,j,k)*100) then
+               if (vmax < V1(i,j,k)*100) then
                   vmax=V1(i,j,k)*100
                   lvmax=i
                   mvmax=j
                   nvmax=k
                endif
 
-               if (vmin.gt.V1(i,j,k)*100) then
+               if (vmin > V1(i,j,k)*100) then
                   vmin=V1(i,j,k)*100
                   lvmin=i
                   mvmin=j
                   nvmin=k
                endif
 
-               if (wmax.lt.W1(i,j,k)*100) then
+               if (wmax < W1(i,j,k)*100) then
                   wmax=W1(i,j,k)*100
                   lwmax=i
                   mwmax=j
                   nwmax=k
                endif
 
-               if (wmin.gt.W1(i,j,k)*100) then
+               if (wmin > W1(i,j,k)*100) then
                   wmin=W1(i,j,k)*100
                   lwmin=i
                   mwmin=j
                   nwmin=k
                endif
 
-               if (titamax.lt.Titaa1(i,j,k)*1000) then
+               if (titamax < Titaa1(i,j,k)*1000) then
                   titamax=Titaa1(i,j,k)*1000
                   ltitamax=i
                   mtitamax=j
                   ntitamax=k
                endif
 
-               if (titamin.gt.Titaa1(i,j,k)*1000) then
+               if (titamin > Titaa1(i,j,k)*1000) then
                   titamin=Titaa1(i,j,k)*1000
                   ltitamin=i
                   mtitamin=j
                   ntitamin=k
                endif
 
-               if (qvapmax.lt.Qvap1(i,j,k)*1e6) then
+               if (qvapmax < Qvap1(i,j,k)*1e6) then
                   qvapmax=Qvap1(i,j,k)*1e6
                   lqvapmax=i
                   mqvapmax=j
                   nqvapmax=k
                endif
 
-               if (qvapmin.gt.Qvap1(i,j,k)*1e6) then
+               if (qvapmin > Qvap1(i,j,k)*1e6) then
                   qvapmin=Qvap1(i,j,k)*1e6
                   lqvapmin=i
                   mqvapmin=j
                   nqvapmin=k
                endif
 
-               if (qgotmax.lt.Qgot1(i,j,k)*1e6) then
+               if (qgotmax < Qgot1(i,j,k)*1e6) then
                   qgotmax=Qgot1(i,j,k)*1e6
                   lqgotmax=i
                   mqgotmax=j
@@ -703,7 +703,7 @@ contains
                endif
                qgottot=qgottot+Qgot1(i,j,k)*1e6
 
-               if (qllumax.lt.Qllu1(i,j,k)*1e6) then
+               if (qllumax < Qllu1(i,j,k)*1e6) then
                   qllumax=Qllu1(i,j,k)*1e6
                   lqllumax=i
                   mqllumax=j
@@ -711,7 +711,7 @@ contains
                endif
                qllutot=qllutot+Qllu1(i,j,k)*1e6
 
-               if (qcrimax.lt.Qcri1(i,j,k)*1e6) then
+               if (qcrimax < Qcri1(i,j,k)*1e6) then
                   qcrimax=Qcri1(i,j,k)*1e6
                   lqcrimax=i
                   mqcrimax=j
@@ -719,7 +719,7 @@ contains
                endif
                qcritot=qcritot+Qcri1(i,j,k)*1e6
 
-               if (qniemax.lt.Qnie1(i,j,k)*1e6) then
+               if (qniemax < Qnie1(i,j,k)*1e6) then
                   qniemax=Qnie1(i,j,k)*1e6
                   lqniemax=i
                   mqniemax=j
@@ -727,7 +727,7 @@ contains
                endif
                qnietot=qnietot+Qnie1(i,j,k)*1e6
 
-               if (qgramax.lt.Qgra1(i,j,k)*1e6) then
+               if (qgramax < Qgra1(i,j,k)*1e6) then
                   qgramax=Qgra1(i,j,k)*1e6
                   lqgramax=i
                   mqgramax=j
@@ -735,7 +735,7 @@ contains
                endif
                qgratot=qgratot+Qgra1(i,j,k)*1e6
 
-               if (aermax.lt.aer1(i,j,k)/1000) then
+               if (aermax < aer1(i,j,k)/1000) then
                   aermax=aer1(i,j,k)/1000
                   laermax=i
                   maermax=j
@@ -808,7 +808,7 @@ contains
 !     es tomada como la velocidad del aire sin perturbar a esa altura
 !                  (1/3/2000)
 
-      if (ngot(2).ge.1 .or. ncri(2).gt.1) then
+      if (ngot(2) >= 1 .or. ncri(2) > 1) then
 
          impx=0.
          impy=0.
@@ -838,7 +838,7 @@ contains
             end do
          end do
 
-         if (Qaguat.gt.1e-3) then
+         if (Qaguat > 1e-3) then
             zmed=zmed/Qaguat
             Xnub(tte)=Xnub(tte)+UU(nint(zmed))*lte
             Ynub(tte)=Ynub(tte)+VV(nint(zmed))*lte
@@ -863,7 +863,7 @@ contains
 !     En posx y posy se guarda para cada tt la posicion en
 !     puntos de red
 
-      if (spos .eq. 1) then
+      if (spos  ==  1) then
          posxx=Xnub(tte)
          posyy=Ynub(tte)
       else
@@ -876,7 +876,7 @@ contains
 
 !*    corrimiento en x
 
-      if (posxx.gt.dx1) then
+      if (posxx > dx1) then
          posx(tte)=posx(tte)+1
          Xnub(tte)=Xnub(tte)-dx1
 
@@ -952,7 +952,7 @@ contains
          end do
       endif
 
-      if (posxx.lt.-dx1) then
+      if (posxx < -dx1) then
          posx(tte)=posx(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
 
@@ -1030,7 +1030,7 @@ contains
 
 !*    corrimiento en y
 
-      if (posyy.gt.dx1) then
+      if (posyy > dx1) then
          posy(tte)=posy(tte)+1
          Ynub(tte)=Ynub(tte)-dx1
 
@@ -1107,7 +1107,7 @@ contains
          end do
       endif
 
-      if (posyy.lt.-dx1) then
+      if (posyy < -dx1) then
          posy(tte)=posy(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
 

@@ -41,7 +41,7 @@ subroutine tempot(i,j,k,dden0z,Fcal)
       Titaa1(i,j,k)
 
    !     control de locura
-   if (abs(Titaa2(i,j,k)).gt.30) then
+   if (abs(Titaa2(i,j,k)) > 30) then
       stop
    endif
 
@@ -62,7 +62,7 @@ subroutine corgot
    do n=ngot(1),ngot(2)
       do l=lgot(1),lgot(2)
          do m=mgot(1),mgot(2)
-            if (Qgot2(l,m,n).lt.0.) then
+            if (Qgot2(l,m,n) < 0.) then
                neg1=neg1+Qgot2(l,m,n)
                Qgot2(l,m,n)=0
             else
@@ -72,7 +72,7 @@ subroutine corgot
       end do
    end do
 
-   if(pos1.le.-neg1) then
+   if(pos1 <= -neg1) then
       do l=lgot(1),lgot(2)
          do m=mgot(1),mgot(2)
             do n=ngot(1),ngot(2)
@@ -81,7 +81,7 @@ subroutine corgot
          end do
       end do
 
-      if (-neg1.gt.1e-3) then
+      if (-neg1 > 1e-3) then
          stop
       endif
    else
@@ -89,7 +89,7 @@ subroutine corgot
       do l=lgot(1),lgot(2)
          do m=mgot(1),mgot(2)
             do n=ngot(1),ngot(2)
-               if(Qgot2(l,m,n).gt.0) then
+               if(Qgot2(l,m,n) > 0) then
                   Qgot2(l,m,n)=Qgot2(l,m,n)*(1.+aux1)
                endif
             end do
@@ -115,7 +115,7 @@ subroutine corllu
    do n=nllu(1),nllu(2)
       do l=lllu(1),lllu(2)
          do m=mllu(1),mllu(2)
-            if (Qllu2(l,m,n).lt.0.) then
+            if (Qllu2(l,m,n) < 0.) then
                neg1=neg1+Qllu2(l,m,n)
                Qllu2(l,m,n)=0
             else
@@ -124,7 +124,7 @@ subroutine corllu
          end do
       end do
    end do
-   if(pos1.le.-neg1) then
+   if(pos1 <= -neg1) then
       do l=lllu(1),lllu(2)
          do m=mllu(1),mllu(2)
             do n=nllu(1),nllu(2)
@@ -133,7 +133,7 @@ subroutine corllu
          end do
       end do
 
-      if (-neg1.gt.1e-3) then
+      if (-neg1 > 1e-3) then
          stop
       endif
    else
@@ -141,7 +141,7 @@ subroutine corllu
       do l=lllu(1),lllu(2)
          do m=mllu(1),mllu(2)
             do n=nllu(1),nllu(2)
-               if(Qllu2(l,m,n).gt.0) then
+               if(Qllu2(l,m,n) > 0) then
                   Qllu2(l,m,n)=Qllu2(l,m,n)*(1.+aux1)
                endif
             end do
@@ -166,7 +166,7 @@ subroutine corcri
    do n=ncri(1),ncri(2)
       do l=lcri(1),lcri(2)
          do m=mcri(1),mcri(2)
-            if (Qcri2(l,m,n).lt.0.) then
+            if (Qcri2(l,m,n) < 0.) then
                neg1=neg1+Qcri2(l,m,n)
                Qcri2(l,m,n)=0
             else
@@ -176,7 +176,7 @@ subroutine corcri
       end do
    end do
 
-   if(pos1.le.-neg1) then
+   if(pos1 <= -neg1) then
       do l=lcri(1),lcri(2)
          do m=mcri(1),mcri(2)
             do n=ncri(1),ncri(2)
@@ -185,7 +185,7 @@ subroutine corcri
          end do
       end do
 
-      if (-neg1.gt.1e-3) then
+      if (-neg1 > 1e-3) then
          stop
       endif
    else
@@ -193,7 +193,7 @@ subroutine corcri
       do l=lcri(1),lcri(2)
          do m=mcri(1),mcri(2)
             do n=ncri(1),ncri(2)
-               if(Qcri2(l,m,n).gt.0) then
+               if(Qcri2(l,m,n) > 0) then
                   Qcri2(l,m,n)=Qcri2(l,m,n)*(1.+aux1)
                endif
             end do
@@ -218,7 +218,7 @@ subroutine cornie
    do n=nnie(1),nnie(2)
       do l=lnie(1),lnie(2)
          do m=mnie(1),mnie(2)
-            if (Qnie2(l,m,n).lt.0.) then
+            if (Qnie2(l,m,n) < 0.) then
                neg1=neg1+Qnie2(l,m,n)
                Qnie2(l,m,n)=0
             else
@@ -228,7 +228,7 @@ subroutine cornie
       end do
    end do
 
-   if(pos1.le.-neg1) then
+   if(pos1 <= -neg1) then
       do l=lnie(1),lnie(2)
          do m=mnie(1),mnie(2)
             do n=nnie(1),nnie(2)
@@ -237,7 +237,7 @@ subroutine cornie
          end do
       end do
 
-      if (-neg1.gt.1e-3) then
+      if (-neg1 > 1e-3) then
          stop
       endif
    else
@@ -245,7 +245,7 @@ subroutine cornie
       do l=lnie(1),lnie(2)
          do m=mnie(1),mnie(2)
             do n=nnie(1),nnie(2)
-               if(Qnie2(l,m,n).gt.0) then
+               if(Qnie2(l,m,n) > 0) then
                   Qnie2(l,m,n)=Qnie2(l,m,n)*(1.+aux1)
                endif
             end do
@@ -270,7 +270,7 @@ subroutine corgra
    do n=ngra(1),ngra(2)
       do l=lgra(1),lgra(2)
          do m=mgra(1),mgra(2)
-            if (Qgra2(l,m,n).lt.0.) then
+            if (Qgra2(l,m,n) < 0.) then
                neg1=neg1+Qgra2(l,m,n)
                Qgra2(l,m,n)=0
             else
@@ -280,7 +280,7 @@ subroutine corgra
       end do
    end do
 
-   if(pos1.le.-neg1) then
+   if(pos1 <= -neg1) then
       do l=lgra(1),lgra(2)
          do m=mgra(1),mgra(2)
             do n=ngra(1),ngra(2)
@@ -289,7 +289,7 @@ subroutine corgra
          end do
       end do
 
-      if (-neg1.gt.1e-3) then
+      if (-neg1 > 1e-3) then
          stop
       endif
    else
@@ -297,7 +297,7 @@ subroutine corgra
       do l=lgra(1),lgra(2)
          do m=mgra(1),mgra(2)
             do n=ngra(1),ngra(2)
-               if(Qgra2(l,m,n).gt.0) then
+               if(Qgra2(l,m,n) > 0) then
                   Qgra2(l,m,n)=Qgra2(l,m,n)*(1.+aux1)
                endif
             end do
@@ -325,7 +325,7 @@ subroutine corvap(Qvapneg)
       do i=1,nx1
          do j=1,nx1
             Qvap2(i,j,k)=Qvap2(i,j,k)+dq
-            if (Qvap2(i,j,k)+Qvap0(k).lt.0) Qvap2(i,j,k)=-Qvap0(k)
+            if (Qvap2(i,j,k)+Qvap0(k) < 0) Qvap2(i,j,k)=-Qvap0(k)
          end do
       end do
    end do
@@ -349,7 +349,7 @@ subroutine coraer(aerneg)
       do i=1,nx1
          do j=1,nx1
             aer2(i,j,k)=aer2(i,j,k)+dq
-            if (aer2(i,j,k)+aer0(k).lt.0) aer2(i,j,k)=-aer0(k)
+            if (aer2(i,j,k)+aer0(k) < 0) aer2(i,j,k)=-aer0(k)
          end do
       end do
    end do
@@ -444,8 +444,8 @@ subroutine dgotit(l,m,n)
 
    advgot2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
       (Qgot1(l,m,n)+Qgot1(l,m,n+1))/4.
-   if ((advgot2(l,m)-advgot1(l,m))*dt1/dx1.gt.Qgot1(l,m,n) .and.&
-      W2(l,m,n).gt.0) then
+   if ((advgot2(l,m)-advgot1(l,m))*dt1/dx1 > Qgot1(l,m,n) .and.&
+      W2(l,m,n) > 0) then
       advgot2(l,m)=advgot1(l,m)+Qgot1(l,m,n)*dx1/dt1
    endif
    adv(3)=advgot2(l,m)-advgot1(l,m)
@@ -578,7 +578,7 @@ subroutine dlluvi(l,m,n)
    Rmi=(Qllui/cteqllu)**.25
    Vtllus=(Av(2*n+1)*Rms**.8+Av(2*n)*Rmm**.8)/2.
    Vtllui=(Av(2*n-1)*Rmi**.8+Av(2*n)*Rmm**.8)/2.
-   if (n.eq.1) then
+   if (n == 1) then
       Vtllui=Av(2*n)*Rmm**.8
       Qllui=Qllu1(l,m,n)
    endif
@@ -736,7 +736,7 @@ subroutine dgrani(l,m,n)
    Rmi=(Qgrai/cteqgra)**.25
    Vtgras=(Vtgra0(2*n+1)*Rms**.8+Vtgra0(2*n)*Rmm**.8)/2.
    Vtgrai=(Vtgra0(2*n-1)*Rmi**.8+Vtgra0(2*n)*Rmm**.8)/2.
-   if (n.eq.1) then
+   if (n == 1) then
       Vtgrai=Vtgra0(2*n)*Rmm**.8
       Qgrai=Qgra1(l,m,n)
    endif
@@ -811,7 +811,7 @@ subroutine speed_pressure()
 
                dvx=vel0*(U2(i+1,j,k)-U2(i-1,j,k))
                dvy=vel0*(V2(i,j+1,k)-V2(i,j-1,k))
-               if (k.eq.1) then
+               if (k == 1) then
                   !      dvz=tiene 80% de (W2(2)-W2(1) y 20% de (W2(1)-W2(0)
                   dvz=(.8*vel2*W2(i,j,k+1)-.8*vel1*W2(i,j,k))*2.
                else
@@ -845,7 +845,7 @@ subroutine speed_pressure()
       do i=1,nx1
          do j=1,nx1
             do k=1,nz1-1
-               if (k.eq.1) then
+               if (k == 1) then
                   U2(i,j,k)=U3(i,j,k)-kkk*&
                      (2.*U3(i,j,k)-U3(i,j,k+1))
                   V2(i,j,k)=V3(i,j,k)-kkk*&
@@ -904,7 +904,7 @@ subroutine speed_pressure()
          end do
       end do
 
-      if (t.eq.lt3/2) then
+      if (t == lt3/2) then
          do i=0,nx1+1
             do j=0,nx1+1
                do k=0,nz1
@@ -964,7 +964,7 @@ subroutine turbu1(kk)
    do i=0,nx1+1
       do j=0,nx1+1
 
-         if (kk.eq.1) then
+         if (kk == 1) then
             do n=1,2
                do m=1,n
                   D(n,m,i,j,1)=0.
@@ -982,7 +982,7 @@ subroutine turbu1(kk)
                do ly=-1,1
                   do lz=-1,1
                      ldis=abs(lx)+abs(ly)+abs(lz)
-                     if (ldis.le.1) then
+                     if (ldis <= 1) then
                         vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+1)
                         vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+1)
                         vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+1)
@@ -1000,7 +1000,7 @@ subroutine turbu1(kk)
                do m=1,n
                   D(n,m,i,j,2)=(dv(n,m)+dv(m,n))
                   D(m,n,i,j,2)=D(n,m,i,j,2)
-                  if (n.eq.m) D(n,n,i,j,2)=2./3.*D(n,n,i,j,2)
+                  if (n == m) D(n,n,i,j,2)=2./3.*D(n,n,i,j,2)
                end do
             end do
          else
@@ -1019,7 +1019,7 @@ subroutine turbu1(kk)
             do ly=-1,1
                do lz=-1,1
                   ldis=abs(lx)+abs(ly)+abs(lz)
-                  if (ldis.le.1) then
+                  if (ldis <= 1) then
                      vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+k)
                      vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+k)
                      vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+k)
@@ -1037,7 +1037,7 @@ subroutine turbu1(kk)
             do m=1,n
                D(n,m,i,j,3)=(dv(n,m)+dv(m,n))
                D(m,n,i,j,3)=D(n,m,i,j,3)
-               if (n.eq.m) D(n,n,i,j,3)=2./3.*D(n,n,i,j,3)
+               if (n == m) D(n,n,i,j,3)=2./3.*D(n,n,i,j,3)
             end do
          end do
       end do
@@ -1076,7 +1076,7 @@ subroutine turbu2(i,j)
       do ly=-1,1
          do lz=-1,1
             ldis=abs(lx)+abs(ly)+abs(lz)
-            if (ldis.le.2) then
+            if (ldis <= 2) then
                call suma(aux,&
                   D(1,1,i+lx,j+ly,2+lz)**2.,&
                   D(2,2,i+lx,j+ly,2+lz)**2.,&
@@ -1122,12 +1122,12 @@ subroutine suma(sum,a1,a2,a3)
    integer j
 
    do j=1,2
-      if (a1.gt.a2) then
+      if (a1 > a2) then
          aux=a1
          a1=a2
          a2=aux
       endif
-      if (a2.gt.a3) then
+      if (a2 > a3) then
          aux=a2
          a2=a3
          a3=aux
@@ -1139,7 +1139,7 @@ subroutine suma(sum,a1,a2,a3)
 end
 
  !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- !> NUCLEA91
+ ! > NUCLEA91
  !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,auxl,auxs)
@@ -1160,21 +1160,21 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
    Naux=0.
 
    Rcri=5e-5
-   if(TT.lt.T0) Rcri=Rcri-4e-5*(T0-TT)/40.
-   if(Rcri.lt.1e-5) Rcri=1e-5
+   if(TT < T0) Rcri=Rcri-4e-5*(T0-TT)/40.
+   if(Rcri < 1e-5) Rcri=1e-5
 
    !     nucleacion sobre cristales
    Tc=T0-TT
-   if (Tc .gt. 0 .and. rs .gt. 0 .and. Naer.gt.0) then
+   if (Tc  >  0 .and. rs  >  0 .and. Naer > 0) then
 
       mcri=pi*Rcri**3./10.*rhocri
 
       Naux=Acri*exp(Bcri*Tc)
-      if (Naux .gt. .9) Naux=.9
+      if (Naux  >  .9) Naux=.9
       Naux=Naux*Naer*1e6   ! en m3
       auxs=Naux*mcri
 
-      if (auxs .gt. (Qvap-ess/Rv/TT*.95)) then
+      if (auxs  >  (Qvap-ess/Rv/TT*.95)) then
          auxs=(Qvap-ess/Rv/TT)*.95
          Naux=auxs/mcri     ! en m3
       endif
@@ -1190,7 +1190,7 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
    endif
 
    !     nucleacion sobre gotitas
-   if (e1.gt.esl) then
+   if (e1 > esl) then
       s=0
       hhh=0
       xxx=0
@@ -1209,13 +1209,13 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
       Qliq1=Qliq+auxl
       e1=esl
 
-      if (Qliq1.lt.0) then
+      if (Qliq1 < 0) then
          Qliq1=0.
          auxl=-Qliq
          TT2=esl/(e1/TT1-auxl*Rv)
          e1=(Qvap-auxl)*Rv*TT2
          hhh=1
-         if (s.eq.1) then
+         if (s == 1) then
             stop
          endif
       endif
@@ -1225,13 +1225,13 @@ subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,l,m,n,Naux,aux
       TT1=TT2
       rl=abs(e1-esl)/esl
       xxx=xxx+1
-      if (rl.gt.1e-3 .and. hhh.eq.0) goto 10
+      if (rl > 1e-3 .and. hhh == 0) goto 10
 
       Qvap=Qvap-auxl
       Qliq=Qliq+auxl
 
       !*     control de mocos
-      if (auxl.lt.0 .or. auxs.lt.0) then
+      if (auxl < 0 .or. auxs < 0) then
          stop
       endif
 
@@ -1337,7 +1337,7 @@ subroutine filtro(varia1,facx,facy,facz)
    real, intent(in) :: facx,facy,facz
    fact=1.-(facx+facy+facz)
 
-   if (fact.lt.0.25) then
+   if (fact < 0.25) then
       stop
    endif
 

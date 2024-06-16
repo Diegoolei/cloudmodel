@@ -14,14 +14,14 @@ contains
             advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
             advgot1(i,j)=0.
             advllu1(i,j)=W2(i,j,1)*Qllu1(i,j,1)
-            if (W2(i,j,1).gt.0) advllu1(i,j)=0.
+            if (W2(i,j,1) > 0) advllu1(i,j)=0.
             advaer1(i,j)=W2(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
-            if(W2(i,j,1).lt.0) advaer1(i,j)=advaer1(i,j)*1.5
+            if(W2(i,j,1) < 0) advaer1(i,j)=advaer1(i,j)*1.5
             advcri1(i,j)=0.
             advnie1(i,j)=W2(i,j,1)*Qnie1(i,j,1)
-            if (W2(i,j,1).gt.0) advnie1(i,j)=0.
+            if (W2(i,j,1) > 0) advnie1(i,j)=0.
             advgra1(i,j)=W2(i,j,1)*Qgra1(i,j,1)
-            if (W2(i,j,1).gt.0) advgra1(i,j)=0.
+            if (W2(i,j,1) > 0) advgra1(i,j)=0.
          end do
       end do
    end subroutine vapor_advection
@@ -123,66 +123,66 @@ contains
                advaer1(i,j)=advaer2(i,j)
 
                !limites de la nube
-               if(Qgot2(i,j,k).ne.0) then
-                  if (i.lt.lgot(1)) lgot(1)=i
-                  if (i.gt.lgot(2)) lgot(2)=i
-                  if (j.lt.mgot(1)) mgot(1)=j
-                  if (j.gt.mgot(2)) mgot(2)=j
-                  if (k.lt.ngot(1)) ngot(1)=k
-                  if (k.gt.ngot(2)) ngot(2)=k
+               if(Qgot2(i,j,k) /= 0) then
+                  if (i < lgot(1)) lgot(1)=i
+                  if (i > lgot(2)) lgot(2)=i
+                  if (j < mgot(1)) mgot(1)=j
+                  if (j > mgot(2)) mgot(2)=j
+                  if (k < ngot(1)) ngot(1)=k
+                  if (k > ngot(2)) ngot(2)=k
                   s=s+1
                endif
 
                !limites de la lluvia
-               if(Qllu2(i,j,k).ne.0) then
-                  if (i.lt.lllu(1)) lllu(1)=i
-                  if (i.gt.lllu(2)) lllu(2)=i
-                  if (j.lt.mllu(1)) mllu(1)=j
-                  if (j.gt.mllu(2)) mllu(2)=j
-                  if (k.lt.nllu(1)) nllu(1)=k
-                  if (k.gt.nllu(2)) nllu(2)=k
+               if(Qllu2(i,j,k) /= 0) then
+                  if (i < lllu(1)) lllu(1)=i
+                  if (i > lllu(2)) lllu(2)=i
+                  if (j < mllu(1)) mllu(1)=j
+                  if (j > mllu(2)) mllu(2)=j
+                  if (k < nllu(1)) nllu(1)=k
+                  if (k > nllu(2)) nllu(2)=k
                   llluneg=1
                endif
 
                !limites de los cristales
-               if(Qcri2(i,j,k).ne.0) then
-                  if (i.lt.lcri(1)) lcri(1)=i
-                  if (i.gt.lcri(2)) lcri(2)=i
-                  if (j.lt.mcri(1)) mcri(1)=j
-                  if (j.gt.mcri(2)) mcri(2)=j
-                  if (k.lt.ncri(1)) ncri(1)=k
-                  if (k.gt.ncri(2)) ncri(2)=k
+               if(Qcri2(i,j,k) /= 0) then
+                  if (i < lcri(1)) lcri(1)=i
+                  if (i > lcri(2)) lcri(2)=i
+                  if (j < mcri(1)) mcri(1)=j
+                  if (j > mcri(2)) mcri(2)=j
+                  if (k < ncri(1)) ncri(1)=k
+                  if (k > ncri(2)) ncri(2)=k
                   lcrineg=1
                endif
 
                !limites de la nieve
-               if(Qnie2(i,j,k).ne.0) then
-                  if (i.lt.lnie(1)) lnie(1)=i
-                  if (i.gt.lnie(2)) lnie(2)=i
-                  if (j.lt.mnie(1)) mnie(1)=j
-                  if (j.gt.mnie(2)) mnie(2)=j
-                  if (k.lt.nnie(1)) nnie(1)=k
-                  if (k.gt.nnie(2)) nnie(2)=k
+               if(Qnie2(i,j,k) /= 0) then
+                  if (i < lnie(1)) lnie(1)=i
+                  if (i > lnie(2)) lnie(2)=i
+                  if (j < mnie(1)) mnie(1)=j
+                  if (j > mnie(2)) mnie(2)=j
+                  if (k < nnie(1)) nnie(1)=k
+                  if (k > nnie(2)) nnie(2)=k
                   lnieneg=1
                endif
 
                !limites del granizo
-               if(Qgra2(i,j,k).ne.0) then
-                  if (i.lt.lgra(1)) lgra(1)=i
-                  if (i.gt.lgra(2)) lgra(2)=i
-                  if (j.lt.mgra(1)) mgra(1)=j
-                  if (j.gt.mgra(2)) mgra(2)=j
-                  if (k.lt.ngra(1)) ngra(1)=k
-                  if (k.gt.ngra(2)) ngra(2)=k
+               if(Qgra2(i,j,k) /= 0) then
+                  if (i < lgra(1)) lgra(1)=i
+                  if (i > lgra(2)) lgra(2)=i
+                  if (j < mgra(1)) mgra(1)=j
+                  if (j > mgra(2)) mgra(2)=j
+                  if (k < ngra(1)) ngra(1)=k
+                  if (k > ngra(2)) ngra(2)=k
                   lgraneg=1
                endif
 
-               if(Qvap0(k)+Qvap2(i,j,k).lt.0) then
+               if(Qvap0(k)+Qvap2(i,j,k) < 0) then
                   Qvapneg=Qvapneg+Qvap0(k)+Qvap2(i,j,k)
                   lvapneg=1
                endif
 
-               if(aer0(k)+aer2(i,j,k).lt.0) then
+               if(aer0(k)+aer2(i,j,k) < 0) then
                   aerneg=aerneg+aer0(k)+aer2(i,j,k)
                   laerneg=1
                endif
@@ -196,13 +196,13 @@ contains
       USE model_var, only: s, llluneg, lcrineg, lnieneg, lgraneg, lvapneg, laerneg,&
          Qvapneg, aerneg
       implicit none
-      if(s.ge.1) call corgot
-      if (llluneg.eq.1) call corllu
-      if (lcrineg.eq.1) call corcri
-      if (lnieneg.eq.1) call cornie
-      if (lgraneg.eq.1) call corgra
-      if (lvapneg.eq.1) call corvap(Qvapneg)
-      if (laerneg.eq.1) call coraer(aerneg)
+      if(s >= 1) call corgot
+      if (llluneg == 1) call corllu
+      if (lcrineg == 1) call corcri
+      if (lnieneg == 1) call cornie
+      if (lgraneg == 1) call corgra
+      if (lvapneg == 1) call corvap(Qvapneg)
+      if (laerneg == 1) call coraer(aerneg)
    end subroutine negative_correction
 
    subroutine water_calculation
@@ -223,7 +223,7 @@ contains
                gott1=gott1+Qgot2(i,j,k)
                aert1=aert1+aer2(i,j,k)
 
-               if(Qvap2(i,j,k)+Qvap0(k).lt.0) then
+               if(Qvap2(i,j,k)+Qvap0(k) < 0) then
                   stop
                endif
             end do
@@ -290,7 +290,7 @@ contains
                Lvs=Tlvs(iT)*(1-aux2)+Tlvs(iT+1)*aux2
                Eaccn=Eacrcn(iT)*(1-aux2)+Eacrcn(iT+1)*aux2
                Eaucn=Eautcn(iT)*(1-aux2)+Eautcn(iT+1)*aux2
-               if (T.ge.T0) then
+               if (T >= T0) then
                   Eacng=1.
                else
                   Eacng=exp(.08*(T-T0))
@@ -307,11 +307,11 @@ contains
                rs=(e1-esvs)/esvs
                yy=0
 
-               if ((rl.gt.1e-3 .or. rs.gt.1e-3).and.Naer.gt.0) then
+               if ((rl > 1e-3 .or. rs > 1e-3).and.Naer > 0) then
                   call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,rl,rs,Lvl,Lvs,l,m,n,daer,dqgot,dqcri)
                   Taux=T-Temp0(k)-Tempa1(i,j,k)
                   Titaa2(i,j,k)=T/aux-Tita0(k)
-                  if (dqgot.gt.0) yy=1
+                  if (dqgot > 0) yy=1
                else
                   Taux=0.
                   dqgot=0.
@@ -325,20 +325,20 @@ contains
                vapt2=vapt2+Qvap2(i,j,k)
                gott2=gott2+Qgot2(i,j,k)
                aert2=aert2+aer2(i,j,k)
-               if (Qgot2(i,j,k).gt.0 .or. dqgot.gt.0 .or.Qllu2(i,j,k).gt.0 .or. Qcri2(i,j,k).gt.0 .or.Qnie2(i,j,k).gt.0) then
+               if (Qgot2(i,j,k) > 0 .or. dqgot > 0 .or.Qllu2(i,j,k) > 0 .or. Qcri2(i,j,k) > 0 .or.Qnie2(i,j,k) > 0) then
                   qgotaux=Qgot2(i,j,k)
-                  if (Qgot2(i,j,k).eq.0) qgotaux=0d0
+                  if (Qgot2(i,j,k) == 0) qgotaux=0d0
                   qvapaux=Qvap2(i,j,k)+Qvap0(k)
                   qlluaux=Qllu2(i,j,k)
-                  if (Qllu2(i,j,k).eq.0) qlluaux=0d0
+                  if (Qllu2(i,j,k) == 0) qlluaux=0d0
                   qcriaux=Qcri2(i,j,k)
-                  if (Qcri2(i,j,k).eq.0) then
+                  if (Qcri2(i,j,k) == 0) then
                      qcriaux=0d0
                   endif
                   qnieaux=Qnie2(i,j,k)
-                  if (Qnie2(i,j,k).eq.0) qnieaux=0d0
+                  if (Qnie2(i,j,k) == 0) qnieaux=0d0
                   qgraaux=Qgra2(i,j,k)
-                  if (Qgra2(i,j,k).eq.0) qgraaux=0d0
+                  if (Qgra2(i,j,k) == 0) qgraaux=0d0
                   Naer=aer2(i,j,k)+aer0(k)
                   T=Tempa1(i,j,k)+Temp0(k)
                   do t2=1,lt2
@@ -372,13 +372,13 @@ contains
 
                endif
 
-               if (Tita0(k).lt.abs(Titaa2(i,j,k))+200.or.Temp0(k).lt.abs(Tempa1(i,j,k))+200) then
+               if (Tita0(k) < abs(Titaa2(i,j,k))+200.or.Temp0(k) < abs(Tempa1(i,j,k))+200) then
                   stop
                endif
 
-               if(aer2(i,j,k)+aer0(k).le.0) then
+               if(aer2(i,j,k)+aer0(k) <= 0) then
 
-                  if (aer2(i,j,k)+aer0(k).lt.-aer0(k)*.05) then
+                  if (aer2(i,j,k)+aer0(k) < -aer0(k)*.05) then
                      stop
                   endif
 
@@ -462,7 +462,7 @@ contains
                /4.*.25
             auxz=W2(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+aer0(1)+aer0(0))/2.*.5
 
-            if (W2(i,j,0).gt.0) then
+            if (W2(i,j,0) > 0) then
                aeraux=-((auxx+auxy)+2.*auxz)*dt1/dx1
             else
                !se refleja un 25 % de los aerosoles que caen
@@ -545,46 +545,46 @@ contains
             Titaa1(i,j,k)=pro3*Titaa2(i,j,k)+&
                pro4*((Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+(Titaa2(i,j+1,k)+Titaa2(i,j-1,k)))
 
-            if (abs(Titaa1(i,j,k)).lt.1e-10) Titaa1(i,j,k)=0
+            if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
 
             Qvap1(i,j,k)=pro3*Qvap2(i,j,k)+&
                pro4*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+(Qvap2(i,j+1,k)+Qvap2(i,j-1,k)))
 
 
-            if (abs(Qvap1(i,j,k)).lt.1e-10) Qvap1(i,j,k)=0
+            if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
 
             Qgot1(i,j,k)=pro3*Qgot2(i,j,k)+&
                pro4*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+(Qgot2(i,j+1,k)+Qgot2(i,j-1,k)))
 
-            if (Qgot1(i,j,k).lt.1e-10) Qgot1(i,j,k)=0
+            if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
 
             Qllu1(i,j,k)=Qllu2(i,j,k)
 
-            if (Qllu1(i,j,k).lt.1e-10) Qllu1(i,j,k)=0
+            if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
 
             Qcri1(i,j,k)=pro3*Qcri2(i,j,k)+&
                pro4*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+(Qcri2(i,j+1,k)+Qcri2(i,j-1,k)))
 
-            if (Qcri1(i,j,k).lt.1e-10) Qcri1(i,j,k)=0
+            if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
 
             Qnie1(i,j,k)=pro3*Qnie2(i,j,k)+pro4*((Qnie2(i+1,j,k)&
                +Qnie2(i-1,j,k))+(Qnie2(i,j+1,k)+Qnie2(i,j-1,k)))
 
-            if (Qnie1(i,j,k).lt.1e-10) Qnie1(i,j,k)=0
+            if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
 
             Qgra1(i,j,k)=Qgra2(i,j,k)
 
-            if (Qgra1(i,j,k).lt.1e-10) Qgra1(i,j,k)=0
+            if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
 
             aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
 
             !correccion cambiando la absorcion de aerosoles
-            if ((Qllu1(i,j,1)+Qgra1(i,j,1)).gt.1e-6 .and.W2(i,j,1).lt.0) then
+            if ((Qllu1(i,j,1)+Qgra1(i,j,1)) > 1e-6 .and.W2(i,j,1) < 0) then
                aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
                aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
             endif
 
-            if (abs(aer1(i,j,k)).lt.1e-10) aer1(i,j,k)=0
+            if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
 
 
             do k=1,nz1-1
@@ -595,54 +595,54 @@ contains
                   (Titaa2(i,j+1,k)+Titaa2(i,j-1,k))+&
                   Titaa2(i,j,k+1)+Titaa2(i,j,k-1))
 
-               if (abs(Titaa1(i,j,k)).lt.1e-10) Titaa1(i,j,k)=0
+               if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
 
                Qvap1(i,j,k)=pro1*Qvap2(i,j,k)+&
                   pro2*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+&
                   (Qvap2(i,j+1,k)+Qvap2(i,j-1,k))+&
                   Qvap2(i,j,k+1)+Qvap2(i,j,k-1))
 
-               if (abs(Qvap1(i,j,k)).lt.1e-10) Qvap1(i,j,k)=0
+               if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
 
                Qgot1(i,j,k)=pro1*Qgot2(i,j,k)+&
                   pro2*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+&
                   (Qgot2(i,j+1,k)+Qgot2(i,j-1,k))+&
                   Qgot2(i,j,k+1)+Qgot2(i,j,k-1))
 
-               if (Qgot1(i,j,k).lt.1e-10) Qgot1(i,j,k)=0
+               if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
 
                Qllu1(i,j,k)=pro1*Qllu2(i,j,k)+&
                   pro2*((Qllu2(i+1,j,k)+Qllu2(i-1,j,k))+&
                   (Qllu2(i,j+1,k)+Qllu2(i,j-1,k))+Qllu2(i,j,k+1)+Qllu2(i,j,k-1))
 
-               if (Qllu1(i,j,k).lt.1e-10) Qllu1(i,j,k)=0
+               if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
 
                Qcri1(i,j,k)=pro1*Qcri2(i,j,k)+&
                   pro2*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+&
                   (Qcri2(i,j+1,k)+Qcri2(i,j-1,k))+Qcri2(i,j,k+1)+Qcri2(i,j,k-1))
 
-               if (Qcri1(i,j,k).lt.1e-10) Qcri1(i,j,k)=0
+               if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
 
                Qnie1(i,j,k)=pro1*Qnie2(i,j,k)+&
                   pro2*((Qnie2(i+1,j,k)+Qnie2(i-1,j,k))+&
                   (Qnie2(i,j+1,k)+Qnie2(i,j-1,k))+&
                   Qnie2(i,j,k+1)+Qnie2(i,j,k-1))
 
-               if (Qnie1(i,j,k).lt.1e-10) Qnie1(i,j,k)=0
+               if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
 
                Qgra1(i,j,k)=pro1*Qgra2(i,j,k)+&
                   pro2*((Qgra2(i+1,j,k)+Qgra2(i-1,j,k))+&
                   (Qgra2(i,j+1,k)+Qgra2(i,j-1,k))+&
                   Qgra2(i,j,k+1)+Qgra2(i,j,k-1))
 
-               if (Qgra1(i,j,k).lt.1e-10) Qgra1(i,j,k)=0
+               if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
 
                aer1(i,j,k)=pro1*aer2(i,j,k)+&
                   pro2*((aer2(i+1,j,k)+aer2(i-1,j,k))+&
                   (aer2(i,j+1,k)+aer2(i,j-1,k))+aer2(i,j,k+1)+aer2(i,j,k-1))
 
 
-               if (abs(aer1(i,j,k)).lt.1e-10) aer1(i,j,k)=0
+               if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
             end do
          end do
       end do
@@ -659,16 +659,16 @@ contains
       do i=1,nx1
          do j=1,nx1
             Titaa1(i,j,0)=Titaa1(i,j,0)
-            if (Titaa1(i,j,0).gt.0.5) Titaa1(i,j,0)=.5
-            if (-Titaa1(i,j,0).gt.0.5) Titaa1(i,j,0)=-.5
+            if (Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=.5
+            if (-Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=-.5
 
             Titaa1(i,j,nz1)=Titaa1(i,j,nz1-1)
 
             !corregido para el vapor
-            if (Qvap1(i,j,0).gt.Qvap0(0)*.5) then
+            if (Qvap1(i,j,0) > Qvap0(0)*.5) then
                Qvap1(i,j,0)=.8*Qvap0(0)
             endif
-            if (-Qvap1(i,j,0).gt.Qvap0(0)*.5) then
+            if (-Qvap1(i,j,0) > Qvap0(0)*.5) then
                Qvap1(i,j,0)=-.8*Qvap0(0)
             endif
 
@@ -687,7 +687,7 @@ contains
             Qgra1(i,j,nz1)=Qgra1(i,j,nz1-1)
 
             !corregido para los aerosoles
-            if (-aer1(i,j,0).gt.0.8*aer0(0)) then
+            if (-aer1(i,j,0) > 0.8*aer0(0)) then
                aer1(i,j,0)=-.8*aer0(0)
             endif
             aer1(i,j,nz1)=aer1(i,j,nz1-1)
@@ -751,7 +751,7 @@ contains
       do i=0,nx1+1
          do j=0,nx1+1
             do k=0,nz1
-               if(Qvap1(i,j,k)+Qvap0(k).lt.0) then
+               if(Qvap1(i,j,k)+Qvap0(k) < 0) then
                   Qvap1(i,j,k)=-Qvap0(k)
                endif
             end do
@@ -776,7 +776,7 @@ contains
       USE model_initialization, only: cloud_position_init, cloud_movement_init, statistics_init
       implicit none
       integer :: unit_number
-      if (tt/nint(lte/dt1)*nint(lte/dt1).eq.tt) then
+      if (tt/nint(lte/dt1)*nint(lte/dt1) == tt) then
          call statistics_init()
          tte=tte+1
          call cloud_position_init()
@@ -787,14 +787,14 @@ contains
          close(unit_number)
       endif
 
-      if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
+      if (tt/nint(ltg/dt1)*nint(ltg/dt1) == tt) then
          file_number = str_gen(t1)
          !call graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
          call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1,file_number)
          t1=t1+1
       endif
 
-      if (tt/nint(ltb/dt1)*nint(ltb/dt1).eq.tt) then
+      if (tt/nint(ltb/dt1)*nint(ltb/dt1) == tt) then
          call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
             U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
             Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo,&
