@@ -20,7 +20,7 @@ contains
 end module velpre01
 
 module model_initial_conditions
-   contains
+contains
    !     Condiciones iniciales para las variables dinamicas
    !     Corresponde a una nube con hielo
    !     Calcula la presion inicial en forma iterativa, primero supone aire
@@ -28,393 +28,376 @@ module model_initial_conditions
    !      vapor.
    !     Solo hay una perturbacion en temperatura para iniciar la conveccion
    !     Incluye viento de corte, tipo frente
-   
-      subroutine initial_conditions()
-         USE cant01
-         USE dimen
-         USE permic
-         USE perdim
-         USE const
-         USE estbas
-         USE config
-   
-         implicit none
-   
-         real equis,ygrie,zeta,G1,centx,centy,centz,cenaerx,cenaery,cenaerz,sigmat&
-            ,sigmaa,radiomed,temper,aerper,elv1,rel1,tem1,a0,a1,a2,a3,a4,a5,a6&
-            ,b0,b1,b2,b3,b4,b5,b6,aux,gam,Tk,Qvaptot,aertot,vb,vc,vh,zeta1
-         integer i,j,k,n,unit
-   
-         centx=(nx1+1.)*dx1/2.           !Coord x de la perturbacion inicial
-         centy=(nx1+1.)*dx1/2.           !Coord y de la perturbacion inicial
-         centz=0.                        !Coord z de la perturbacion inicial
-         cenaerx=(nx1+1.)*dx1/2.+4000.   !Coord x de la perturbacion de aerosoles
-         cenaery=(nx1+1.)*dx1/2.+1000.   !Coord y de la perturbacion de aerosoles
-         cenaerz=0.                      !Coord z de la perturbacion de aerosoles
-         sigmat=2*1000.**2.              !Decaimiento en z de la perturbacion en T
-         sigmaa=200.**2.                 !Decaimiento en z de la perturbacion en A
-         radiomed=2000.                  !Ancho de la perturbacion
-         temper=.7                       !Perturbacion maxima de temperatura
-         aerper=10000.                   !Perturbacion maxima de aerosoles
-   
-         a0=6.10780
-         a1=4.43652e-1
-         a2=1.42895e-2
-         a3=2.65065e-4
-         a4=3.03124e-6
-         a5=2.03408e-8
-         a6=6.13682e-11
-   
-         b0=6.10918
-         b1=5.03470e-1
-         b2=1.88601e-2
-         b3=4.17622e-4
-         b4=5.82472e-6
-         b5=4.83880e-8
-         b6=1.83883e-10
-   
-   
-         call PP(G,Rd,dx1,nz,Presi0,P00)
-   
-         !**   viento de corte
-         vc=1.5/3000**2.
-         vh=5000./pi
-   
-         do k=0,nz1
-            zeta=k*dx1
-            if (zeta  <=  500.) then
-               UU(k)=0.
-               VV(k)=0.
-   
-            elseif (zeta  <=  2000.) then
-               zeta1=zeta-500.
-               aux=4.*(zeta1/1500.)**2.
-               UU(k)=aux
-               VV(k)=0.
-   
-            elseif (zeta  <=  9000.) then
-               zeta1=zeta-2000.
-               vb=zeta1/7000.
-               UU(k)=4.-10.*vb**2.
-               VV(k)=3.*vb**.5
-               !
-            else
-               zeta1=zeta-9000.
-               UU(k)=-6.+4.*(zeta1/9000.)**2.
-               VV(k)=3.-5.*(zeta1/9000.)**.5
-               !
-            endif
-   
-            UU(k)=UU(k)*.7
-            VV(k)=VV(k)*0.
-         end do
-   
-   
-         !**   calculo de 'constantes' que dependen de T
-   
-         open(newunit=unit,file=output_directory//"ccc", access='append')
-         do k=313,210,-1
-   
-            Tk=k-T0
-   
-            Tvis(k)=4.9e-8*Tk+Vis0
-            if (k < 273.15) Tvis(k)=Tvis(k)-1.2e-10*Tk**2.
-   
-            !calores latentes de evaporacion, fusion y sublimacion
-            gam=.167+3.67e-4*k
-            Tlvl(k)=Lvl0*(T0/k)**gam
-            Tlsl(k)=(Lsl0+0.485*Tk-2.5e-3*Tk**2.)*4180.
-            Tlvs(k)=Tlvl(k)+Tlsl(k)
-   
-            !tension de vapor de saturacion liquido y solido
-            aux=a3+Tk*(a4+Tk*(a5+Tk*a6))
-            aux=a0+Tk*(a1+Tk*(a2+Tk*aux))
-            Telvs(k)=aux*100.
-   
-            aux=b3+Tk*(b4+Tk*(b5+Tk*b6))
-            aux=b0+Tk*(b1+Tk*(b2+Tk*aux))
-            Tesvs(k)=aux*100.
-            if (k < 220) then
-               aux=Tlvl(220)/Rv*(1./220.-1./k)
-               Telvs(k)=Telvs(220)*exp(aux)
-               aux=Tlvs(220)/Rv*(1./220.-1./k)
-               Tesvs(k)=Tesvs(220)*exp(aux)
-            endif
-            !cambio por las expresiones de Straka(17/01/99)
-            Eautcn(k)=10.**(.035*(Tk)-.7)
-            Eacrcn(k)=exp(.09*Tk)
-   
-            write(unit,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k),Tesvs(k),&
-               Eautcn(k),Eacrcn(k)
-         end do
-         close(unit)
-   
-         !**   condiciones de tiempo bueno
-   
-         do k=-1,nz1+2
-            do i=-1,nx1+2
-               do j=-1,nx1+1
-   
-                  !     cantidades primas
-                  U1(i,j,k)=0.
-                  U2(i,j,k)=0.
-                  V1(i,j,k)=0.
-                  V2(i,j,k)=0.
-                  W1(i,j,k)=0.
-                  W2(i,j,k)=0.
-                  Pres1(i,j,k)=0.
-                  Pres2(i,j,k)=0.
-                  Titaa2(i,j,k)=0.
-                  Titaa1(i,j,k)=0.
-                  Qvap1(i,j,k)=0.
-                  Qvap2(i,j,k)=0.
-                  Qgot1(i,j,k)=0.
-                  Qgot2(i,j,k)=0.
-                  Qllu1(i,j,k)=0.
-                  Qllu2(i,j,k)=0.
-                  Qcri1(i,j,k)=0.
-                  Qcri2(i,j,k)=0.
-                  Qnie1(i,j,k)=0.
-                  Qnie2(i,j,k)=0.
-                  Qgra1(i,j,k)=0.
-                  Qgra2(i,j,k)=0.
-                  aer1(i,j,k)=0.
-                  aer2(i,j,k)=0.
-               end do
-            end do
-   
-            ! cantidades base
-            zeta=k*dx1
-            Temp0(k)=TT_f(zeta)
-            Den0(k)=Presi0(k)/Rd/Temp0(k)
-            Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
-            Pres00(k)=Temp0(k)/Tita0(k)
-            aer0(k)=10000.*exp(-zeta/2500.)
-         end do
-   
-         Temp0(-1)=Temp0(0)
-         Den0(-1)=Den0(0)
-         Tita0(-1)=Tita0(0)
-         Pres00(-1)=Pres00(0)
-         aer0(-1)=-aer0(0)
-   
-         do k=0,nz1
-            do i=1,nx1
-               do j=1,nx1
-                  !perturbaciones iniciales en la temperatura y en los aerosoles
-                  zeta=k*dx1
-                  equis=i*dx1
-                  ygrie=j*dx1
-   
-                  G1=exp(-((centx-equis)**2.+(centy-ygrie)**2.)*.5&
-                     /radiomed**2.)
-   
-                  Titaa1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
-   
-                  if (Titaa1(i,j,k) < 1e-5) Titaa1(i,j,k)=0.
-   
-                  G1=exp(-((cenaerx-equis)**2.+(cenaery-ygrie)**2.)*.5&
-                     /radiomed**2.)
-   
-   
-                  aer1(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
-               end do
-            end do
-            !vapor base
-            Tem1=Temp0(k)
-   
-            if (zeta <= 500) then
-               rel1=.55+.05*zeta/500.
-            else if (zeta <=  1500.) then
-               rel1=.6
-            else if (zeta <= 4000) then
-               rel1=.6-(zeta-1500)/2500.*.25
-            else if (zeta <= 7000) then
-               rel1=.35-(zeta-4000.)/3000.*.25
-            else if(zeta > 7000) then
-               rel1=.1-(zeta-7000)/3000.*.02
-            endif
-            n=int(Tem1)
-            aux=Tem1-n
-            elv1=Telvs(n)*(1-aux)+Telvs(n+1)*aux
-   
-            Qvap0(k)=rel1*elv1/Rv/Tem1
-   
-            !recalculo de la densidad
-            Den0(k)=Den0(k)+Qvap0(k)
-         end do
-   
-         !**   Velocidad terminal para gota de lluvia, cte que depende de P
-         do k=1,nz1+1
-            Av(2*k-1)=Av0*((P00/Presi0(k-1))**.286+(P00/Presi0(k))**.286)/2. !puntos intermedios
-            Av(2*k)=Av0*(P00/Presi0(k))**.286
-         end do
-   
-         !**   Velocidad terminal para la nieve, cte que depende de P
-         do k=1,nz1+1
-            Vtnie(2*k-1)=Vtnie0*((P00/Presi0(k-1))**.3+(P00/Presi0(k))**.3)/2. !puntos intermedios&
-            Vtnie(2*k)=Vtnie0*(P00/Presi0(k))**.3
-         end do
-   
-         !**   Velocidad terminal para el granizo, cte que depende de z
-         do k=0,nz1+1
-            aux=2.754*rhogra**.605
-            Vtgra0(2*k)=aux/Tvis(Temp0(k))**.21/Den0(k)**.395
-         end do
-   
-         do k=1,nz1+1
-            Vtgra0(2*k-1)=(Vtgra0(2*k-2)+Vtgra0(2*k))/2.  ! punto intermedio
-         end do
-   
-         !**************************************************************
-         !    Recalculo de la Presion y de Tita
-   
-         !    Recalculo de la Presion a partir de la densidad
-   
-         call PP2(G,dx1,Den0,Presi0,P00)
-   
-         open(newunit=unit,file=output_directory//"inic03.sa", access='append')
-         do k=0,nz1
-            Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
-            Pres00(k)=Temp0(k)/Tita0(k)
-            cc2(k)=Cp*Rd*Tita0(k)*Pres00(k)/Cv
-   
-            write(unit,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),&
-               Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
-         end do
-         close(unit)
-   
-   
-         Tita0(-1)=Tita0(0)
-         Pres00(-1)=Pres00(0)
-         Den0(-1)=Den0(0)
-         Qvap0(-1)=0
-   
-         do i=1,nx1
-            do j=1,nx1
-               Pres1(i,j,0)=Pres1(i,j,1)
-               Pres1(i,j,-1)=Pres1(i,j,1)
-               Pres2(i,j,0)=Pres1(i,j,1)
-               Pres2(i,j,-1)=Pres1(i,j,1)
-               Titaa1(i,j,0)=Titaa1(i,j,1)
-               Titaa1(i,j,-1)=Titaa1(i,j,1)
-               Qvap1(i,j,0)=Qvap1(i,j,1)
-               Qvap1(i,j,-1)=Qvap1(i,j,1)
-            end do
-         end do
-   
-         !     calculo del Qvaprel
-         Qvaptot=0.
-         do k=1,nz1
-            Qvaptot=Qvaptot+Qvap0(k)
-         end do
-         do k=1,nz1
-            Qvaprel(k)=Qvap0(k)/Qvaptot
-         end do
-   
-         !     calculo del aerrel
-         aertot=0.
-         do k=1,nz1
-            aertot=aertot+aer0(k)
-         end do
-         do k=1,nz1
-            aerrel(k)=aer0(k)/aertot
-         end do
-   
-   210   format(I3,9E12.4)
-         return
-   
-      end subroutine initial_conditions
-   
-      !*********************************************************
-   
-      function TT_f (zeta)
-         real :: a, xx, TT_f
-         a = 298.15
-         if (zeta <= 2000) then
-            TT_f = a - 9.e-3 * zeta
-         elseif (zeta <= 5500) then
-            xx = zeta - 2000.
-            TT_f = a - 18. - xx * (9.e-3 - 2e-3 * xx / 3500. / 2.)
-         elseif (zeta <= 9000) then
-            xx = zeta - 5500.
-            TT_f = a - 46. - 7e-3 * xx
-         elseif (zeta <= 11000) then
-            xx = zeta - 9000
-            TT_f = a - 70.5 - 7e-3 * xx + 1.75e-6 * xx**2.
-         elseif (zeta <= 12000) then
-            TT_f = a - 77.5
+
+   subroutine initial_conditions()
+      USE cant01
+      USE dimen
+      USE permic
+      USE perdim
+      USE const
+      USE estbas
+      USE config
+
+      implicit none
+
+      real equis,ygrie,zeta,G1,centx,centy,centz,cenaerx,cenaery,cenaerz,sigmat&
+         ,sigmaa,radiomed,temper,aerper,elv1,rel1,tem1,a0,a1,a2,a3,a4,a5,a6&
+         ,b0,b1,b2,b3,b4,b5,b6,aux,gam,Tk,Qvaptot,aertot,vb,vc,vh,zeta1
+      integer i,j,k,n,unit
+
+      centx=(nx1+1.)*dx1/2.           !Coord x de la perturbacion inicial
+      centy=(nx1+1.)*dx1/2.           !Coord y de la perturbacion inicial
+      centz=0.                        !Coord z de la perturbacion inicial
+      cenaerx=(nx1+1.)*dx1/2.+4000.   !Coord x de la perturbacion de aerosoles
+      cenaery=(nx1+1.)*dx1/2.+1000.   !Coord y de la perturbacion de aerosoles
+      cenaerz=0.                      !Coord z de la perturbacion de aerosoles
+      sigmat=2*1000.**2.              !Decaimiento en z de la perturbacion en T
+      sigmaa=200.**2.                 !Decaimiento en z de la perturbacion en A
+      radiomed=2000.                  !Ancho de la perturbacion
+      temper=.7                       !Perturbacion maxima de temperatura
+      aerper=10000.                   !Perturbacion maxima de aerosoles
+
+      a0=6.10780
+      a1=4.43652e-1
+      a2=1.42895e-2
+      a3=2.65065e-4
+      a4=3.03124e-6
+      a5=2.03408e-8
+      a6=6.13682e-11
+
+      b0=6.10918
+      b1=5.03470e-1
+      b2=1.88601e-2
+      b3=4.17622e-4
+      b4=5.82472e-6
+      b5=4.83880e-8
+      b6=1.83883e-10
+
+
+      call PP(G,Rd,dx1,nz,Presi0,P00)
+
+      !**   viento de corte
+      vc=1.5/3000**2.
+      vh=5000./pi
+
+      do concurrent(k=0:nz1)
+         zeta=k*dx1
+         if (zeta  <=  500.) then
+            UU(k)=0.
+            VV(k)=0.
+
+         elseif (zeta  <=  2000.) then
+            zeta1=zeta-500.
+            aux=4.*(zeta1/1500.)**2.
+            UU(k)=aux
+            VV(k)=0.
+
+         elseif (zeta  <=  9000.) then
+            zeta1=zeta-2000.
+            vb=zeta1/7000.
+            UU(k)=4.-10.*vb**2.
+            VV(k)=3.*vb**.5
+            !
          else
-            xx = zeta - 12000
-            TT_f = a - 77.5 + 50. * (xx / 9000.)**2.
+            zeta1=zeta-9000.
+            UU(k)=-6.+4.*(zeta1/9000.)**2.
+            VV(k)=3.-5.*(zeta1/9000.)**.5
+            !
          endif
-      end function TT_f
-      !*****************************************************
-      subroutine PP(G,Rd,dx,nz1,Pres,Pres0)
-         integer k,nz1,nx4
-         parameter (nx4=500)
-         real Pres(-3:nz1+3)
-         real integ(-2:nx4+2)
-         real Pres0
-         real G,Rd,dx,dx4
-         real zetaa,zetam,zetad
-         dx4=dx/4.
-   
-         integ(0)=0
-         do k=1,nx4
-            zetaa=(2*k-2)*dx4
-            zetam=(2*k-1)*dx4
-            zetad=(2*k)*dx4
-            ya=1/TT_f(zetaa)
-            ym=1/TT_f(zetam)
-            yd=1/TT_f(zetad)
-            integ(k)=integ(k-1)+ya+4*ym+yd
+
+         UU(k)=UU(k)*.7
+         VV(k)=VV(k)*0.
+      end do
+
+
+      !**   calculo de 'constantes' que dependen de T
+
+      open(newunit=unit,file=output_directory//"ccc", access='append')
+      do concurrent (k=210:313)
+         Tk=k-T0
+         Tvis(k)=4.9e-8*Tk+Vis0
+         if (k < 273.15) Tvis(k)=Tvis(k)-1.2e-10*Tk**2.
+
+         !calores latentes de evaporacion, fusion y sublimacion
+         gam=.167+3.67e-4*k
+         Tlvl(k)=Lvl0*(T0/k)**gam
+         Tlsl(k)=(Lsl0+0.485*Tk-2.5e-3*Tk**2.)*4180.
+         Tlvs(k)=Tlvl(k)+Tlsl(k)
+
+         !tension de vapor de saturacion liquido y solido
+         aux=a3+Tk*(a4+Tk*(a5+Tk*a6))
+         aux=a0+Tk*(a1+Tk*(a2+Tk*aux))
+         Telvs(k)=aux*100.
+         aux=b3+Tk*(b4+Tk*(b5+Tk*b6))
+         aux=b0+Tk*(b1+Tk*(b2+Tk*aux))
+         Tesvs(k)=aux*100.
+         if (k < 220) then
+            aux=Tlvl(220)/Rv*(1./220.-1./k)
+            Telvs(k)=Telvs(220)*exp(aux)
+            aux=Tlvs(220)/Rv*(1./220.-1./k)
+            Tesvs(k)=Tesvs(220)*exp(aux)
+         endif
+
+         !cambio por las expresiones de Straka
+         Eautcn(k)=10.**(.035*(Tk)-.7)
+         Eacrcn(k)=exp(.09*Tk)
+         write(unit,*) k,Tvis(k),Tlvl(k),Tlsl(k),Tlvs(k),Telvs(k),Tesvs(k),&
+            Eautcn(k),Eacrcn(k)
+      end do
+      close(unit)
+
+      !**   condiciones de tiempo bueno
+      ! TT_f not pure function, do concurrent not allowed
+      do k=-1,nz1+2
+         do concurrent(i=-1:nx1+2, j=-1:nx1+1)
+            !     cantidades primas
+            U1(i,j,k)=0.
+            U2(i,j,k)=0.
+            V1(i,j,k)=0.
+            V2(i,j,k)=0.
+            W1(i,j,k)=0.
+            W2(i,j,k)=0.
+            Pres1(i,j,k)=0.
+            Pres2(i,j,k)=0.
+            Titaa2(i,j,k)=0.
+            Titaa1(i,j,k)=0.
+            Qvap1(i,j,k)=0.
+            Qvap2(i,j,k)=0.
+            Qgot1(i,j,k)=0.
+            Qgot2(i,j,k)=0.
+            Qllu1(i,j,k)=0.
+            Qllu2(i,j,k)=0.
+            Qcri1(i,j,k)=0.
+            Qcri2(i,j,k)=0.
+            Qnie1(i,j,k)=0.
+            Qnie2(i,j,k)=0.
+            Qgra1(i,j,k)=0.
+            Qgra2(i,j,k)=0.
+            aer1(i,j,k)=0.
+            aer2(i,j,k)=0.
          end do
-   
-         do k=1,nz1+2
-            Pres(k)=Pres0*exp(-G/Rd*(integ(2*k)*dx4/3))
+
+         ! cantidades base
+         zeta=k*dx1
+         Temp0(k)=TT_f(zeta)
+         Den0(k)=Presi0(k)/Rd/Temp0(k)
+         Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
+         Pres00(k)=Temp0(k)/Tita0(k)
+         aer0(k)=10000.*exp(-zeta/2500.)
+      end do
+
+      Temp0(-1)=Temp0(0)
+      Den0(-1)=Den0(0)
+      Tita0(-1)=Tita0(0)
+      Pres00(-1)=Pres00(0)
+      aer0(-1)=-aer0(0)
+
+      do concurrent(k=0:nz1)
+         do concurrent(i=1:nx1, j=1:nx1)
+            !perturbaciones iniciales en la temperatura y en los aerosoles
+            zeta=k*dx1
+            equis=i*dx1
+            ygrie=j*dx1
+            G1=exp(-((centx-equis)**2.+(centy-ygrie)**2.)*.5&
+               /radiomed**2.)
+            Titaa1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
+            if (Titaa1(i,j,k) < 1e-5) Titaa1(i,j,k)=0.
+            G1=exp(-((cenaerx-equis)**2.+(cenaery-ygrie)**2.)*.5&
+               /radiomed**2.)
+            aer1(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
          end do
-         Pres(0)=Pres0
-         Pres(-1)=Pres0
-   
-         return
-      end subroutine PP
-   
-      !*****************************************************
-      subroutine PP2(G,dx,Den0,Pres00,Pres0)
-         USE dimen
-         integer k
-         real Pres00(-3:nz1+3)
-         real Den0(-3:nz1+3)
-         real Den00(-3:3*nz1+3)
-         real integ(-3:3*nz1+3)
-         real Pres0
-         real G,dx
-   
-         do k=0,nz1-1
-            Den00(2*k)=Den0(k)
-            Den00(2*k+1)=(Den0(k)+Den0(k+1))/2.
-         end do
-         Den00(2*nz1)=Den0(nz1)
-         Den00(2*nz1+1)=2.*Den0(nz1)-Den00(2*nz1-1)
-   
-         integ(0)=0
-         do k=1,nz1
-            ya=Den00(2*k-1)
-            ym=Den00(2*k)
-            yd=Den00(2*k+1)
-            integ(k)=integ(k-1)+ya+4*ym+yd
-         end do
-         do k=1,nz1
-            Pres00(k)=Pres0-G*integ(k)*dx/6.
-         end do
-         Pres00(0)=Pres0
-         Pres00(-1)=Pres0
-   
-         return
-      end subroutine PP2
-   end module model_initial_conditions
-   
+
+         !vapor base
+         Tem1=Temp0(k)
+         if (zeta <= 500) then
+            rel1=.55+.05*zeta/500.
+         else if (zeta <=  1500.) then
+            rel1=.6
+         else if (zeta <= 4000) then
+            rel1=.6-(zeta-1500)/2500.*.25
+         else if (zeta <= 7000) then
+            rel1=.35-(zeta-4000.)/3000.*.25
+         else if(zeta > 7000) then
+            rel1=.1-(zeta-7000)/3000.*.02
+         endif
+         n=int(Tem1)
+         aux=Tem1-n
+         elv1=Telvs(n)*(1-aux)+Telvs(n+1)*aux
+         Qvap0(k)=rel1*elv1/Rv/Tem1
+
+         !recalculo de la densidad
+         Den0(k)=Den0(k)+Qvap0(k)
+      end do
+
+      !**   Velocidad terminal para gota de lluvia, cte que depende de P
+      do concurrent(k=1:nz1+1)
+         Av(2*k-1)=Av0*((P00/Presi0(k-1))**.286+(P00/Presi0(k))**.286)/2. !puntos intermedios
+         Av(2*k)=Av0*(P00/Presi0(k))**.286
+      end do
+
+      !**   Velocidad terminal para la nieve, cte que depende de P
+      do concurrent(k=1:nz1+1)
+         Vtnie(2*k-1)=Vtnie0*((P00/Presi0(k-1))**.3+(P00/Presi0(k))**.3)/2. !puntos intermedios&
+         Vtnie(2*k)=Vtnie0*(P00/Presi0(k))**.3
+      end do
+
+      !**   Velocidad terminal para el granizo, cte que depende de z
+      do concurrent(k=0:nz1+1)
+         aux=2.754*rhogra**.605
+         Vtgra0(2*k)=aux/Tvis(Temp0(k))**.21/Den0(k)**.395
+      end do
+
+      do concurrent(k=1:nz1+1)
+         Vtgra0(2*k-1)=(Vtgra0(2*k-2)+Vtgra0(2*k))/2.  ! punto intermedio
+      end do
+
+      !**************************************************************
+      !    Recalculo de la Presion y de Tita
+
+      !    Recalculo de la Presion a partir de la densidad
+
+      call PP2(G,dx1,Den0,Presi0,P00)
+
+      open(newunit=unit,file=output_directory//"inic03.sa", access='append')
+      do concurrent(k=0:nz1)
+         Tita0(k)=Temp0(k)*(P00/Presi0(k))**Kapa
+         Pres00(k)=Temp0(k)/Tita0(k)
+         cc2(k)=Cp*Rd*Tita0(k)*Pres00(k)/Cv
+
+         write(unit,210) k,Temp0(k),Tita0(k),Presi0(k),Pres00(k),&
+            Den0(k),aer0(k),Qvap0(k),UU(k),VV(k)
+      end do
+      close(unit)
+
+
+      Tita0(-1)=Tita0(0)
+      Pres00(-1)=Pres00(0)
+      Den0(-1)=Den0(0)
+      Qvap0(-1)=0
+
+      do concurrent(i=1:nx1, j=1:nx1)
+         Pres1(i,j,0)=Pres1(i,j,1)
+         Pres1(i,j,-1)=Pres1(i,j,1)
+         Pres2(i,j,0)=Pres1(i,j,1)
+         Pres2(i,j,-1)=Pres1(i,j,1)
+         Titaa1(i,j,0)=Titaa1(i,j,1)
+         Titaa1(i,j,-1)=Titaa1(i,j,1)
+         Qvap1(i,j,0)=Qvap1(i,j,1)
+         Qvap1(i,j,-1)=Qvap1(i,j,1)
+      end do
+
+      !     calculo del Qvaprel
+      Qvaptot=0.
+      do concurrent(k=1:nz1)
+         Qvaptot=Qvaptot+Qvap0(k)
+      end do
+      do concurrent(k=1:nz1)
+         Qvaprel(k)=Qvap0(k)/Qvaptot
+      end do
+
+      !     calculo del aerrel
+      aertot=0.
+      do concurrent(k=1:nz1)
+         aertot=aertot+aer0(k)
+      end do
+      do concurrent(k=1:nz1)
+         aerrel(k)=aer0(k)/aertot
+      end do
+
+210   format(I3,9E12.4)
+      return
+
+   end subroutine initial_conditions
+
+   !*********************************************************
+
+   function TT_f (zeta)
+      real :: a, xx, TT_f
+      a = 298.15
+      if (zeta <= 2000) then
+         TT_f = a - 9.e-3 * zeta
+      elseif (zeta <= 5500) then
+         xx = zeta - 2000.
+         TT_f = a - 18. - xx * (9.e-3 - 2e-3 * xx / 3500. / 2.)
+      elseif (zeta <= 9000) then
+         xx = zeta - 5500.
+         TT_f = a - 46. - 7e-3 * xx
+      elseif (zeta <= 11000) then
+         xx = zeta - 9000
+         TT_f = a - 70.5 - 7e-3 * xx + 1.75e-6 * xx**2.
+      elseif (zeta <= 12000) then
+         TT_f = a - 77.5
+      else
+         xx = zeta - 12000
+         TT_f = a - 77.5 + 50. * (xx / 9000.)**2.
+      endif
+   end function TT_f
+   !*****************************************************
+   subroutine PP(G,Rd,dx,nz1,Pres,Pres0)
+      integer k,nz1,nx4
+      parameter (nx4=500)
+      real Pres(-3:nz1+3)
+      real integ(-2:nx4+2)
+      real Pres0
+      real G,Rd,dx,dx4
+      real zetaa,zetam,zetad
+      dx4=dx/4.
+
+      integ(0)=0
+      ! TT_f not pure function, do concurrent not allowed
+      do k=1,nx4
+         zetaa=(2*k-2)*dx4
+         zetam=(2*k-1)*dx4
+         zetad=(2*k)*dx4
+         ya=1/TT_f(zetaa)
+         ym=1/TT_f(zetam)
+         yd=1/TT_f(zetad)
+         integ(k)=integ(k-1)+ya+4*ym+yd
+      end do
+
+      do concurrent(k=1:nz1+2)
+         Pres(k)=Pres0*exp(-G/Rd*(integ(2*k)*dx4/3))
+      end do
+      Pres(0)=Pres0
+      Pres(-1)=Pres0
+
+      return
+   end subroutine PP
+
+   !*****************************************************
+   subroutine PP2(G,dx,Den0,Pres00,Pres0)
+      USE dimen
+      integer k
+      real Pres00(-3:nz1+3)
+      real Den0(-3:nz1+3)
+      real Den00(-3:3*nz1+3)
+      real integ(-3:3*nz1+3)
+      real Pres0
+      real G,dx
+
+      do concurrent(k=0:nz1-1)
+         Den00(2*k)=Den0(k)
+         Den00(2*k+1)=(Den0(k)+Den0(k+1))/2.
+      end do
+      Den00(2*nz1)=Den0(nz1)
+      Den00(2*nz1+1)=2.*Den0(nz1)-Den00(2*nz1-1)
+
+      integ(0)=0
+      do concurrent(k=1:nz1)
+         ya=Den00(2*k-1)
+         ym=Den00(2*k)
+         yd=Den00(2*k+1)
+         integ(k)=integ(k-1)+ya+4*ym+yd
+      end do
+      do concurrent(k=1:nz1)
+         Pres00(k)=Pres0-G*integ(k)*dx/6.
+      end do
+      Pres00(0)=Pres0
+      Pres00(-1)=Pres0
+      return
+   end subroutine PP2
+end module model_initial_conditions
+
 module model_var
    real :: T, P, Dv, Lvl, Lvs, Lsl, Vis, Qvap, Qliq, densi, nu, Lsl00, Eaucn,&
       Eaccn, Eacng, Naer, dqgot, dqcri, daer, daer2, Fcal, elvs, esvs, e1, rl,&
@@ -529,14 +512,10 @@ contains
          read(unit_number)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
          close(unit_number)
 
-         do i=1,nx1
-            do j=1,nx1
-               do k=1,nz1
-                  aux=.8*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
-                  Titaa1(i,j,k)=Titaa1(i,j,k)+aux
-                  Titaa2(i,j,k)=Titaa2(i,j,k)+aux
-               end do
-            end do
+         do concurrent (i=1:nx1, j=1:nx1, k=1:nz1)
+            aux=.8*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
+            Titaa1(i,j,k)=Titaa1(i,j,k)+aux
+            Titaa2(i,j,k)=Titaa2(i,j,k)+aux
          end do
       endif
 
@@ -622,140 +601,133 @@ contains
       qnietot=0.
       qgratot=0.
 
-      do k=1,nz1
-         do i=1,nx1
-            do j=1,nx1
-               if (umax < U1(i,j,k)*100) then
-                  umax=U1(i,j,k)*100
-                  lumax=i
-                  mumax=j
-                  numax=k
-               endif
+      do concurrent(k=1:nz1, i=1:nx1, j=1:nx1)
+         if (umax < U1(i,j,k)*100) then
+            umax=U1(i,j,k)*100
+            lumax=i
+            mumax=j
+            numax=k
+         endif
 
-               if (umin > U1(i,j,k)*100) then
-                  umin=U1(i,j,k)*100
-                  lumin=i
-                  mumin=j
-                  numin=k
-               endif
+         if (umin > U1(i,j,k)*100) then
+            umin=U1(i,j,k)*100
+            lumin=i
+            mumin=j
+            numin=k
+         endif
 
-               if (vmax < V1(i,j,k)*100) then
-                  vmax=V1(i,j,k)*100
-                  lvmax=i
-                  mvmax=j
-                  nvmax=k
-               endif
+         if (vmax < V1(i,j,k)*100) then
+            vmax=V1(i,j,k)*100
+            lvmax=i
+            mvmax=j
+            nvmax=k
+         endif
 
-               if (vmin > V1(i,j,k)*100) then
-                  vmin=V1(i,j,k)*100
-                  lvmin=i
-                  mvmin=j
-                  nvmin=k
-               endif
+         if (vmin > V1(i,j,k)*100) then
+            vmin=V1(i,j,k)*100
+            lvmin=i
+            mvmin=j
+            nvmin=k
+         endif
 
-               if (wmax < W1(i,j,k)*100) then
-                  wmax=W1(i,j,k)*100
-                  lwmax=i
-                  mwmax=j
-                  nwmax=k
-               endif
+         if (wmax < W1(i,j,k)*100) then
+            wmax=W1(i,j,k)*100
+            lwmax=i
+            mwmax=j
+            nwmax=k
+         endif
 
-               if (wmin > W1(i,j,k)*100) then
-                  wmin=W1(i,j,k)*100
-                  lwmin=i
-                  mwmin=j
-                  nwmin=k
-               endif
+         if (wmin > W1(i,j,k)*100) then
+            wmin=W1(i,j,k)*100
+            lwmin=i
+            mwmin=j
+            nwmin=k
+         endif
 
-               if (titamax < Titaa1(i,j,k)*1000) then
-                  titamax=Titaa1(i,j,k)*1000
-                  ltitamax=i
-                  mtitamax=j
-                  ntitamax=k
-               endif
+         if (titamax < Titaa1(i,j,k)*1000) then
+            titamax=Titaa1(i,j,k)*1000
+            ltitamax=i
+            mtitamax=j
+            ntitamax=k
+         endif
 
-               if (titamin > Titaa1(i,j,k)*1000) then
-                  titamin=Titaa1(i,j,k)*1000
-                  ltitamin=i
-                  mtitamin=j
-                  ntitamin=k
-               endif
+         if (titamin > Titaa1(i,j,k)*1000) then
+            titamin=Titaa1(i,j,k)*1000
+            ltitamin=i
+            mtitamin=j
+            ntitamin=k
+         endif
 
-               if (qvapmax < Qvap1(i,j,k)*1e6) then
-                  qvapmax=Qvap1(i,j,k)*1e6
-                  lqvapmax=i
-                  mqvapmax=j
-                  nqvapmax=k
-               endif
+         if (qvapmax < Qvap1(i,j,k)*1e6) then
+            qvapmax=Qvap1(i,j,k)*1e6
+            lqvapmax=i
+            mqvapmax=j
+            nqvapmax=k
+         endif
 
-               if (qvapmin > Qvap1(i,j,k)*1e6) then
-                  qvapmin=Qvap1(i,j,k)*1e6
-                  lqvapmin=i
-                  mqvapmin=j
-                  nqvapmin=k
-               endif
+         if (qvapmin > Qvap1(i,j,k)*1e6) then
+            qvapmin=Qvap1(i,j,k)*1e6
+            lqvapmin=i
+            mqvapmin=j
+            nqvapmin=k
+         endif
 
-               if (qgotmax < Qgot1(i,j,k)*1e6) then
-                  qgotmax=Qgot1(i,j,k)*1e6
-                  lqgotmax=i
-                  mqgotmax=j
-                  nqgotmax=k
-               endif
-               qgottot=qgottot+Qgot1(i,j,k)*1e6
+         if (qgotmax < Qgot1(i,j,k)*1e6) then
+            qgotmax=Qgot1(i,j,k)*1e6
+            lqgotmax=i
+            mqgotmax=j
+            nqgotmax=k
+         endif
+         qgottot=qgottot+Qgot1(i,j,k)*1e6
 
-               if (qllumax < Qllu1(i,j,k)*1e6) then
-                  qllumax=Qllu1(i,j,k)*1e6
-                  lqllumax=i
-                  mqllumax=j
-                  nqllumax=k
-               endif
-               qllutot=qllutot+Qllu1(i,j,k)*1e6
+         if (qllumax < Qllu1(i,j,k)*1e6) then
+            qllumax=Qllu1(i,j,k)*1e6
+            lqllumax=i
+            mqllumax=j
+            nqllumax=k
+         endif
+         qllutot=qllutot+Qllu1(i,j,k)*1e6
 
-               if (qcrimax < Qcri1(i,j,k)*1e6) then
-                  qcrimax=Qcri1(i,j,k)*1e6
-                  lqcrimax=i
-                  mqcrimax=j
-                  nqcrimax=k
-               endif
-               qcritot=qcritot+Qcri1(i,j,k)*1e6
+         if (qcrimax < Qcri1(i,j,k)*1e6) then
+            qcrimax=Qcri1(i,j,k)*1e6
+            lqcrimax=i
+            mqcrimax=j
+            nqcrimax=k
+         endif
+         qcritot=qcritot+Qcri1(i,j,k)*1e6
 
-               if (qniemax < Qnie1(i,j,k)*1e6) then
-                  qniemax=Qnie1(i,j,k)*1e6
-                  lqniemax=i
-                  mqniemax=j
-                  nqniemax=k
-               endif
-               qnietot=qnietot+Qnie1(i,j,k)*1e6
+         if (qniemax < Qnie1(i,j,k)*1e6) then
+            qniemax=Qnie1(i,j,k)*1e6
+            lqniemax=i
+            mqniemax=j
+            nqniemax=k
+         endif
+         qnietot=qnietot+Qnie1(i,j,k)*1e6
 
-               if (qgramax < Qgra1(i,j,k)*1e6) then
-                  qgramax=Qgra1(i,j,k)*1e6
-                  lqgramax=i
-                  mqgramax=j
-                  nqgramax=k
-               endif
-               qgratot=qgratot+Qgra1(i,j,k)*1e6
+         if (qgramax < Qgra1(i,j,k)*1e6) then
+            qgramax=Qgra1(i,j,k)*1e6
+            lqgramax=i
+            mqgramax=j
+            nqgramax=k
+         endif
+         qgratot=qgratot+Qgra1(i,j,k)*1e6
 
-               if (aermax < aer1(i,j,k)/1000) then
-                  aermax=aer1(i,j,k)/1000
-                  laermax=i
-                  maermax=j
-                  naermax=k
-               endif
-            end do
-         end do
+         if (aermax < aer1(i,j,k)/1000) then
+            aermax=aer1(i,j,k)/1000
+            laermax=i
+            maermax=j
+            naermax=k
+         endif
       end do
 
       qgotmax=0.
       qcrimax=0.
       qniemax=0.
-      do i=-1,1
-         do j=-1,1
-            do k=-1,1
-               qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
-               qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
-               qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
-            end do
-         end do
+
+      do concurrent(i=-1:1, j=-1:1, k=-1:1)
+         qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
+         qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
+         qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
       end do
 
       qgotmax=qgotmax/27.
@@ -824,18 +796,13 @@ contains
          maux2=max(mgot(2),mcri(2))
          naux2=max(ngot(2),ncri(2))
 
-         do k=1,naux2
-            do i=laux1,laux2
-               do j=maux1,maux2
-
-                  Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+&
-                     Qnie1(i,j,k)+Qgra1(i,j,k)
-                  Qagua=Qgot1(i,j,k)+Qllu1(i,j,k)+&
-                     (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
-                  zmed=zmed+k*Qagua
-                  Qaguat=Qaguat+Qagua
-               end do
-            end do
+         do concurrent(k=1:naux2, i=laux1:laux2, j=maux1:maux2)
+            Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+&
+               Qnie1(i,j,k)+Qgra1(i,j,k)
+            Qagua=Qgot1(i,j,k)+Qllu1(i,j,k)+&
+               (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
+            zmed=zmed+k*Qagua
+            Qaguat=Qaguat+Qagua
          end do
 
          if (Qaguat > 1e-3) then
@@ -849,7 +816,7 @@ contains
    end subroutine cloud_position_init
 
    subroutine cloud_movement_init()
-   !desplazamiento de la nube
+      !desplazamiento de la nube
       USE model_var
       USE perdim
       USE permic
@@ -880,9 +847,9 @@ contains
          posx(tte)=posx(tte)+1
          Xnub(tte)=Xnub(tte)-dx1
 
-         do k=0,nz1+1
-            do j=0,nx1+1
-               do i=1,nx1+1
+         do concurrent(k=0:nz1+1)
+            do concurrent(j=0:nx1+1)
+               do concurrent(i=1:nx1+1)
                   U1(i-1,j,k)=U1(i,j,k)
                   V1(i-1,j,k)=V1(i,j,k)
                   W1(i-1,j,k)=W1(i,j,k)
@@ -956,9 +923,9 @@ contains
          posx(tte)=posx(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
 
-         do k=0,nz1+1
-            do j=0,nx1+1
-               do i=nx1,0,-1
+         do concurrent(k=0:nz1+1)
+            do concurrent(j=0:nx1+1)
+               do concurrent(i=nx1:0) ! TODO Test this loop
                   U1(i+1,j,k)=U1(i,j,k)
                   V1(i+1,j,k)=V1(i,j,k)
                   W1(i+1,j,k)=W1(i,j,k)
@@ -1035,9 +1002,9 @@ contains
          Ynub(tte)=Ynub(tte)-dx1
 
 
-         do k=0,nz1+1
-            do i=0,nx1+1
-               do j=1,nx1+1
+         do concurrent(k=0:nz1+1)
+            do concurrent(i=0:nx1+1)
+               do concurrent(j=1:nx1+1)
                   U1(i,j-1,k)=U1(i,j,k)
                   V1(i,j-1,k)=V1(i,j,k)
                   W1(i,j-1,k)=W1(i,j,k)
@@ -1111,9 +1078,9 @@ contains
          posy(tte)=posy(tte)-1
          Xnub(tte)=Xnub(tte)+dx1
 
-         do k=0,nz1+1
-            do i=0,nx1+1
-               do j=nx1,0,-1
+         do concurrent(k=0:nz1+1)
+            do concurrent(i=0:nx1+1)
+               do concurrent(j=nx1:0) ! TODO Test this loop
                   U1(i,j+1,k)=U1(i,j,k)
                   V1(i,j+1,k)=V1(i,j,k)
                   W1(i,j+1,k)=W1(i,j,k)
