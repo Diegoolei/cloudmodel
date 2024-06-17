@@ -59,43 +59,29 @@ subroutine corgot
 
    neg1=0.
    pos1=0.
-   do n=ngot(1),ngot(2)
-      do l=lgot(1),lgot(2)
-         do m=mgot(1),mgot(2)
-            if (Qgot2(l,m,n) < 0.) then
-               neg1=neg1+Qgot2(l,m,n)
-               Qgot2(l,m,n)=0
-            else
-               pos1=pos1+Qgot2(l,m,n)
-            endif
-         end do
-      end do
+   do concurrent(n=ngot(1):ngot(2), l=lgot(1):lgot(2), m=mgot(1):mgot(2))
+      if (Qgot2(l,m,n) < 0.) then
+         neg1=neg1+Qgot2(l,m,n)
+         Qgot2(l,m,n)=0
+      else
+         pos1=pos1+Qgot2(l,m,n)
+      endif
    end do
 
    if(pos1 <= -neg1) then
-      do l=lgot(1),lgot(2)
-         do m=mgot(1),mgot(2)
-            do n=ngot(1),ngot(2)
-               Qgot2(l,m,n)=0.
-            end do
-         end do
+      do concurrent(l=lgot(1):lgot(2), m=mgot(1):mgot(2), n=ngot(1):ngot(2))
+         Qgot2(l,m,n)=0.
       end do
-
       if (-neg1 > 1e-3) then
          stop
       endif
    else
       aux1=neg1/pos1
-      do l=lgot(1),lgot(2)
-         do m=mgot(1),mgot(2)
-            do n=ngot(1),ngot(2)
-               if(Qgot2(l,m,n) > 0) then
-                  Qgot2(l,m,n)=Qgot2(l,m,n)*(1.+aux1)
-               endif
-            end do
-         end do
+      do concurrent(l=lgot(1):lgot(2), m=mgot(1):mgot(2), n=ngot(1):ngot(2))
+         if(Qgot2(l,m,n) > 0) then
+            Qgot2(l,m,n)=Qgot2(l,m,n)*(1.+aux1)
+         endif
       end do
-
    endif
 
    return
@@ -112,44 +98,30 @@ subroutine corllu
 
    neg1=0.
    pos1=0.
-   do n=nllu(1),nllu(2)
-      do l=lllu(1),lllu(2)
-         do m=mllu(1),mllu(2)
-            if (Qllu2(l,m,n) < 0.) then
-               neg1=neg1+Qllu2(l,m,n)
-               Qllu2(l,m,n)=0
-            else
-               pos1=pos1+Qllu2(l,m,n)
-            endif
-         end do
-      end do
+   do concurrent(n=nllu(1):nllu(2), l=lllu(1):lllu(2), m=mllu(1):mllu(2))
+      if (Qllu2(l,m,n) < 0.) then
+         neg1=neg1+Qllu2(l,m,n)
+         Qllu2(l,m,n)=0
+      else
+         pos1=pos1+Qllu2(l,m,n)
+      endif
    end do
-   if(pos1 <= -neg1) then
-      do l=lllu(1),lllu(2)
-         do m=mllu(1),mllu(2)
-            do n=nllu(1),nllu(2)
-               Qllu2(l,m,n)=0.
-            end do
-         end do
-      end do
 
+   if(pos1 <= -neg1) then
+      do concurrent(l=lllu(1):lllu(2), m=mllu(1):mllu(2), n=nllu(1):nllu(2))
+         Qllu2(l,m,n)=0.
+      end do
       if (-neg1 > 1e-3) then
          stop
       endif
    else
       aux1=neg1/pos1
-      do l=lllu(1),lllu(2)
-         do m=mllu(1),mllu(2)
-            do n=nllu(1),nllu(2)
-               if(Qllu2(l,m,n) > 0) then
-                  Qllu2(l,m,n)=Qllu2(l,m,n)*(1.+aux1)
-               endif
-            end do
-         end do
+      do concurrent(l=lllu(1):lllu(2), m=mllu(1):mllu(2), n=nllu(1):nllu(2))
+         if(Qllu2(l,m,n) > 0) then
+            Qllu2(l,m,n)=Qllu2(l,m,n)*(1.+aux1)
+         endif
       end do
-
    endif
-
    return
 end
 
@@ -163,43 +135,29 @@ subroutine corcri
    implicit none
    neg1=0.
    pos1=0.
-   do n=ncri(1),ncri(2)
-      do l=lcri(1),lcri(2)
-         do m=mcri(1),mcri(2)
-            if (Qcri2(l,m,n) < 0.) then
-               neg1=neg1+Qcri2(l,m,n)
-               Qcri2(l,m,n)=0
-            else
-               pos1=pos1+Qcri2(l,m,n)
-            endif
-         end do
-      end do
+   do concurrent(n=ncri(1):ncri(2), l=lcri(1):lcri(2), m=mcri(1):mcri(2))
+      if (Qcri2(l,m,n) < 0.) then
+         neg1=neg1+Qcri2(l,m,n)
+         Qcri2(l,m,n)=0
+      else
+         pos1=pos1+Qcri2(l,m,n)
+      endif
    end do
 
    if(pos1 <= -neg1) then
-      do l=lcri(1),lcri(2)
-         do m=mcri(1),mcri(2)
-            do n=ncri(1),ncri(2)
-               Qcri2(l,m,n)=0.
-            end do
-         end do
+      do concurrent(l=lcri(1):lcri(2), m=mcri(1):mcri(2), n=ncri(1):ncri(2))
+         Qcri2(l,m,n)=0.
       end do
-
       if (-neg1 > 1e-3) then
          stop
       endif
    else
       aux1=neg1/pos1
-      do l=lcri(1),lcri(2)
-         do m=mcri(1),mcri(2)
-            do n=ncri(1),ncri(2)
-               if(Qcri2(l,m,n) > 0) then
-                  Qcri2(l,m,n)=Qcri2(l,m,n)*(1.+aux1)
-               endif
-            end do
-         end do
+      do concurrent(l=lcri(1):lcri(2), m=mcri(1):mcri(2), n=ncri(1):ncri(2))
+         if(Qcri2(l,m,n) > 0) then
+            Qcri2(l,m,n)=Qcri2(l,m,n)*(1.+aux1)
+         endif
       end do
-
    endif
 
    return
@@ -215,26 +173,18 @@ subroutine cornie
    implicit none
    neg1=0.
    pos1=0.
-   do n=nnie(1),nnie(2)
-      do l=lnie(1),lnie(2)
-         do m=mnie(1),mnie(2)
-            if (Qnie2(l,m,n) < 0.) then
-               neg1=neg1+Qnie2(l,m,n)
-               Qnie2(l,m,n)=0
-            else
-               pos1=pos1+Qnie2(l,m,n)
-            endif
-         end do
-      end do
+   do concurrent(n=nnie(1):nnie(2), l=lnie(1):lnie(2), m=mnie(1):mnie(2))
+      if (Qnie2(l,m,n) < 0.) then
+         neg1=neg1+Qnie2(l,m,n)
+         Qnie2(l,m,n)=0
+      else
+         pos1=pos1+Qnie2(l,m,n)
+      endif
    end do
 
    if(pos1 <= -neg1) then
-      do l=lnie(1),lnie(2)
-         do m=mnie(1),mnie(2)
-            do n=nnie(1),nnie(2)
-               Qnie2(l,m,n)=0.
-            end do
-         end do
+      do concurrent(l=lnie(1):lnie(2), m=mnie(1):mnie(2), n=nnie(1):nnie(2))
+         Qnie2(l,m,n)=0.
       end do
 
       if (-neg1 > 1e-3) then
@@ -242,18 +192,12 @@ subroutine cornie
       endif
    else
       aux1=neg1/pos1
-      do l=lnie(1),lnie(2)
-         do m=mnie(1),mnie(2)
-            do n=nnie(1),nnie(2)
-               if(Qnie2(l,m,n) > 0) then
-                  Qnie2(l,m,n)=Qnie2(l,m,n)*(1.+aux1)
-               endif
-            end do
-         end do
+      do concurrent(l=lnie(1):lnie(2), m=mnie(1):mnie(2), n=nnie(1):nnie(2))
+         if(Qnie2(l,m,n) > 0) then
+            Qnie2(l,m,n)=Qnie2(l,m,n)*(1.+aux1)
+         endif
       end do
-
    endif
-
    return
 end
 
@@ -267,26 +211,18 @@ subroutine corgra
    implicit none
    neg1=0.
    pos1=0.
-   do n=ngra(1),ngra(2)
-      do l=lgra(1),lgra(2)
-         do m=mgra(1),mgra(2)
-            if (Qgra2(l,m,n) < 0.) then
-               neg1=neg1+Qgra2(l,m,n)
-               Qgra2(l,m,n)=0
-            else
-               pos1=pos1+Qgra2(l,m,n)
-            endif
-         end do
-      end do
+   do concurrent(n=ngra(1):ngra(2), l=lgra(1):lgra(2), m=mgra(1):mgra(2))
+      if (Qgra2(l,m,n) < 0.) then
+         neg1=neg1+Qgra2(l,m,n)
+         Qgra2(l,m,n)=0
+      else
+         pos1=pos1+Qgra2(l,m,n)
+      endif
    end do
 
    if(pos1 <= -neg1) then
-      do l=lgra(1),lgra(2)
-         do m=mgra(1),mgra(2)
-            do n=ngra(1),ngra(2)
-               Qgra2(l,m,n)=0.
-            end do
-         end do
+      do concurrent(l=lgra(1):lgra(2), m=mgra(1):mgra(2), n=ngra(1):ngra(2))
+         Qgra2(l,m,n)=0.
       end do
 
       if (-neg1 > 1e-3) then
@@ -294,18 +230,12 @@ subroutine corgra
       endif
    else
       aux1=neg1/pos1
-      do l=lgra(1),lgra(2)
-         do m=mgra(1),mgra(2)
-            do n=ngra(1),ngra(2)
-               if(Qgra2(l,m,n) > 0) then
-                  Qgra2(l,m,n)=Qgra2(l,m,n)*(1.+aux1)
-               endif
-            end do
-         end do
+      do concurrent(l=lgra(1):lgra(2), m=mgra(1):mgra(2), n=ngra(1):ngra(2))
+         if(Qgra2(l,m,n) > 0) then
+            Qgra2(l,m,n)=Qgra2(l,m,n)*(1.+aux1)
+         endif
       end do
-
    endif
-
    return
 end
 
@@ -320,13 +250,11 @@ subroutine corvap(Qvapneg)
 
    real(8), intent(in) :: Qvapneg
 
-   do k=1,nz1
+   do concurrent(k=1:nz1)
       dq=Qvapneg*Qvaprel(k)/nx1**2.
-      do i=1,nx1
-         do j=1,nx1
-            Qvap2(i,j,k)=Qvap2(i,j,k)+dq
-            if (Qvap2(i,j,k)+Qvap0(k) < 0) Qvap2(i,j,k)=-Qvap0(k)
-         end do
+      do concurrent(i=1:nx1, j=1:nx1)
+         Qvap2(i,j,k)=Qvap2(i,j,k)+dq
+         if (Qvap2(i,j,k)+Qvap0(k) < 0) Qvap2(i,j,k)=-Qvap0(k)
       end do
    end do
 
@@ -344,16 +272,13 @@ subroutine coraer(aerneg)
 
    real(8), intent(in) :: aerneg
 
-   do k=1,nz1
+   do concurrent(k=1:nz1)
       dq=aerneg*aerrel(k)/nx1**2.
-      do i=1,nx1
-         do j=1,nx1
-            aer2(i,j,k)=aer2(i,j,k)+dq
-            if (aer2(i,j,k)+aer0(k) < 0) aer2(i,j,k)=-aer0(k)
-         end do
+      do concurrent(i=1:nx1, j=1:nx1)
+         aer2(i,j,k)=aer2(i,j,k)+dq
+         if (aer2(i,j,k)+aer0(k) < 0) aer2(i,j,k)=-aer0(k)
       end do
    end do
-
    return
 end
 
@@ -774,146 +699,123 @@ subroutine speed_pressure()
 
    call velpre01_init()
 
-   do i=0,nx1+1
-      do j=0,nx1+1
-         do k=0,nz1
-            U2(i,j,k)=U1(i,j,k)
-            V2(i,j,k)=V1(i,j,k)
-            W2(i,j,k)=W1(i,j,k)
-            Pres2(i,j,k)=Pres1(i,j,k)
-         end do
-      end do
+   do concurrent (i=0:nx1+1, j=0:nx1+1, k=0:nz1)
+      U2(i,j,k)=U1(i,j,k)
+      V2(i,j,k)=V1(i,j,k)
+      W2(i,j,k)=W1(i,j,k)
+      Pres2(i,j,k)=Pres1(i,j,k)
    end do
 
-   do t=1,lt3
-      presprom=0.
-      do k=1,nz1-1
+   do concurrent(t=1:lt3)
+      do concurrent(k=1:nz1-1)
          presi=-Cp*Tita0(k)*(1.+.61*Qvap0(k)/Den0(k))
          vel0=Tita0(k)*(Den0(k)+.61*Qvap0(k))
          vel1=Tita0(k-1)*(Den0(k-1)+.61*Qvap0(k-1))
          vel2=Tita0(k+1)*(Den0(k+1)+.61*Qvap0(k+1))
          vel3=cc2(k)/presi/vel0
-         do i=1,nx1
-            do j=1,nx1
+         do concurrent (i=1:nx1, j=1:nx1)
+            dprex=Pres2(i+1,j,k)-Pres2(i-1,j,k)
+            dprey=Pres2(i,j+1,k)-Pres2(i,j-1,k)
+            dprez=Pres2(i,j,k+1)-Pres2(i,j,k-1)
 
-               dprex=Pres2(i+1,j,k)-Pres2(i-1,j,k)
-               dprey=Pres2(i,j+1,k)-Pres2(i,j-1,k)
-               dprez=Pres2(i,j,k+1)-Pres2(i,j,k-1)
+            presix=presi*dprex/dx2
+            presiy=presi*dprey/dx2
+            presiz=presi*dprez/dx2
 
-               presix=presi*dprex/dx2
-               presiy=presi*dprey/dx2
-               presiz=presi*dprez/dx2
-
-               U3(i,j,k)=dt3*(presix+fu(i,j,k))+U2(i,j,k)
-               V3(i,j,k)=dt3*(presiy+fv(i,j,k))+V2(i,j,k)
-               W3(i,j,k)=dt3*(presiz+fw(i,j,k))+W2(i,j,k)
+            U3(i,j,k)=dt3*(presix+fu(i,j,k))+U2(i,j,k)
+            V3(i,j,k)=dt3*(presiy+fv(i,j,k))+V2(i,j,k)
+            W3(i,j,k)=dt3*(presiz+fw(i,j,k))+W2(i,j,k)
 
 
-               dvx=vel0*(U2(i+1,j,k)-U2(i-1,j,k))
-               dvy=vel0*(V2(i,j+1,k)-V2(i,j-1,k))
-               if (k == 1) then
-                  !      dvz=tiene 80% de (W2(2)-W2(1) y 20% de (W2(1)-W2(0)
-                  dvz=(.8*vel2*W2(i,j,k+1)-.8*vel1*W2(i,j,k))*2.
-               else
-                  dvz=vel2*W2(i,j,k+1)-vel1*W2(i,j,k-1)
-               endif
+            dvx=vel0*(U2(i+1,j,k)-U2(i-1,j,k))
+            dvy=vel0*(V2(i,j+1,k)-V2(i,j-1,k))
+            if (k == 1) then
+               !      dvz=tiene 80% de (W2(2)-W2(1) y 20% de (W2(1)-W2(0)
+               dvz=(.8*vel2*W2(i,j,k+1)-.8*vel1*W2(i,j,k))*2.
+            else
+               dvz=vel2*W2(i,j,k+1)-vel1*W2(i,j,k-1)
+            endif
 
-               diver=vel3*((dvx+dvy)+dvz)/dx2
+            diver=vel3*((dvx+dvy)+dvz)/dx2
 
-               !      modificado para agrega turbulencia en la P 23/8/97
-               Pres3(i,j,k)=dt3*(diver+fp(i,j,k))+Pres2(i,j,k)
-            end do
+            !      modificado para agrega turbulencia en la P 23/8/97
+            Pres3(i,j,k)=dt3*(diver+fp(i,j,k))+Pres2(i,j,k)
          end do
       end do
 
       !*      redefiniciones y contornos
-      do i=1,nx1
-         do j=1,nx1
-            Pres3(i,j,0)=Pres3(i,j,1)
-            Pres3(i,j,nz1)=Pres3(i,j,nz1-1)
-         end do
+      do concurrent(i=1:nx1, j=1:nx1)
+         Pres3(i,j,0)=Pres3(i,j,1)
+         Pres3(i,j,nz1)=Pres3(i,j,nz1-1)
       end do
-      do i=1,nx1
-         do k=0,nz1
-            Pres3(i,0,k)=Pres3(i,1,k)
-            Pres3(i,nx1+1,k)=Pres3(i,nx1,k)
-            Pres3(0,i,k)=Pres3(1,i,k)
-            Pres3(nx1+1,i,k)=Pres3(nx1,i,k)
-         end do
+      do concurrent(i=1:nx1, k=0:nz1)
+         Pres3(i,0,k)=Pres3(i,1,k)
+         Pres3(i,nx1+1,k)=Pres3(i,nx1,k)
+         Pres3(0,i,k)=Pres3(1,i,k)
+         Pres3(nx1+1,i,k)=Pres3(nx1,i,k)
       end do
 
-      do i=1,nx1
-         do j=1,nx1
-            do k=1,nz1-1
-               if (k == 1) then
-                  U2(i,j,k)=U3(i,j,k)-kkk*&
-                     (2.*U3(i,j,k)-U3(i,j,k+1))
-                  V2(i,j,k)=V3(i,j,k)-kkk*&
-                     (2.*V3(i,j,k)-V3(i,j,k+1))
-                  W2(i,j,k)=W3(i,j,k)-kkk*&
-                     (2.*W3(i,j,k)-W3(i,j,k+1))
-               else
-                  U2(i,j,k)=U3(i,j,k)
-                  V2(i,j,k)=V3(i,j,k)
-                  W2(i,j,k)=W3(i,j,k)
-               endif
-               Pres2(i,j,k)=prom1*Pres3(i,j,k)+prom*(&
-                  ((Pres3(i+1,j,k)+ Pres3(i-1,j,k))+&
-                  (Pres3(i,j+1,k)+Pres3(i,j-1,k)))+&
-                  Pres3(i,j,k+1)+Pres3(i,j,k-1))
-               presprom=Pres2(i,j,k)+presprom
-            end do
+      presprom=0.
+      do concurrent(i=1:nx1, j=1:nx1)
+         do k=1,nz1-1
+            if (k == 1) then
+               U2(i,j,k)=U3(i,j,k)-kkk*&
+                  (2.*U3(i,j,k)-U3(i,j,k+1))
+               V2(i,j,k)=V3(i,j,k)-kkk*&
+                  (2.*V3(i,j,k)-V3(i,j,k+1))
+               W2(i,j,k)=W3(i,j,k)-kkk*&
+                  (2.*W3(i,j,k)-W3(i,j,k+1))
+            else
+               U2(i,j,k)=U3(i,j,k)
+               V2(i,j,k)=V3(i,j,k)
+               W2(i,j,k)=W3(i,j,k)
+            endif
+            Pres2(i,j,k)=prom1*Pres3(i,j,k)+prom*(&
+               ((Pres3(i+1,j,k)+ Pres3(i-1,j,k))+&
+               (Pres3(i,j+1,k)+Pres3(i,j-1,k)))+&
+               Pres3(i,j,k+1)+Pres3(i,j,k-1))
+            presprom=Pres2(i,j,k)+presprom
+         end do
 
-            U2(i,j,0)=0
-            V2(i,j,0)=0
-            W2(i,j,0)=0
-            Pres2(i,j,0)=Pres2(i,j,1)
-            U2(i,j,nz1)=U2(i,j,nz1-1)
-            V2(i,j,nz1)=V2(i,j,nz1-1)
-            W2(i,j,nz1)=W2(i,j,nz1-1)
-            Pres2(i,j,nz1)=Pres2(i,j,nz1-1)
-         end do
+         U2(i,j,0)=0
+         V2(i,j,0)=0
+         W2(i,j,0)=0
+         Pres2(i,j,0)=Pres2(i,j,1)
+         U2(i,j,nz1)=U2(i,j,nz1-1)
+         V2(i,j,nz1)=V2(i,j,nz1-1)
+         W2(i,j,nz1)=W2(i,j,nz1-1)
+         Pres2(i,j,nz1)=Pres2(i,j,nz1-1)
       end do
-      do i=1,nx1
-         do k=0,nz1
-            U2(0,i,k)=U2(1,i,k)
-            V2(0,i,k)=V2(1,i,k)
-            W2(0,i,k)=W2(1,i,k)
-            Pres2(0,i,k)=Pres2(1,i,k)
-            U2(nx1+1,i,k)=U2(nx1,i,k)
-            V2(nx1+1,i,k)=V2(nx1,i,k)
-            W2(nx1+1,i,k)=W2(nx1,i,k)
-            Pres2(nx1+1,i,k)=Pres2(nx1,i,k)
-            U2(i,0,k)=U2(i,1,k)
-            V2(i,0,k)=V2(i,1,k)
-            W2(i,0,k)=W2(i,1,k)
-            Pres2(i,0,k)=Pres2(i,1,k)
-            U2(i,nx1+1,k)=U2(i,nx1,k)
-            V2(i,nx1+1,k)=V2(i,nx1,k)
-            W2(i,nx1+1,k)=W2(i,nx1,k)
-            Pres2(i,nx1+1,k)=Pres2(i,nx1,k)
-         end do
+      do concurrent(i=1:nx1, k=0:nz1)
+         U2(0,i,k)=U2(1,i,k)
+         V2(0,i,k)=V2(1,i,k)
+         W2(0,i,k)=W2(1,i,k)
+         Pres2(0,i,k)=Pres2(1,i,k)
+         U2(nx1+1,i,k)=U2(nx1,i,k)
+         V2(nx1+1,i,k)=V2(nx1,i,k)
+         W2(nx1+1,i,k)=W2(nx1,i,k)
+         Pres2(nx1+1,i,k)=Pres2(nx1,i,k)
+         U2(i,0,k)=U2(i,1,k)
+         V2(i,0,k)=V2(i,1,k)
+         W2(i,0,k)=W2(i,1,k)
+         Pres2(i,0,k)=Pres2(i,1,k)
+         U2(i,nx1+1,k)=U2(i,nx1,k)
+         V2(i,nx1+1,k)=V2(i,nx1,k)
+         W2(i,nx1+1,k)=W2(i,nx1,k)
+         Pres2(i,nx1+1,k)=Pres2(i,nx1,k)
       end do
 
       presprom=presprom/nnn
-      do i=0,nx1+1
-         do j=0,nx1+1
-            do k=0,nz1
-               Pres2(i,j,k)=Pres2(i,j,k)-presprom
-            end do
-         end do
+      do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
+         Pres2(i,j,k)=Pres2(i,j,k)-presprom
       end do
 
       if (t == lt3/2) then
-         do i=0,nx1+1
-            do j=0,nx1+1
-               do k=0,nz1
-                  U1(i,j,k)=U2(i,j,k)
-                  V1(i,j,k)=V2(i,j,k)
-                  W1(i,j,k)=W2(i,j,k)
-                  Pres1(i,j,k)=Pres2(i,j,k)
-               end do
-            end do
+         do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
+            U1(i,j,k)=U2(i,j,k)
+            V1(i,j,k)=V2(i,j,k)
+            W1(i,j,k)=W2(i,j,k)
+            Pres1(i,j,k)=Pres2(i,j,k)
          end do
       endif
 
@@ -933,11 +835,9 @@ subroutine speed_pressure()
    call filtro(W1,facx,facy,facz)
    call filtro(W2,facx,facy,facz)
 
-   do i=1,nx1
-      do j=1,nx1
-         Pres1(i,j,0)=Pres1(i,j,1)
-         Pres2(i,j,0)=Pres2(i,j,1)
-      end do
+   do concurrent(i=1:nx1, j=1:nx1)
+      Pres1(i,j,0)=Pres1(i,j,1)
+      Pres2(i,j,0)=Pres2(i,j,1)
    end do
    !**********************************************************
 
@@ -961,88 +861,72 @@ subroutine turbu1(kk)
    integer, intent(in) :: kk
 
    k=kk+1
-   do i=0,nx1+1
-      do j=0,nx1+1
-
-         if (kk == 1) then
-            do n=1,2
-               do m=1,n
-                  D(n,m,i,j,1)=0.
-               end do
-            end do
-            D(3,1,i,j,1)=U2(i,j,1)
-            D(3,2,i,j,1)=V2(i,j,1)
-            D(3,3,i,j,1)=W2(i,j,1)*2./3.
-            do n=1,3
-               do m=1,n
-                  D(m,n,i,j,1)=D(n,m,i,j,1)
-               end do
-            end do
-            do lx=-1,1
-               do ly=-1,1
-                  do lz=-1,1
-                     ldis=abs(lx)+abs(ly)+abs(lz)
-                     if (ldis <= 1) then
-                        vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+1)
-                        vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+1)
-                        vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+1)
-                     endif
-                  end do
-               end do
-            end do
-            !     calculo de Dij
-            do n=1,3
-               dv(n,1)=vel(n,1,0,0)-vel(n,-1,0,0)
-               dv(n,2)=vel(n,0,1,0)-vel(n,0,-1,0)
-               dv(n,3)=vel(n,0,0,1)-vel(n,0,0,-1)
-            end do
-            do n=1,3
-               do m=1,n
-                  D(n,m,i,j,2)=(dv(n,m)+dv(m,n))
-                  D(m,n,i,j,2)=D(n,m,i,j,2)
-                  if (n == m) D(n,n,i,j,2)=2./3.*D(n,n,i,j,2)
-               end do
-            end do
-         else
-            do n=1,3
-               do m=1,3
-                  do lz=1,2
-                     D(n,m,i,j,lz)=D(n,m,i,j,lz+1)
-                  end do
-               end do
-            end do
-         endif
-         !*********************************************************
-
-         !     Lectura de las velocidades necesarias
-         do lx=-1,1
-            do ly=-1,1
-               do lz=-1,1
-                  ldis=abs(lx)+abs(ly)+abs(lz)
-                  if (ldis <= 1) then
-                     vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+k)
-                     vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+k)
-                     vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+k)
-                  endif
-               end do
+   do concurrent(i=0:nx1+1, j=0:nx1+1)
+      if (kk == 1) then
+         do concurrent(n=1:2)
+            do concurrent(m=1:n)
+               D(n,m,i,j,1)=0.
             end do
          end do
+         D(3,1,i,j,1)=U2(i,j,1)
+         D(3,2,i,j,1)=V2(i,j,1)
+         D(3,3,i,j,1)=W2(i,j,1)*2./3.
+         do concurrent(n=1:3)
+            do concurrent(m=1:n)
+               D(m,n,i,j,1)=D(n,m,i,j,1)
+            end do
+         end do
+         do concurrent(lx=-1:1, ly=-1:1, lz=-1:1)
+            ldis=abs(lx)+abs(ly)+abs(lz)
+            if (ldis <= 1) then
+               vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+1)
+               vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+1)
+               vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+1)
+            endif
+         end do
          !     calculo de Dij
-         do n=1,3
+         do concurrent(n=1:3)
             dv(n,1)=vel(n,1,0,0)-vel(n,-1,0,0)
             dv(n,2)=vel(n,0,1,0)-vel(n,0,-1,0)
             dv(n,3)=vel(n,0,0,1)-vel(n,0,0,-1)
          end do
-         do n=1,3
-            do m=1,n
-               D(n,m,i,j,3)=(dv(n,m)+dv(m,n))
-               D(m,n,i,j,3)=D(n,m,i,j,3)
-               if (n == m) D(n,n,i,j,3)=2./3.*D(n,n,i,j,3)
+         do concurrent(n=1:3)
+            do concurrent(m=1:n)
+               D(n,m,i,j,2)=(dv(n,m)+dv(m,n))
+               D(m,n,i,j,2)=D(n,m,i,j,2)
+               if (n == m) D(n,n,i,j,2)=2./3.*D(n,n,i,j,2)
             end do
+         end do
+      else
+         do concurrent(n=1:3, m=1:3, lz=1:2)
+            D(n,m,i,j,lz)=D(n,m,i,j,lz+1)
+         end do
+      endif
+      !*********************************************************
+
+      !     Lectura de las velocidades necesarias
+      do concurrent(lx=-1:1, ly=-1:1, lz=-1:1)
+         ldis=abs(lx)+abs(ly)+abs(lz)
+         if (ldis <= 1) then
+            vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+k)
+            vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+k)
+            vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+k)
+         endif
+      end do
+      !     calculo de Dij
+      do concurrent(n=1:3)
+         dv(n,1)=vel(n,1,0,0)-vel(n,-1,0,0)
+         dv(n,2)=vel(n,0,1,0)-vel(n,0,-1,0)
+         dv(n,3)=vel(n,0,0,1)-vel(n,0,0,-1)
+      end do
+      do concurrent(n=1:3)
+         do concurrent(m=1:n)
+            D(n,m,i,j,3)=(dv(n,m)+dv(m,n))
+            D(m,n,i,j,3)=D(n,m,i,j,3)
+            if (n == m) D(n,n,i,j,3)=2./3.*D(n,n,i,j,3)
          end do
       end do
    end do
-
    return
 end
 
@@ -1100,16 +984,14 @@ subroutine turbu2(i,j)
    KM1=KM(1,0,0)-KM(-1,0,0)
    KM2=KM(0,1,0)-KM(0,-1,0)
    KM3=KM(0,0,1)-KM(0,0,-1)
-   do n=1,3
+   do concurrent(n=1:3)
       D1(n)=D(n,1,i+1,j,2)-D(n,1,i-1,j,2)
       D2(n)=D(n,2,i,j+1,2)-D(n,2,i,j-1,2)
       D3(n)=D(n,3,i,j,3)-D(n,3,i,j,1)
    end do
    KMM=KM(0,0,0)
-   do n=1,3
-      do m=1,3
-         DD(n,m)=D(n,m,i,j,2)
-      end do
+   do concurrent(n=1:3, m=1:3)
+      DD(n,m)=D(n,m,i,j,2)
    end do
 
    return
@@ -1121,7 +1003,7 @@ subroutine suma(sum,a1,a2,a3)
    real a1,a2,a3,sum,aux
    integer j
 
-   do j=1,2
+   do concurrent(j=1:2)
       if (a1 > a2) then
          aux=a1
          a1=a2
@@ -1343,70 +1225,53 @@ subroutine filtro(varia1,facx,facy,facz)
    !**********************************************************
    !     Redefiniciones y contornos
 
-   do i=0,nx1+1
-      do j=0,nx1+1
-         do k=0,nz1
-            varia2(i,j,k)=varia1(i,j,k)
-         end do
-      end do
+   do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
+      varia2(i,j,k)=varia1(i,j,k)
    end do
 
-   do k=0,nz1
-      do i=0,nx1
-         varia2(i,-1,k)=varia2(i,1,k)
-         varia2(i,-2,k)=varia2(i,1,k)
-         varia2(i,nx1+2,k)=varia2(i,nx1,k)
-         varia2(i,nx1+3,k)=varia2(i,nx1,k)
-         varia2(-1,i,k)=varia2(1,i,k)
-         varia2(-2,i,k)=varia2(1,i,k)
-         varia2(nx1+2,i,k)=varia2(nx1,i,k)
-         varia2(nx1+3,i,k)=varia2(nx1,i,k)
-      end do
+   do concurrent(k=0:nz1, i=0:nx1)
+      varia2(i,-1,k)=varia2(i,1,k)
+      varia2(i,-2,k)=varia2(i,1,k)
+      varia2(i,nx1+2,k)=varia2(i,nx1,k)
+      varia2(i,nx1+3,k)=varia2(i,nx1,k)
+      varia2(-1,i,k)=varia2(1,i,k)
+      varia2(-2,i,k)=varia2(1,i,k)
+      varia2(nx1+2,i,k)=varia2(nx1,i,k)
+      varia2(nx1+3,i,k)=varia2(nx1,i,k)
    end do
 
-   do i=1,nx1
-      do j=1,nx1
-         varia2(i,j,-1)=varia2(i,j,0)
-         varia2(i,j,-2)=varia2(i,j,0)
-         varia2(i,j,nz1+1)=varia2(i,j,nz1)
-         varia2(i,j,nz1+2)=varia2(i,j,nz1)
-      end do
+   do concurrent(i=1:nx1, j=1:nx1)
+      varia2(i,j,-1)=varia2(i,j,0)
+      varia2(i,j,-2)=varia2(i,j,0)
+      varia2(i,j,nz1+1)=varia2(i,j,nz1)
+      varia2(i,j,nz1+2)=varia2(i,j,nz1)
    end do
 
    !**********************************************************
    !     Filtro
 
-   do i=1,nx1
-      do j=1,nx1
-         do k=1,nz1-1
-            varx=(9.*(varia2(i-1,j,k)+varia2(i+1,j,k))-&
-               (varia2(i-3,j,k)+varia2(i+3,j,k)))/16.
-            vary=(9.*(varia2(i,j-1,k)+varia2(i,j+1,k))-&
-               (varia2(i,j-3,k)+varia2(i,j+3,k)))/16.
-            varz=(9.*(varia2(i,j,k-1)+varia2(i,j,k+1))-&
-               (varia2(i,j,k-3)+varia2(i,j,k+3)))/16.
+   do concurrent(i=1:nx1, j=1:nx1, k=1:nz1-1)
+      varx=(9.*(varia2(i-1,j,k)+varia2(i+1,j,k))-&
+         (varia2(i-3,j,k)+varia2(i+3,j,k)))/16.
+      vary=(9.*(varia2(i,j-1,k)+varia2(i,j+1,k))-&
+         (varia2(i,j-3,k)+varia2(i,j+3,k)))/16.
+      varz=(9.*(varia2(i,j,k-1)+varia2(i,j,k+1))-&
+         (varia2(i,j,k-3)+varia2(i,j,k+3)))/16.
 
-            varia1(i,j,k)=((facx*varx+facy*vary)+facz*varz)+&
-               fact*varia2(i,j,k)
-         end do
-      end do
+      varia1(i,j,k)=((facx*varx+facy*vary)+facz*varz)+&
+         fact*varia2(i,j,k)
    end do
 
-   do k=1,nz1-1
-      do i=1,nx1
-         varia1(i,0,k)=varia1(i,1,k)
-         varia1(i,nx1+1,k)=varia1(i,nx1,k)
-         varia1(0,i,k)=varia1(1,i,k)
-         varia1(nx1+1,i,k)=varia1(nx1,i,k)
-      end do
+   do concurrent(k=1:nz1-1, i=1:nx1)
+      varia1(i,0,k)=varia1(i,1,k)
+      varia1(i,nx1+1,k)=varia1(i,nx1,k)
+      varia1(0,i,k)=varia1(1,i,k)
+      varia1(nx1+1,i,k)=varia1(nx1,i,k)
    end do
 
-   do i=1,nx1
-      do j=1,nx1
-         varia1(i,j,nz1)=varia1(i,j,nz1-1)
-      end do
+   do concurrent(i=1:nx1, j=1:nx1)
+      varia1(i,j,nz1)=varia1(i,j,nz1-1)
    end do
    !**********************************************************
-
    return
 end
