@@ -9,20 +9,18 @@ contains
       USE dimen, only: nx1
       implicit none
       integer :: i, j
-      do i=0,nx1+1
-         do j=0,nx1+1
-            advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
-            advgot1(i,j)=0.
-            advllu1(i,j)=W2(i,j,1)*Qllu1(i,j,1)
-            if (W2(i,j,1) > 0) advllu1(i,j)=0.
-            advaer1(i,j)=W2(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
-            if(W2(i,j,1) < 0) advaer1(i,j)=advaer1(i,j)*1.5
-            advcri1(i,j)=0.
-            advnie1(i,j)=W2(i,j,1)*Qnie1(i,j,1)
-            if (W2(i,j,1) > 0) advnie1(i,j)=0.
-            advgra1(i,j)=W2(i,j,1)*Qgra1(i,j,1)
-            if (W2(i,j,1) > 0) advgra1(i,j)=0.
-         end do
+      do concurrent (i=0:nx1+1, j=0:nx1+1)
+         advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
+         advgot1(i,j)=0.
+         advllu1(i,j)=W2(i,j,1)*Qllu1(i,j,1)
+         if (W2(i,j,1) > 0) advllu1(i,j)=0.
+         advaer1(i,j)=W2(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
+         if(W2(i,j,1) < 0) advaer1(i,j)=advaer1(i,j)*1.5
+         advcri1(i,j)=0.
+         advnie1(i,j)=W2(i,j,1)*Qnie1(i,j,1)
+         if (W2(i,j,1) > 0) advnie1(i,j)=0.
+         advgra1(i,j)=W2(i,j,1)*Qgra1(i,j,1)
+         if (W2(i,j,1) > 0) advgra1(i,j)=0.
       end do
    end subroutine vapor_advection
 
@@ -44,7 +42,6 @@ contains
       USE lmngra, only: lgra, mgra, ngra
       implicit none
       integer :: i, j, k, l, m, n
-
       s=0
       Qvapneg=0.
       lvapneg=0
@@ -216,18 +213,14 @@ contains
       vapt1=0.
       gott1=0.
       aert1=0.
-      do i=1,nx1
-         do j=1,nx1
-            do k=1,nz1-1
-               vapt1=vapt1+Qvap2(i,j,k)
-               gott1=gott1+Qgot2(i,j,k)
-               aert1=aert1+aer2(i,j,k)
+      do concurrent (i=1:nx1, j=1:nx1, k=1:nz1-1)
+         vapt1=vapt1+Qvap2(i,j,k)
+         gott1=gott1+Qgot2(i,j,k)
+         aert1=aert1+aer2(i,j,k)
 
-               if(Qvap2(i,j,k)+Qvap0(k) < 0) then
-                  stop
-               endif
-            end do
-         end do
+         if(Qvap2(i,j,k)+Qvap0(k) < 0) then
+            stop
+         endif
       end do
    end subroutine water_calculation
 
@@ -308,7 +301,7 @@ contains
                yy=0
 
                if ((rl > 1e-3 .or. rs > 1e-3).and.Naer > 0) then
-                  call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,rl,rs,Lvl,Lvs,l,m,n,daer,dqgot,dqcri)
+                  call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,rl,rs,Lvl,Lvs,daer,dqgot,dqcri)
                   Taux=T-Temp0(k)-Tempa1(i,j,k)
                   Titaa2(i,j,k)=T/aux-Tita0(k)
                   if (dqgot > 0) yy=1
@@ -417,68 +410,66 @@ contains
 
       Qvap = (qv+qg)/nx1**2.*nz1*.1
       !contornos en el piso y en el techo
-      do i=1,nx1
-         do j=1,nx1
-            Titaa2(i,j,0)=-W2(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+Titaa1(i,j,0)
-            Titaa2(i,j,nz1)=Titaa2(i,j,nz1-1)
+      do concurrent (i=1:nx1, j=1:nx1)
+         Titaa2(i,j,0)=-W2(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+Titaa1(i,j,0)
+         Titaa2(i,j,nz1)=Titaa2(i,j,nz1-1)
 
-            !suponemos que las velocidades horizontales a nivel de piso son
-            !iguales a 1/4 de la correspondiente en el nivel 1
-            auxx=((U2(i+1,j,1)+U2(i,j,1))*(Qvap1(i+1,j,0)+Qvap1(i,j,0))&
-               -(U2(i-1,j,1)+U2(i,j,1))*(Qvap1(i-1,j,0)+Qvap1(i,j,0)))&
-               /4.*.25
-            auxy=((V2(i,j+1,1)+V2(i,j,1))*(Qvap1(i,j+1,0)+Qvap1(i,j,0))&
-               -(V2(i,j-1,1)+V2(i,j,1))*(Qvap1(i,j-1,0)+Qvap1(i,j,0)))&
-               /4.*.25
-            auxz=W2(i,j,1)*((Qvap1(i,j,1)+Qvap1(i,j,0))+Qvap0(1)+Qvap0(0))/2.*.5
+         !suponemos que las velocidades horizontales a nivel de piso son
+         !iguales a 1/4 de la correspondiente en el nivel 1
+         auxx=((U2(i+1,j,1)+U2(i,j,1))*(Qvap1(i+1,j,0)+Qvap1(i,j,0))&
+            -(U2(i-1,j,1)+U2(i,j,1))*(Qvap1(i-1,j,0)+Qvap1(i,j,0)))&
+            /4.*.25
+         auxy=((V2(i,j+1,1)+V2(i,j,1))*(Qvap1(i,j+1,0)+Qvap1(i,j,0))&
+            -(V2(i,j-1,1)+V2(i,j,1))*(Qvap1(i,j-1,0)+Qvap1(i,j,0)))&
+            /4.*.25
+         auxz=W2(i,j,1)*((Qvap1(i,j,1)+Qvap1(i,j,0))+Qvap0(1)+Qvap0(0))/2.*.5
 
-            Qvap2(i,j,nz1)=Qvap2(i,j,nz1-1)
+         Qvap2(i,j,nz1)=Qvap2(i,j,nz1-1)
 
-            Qgot2(i,j,0)=Qgot2(i,j,1)
-            Qgot2(i,j,nz1)=Qgot2(i,j,nz1-1)
+         Qgot2(i,j,0)=Qgot2(i,j,1)
+         Qgot2(i,j,nz1)=Qgot2(i,j,nz1-1)
 
-            Qcri2(i,j,0)=Qcri2(i,j,1)
-            Qcri2(i,j,nz1)=Qcri2(i,j,nz1-1)
+         Qcri2(i,j,0)=Qcri2(i,j,1)
+         Qcri2(i,j,nz1)=Qcri2(i,j,nz1-1)
 
-            !Para que no se acumulen el piso
-            Qllu2(i,j,0)=Qllu2(i,j,1)/2.
-            Qllu2(i,j,nz1)=Qllu2(i,j,nz1-1)
+         !Para que no se acumulen el piso
+         Qllu2(i,j,0)=Qllu2(i,j,1)/2.
+         Qllu2(i,j,nz1)=Qllu2(i,j,nz1-1)
 
-            Qnie2(i,j,0)=Qnie2(i,j,1)
-            Qnie2(i,j,nz1)=Qnie2(i,j,nz1-1)
+         Qnie2(i,j,0)=Qnie2(i,j,1)
+         Qnie2(i,j,nz1)=Qnie2(i,j,nz1-1)
 
-            !Para que no se acumulen el piso
-            Qgra2(i,j,0)=Qgra2(i,j,1)/2.
-            Qgra2(i,j,nz1)=Qgra2(i,j,nz1-1)
+         !Para que no se acumulen el piso
+         Qgra2(i,j,0)=Qgra2(i,j,1)/2.
+         Qgra2(i,j,nz1)=Qgra2(i,j,nz1-1)
 
-            !suponemos que las velocidades horizontales a nivel de piso son
-            !iguales a 1/4 de la correspondiente en el nivel 1
+         !suponemos que las velocidades horizontales a nivel de piso son
+         !iguales a 1/4 de la correspondiente en el nivel 1
 
-            auxx=((U2(i+1,j,1)+U2(i,j,1))*(aer1(i+1,j,0)+aer1(i,j,0))&
-               -(U2(i-1,j,1)+U2(i,j,1))*(aer1(i-1,j,0)+aer1(i,j,0)))&
-               /4.*.25
-            auxy=((V2(i,j+1,1)+V2(i,j,1))*(aer1(i,j+1,0)+aer1(i,j,0))&
-               -(V2(i,j-1,1)+V2(i,j,1))*(aer1(i,j-1,0)+aer1(i,j,0)))&
-               /4.*.25
-            auxz=W2(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+aer0(1)+aer0(0))/2.*.5
+         auxx=((U2(i+1,j,1)+U2(i,j,1))*(aer1(i+1,j,0)+aer1(i,j,0))&
+            -(U2(i-1,j,1)+U2(i,j,1))*(aer1(i-1,j,0)+aer1(i,j,0)))&
+            /4.*.25
+         auxy=((V2(i,j+1,1)+V2(i,j,1))*(aer1(i,j+1,0)+aer1(i,j,0))&
+            -(V2(i,j-1,1)+V2(i,j,1))*(aer1(i,j-1,0)+aer1(i,j,0)))&
+            /4.*.25
+         auxz=W2(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+aer0(1)+aer0(0))/2.*.5
 
-            if (W2(i,j,0) > 0) then
-               aeraux=-((auxx+auxy)+2.*auxz)*dt1/dx1
-            else
-               !se refleja un 25 % de los aerosoles que caen
-               aeraux=-((auxx+auxy)+.25*2.*auxz)*dt1/dx1
-            endif
+         if (W2(i,j,0) > 0) then
+            aeraux=-((auxx+auxy)+2.*auxz)*dt1/dx1
+         else
+            !se refleja un 25 % de los aerosoles que caen
+            aeraux=-((auxx+auxy)+.25*2.*auxz)*dt1/dx1
+         endif
 
-            !agregamos un termino de turbulencia para los aerosoles
-            !a nivel de piso
-            turbu=cks/dx1*.25*(abs(U2(i,j,1))+abs(V2(i,j,1))+2.*abs(W2(i,j,1)))
-            lapla=((aer1(i+1,j,0)+aer1(i-1,j,0))+(aer1(i,j+1,0)+aer1(i,j-1,0)+aer1(i,j,1)))-5.*aer1(i,j,0)
-            lapla=lapla+(aer0(1)-aer0(0))
+         !agregamos un termino de turbulencia para los aerosoles
+         !a nivel de piso
+         turbu=cks/dx1*.25*(abs(U2(i,j,1))+abs(V2(i,j,1))+2.*abs(W2(i,j,1)))
+         lapla=((aer1(i+1,j,0)+aer1(i-1,j,0))+(aer1(i,j+1,0)+aer1(i,j-1,0)+aer1(i,j,1)))-5.*aer1(i,j,0)
+         lapla=lapla+(aer0(1)-aer0(0))
 
-            aer2(i,j,0)=aeraux+aer1(i,j,0)+turbu*lapla
+         aer2(i,j,0)=aeraux+aer1(i,j,0)+turbu*lapla
 
-            aer2(i,j,nz1)=aer2(i,j,nz1-1)
-         end do
+         aer2(i,j,nz1)=aer2(i,j,nz1-1)
       end do
    end subroutine floor_and_ceiling_contour
 
@@ -489,41 +480,39 @@ contains
       USE permic, only: Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer2
       implicit none
       integer :: j, k
-      do k=1,nz1-1
-         do j=1,nx1
-            Titaa2(0,j,k)=Titaa2(1,j,k)
-            Titaa2(nx1+1,j,k)=Titaa2(nx1,j,k)
-            Titaa2(j,0,k)=Titaa2(j,1,k)
-            Titaa2(j,nx1+1,k)=Titaa2(j,nx1,k)
-            Qvap2(0,j,k)=0.
-            Qvap2(nx1+1,j,k)=0.
-            Qvap2(j,0,k)=0.
-            Qvap2(j,nx1+1,k)=0.
-            Qgot2(0,j,k)=Qgot2(1,j,k)
-            Qgot2(nx1+1,j,k)=Qgot2(nx1,j,k)
-            Qgot2(j,0,k)=Qgot2(j,1,k)
-            Qgot2(j,nx1+1,k)=Qgot2(j,nx1,k)
-            Qllu2(0,j,k)=0.
-            Qllu2(nx1+1,j,k)=0.
-            Qllu2(j,0,k)=0.
-            Qllu2(j,nx1+1,k)=0.
-            Qcri2(0,j,k)=Qcri2(1,j,k)
-            Qcri2(nx1+1,j,k)=Qcri2(nx1,j,k)
-            Qcri2(j,0,k)=Qcri2(j,1,k)
-            Qcri2(j,nx1+1,k)=Qcri2(j,nx1,k)
-            Qnie2(0,j,k)=Qnie2(1,j,k)
-            Qnie2(nx1+1,j,k)=Qnie2(nx1,j,k)
-            Qnie2(j,0,k)=Qnie2(j,1,k)
-            Qnie2(j,nx1+1,k)=Qnie2(j,nx1,k)
-            Qgra2(0,j,k)=0.
-            Qgra2(nx1+1,j,k)=0.
-            Qgra2(j,0,k)=0.
-            Qgra2(j,nx1+1,k)=0.
-            aer2(0,j,k)=aer2(1,j,k)
-            aer2(nx1+1,j,k)=aer2(nx1,j,k)
-            aer2(j,0,k)=aer2(j,1,k)
-            aer2(j,nx1+1,k)=aer2(j,nx1,k)
-         end do
+      do concurrent (k=1:nz1-1, j=1:nx1)
+         Titaa2(0,j,k)=Titaa2(1,j,k)
+         Titaa2(nx1+1,j,k)=Titaa2(nx1,j,k)
+         Titaa2(j,0,k)=Titaa2(j,1,k)
+         Titaa2(j,nx1+1,k)=Titaa2(j,nx1,k)
+         Qvap2(0,j,k)=0.
+         Qvap2(nx1+1,j,k)=0.
+         Qvap2(j,0,k)=0.
+         Qvap2(j,nx1+1,k)=0.
+         Qgot2(0,j,k)=Qgot2(1,j,k)
+         Qgot2(nx1+1,j,k)=Qgot2(nx1,j,k)
+         Qgot2(j,0,k)=Qgot2(j,1,k)
+         Qgot2(j,nx1+1,k)=Qgot2(j,nx1,k)
+         Qllu2(0,j,k)=0.
+         Qllu2(nx1+1,j,k)=0.
+         Qllu2(j,0,k)=0.
+         Qllu2(j,nx1+1,k)=0.
+         Qcri2(0,j,k)=Qcri2(1,j,k)
+         Qcri2(nx1+1,j,k)=Qcri2(nx1,j,k)
+         Qcri2(j,0,k)=Qcri2(j,1,k)
+         Qcri2(j,nx1+1,k)=Qcri2(j,nx1,k)
+         Qnie2(0,j,k)=Qnie2(1,j,k)
+         Qnie2(nx1+1,j,k)=Qnie2(nx1,j,k)
+         Qnie2(j,0,k)=Qnie2(j,1,k)
+         Qnie2(j,nx1+1,k)=Qnie2(j,nx1,k)
+         Qgra2(0,j,k)=0.
+         Qgra2(nx1+1,j,k)=0.
+         Qgra2(j,0,k)=0.
+         Qgra2(j,nx1+1,k)=0.
+         aer2(0,j,k)=aer2(1,j,k)
+         aer2(nx1+1,j,k)=aer2(nx1,j,k)
+         aer2(j,0,k)=aer2(j,1,k)
+         aer2(j,nx1+1,k)=aer2(j,nx1,k)
       end do
    end subroutine lateral_contour
 
@@ -539,111 +528,108 @@ contains
       integer :: i, j, k
       !*** modificada las condiciones en el piso
       !Redefinicion
-      do i=1,nx1
-         do j=1,nx1
-            k=0
-            Titaa1(i,j,k)=pro3*Titaa2(i,j,k)+&
-               pro4*((Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+(Titaa2(i,j+1,k)+Titaa2(i,j-1,k)))
+      do concurrent (i=1:nx1, j=1:nx1)
+         k=0
+         Titaa1(i,j,k)=pro3*Titaa2(i,j,k)+&
+            pro4*((Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+(Titaa2(i,j+1,k)+Titaa2(i,j-1,k)))
+
+         if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
+
+         Qvap1(i,j,k)=pro3*Qvap2(i,j,k)+&
+            pro4*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+(Qvap2(i,j+1,k)+Qvap2(i,j-1,k)))
+
+
+         if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
+
+         Qgot1(i,j,k)=pro3*Qgot2(i,j,k)+&
+            pro4*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+(Qgot2(i,j+1,k)+Qgot2(i,j-1,k)))
+
+         if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
+
+         Qllu1(i,j,k)=Qllu2(i,j,k)
+
+         if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
+
+         Qcri1(i,j,k)=pro3*Qcri2(i,j,k)+&
+            pro4*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+(Qcri2(i,j+1,k)+Qcri2(i,j-1,k)))
+
+         if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
+
+         Qnie1(i,j,k)=pro3*Qnie2(i,j,k)+pro4*((Qnie2(i+1,j,k)&
+            +Qnie2(i-1,j,k))+(Qnie2(i,j+1,k)+Qnie2(i,j-1,k)))
+
+         if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
+
+         Qgra1(i,j,k)=Qgra2(i,j,k)
+
+         if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
+
+         aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
+
+         !correccion cambiando la absorcion de aerosoles
+         if ((Qllu1(i,j,1)+Qgra1(i,j,1)) > 1e-6 .and.W2(i,j,1) < 0) then
+            aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
+            aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
+         endif
+
+         if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
+
+
+         do concurrent(k=1:nz1-1)
+            Titaa1(i,j,k)=pro1*Titaa2(i,j,k)+&
+               pro2*(&
+               (Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+&
+               (Titaa2(i,j+1,k)+Titaa2(i,j-1,k))+&
+               Titaa2(i,j,k+1)+Titaa2(i,j,k-1))
 
             if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
 
-            Qvap1(i,j,k)=pro3*Qvap2(i,j,k)+&
-               pro4*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+(Qvap2(i,j+1,k)+Qvap2(i,j-1,k)))
-
+            Qvap1(i,j,k)=pro1*Qvap2(i,j,k)+&
+               pro2*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+&
+               (Qvap2(i,j+1,k)+Qvap2(i,j-1,k))+&
+               Qvap2(i,j,k+1)+Qvap2(i,j,k-1))
 
             if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
 
-            Qgot1(i,j,k)=pro3*Qgot2(i,j,k)+&
-               pro4*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+(Qgot2(i,j+1,k)+Qgot2(i,j-1,k)))
+            Qgot1(i,j,k)=pro1*Qgot2(i,j,k)+&
+               pro2*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+&
+               (Qgot2(i,j+1,k)+Qgot2(i,j-1,k))+&
+               Qgot2(i,j,k+1)+Qgot2(i,j,k-1))
 
             if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
 
-            Qllu1(i,j,k)=Qllu2(i,j,k)
+            Qllu1(i,j,k)=pro1*Qllu2(i,j,k)+&
+               pro2*((Qllu2(i+1,j,k)+Qllu2(i-1,j,k))+&
+               (Qllu2(i,j+1,k)+Qllu2(i,j-1,k))+Qllu2(i,j,k+1)+Qllu2(i,j,k-1))
 
             if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
 
-            Qcri1(i,j,k)=pro3*Qcri2(i,j,k)+&
-               pro4*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+(Qcri2(i,j+1,k)+Qcri2(i,j-1,k)))
+            Qcri1(i,j,k)=pro1*Qcri2(i,j,k)+&
+               pro2*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+&
+               (Qcri2(i,j+1,k)+Qcri2(i,j-1,k))+Qcri2(i,j,k+1)+Qcri2(i,j,k-1))
 
             if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
 
-            Qnie1(i,j,k)=pro3*Qnie2(i,j,k)+pro4*((Qnie2(i+1,j,k)&
-               +Qnie2(i-1,j,k))+(Qnie2(i,j+1,k)+Qnie2(i,j-1,k)))
+            Qnie1(i,j,k)=pro1*Qnie2(i,j,k)+&
+               pro2*((Qnie2(i+1,j,k)+Qnie2(i-1,j,k))+&
+               (Qnie2(i,j+1,k)+Qnie2(i,j-1,k))+&
+               Qnie2(i,j,k+1)+Qnie2(i,j,k-1))
 
             if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
 
-            Qgra1(i,j,k)=Qgra2(i,j,k)
+            Qgra1(i,j,k)=pro1*Qgra2(i,j,k)+&
+               pro2*((Qgra2(i+1,j,k)+Qgra2(i-1,j,k))+&
+               (Qgra2(i,j+1,k)+Qgra2(i,j-1,k))+&
+               Qgra2(i,j,k+1)+Qgra2(i,j,k-1))
 
             if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
 
-            aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
+            aer1(i,j,k)=pro1*aer2(i,j,k)+&
+               pro2*((aer2(i+1,j,k)+aer2(i-1,j,k))+&
+               (aer2(i,j+1,k)+aer2(i,j-1,k))+aer2(i,j,k+1)+aer2(i,j,k-1))
 
-            !correccion cambiando la absorcion de aerosoles
-            if ((Qllu1(i,j,1)+Qgra1(i,j,1)) > 1e-6 .and.W2(i,j,1) < 0) then
-               aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
-               aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
-            endif
 
             if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
-
-
-            do k=1,nz1-1
-
-               Titaa1(i,j,k)=pro1*Titaa2(i,j,k)+&
-                  pro2*(&
-                  (Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+&
-                  (Titaa2(i,j+1,k)+Titaa2(i,j-1,k))+&
-                  Titaa2(i,j,k+1)+Titaa2(i,j,k-1))
-
-               if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
-
-               Qvap1(i,j,k)=pro1*Qvap2(i,j,k)+&
-                  pro2*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+&
-                  (Qvap2(i,j+1,k)+Qvap2(i,j-1,k))+&
-                  Qvap2(i,j,k+1)+Qvap2(i,j,k-1))
-
-               if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
-
-               Qgot1(i,j,k)=pro1*Qgot2(i,j,k)+&
-                  pro2*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+&
-                  (Qgot2(i,j+1,k)+Qgot2(i,j-1,k))+&
-                  Qgot2(i,j,k+1)+Qgot2(i,j,k-1))
-
-               if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
-
-               Qllu1(i,j,k)=pro1*Qllu2(i,j,k)+&
-                  pro2*((Qllu2(i+1,j,k)+Qllu2(i-1,j,k))+&
-                  (Qllu2(i,j+1,k)+Qllu2(i,j-1,k))+Qllu2(i,j,k+1)+Qllu2(i,j,k-1))
-
-               if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
-
-               Qcri1(i,j,k)=pro1*Qcri2(i,j,k)+&
-                  pro2*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+&
-                  (Qcri2(i,j+1,k)+Qcri2(i,j-1,k))+Qcri2(i,j,k+1)+Qcri2(i,j,k-1))
-
-               if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
-
-               Qnie1(i,j,k)=pro1*Qnie2(i,j,k)+&
-                  pro2*((Qnie2(i+1,j,k)+Qnie2(i-1,j,k))+&
-                  (Qnie2(i,j+1,k)+Qnie2(i,j-1,k))+&
-                  Qnie2(i,j,k+1)+Qnie2(i,j,k-1))
-
-               if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
-
-               Qgra1(i,j,k)=pro1*Qgra2(i,j,k)+&
-                  pro2*((Qgra2(i+1,j,k)+Qgra2(i-1,j,k))+&
-                  (Qgra2(i,j+1,k)+Qgra2(i,j-1,k))+&
-                  Qgra2(i,j,k+1)+Qgra2(i,j,k-1))
-
-               if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
-
-               aer1(i,j,k)=pro1*aer2(i,j,k)+&
-                  pro2*((aer2(i+1,j,k)+aer2(i-1,j,k))+&
-                  (aer2(i,j+1,k)+aer2(i,j-1,k))+aer2(i,j,k+1)+aer2(i,j,k-1))
-
-
-               if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
-            end do
          end do
       end do
    end subroutine floor_condition_redefinition
@@ -656,42 +642,40 @@ contains
       implicit none
       integer :: i, j
       !contornos en el piso y en el techo
-      do i=1,nx1
-         do j=1,nx1
-            Titaa1(i,j,0)=Titaa1(i,j,0)
-            if (Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=.5
-            if (-Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=-.5
+      do concurrent(i=1:nx1, j=1:nx1)
+         Titaa1(i,j,0)=Titaa1(i,j,0)
+         if (Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=.5
+         if (-Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=-.5
 
-            Titaa1(i,j,nz1)=Titaa1(i,j,nz1-1)
+         Titaa1(i,j,nz1)=Titaa1(i,j,nz1-1)
 
-            !corregido para el vapor
-            if (Qvap1(i,j,0) > Qvap0(0)*.5) then
-               Qvap1(i,j,0)=.8*Qvap0(0)
-            endif
-            if (-Qvap1(i,j,0) > Qvap0(0)*.5) then
-               Qvap1(i,j,0)=-.8*Qvap0(0)
-            endif
+         !corregido para el vapor
+         if (Qvap1(i,j,0) > Qvap0(0)*.5) then
+            Qvap1(i,j,0)=.8*Qvap0(0)
+         endif
+         if (-Qvap1(i,j,0) > Qvap0(0)*.5) then
+            Qvap1(i,j,0)=-.8*Qvap0(0)
+         endif
 
-            Qvap1(i,j,nz1)=Qvap1(i,j,nz1-1)
-            Qgot1(i,j,0)=0.
-            Qgot1(i,j,nz1)=Qgot1(i,j,nz1-1)
-            Qllu1(i,j,0)=Qllu1(i,j,0)
-            Qllu1(i,j,nz1)=Qllu1(i,j,nz1-1)
-            Qcri1(i,j,0)=0.
-            Qcri1(i,j,nz1)=Qcri1(i,j,nz1-1)
+         Qvap1(i,j,nz1)=Qvap1(i,j,nz1-1)
+         Qgot1(i,j,0)=0.
+         Qgot1(i,j,nz1)=Qgot1(i,j,nz1-1)
+         Qllu1(i,j,0)=Qllu1(i,j,0)
+         Qllu1(i,j,nz1)=Qllu1(i,j,nz1-1)
+         Qcri1(i,j,0)=0.
+         Qcri1(i,j,nz1)=Qcri1(i,j,nz1-1)
 
-            Qnie1(i,j,0)=0.
-            Qnie1(i,j,nz1)=Qnie1(i,j,nz1-1)
+         Qnie1(i,j,0)=0.
+         Qnie1(i,j,nz1)=Qnie1(i,j,nz1-1)
 
-            Qgra1(i,j,0)=Qgra1(i,j,0)
-            Qgra1(i,j,nz1)=Qgra1(i,j,nz1-1)
+         Qgra1(i,j,0)=Qgra1(i,j,0)
+         Qgra1(i,j,nz1)=Qgra1(i,j,nz1-1)
 
-            !corregido para los aerosoles
-            if (-aer1(i,j,0) > 0.8*aer0(0)) then
-               aer1(i,j,0)=-.8*aer0(0)
-            endif
-            aer1(i,j,nz1)=aer1(i,j,nz1-1)
-         end do
+         !corregido para los aerosoles
+         if (-aer1(i,j,0) > 0.8*aer0(0)) then
+            aer1(i,j,0)=-.8*aer0(0)
+         endif
+         aer1(i,j,nz1)=aer1(i,j,nz1-1)
       end do
    end subroutine floor_and_ceiling_contour_redefinition
 
@@ -702,42 +686,40 @@ contains
       USE permic, only: Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1
       implicit none
       integer :: j, k
-      do k=1,nz1-1
-         do j=1,nx1
-            Titaa1(0,j,k)=Titaa1(1,j,k)
-            Titaa1(nx1+1,j,k)=Titaa1(nx1,j,k)
-            Titaa1(j,0,k)=Titaa1(j,1,k)
-            Titaa1(j,nx1+1,k)=Titaa1(j,nx1,k)
-            Qvap1(0,j,k)=0.
-            Qvap1(nx1+1,j,k)=0.
-            Qvap1(j,0,k)=0.
-            Qvap1(j,nx1+1,k)=0.
-            Qgot1(0,j,k)=Qgot1(1,j,k)
-            Qgot1(nx1+1,j,k)=Qgot1(nx1,j,k)
-            Qgot1(j,0,k)=Qgot1(j,1,k)
-            Qgot1(j,nx1+1,k)=Qgot1(j,nx1,k)
-            Qllu1(0,j,k)=0.
-            Qllu1(nx1+1,j,k)=0.
-            Qllu1(j,0,k)=0.
-            Qllu1(j,nx1+1,k)=0.
-            Qcri1(0,j,k)=Qcri1(1,j,k)
-            Qcri1(nx1+1,j,k)=Qcri1(nx1,j,k)
-            Qcri1(j,0,k)=Qcri1(j,1,k)
-            Qcri1(j,nx1+1,k)=Qcri1(j,nx1,k)
-            Qnie1(0,j,k)=Qnie1(1,j,k)
-            Qnie1(nx1+1,j,k)=Qnie1(nx1,j,k)
-            Qnie1(j,0,k)=Qnie1(j,1,k)
-            Qnie1(j,nx1+1,k)=Qnie1(j,nx1,k)
-            Qgra1(0,j,k)=0.
-            Qgra1(nx1+1,j,k)=0.
-            Qgra1(j,0,k)=0.
-            Qgra1(j,nx1+1,k)=0.
+      do concurrent(k=1:nz1-1, j=1:nx1)
+         Titaa1(0,j,k)=Titaa1(1,j,k)
+         Titaa1(nx1+1,j,k)=Titaa1(nx1,j,k)
+         Titaa1(j,0,k)=Titaa1(j,1,k)
+         Titaa1(j,nx1+1,k)=Titaa1(j,nx1,k)
+         Qvap1(0,j,k)=0.
+         Qvap1(nx1+1,j,k)=0.
+         Qvap1(j,0,k)=0.
+         Qvap1(j,nx1+1,k)=0.
+         Qgot1(0,j,k)=Qgot1(1,j,k)
+         Qgot1(nx1+1,j,k)=Qgot1(nx1,j,k)
+         Qgot1(j,0,k)=Qgot1(j,1,k)
+         Qgot1(j,nx1+1,k)=Qgot1(j,nx1,k)
+         Qllu1(0,j,k)=0.
+         Qllu1(nx1+1,j,k)=0.
+         Qllu1(j,0,k)=0.
+         Qllu1(j,nx1+1,k)=0.
+         Qcri1(0,j,k)=Qcri1(1,j,k)
+         Qcri1(nx1+1,j,k)=Qcri1(nx1,j,k)
+         Qcri1(j,0,k)=Qcri1(j,1,k)
+         Qcri1(j,nx1+1,k)=Qcri1(j,nx1,k)
+         Qnie1(0,j,k)=Qnie1(1,j,k)
+         Qnie1(nx1+1,j,k)=Qnie1(nx1,j,k)
+         Qnie1(j,0,k)=Qnie1(j,1,k)
+         Qnie1(j,nx1+1,k)=Qnie1(j,nx1,k)
+         Qgra1(0,j,k)=0.
+         Qgra1(nx1+1,j,k)=0.
+         Qgra1(j,0,k)=0.
+         Qgra1(j,nx1+1,k)=0.
 
-            aer1(0,j,k)=aer1(1,j,k)
-            aer1(nx1+1,j,k)=aer1(nx1,j,k)
-            aer1(j,0,k)=aer1(j,1,k)
-            aer1(j,nx1+1,k)=aer1(j,nx1,k)
-         end do
+         aer1(0,j,k)=aer1(1,j,k)
+         aer1(nx1+1,j,k)=aer1(nx1,j,k)
+         aer1(j,0,k)=aer1(j,1,k)
+         aer1(j,nx1+1,k)=aer1(j,nx1,k)
       end do
    end subroutine lateral_contour_redefinition
 
@@ -748,14 +730,10 @@ contains
       USE estbas, only: Qvap0
       implicit none
       integer :: i, j, k
-      do i=0,nx1+1
-         do j=0,nx1+1
-            do k=0,nz1
-               if(Qvap1(i,j,k)+Qvap0(k) < 0) then
-                  Qvap1(i,j,k)=-Qvap0(k)
-               endif
-            end do
-         end do
+      do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
+         if(Qvap1(i,j,k)+Qvap0(k) < 0) then
+            Qvap1(i,j,k)=-Qvap0(k)
+         endif
       end do
    end subroutine vapour_negative_correction
 
@@ -802,3 +780,4 @@ contains
       endif
    end subroutine save_backup
 end module model_aux
+
