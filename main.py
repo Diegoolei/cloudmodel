@@ -1,6 +1,6 @@
 from cloud_read import FileStyle
 import numpy as np
-import nubepy.nubepy as nb
+import interphase.interphase as nb
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
         folder_handle="Delete",
     )
     nubes.check_path(nubes.output_data_path)
-    nb.c_interface.run_model_python(45,3)
+    # nb.c_interphase.run_model_python(45,3)
 
     iniciales.parse_status_img()
     nubes.parse_status_img()

@@ -39,6 +39,7 @@ contains
          call lateral_contour()
          call speed_pressure()
          call floor_condition_redefinition()
+         call floor_and_ceiling_contour_redefinition()
          call lateral_contour_redefinition()
          call filtro(Titaa1,.01,.01,.02)
          call vapour_negative_correction()

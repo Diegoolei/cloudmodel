@@ -1,4 +1,4 @@
-module c_interface
+module c_interphase
     use iso_c_binding
 
     use config, only: init_config
