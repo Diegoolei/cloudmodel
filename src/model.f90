@@ -26,9 +26,18 @@ contains
          microphisics_substring, floor_and_ceiling_contour, lateral_contour,&
          floor_condition_redefinition, floor_and_ceiling_contour_redefinition,&
          lateral_contour_redefinition, vapour_negative_correction, save_backup
+      USE, intrinsic :: iso_fortran_env, only : I4P=>int32, R8P=>real64
+      use, intrinsic :: iso_fortran_env
+      USE forbear, only: bar_object
       implicit none
-      
+      real(R8P)        :: x
+      real(R8P)        :: y
+      type(bar_object) :: bar
       call initialize_model()
+      call bar%initialize(filled_char_string='㊂', empty_char_string='●',&
+         suffix_string='| ', add_progress_percent=.true.,prefix_string='Progress |',&
+         scale_bar_color_fg='blue', scale_bar_style='underline_on', spinner_string='(  ●   )')
+      call bar%start
       do tt=1,lt1
          call vapor_advection()
          call dinamics()
@@ -44,8 +53,11 @@ contains
          call filtro(Titaa1,.01,.01,.02)
          call vapour_negative_correction()
          call save_backup()
-         write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
+         x = real(tt, R8P)/real(lt1, R8P)
+         call bar%update(current=x)
+         !write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
       end do
 
+      call bar%destroy
    end subroutine model
 end module cloud_model

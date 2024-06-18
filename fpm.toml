@@ -1,9 +1,9 @@
 name = "cloudsim"
-version = "0.1.0"
+version = "1.0.0"
 license = "license"
-author = "Federico E. Benelli"
-maintainer = "fedebenelli@outlook.com"
-copyright = "Copyright 2023, Federico E. Benelli"
+author = "Diego E. Oleiaz"
+maintainer = "diegooleiarz@hotmail.com"
+copyright = "Copyright 2024, Diego E. Oleiaz"
 
 [build]
 auto-executables = false
@@ -28,3 +28,5 @@ source-form = "default"
 # implicit-external = false
 # source-form = "free"
 
+[dependencies]
+forbear = {git="https://github.com/szaghi/forbear"}
