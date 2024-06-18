@@ -1,7 +1,9 @@
 from cloud_read import FileStyle
 import numpy as np
-import interphase.interphase as nb
+import interface.interface as nb
 
+
+nb.c_interface.run_model_python(45,3)
 
 def main():
     iniciales = FileStyle(
@@ -28,8 +30,6 @@ def main():
         folder_handle="Delete",
     )
     nubes.check_path(nubes.output_data_path)
-    # nb.c_interphase.run_model_python(45,3)
-
     iniciales.parse_status_img()
     nubes.parse_status_img()
 

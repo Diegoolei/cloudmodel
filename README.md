@@ -28,7 +28,16 @@ xcode-select --install
 
 ## F2Py
 
+### Compile with F2Py
+
 ```console
-cd interphase
+cd interface
 make
+```
+
+### Execute with Python
+
+```console
+cd ..
+python3 main.py
 ```
