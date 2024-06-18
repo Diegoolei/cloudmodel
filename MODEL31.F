@@ -1,5 +1,5 @@
 *23456789*123456789*123456789*123456789*123456789*123456789*123456789*
-*     Revision 8/04/00
+*     Revision 14/04/99
 *     Incluye microfisica con vapor, gotitas, lluvia, cristales, nieve 
 *      y granizos (por unidad de volumen)
 *     Con viento de corte.
@@ -14,8 +14,6 @@
 *     Graba el valor de las variables para analisis cada ltg segundos.
 *     Condicion de contorno nula para el vapor
 *     Contempla el desplazamiento de la nube.
-*     Mejora la condicion en el piso para los aerosoles cuando hay agua (815)
-
 
       program modelo
 
@@ -36,7 +34,7 @@
       include 'lmngra.i'
       include 'turbvar.i'
 
-      include 'mode20.i'   !include del modelo
+      include 'mode10.i'   !include del modelo
 
 *******************************************************************
 **    Condiciones iniciales. Si ini=0 el calculo empieza por primera,
@@ -44,7 +42,7 @@
 
       if (ini.eq.0) then
 *&&
-	    call condi
+	call condi
       else
 
       open(13,file='inis.da')
@@ -67,16 +65,6 @@
 	close(3)
 	close(13)
 	close(14)
-
-	do 5001 i=1,nx1
-	do 5001 j=1,nx1
-	do 5001 k=1,nz1
-*           aux=.7*exp(-((i-35)**2.+(j-25.5)**2.+(k-10)**2.)/50.)
-*           aux=1.*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
-           aux=.8*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
-	   Titaa1(i,j,k)=Titaa1(i,j,k)+aux
-	   Titaa2(i,j,k)=Titaa2(i,j,k)+aux
- 5001   continue
       endif
 
 ***   definicion de calores y presiones de vapor a 0 K
@@ -819,10 +807,9 @@
 	aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)
      &       +aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
 
-*     correccion cambiando la absorcion de aerosoles (07/04/00)
-	if ((Qllu1(i,j,1)+Qgra1(i,j,1)).gt.1e-6 .and. 
-     &             W2(i,j,1).lt.0) then
-	  aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
+*     correccion cambiando la absorcion de aerosoles (04/05/98)
+	if (Qllu1(i,j,0).gt.1e-6 .and. W2(i,j,1).lt.-.1) then
+	  aeraux=(-W2(i,j,1)/1.)*(Qllu1(i,j,0)/1e-3)*.02*(dt1/5.)
 	  aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
 	endif
  
@@ -1049,9 +1036,9 @@
 
 
        write(*,*) W1(20,22,30),W1(19,22,30),W1(21,22,30),W1(20,21,30)
-     &            ,W1(20,23,30)
+     &            W1(20,23,30)
        write(*,*) W1(19,21,30),W1(21,21,30),W1(21,23,30),W1(19,23,30)
-     &            ,W1(21,22,30)
+     &            W1(21,22,30)
 
 *       write(*,*) Qcri1(20,22,22),Qnie1(20,22,22),Qvap1(20,22,22)
 *     &           ,Qvap0(22),W1(20,22,22)
@@ -1153,7 +1140,7 @@
 	include 'estad03.i'
 *       desplazamiento de la nube
         tte=tte+1
-        include 'posnub02.i'
+        include 'posnub01.i'
         include 'corrinu2.i'
         write(32,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),
      &              posxx,posyy
@@ -1162,7 +1149,7 @@
       if (tt/nint(ltg/dt1)*nint(ltg/dt1).eq.tt) then
 	t1=t1+1
 *     grabacion 2D
-*       include 'graba231.i'
+*       include 'graba220.i'
 *     grabacion 3D
         include 'graba320.i'
       endif

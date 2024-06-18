@@ -8,7 +8,7 @@
       
 *     parametros de las particulas
       real Rgotmin,Acri,Bcri
-      parameter (Rgotmin=5e-6,Acri=1e-11,Bcri=.6)   !A en cm^-3
+      parameter (Rgotmin=7e-6,Acri=1e-11,Bcri=.6)   !A en cm^-3
 
 *     numero de aesosoles
       real Naer,Naux

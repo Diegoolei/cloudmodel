@@ -53,21 +53,21 @@
       real cks,turbu,lapla      
 
       bre='01020304050607080910111213141516171819202122232425'
-      tie='31'      
+      tie='18'      
       
       ini=0                            !inicio por vez primera= 0
       t1=0                             !paso a inicio (si ini=0->t1=0)
 *      ltt=25.*3.*60.                       !tiempo total de simulacion
-      ltt=15.*6.*60.                       !tiempo total de simulacion
-*      ltt=3.*60.                       !tiempo total de simulacion
-*      ltt=2.*2.                       !tiempo total de simulacion
+*      ltt=7.*15.*60.                       !tiempo total de simulacion
+*      ltt=1.*60.                       !tiempo total de simulacion
+      ltt=2.*2.                       !tiempo total de simulacion
 *      ltg=3*60.                        !tiempo de grabacion
-*      ltg=6.*60.                        !tiempo de grabacion
-      ltg=10.                        !tiempo de grabacion
+      ltg=15*60.                        !tiempo de grabacion
+*      ltg=60.                        !tiempo de grabacion
       lte=30.                          !tiempo de grabacion estadistica
 *      lte=2.                          !tiempo de grabacion estadistica
 *      ltb=3*60.                        ! tiempo de grabacion de backup
-      ltb=10.                        ! tiempo de grabacion de backup
+      ltb=2*2.                        ! tiempo de grabacion de backup
       
       ctur=.5
       

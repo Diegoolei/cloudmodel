@@ -37,7 +37,7 @@
 *$$
       real*8 Rgot,Ngot,Rllu,Nllu,Rcri,Ncri,Rnie,Nnie,Rgra,Ngra
       real*8 Vtm,Vtgra,Nre,Nsc,A,fventl,fventn,fventgs,fventgl,Rgotmin
-      parameter (Rgotmin=5e-6)
+      parameter (Rgotmin=7e-6)
       
 
       integer s
