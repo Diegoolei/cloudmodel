@@ -40,7 +40,7 @@ contains
 
       implicit none
 
-      real equis,ygrie,zeta,G1,centx,centy,centz,cenaerx,cenaery,cenaerz,sigmat&
+      real equis,ygrie,zeta,G1,centx,centy,centz,sigmat&
          ,sigmaa,radiomed,temper,aerper,elv1,rel1,tem1,a0,a1,a2,a3,a4,a5,a6&
          ,b0,b1,b2,b3,b4,b5,b6,aux,gam,Tk,Qvaptot,aertot,vb,vc,vh,zeta1
       integer i,j,k,n,unit
@@ -48,9 +48,6 @@ contains
       centx=(nx1+1.)*dx1/2.           !Coord x de la perturbacion inicial
       centy=(nx1+1.)*dx1/2.           !Coord y de la perturbacion inicial
       centz=0.                        !Coord z de la perturbacion inicial
-      cenaerx=(nx1+1.)*dx1/2.+4000.   !Coord x de la perturbacion de aerosoles
-      cenaery=(nx1+1.)*dx1/2.+1000.   !Coord y de la perturbacion de aerosoles
-      cenaerz=0.                      !Coord z de la perturbacion de aerosoles
       sigmat=2*1000.**2.              !Decaimiento en z de la perturbacion en T
       sigmaa=200.**2.                 !Decaimiento en z de la perturbacion en A
       radiomed=2000.                  !Ancho de la perturbacion
@@ -105,8 +102,8 @@ contains
             !
          endif
 
-         UU(k)=UU(k)*.7
-         VV(k)=VV(k)*0.
+         UU(k)=UU(k)*0.7
+         VV(k)=VV(k)*0.7
       end do
 
 
@@ -202,8 +199,6 @@ contains
                /radiomed**2.)
             Titaa1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
             if (Titaa1(i,j,k) < 1e-5) Titaa1(i,j,k)=0.
-            G1=exp(-((cenaerx-equis)**2.+(cenaery-ygrie)**2.)*.5&
-               /radiomed**2.)
             aer1(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
          end do
 
@@ -512,11 +507,6 @@ contains
          read(unit_number)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
          close(unit_number)
 
-         do concurrent (i=1:nx1, j=1:nx1, k=1:nz1)
-            aux=.8*exp(-((i-35)**2.+(j-25.5)**2.+(k-8)**2.)/50.)
-            Titaa1(i,j,k)=Titaa1(i,j,k)+aux
-            Titaa2(i,j,k)=Titaa2(i,j,k)+aux
-         end do
       endif
 
       !definicion de calores y presiones de vapor a 0 K
@@ -799,8 +789,6 @@ contains
          do concurrent(k=1:naux2, i=laux1:laux2, j=maux1:maux2)
             Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+&
                Qnie1(i,j,k)+Qgra1(i,j,k)
-            Qagua=Qgot1(i,j,k)+Qllu1(i,j,k)+&
-               (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
             zmed=zmed+k*Qagua
             Qaguat=Qaguat+Qagua
          end do
