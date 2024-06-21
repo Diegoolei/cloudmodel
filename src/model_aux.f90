@@ -2,44 +2,44 @@ module model_aux
 contains
    subroutine vapor_advection()
       !######################## Adveccion de vapores #######################
-      USE advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
+      use advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
          advcri1, advaer1
-      USE permic, only: aer1, Qvap1, Qllu1, Qnie1, Qgra1
-      USE perdim, only: W2
-      USE dimen, only: nx1
+      use permic, only: aer1, Qvap1, Qllu1, Qnie1, Qgra1
+      use dinamic_var_perturbation, only: w_perturbed
+      use dimen, only: nx1
       implicit none
       integer :: i, j
       do concurrent (i=0:nx1+1, j=0:nx1+1)
-         advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
+         advvap1(i,j)=w_perturbed(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
          advgot1(i,j)=0.
-         advllu1(i,j)=W2(i,j,1)*Qllu1(i,j,1)
-         if (W2(i,j,1) > 0) advllu1(i,j)=0.
-         advaer1(i,j)=W2(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
-         if(W2(i,j,1) < 0) advaer1(i,j)=advaer1(i,j)*1.5
+         advllu1(i,j)=w_perturbed(i,j,1)*Qllu1(i,j,1)
+         if (w_perturbed(i,j,1) > 0) advllu1(i,j)=0.
+         advaer1(i,j)=w_perturbed(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
+         if(w_perturbed(i,j,1) < 0) advaer1(i,j)=advaer1(i,j)*1.5
          advcri1(i,j)=0.
-         advnie1(i,j)=W2(i,j,1)*Qnie1(i,j,1)
-         if (W2(i,j,1) > 0) advnie1(i,j)=0.
-         advgra1(i,j)=W2(i,j,1)*Qgra1(i,j,1)
-         if (W2(i,j,1) > 0) advgra1(i,j)=0.
+         advnie1(i,j)=w_perturbed(i,j,1)*Qnie1(i,j,1)
+         if (w_perturbed(i,j,1) > 0) advnie1(i,j)=0.
+         advgra1(i,j)=w_perturbed(i,j,1)*Qgra1(i,j,1)
+         if (w_perturbed(i,j,1) > 0) advgra1(i,j)=0.
       end do
    end subroutine vapor_advection
 
    subroutine dinamics()
       !########### calculo de la dinamica y de la termodinamica ############
-      USE dimen, only: dt1, dx1, nx1, nz1
-      USE model_var, only: dden0z, ener1, s, llluneg, lcrineg, lnieneg, lgraneg,&
+      use dimen, only: dt1, dx1, nx1, nz1
+      use model_var, only: dden0z, ener1, s, llluneg, lcrineg, lnieneg, lgraneg,&
          lvapneg, laerneg, Qvapneg, aerneg
-      USE estbas, only: Den0, Qvap0, aer0
-      USE perdim, only: W2, U2, V2, Fcalo
-      USE advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
+      use estbas, only: Den0, Qvap0, aer0
+      use dinamic_var_perturbation, only: w_perturbed, u_perturbed, v_perturbed, heat_force
+      use advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
          advcri1, advvap2, advgot2, advllu2, advcri2, advnie2, advgra2, advaer1,&
          advaer2
-      USE permic, only: Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2
-      USE lmngot, only: lgot, mgot, ngot
-      USE lmnllu, only: lllu, mllu, nllu
-      USE lmncri, only: lcri, mcri, ncri
-      USE lmnnie, only: lnie, mnie, nnie
-      USE lmngra, only: lgra, mgra, ngra
+      use permic, only: Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2
+      use lmngot, only: lgot, mgot, ngot
+      use lmnllu, only: lllu, mllu, nllu
+      use lmncri, only: lcri, mcri, ncri
+      use lmnnie, only: lnie, mnie, nnie
+      use lmngra, only: lgra, mgra, ngra
       implicit none
       integer :: i, j, k, l, m, n
       s=0
@@ -97,11 +97,11 @@ contains
                call inomo(l,m,n,dden0z)
 
                !calculo de la energia cinetica
-               ener1=.5*Den0(k)*(U2(i,j,k)**2.+V2(i,j,k)**2.+W2(i,j,k)**2.)+ener1
+               ener1=.5*Den0(k)*(u_perturbed(i,j,k)**2.+v_perturbed(i,j,k)**2.+w_perturbed(i,j,k)**2.)+ener1
 
                !calculo de la temperatura potencial
-               call tempot(l,m,n,dden0z,Fcalo(i,j,k))
-               Fcalo(i,j,k)=0.
+               call tempot(l,m,n,dden0z,heat_force(i,j,k))
+               heat_force(i,j,k)=0.
 
                !dinamica del vapor y de las gotitas
                call dvapor(l,m,n)
@@ -190,7 +190,7 @@ contains
    end subroutine dinamics
 
    subroutine negative_correction
-      USE model_var, only: s, llluneg, lcrineg, lnieneg, lgraneg, lvapneg, laerneg,&
+      use model_var, only: s, llluneg, lcrineg, lnieneg, lgraneg, lvapneg, laerneg,&
          Qvapneg, aerneg
       implicit none
       if(s >= 1) call corgot
@@ -204,10 +204,10 @@ contains
 
    subroutine water_calculation
       !primer calculo de agua (sin laterales)
-      USE dimen, only: nx1, nz1
-      USE model_var, only: vapt1, gott1, aert1
-      USE permic, only: Qvap2, Qgot2, aer2
-      USE estbas, only: Qvap0
+      use dimen, only: nx1, nz1
+      use model_var, only: vapt1, gott1, aert1
+      use permic, only: Qvap2, Qgot2, aer2
+      use estbas, only: Qvap0
       implicit none
       integer :: i, j, k
       vapt1=0.
@@ -225,19 +225,19 @@ contains
    end subroutine water_calculation
 
    subroutine microphisics_substring
-      USE dimen, only: nx1, nz1, dt1, dx1
-      USE model_var, only: aux, P, T, Qvap, Naer, densi, Dv, iT, aux2, Vis,&
-         esvs, elvs, Lvl, Lsl, Lvs, Eaccn, Eaucn, Eacng, nu, lll, tt, Qliq, e1,&
+      use dimen, only: nx1, nz1, dt1, dx1
+      use model_var, only: aux, P, T, Qvap, Naer, densi, Dv, iT, aux2, Vis,&
+         esvs, elvs, Lvl, Lsl, Lvs, Eaccn, Eaucn, Eacng, nu, lll, current_time, Qliq, e1,&
          rl, rs, yy, daer, dqgot, dqcri, Taux, totnuc, vapt2, gott2, aert2,&
          qgotaux, qvapaux, qlluaux, qcriaux, qnieaux, qgraaux, t2, Lsl00, Fcal,&
          daer2, totmic, vapt3, gott3, aert3, ener2, ener3, ener4, ener5, qv, qg,&
          daitot
-      USE perdim, only: Titaa2, Pres2, Tempa1, Fcalo
-      USE estbas, only: Qvap0, aer0, Tita0, Temp0, Pres00
-      USE cant01, only: ikapa, AA, lt2
-      USE const, only: P00, Rd, Dv0, Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs,&
+      use dinamic_var_perturbation, only: thermal_property_2, pressure_perturbed, ambient_temperature, heat_force
+      use estbas, only: Qvap0, aer0, Tita0, Temp0, Pres00
+      use cant01, only: ikapa, AA, lt2
+      use constants, only: P00, Rd, Dv0, Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs,&
          Eacrcn, Eautcn, T0, Rv, G, Cp
-      USE permic, only: Qvap2, aer2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2
+      use permic, only: Qvap2, aer2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2
       implicit none
       integer :: k, n, i, l, j, m
       !####################### Sublazo Microfisico #########################
@@ -263,10 +263,10 @@ contains
             do j=1,nx1
                m=j
                !calculo de T,P,Densi,Dv,Vis
-               aux=Pres00(k)+Pres2(i,j,k)
+               aux=Pres00(k)+pressure_perturbed(i,j,k)
                P=aux**ikapa*P00
-               T=(Tita0(k)+Titaa2(i,j,k))*aux
-               Tempa1(i,j,k)=T-Temp0(k)
+               T=(Tita0(k)+thermal_property_2(i,j,k))*aux
+               ambient_temperature(i,j,k)=T-Temp0(k)
                Qvap=Qvap0(k)+Qvap2(i,j,k)
                Naer=aer0(k)+aer2(i,j,k)
                densi=P/T/Rd-AA*Qvap
@@ -292,7 +292,7 @@ contains
                nu=Vis/densi
 
                !nucleacion (de ser necesario tiene otro paso de tiempo)
-               lll=tt
+               lll = current_time
 
                Qliq=Qgot2(i,j,k)
                e1=Qvap*Rv*T
@@ -302,8 +302,8 @@ contains
 
                if ((rl > 1e-3 .or. rs > 1e-3).and.Naer > 0) then
                   call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,rl,rs,Lvl,Lvs,daer,dqgot,dqcri)
-                  Taux=T-Temp0(k)-Tempa1(i,j,k)
-                  Titaa2(i,j,k)=T/aux-Tita0(k)
+                  Taux=T-Temp0(k)-ambient_temperature(i,j,k)
+                  thermal_property_2(i,j,k)=T/aux-Tita0(k)
                   if (dqgot > 0) yy=1
                else
                   Taux=0.
@@ -333,7 +333,7 @@ contains
                   qgraaux=Qgra2(i,j,k)
                   if (Qgra2(i,j,k) == 0) qgraaux=0d0
                   Naer=aer2(i,j,k)+aer0(k)
-                  T=Tempa1(i,j,k)+Temp0(k)
+                  T=ambient_temperature(i,j,k)+Temp0(k)
                   do t2=1,lt2
                      qgotaux=qgotaux+dqgot/float(lt2)
                      qcriaux=qcriaux+dqcri/float(lt2)
@@ -349,7 +349,7 @@ contains
                      call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,&
                         Lsl00,Fcal,n,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
                         qgraaux,Naer,daer2,nu,yy)
-                     Fcalo(l,m,n)=Fcalo(l,m,n)+Fcal/dt1/densi
+                     heat_force(l,m,n)=heat_force(l,m,n)+Fcal/dt1/densi
                      Naer=Naer+daer2
                      totmic=totmic+daer2
                   end do
@@ -361,11 +361,11 @@ contains
                   Qgra2(i,j,k)=qgraaux
                   Qvap2(i,j,k)=qvapaux-Qvap0(k)
                   aer2(i,j,k)=Naer-aer0(k)
-                  Tempa1(i,j,k)=T-Temp0(k)
+                  ambient_temperature(i,j,k)=T-Temp0(k)
 
                endif
 
-               if (Tita0(k) < abs(Titaa2(i,j,k))+200.or.Temp0(k) < abs(Tempa1(i,j,k))+200) then
+               if (Tita0(k) < abs(thermal_property_2(i,j,k))+200.or.Temp0(k) < abs(ambient_temperature(i,j,k))+200) then
                   stop
                endif
 
@@ -397,13 +397,13 @@ contains
    end subroutine microphisics_substring
 
    subroutine floor_and_ceiling_contour
-      USE dimen, only: nx1, nz1, dt1, dx1
-      USE perdim, only: Titaa2, Titaa1, W2, U2, V2
-      USE cant01, only: dx2
-      USE estbas, only: Tita0, Qvap0, aer0
-      USE model_var, only: auxx, auxy, auxz, turbu, aeraux, lapla, cks, Qvap,&
+      use dimen, only: nx1, nz1, dt1, dx1
+      use dinamic_var_perturbation, only: thermal_property_2, thermal_property_1, w_perturbed, u_perturbed, v_perturbed
+      use cant01, only: dx2
+      use estbas, only: Tita0, Qvap0, aer0
+      use model_var, only: auxx, auxy, auxz, turbu, aeraux, lapla, cks, Qvap,&
          qv, qg
-      USE permic, only: Qvap1, Qvap2, Qgot2, Qcri2, Qllu2, Qnie2, Qgra2, aer1,&
+      use permic, only: Qvap1, Qvap2, Qgot2, Qcri2, Qllu2, Qnie2, Qgra2, aer1,&
          aer2
       implicit none
       integer :: i, j
@@ -411,18 +411,18 @@ contains
       Qvap = (qv+qg)/nx1**2.*nz1*.1
       !contornos en el piso y en el techo
       do concurrent (i=1:nx1, j=1:nx1)
-         Titaa2(i,j,0)=-W2(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+Titaa1(i,j,0)
-         Titaa2(i,j,nz1)=Titaa2(i,j,nz1-1)
+         thermal_property_2(i,j,0)=-w_perturbed(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+thermal_property_1(i,j,0)
+         thermal_property_2(i,j,nz1)=thermal_property_2(i,j,nz1-1)
 
          !suponemos que las velocidades horizontales a nivel de piso son
          !iguales a 1/4 de la correspondiente en el nivel 1
-         auxx=((U2(i+1,j,1)+U2(i,j,1))*(Qvap1(i+1,j,0)+Qvap1(i,j,0))&
-            -(U2(i-1,j,1)+U2(i,j,1))*(Qvap1(i-1,j,0)+Qvap1(i,j,0)))&
+         auxx=((u_perturbed(i+1,j,1)+u_perturbed(i,j,1))*(Qvap1(i+1,j,0)+Qvap1(i,j,0))&
+            -(u_perturbed(i-1,j,1)+u_perturbed(i,j,1))*(Qvap1(i-1,j,0)+Qvap1(i,j,0)))&
             /4.*.25
-         auxy=((V2(i,j+1,1)+V2(i,j,1))*(Qvap1(i,j+1,0)+Qvap1(i,j,0))&
-            -(V2(i,j-1,1)+V2(i,j,1))*(Qvap1(i,j-1,0)+Qvap1(i,j,0)))&
+         auxy=((v_perturbed(i,j+1,1)+v_perturbed(i,j,1))*(Qvap1(i,j+1,0)+Qvap1(i,j,0))&
+            -(v_perturbed(i,j-1,1)+v_perturbed(i,j,1))*(Qvap1(i,j-1,0)+Qvap1(i,j,0)))&
             /4.*.25
-         auxz=W2(i,j,1)*((Qvap1(i,j,1)+Qvap1(i,j,0))+Qvap0(1)+Qvap0(0))/2.*.5
+         auxz=w_perturbed(i,j,1)*((Qvap1(i,j,1)+Qvap1(i,j,0))+Qvap0(1)+Qvap0(0))/2.*.5
 
          Qvap2(i,j,nz1)=Qvap2(i,j,nz1-1)
 
@@ -446,15 +446,15 @@ contains
          !suponemos que las velocidades horizontales a nivel de piso son
          !iguales a 1/4 de la correspondiente en el nivel 1
 
-         auxx=((U2(i+1,j,1)+U2(i,j,1))*(aer1(i+1,j,0)+aer1(i,j,0))&
-            -(U2(i-1,j,1)+U2(i,j,1))*(aer1(i-1,j,0)+aer1(i,j,0)))&
+         auxx=((u_perturbed(i+1,j,1)+u_perturbed(i,j,1))*(aer1(i+1,j,0)+aer1(i,j,0))&
+            -(u_perturbed(i-1,j,1)+u_perturbed(i,j,1))*(aer1(i-1,j,0)+aer1(i,j,0)))&
             /4.*.25
-         auxy=((V2(i,j+1,1)+V2(i,j,1))*(aer1(i,j+1,0)+aer1(i,j,0))&
-            -(V2(i,j-1,1)+V2(i,j,1))*(aer1(i,j-1,0)+aer1(i,j,0)))&
+         auxy=((v_perturbed(i,j+1,1)+v_perturbed(i,j,1))*(aer1(i,j+1,0)+aer1(i,j,0))&
+            -(v_perturbed(i,j-1,1)+v_perturbed(i,j,1))*(aer1(i,j-1,0)+aer1(i,j,0)))&
             /4.*.25
-         auxz=W2(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+aer0(1)+aer0(0))/2.*.5
+         auxz=w_perturbed(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+aer0(1)+aer0(0))/2.*.5
 
-         if (W2(i,j,0) > 0) then
+         if (w_perturbed(i,j,0) > 0) then
             aeraux=-((auxx+auxy)+2.*auxz)*dt1/dx1
          else
             !se refleja un 25 % de los aerosoles que caen
@@ -463,7 +463,7 @@ contains
 
          !agregamos un termino de turbulencia para los aerosoles
          !a nivel de piso
-         turbu=cks/dx1*.25*(abs(U2(i,j,1))+abs(V2(i,j,1))+2.*abs(W2(i,j,1)))
+         turbu=cks/dx1*.25*(abs(u_perturbed(i,j,1))+abs(v_perturbed(i,j,1))+2.*abs(w_perturbed(i,j,1)))
          lapla=((aer1(i+1,j,0)+aer1(i-1,j,0))+(aer1(i,j+1,0)+aer1(i,j-1,0)+aer1(i,j,1)))-5.*aer1(i,j,0)
          lapla=lapla+(aer0(1)-aer0(0))
 
@@ -475,16 +475,16 @@ contains
 
    subroutine lateral_contour
       !contornos laterales
-      USE dimen, only: nx1, nz1
-      USE perdim, only: Titaa2
-      USE permic, only: Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer2
+      use dimen, only: nx1, nz1
+      use dinamic_var_perturbation, only: thermal_property_2
+      use permic, only: Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer2
       implicit none
       integer :: j, k
       do concurrent (k=1:nz1-1, j=1:nx1)
-         Titaa2(0,j,k)=Titaa2(1,j,k)
-         Titaa2(nx1+1,j,k)=Titaa2(nx1,j,k)
-         Titaa2(j,0,k)=Titaa2(j,1,k)
-         Titaa2(j,nx1+1,k)=Titaa2(j,nx1,k)
+         thermal_property_2(0,j,k)=thermal_property_2(1,j,k)
+         thermal_property_2(nx1+1,j,k)=thermal_property_2(nx1,j,k)
+         thermal_property_2(j,0,k)=thermal_property_2(j,1,k)
+         thermal_property_2(j,nx1+1,k)=thermal_property_2(j,nx1,k)
          Qvap2(0,j,k)=0.
          Qvap2(nx1+1,j,k)=0.
          Qvap2(j,0,k)=0.
@@ -517,23 +517,24 @@ contains
    end subroutine lateral_contour
 
    subroutine floor_condition_redefinition()
-      USE dimen, only: nx1, nz1, dt1, dx1
-      USE perdim, only: Titaa2, Titaa1, W2
-      USE cant01, only: pro3, pro4, pro1, pro2
-      USE permic, only: Qvap1, Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer1,&
+      use dimen, only: nx1, nz1, dt1, dx1
+      use dinamic_var_perturbation, only: thermal_property_2, thermal_property_1, w_perturbed
+      use cant01, only: pro3, pro4, pro1, pro2
+      use permic, only: Qvap1, Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer1,&
          aer2, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1
-      USE estbas, only: aer0
-      USE model_var, only: aeraux
+      use estbas, only: aer0
+      use model_var, only: aeraux
       implicit none
       integer :: i, j, k
       !*** modificada las condiciones en el piso
       !Redefinicion
       do concurrent (i=1:nx1, j=1:nx1)
          k=0
-         Titaa1(i,j,k)=pro3*Titaa2(i,j,k)+&
-            pro4*((Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+(Titaa2(i,j+1,k)+Titaa2(i,j-1,k)))
+         thermal_property_1(i,j,k)=pro3*thermal_property_2(i,j,k)+&
+            pro4*((thermal_property_2(i+1,j,k)+thermal_property_2(i-1,j,k))+&
+            (thermal_property_2(i,j+1,k)+thermal_property_2(i,j-1,k)))
 
-         if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
+         if (abs(thermal_property_1(i,j,k)) < 1e-10) thermal_property_1(i,j,k)=0
 
          Qvap1(i,j,k)=pro3*Qvap2(i,j,k)+&
             pro4*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+(Qvap2(i,j+1,k)+Qvap2(i,j-1,k)))
@@ -567,8 +568,8 @@ contains
          aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
 
          !correccion cambiando la absorcion de aerosoles
-         if ((Qllu1(i,j,1)+Qgra1(i,j,1)) > 1e-6 .and.W2(i,j,1) < 0) then
-            aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
+         if ((Qllu1(i,j,1)+Qgra1(i,j,1)) > 1e-6 .and.w_perturbed(i,j,1) < 0) then
+            aeraux=-w_perturbed(i,j,1)*.5*dt1/(dx1/2)
             aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
          endif
 
@@ -576,13 +577,13 @@ contains
 
 
          do concurrent(k=1:nz1-1)
-            Titaa1(i,j,k)=pro1*Titaa2(i,j,k)+&
+            thermal_property_1(i,j,k)=pro1*thermal_property_2(i,j,k)+&
                pro2*(&
-               (Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+&
-               (Titaa2(i,j+1,k)+Titaa2(i,j-1,k))+&
-               Titaa2(i,j,k+1)+Titaa2(i,j,k-1))
+               (thermal_property_2(i+1,j,k)+thermal_property_2(i-1,j,k))+&
+               (thermal_property_2(i,j+1,k)+thermal_property_2(i,j-1,k))+&
+               thermal_property_2(i,j,k+1)+thermal_property_2(i,j,k-1))
 
-            if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
+            if (abs(thermal_property_1(i,j,k)) < 1e-10) thermal_property_1(i,j,k)=0
 
             Qvap1(i,j,k)=pro1*Qvap2(i,j,k)+&
                pro2*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+&
@@ -635,19 +636,19 @@ contains
    end subroutine floor_condition_redefinition
 
    subroutine floor_and_ceiling_contour_redefinition()
-      USE dimen, only: nx1, nz1
-      USE perdim, only: Titaa1
-      USE permic, only: Qvap1, aer1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1
-      USE estbas, only: Qvap0, aer0
+      use dimen, only: nx1, nz1
+      use dinamic_var_perturbation, only: thermal_property_1
+      use permic, only: Qvap1, aer1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1
+      use estbas, only: Qvap0, aer0
       implicit none
       integer :: i, j
       !contornos en el piso y en el techo
       do concurrent(i=1:nx1, j=1:nx1)
-         Titaa1(i,j,0)=Titaa1(i,j,0)
-         if (Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=.5
-         if (-Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=-.5
+         thermal_property_1(i,j,0)=thermal_property_1(i,j,0)
+         if (thermal_property_1(i,j,0) > 0.5) thermal_property_1(i,j,0)=.5
+         if (-thermal_property_1(i,j,0) > 0.5) thermal_property_1(i,j,0)=-.5
 
-         Titaa1(i,j,nz1)=Titaa1(i,j,nz1-1)
+         thermal_property_1(i,j,nz1)=thermal_property_1(i,j,nz1-1)
 
          !corregido para el vapor
          if (Qvap1(i,j,0) > Qvap0(0)*.5) then
@@ -681,16 +682,16 @@ contains
 
    subroutine lateral_contour_redefinition()
       !contornos laterales
-      USE dimen, only: nx1, nz1
-      USE perdim, only: Titaa1
-      USE permic, only: Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1
+      use dimen, only: nx1, nz1
+      use dinamic_var_perturbation, only: thermal_property_1
+      use permic, only: Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1
       implicit none
       integer :: j, k
       do concurrent(k=1:nz1-1, j=1:nx1)
-         Titaa1(0,j,k)=Titaa1(1,j,k)
-         Titaa1(nx1+1,j,k)=Titaa1(nx1,j,k)
-         Titaa1(j,0,k)=Titaa1(j,1,k)
-         Titaa1(j,nx1+1,k)=Titaa1(j,nx1,k)
+         thermal_property_1(0,j,k)=thermal_property_1(1,j,k)
+         thermal_property_1(nx1+1,j,k)=thermal_property_1(nx1,j,k)
+         thermal_property_1(j,0,k)=thermal_property_1(j,1,k)
+         thermal_property_1(j,nx1+1,k)=thermal_property_1(j,nx1,k)
          Qvap1(0,j,k)=0.
          Qvap1(nx1+1,j,k)=0.
          Qvap1(j,0,k)=0.
@@ -725,9 +726,9 @@ contains
 
    subroutine vapour_negative_correction()
       !correccion de negativos para el vapor
-      USE dimen, only: nx1, nz1
-      USE permic, only: Qvap1
-      USE estbas, only: Qvap0
+      use dimen, only: nx1, nz1
+      use permic, only: Qvap1
+      use estbas, only: Qvap0
       implicit none
       integer :: i, j, k
       do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
@@ -738,23 +739,24 @@ contains
    end subroutine vapour_negative_correction
 
    subroutine save_backup()
-      USE model_var, only: tt, tte, posx, posy, Xnub, Ynub, posxx, posyy,&
+      use model_var, only: current_time, tte, posx, posy, Xnub, Ynub, posxx, posyy,&
          file_number, t1
-      USE cant01, only: lte, ltg, ltb
-      USE dimen, only: dt1
-      USE config, only: output_directory
-      USE perdim, only: W2, U2, V2, Fcalo, Titaa2, Titaa1, Pres2, Pres1, U1, V1,&
-         W1
-      USE io, only: str_gen
-      USE permic, only: aer1, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2,&
+      use cant01, only: lte, ltg, ltb
+      use dimen, only: dt1
+      use config, only: output_directory
+      use dinamic_var_perturbation, only: w_perturbed, u_perturbed, v_perturbed,&
+         heat_force, thermal_property_2, thermal_property_1, pressure_perturbed,&
+         pressure_original, u_original, v_original, w_original
+      use io, only: str_gen
+      use permic, only: aer1, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2,&
          Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, Av, Vtgra0, Vtnie
-      USE const, only: Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs, Eacrcn, Eautcn
-      USE estbas, only: Den0, Qvap0, aer0, Tita0, Temp0, Pres00, aerrel, cc2,&
+      use constants, only: Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs, Eacrcn, Eautcn
+      use estbas, only: Den0, Qvap0, aer0, Tita0, Temp0, Pres00, aerrel, cc2,&
          Qvaprel, UU, VV
-      USE model_initialization, only: cloud_position_init, cloud_movement_init, statistics_init
+      use model_initialization, only: cloud_position_init, cloud_movement_init, statistics_init
       implicit none
       integer :: unit_number
-      if (tt/nint(lte/dt1)*nint(lte/dt1) == tt) then
+      if (current_time/nint(lte/dt1)*nint(lte/dt1) == current_time) then
          call statistics_init()
          tte=tte+1
          call cloud_position_init()
@@ -765,18 +767,22 @@ contains
          close(unit_number)
       endif
 
-      if (tt/nint(ltg/dt1)*nint(ltg/dt1) == tt) then
+      if (current_time/nint(ltg/dt1)*nint(ltg/dt1) == current_time) then
          file_number = str_gen(t1)
-         !call graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
-         call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1,file_number)
+         !call graba231(k, w_perturbed, thermal_property_1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
+         call graba320(u_original, v_original, w_original, thermal_property_1,&
+            pressure_original, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, file_number)
          t1=t1+1
       endif
 
-      if (tt/nint(ltb/dt1)*nint(ltb/dt1) == tt) then
-         call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
-            U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
-            Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo,&
-            Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
+      if (current_time/nint(ltb/dt1)*nint(ltb/dt1) == current_time) then
+         call graba120(Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV,&
+            u_original, u_perturbed, v_original, v_perturbed, w_original,&
+            w_perturbed, thermal_property_1, thermal_property_2, pressure_original,&
+            pressure_perturbed, Qvap1, Qvap2, Qgot1, Qgot2, Qllu1, Qllu2,&
+            Qcri1, Qcri2, Qnie1, Qnie2, Qgra1, Qgra2, aer1, aer2, heat_force,&
+            Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, Av, Vtnie, Vtgra0, Qvaprel,&
+            aerrel, Eautcn, Eacrcn)
       endif
    end subroutine save_backup
 end module model_aux

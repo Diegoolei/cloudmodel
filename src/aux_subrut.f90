@@ -1,47 +1,47 @@
 subroutine tempot(i,j,k,dden0z,Fcal)
-   !> Fcalo es el calor liberado por cambio de fase, por unidad de masa de aire
-   USE cant01
-   USE dimen
-   USE perdim
-   USE const
-   USE estbas
-   USE turbvar
-   USE tempe01
+   !> heat_force es el calor liberado por cambio de fase, por unidad de masa de aire
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use constants
+   use estbas
+   use turbvar
+   use tempe01
    implicit none
 
    real, intent(in) :: dden0z,Fcal
    integer, intent(in) :: i,j,k
 
-   adv(1)=(U2(i,j,k)+UU(k))*(Titaa1(i+1,j,k)-Titaa1(i-1,j,k))
-   adv(2)=(V2(i,j,k)+VV(k))*(Titaa1(i,j+1,k)-Titaa1(i,j-1,k))
-   adv(3)=W2(i,j,k)*(Titaa1(i,j,k+1)-Titaa1(i,j,k-1))
+   adv(1)=(u_perturbed(i,j,k)+UU(k))*(thermal_property_1(i+1,j,k)-thermal_property_1(i-1,j,k))
+   adv(2)=(v_perturbed(i,j,k)+VV(k))*(thermal_property_1(i,j+1,k)-thermal_property_1(i,j-1,k))
+   adv(3)=w_perturbed(i,j,k)*(thermal_property_1(i,j,k+1)-thermal_property_1(i,j,k-1))
 
    advec=-((adv(1)+adv(2))+adv(3))
 
-   verti=-W2(i,j,k)*(Tita0(k+1)-Tita0(k-1))
+   verti=-w_perturbed(i,j,k)*(Tita0(k+1)-Tita0(k-1))
 
    calor=Fcal*Tita0(k)/(Temp0(k)*Cp)
 
-   dtita(1)=Titaa1(i+1,j,k)-Titaa1(i-1,j,k)
-   dtita(2)=Titaa1(i,j+1,k)-Titaa1(i,j-1,k)
-   dtita(3)=Titaa1(i,j,k+1)-Titaa1(i,j,k-1)
+   dtita(1)=thermal_property_1(i+1,j,k)-thermal_property_1(i-1,j,k)
+   dtita(2)=thermal_property_1(i,j+1,k)-thermal_property_1(i,j-1,k)
+   dtita(3)=thermal_property_1(i,j,k+1)-thermal_property_1(i,j,k-1)
 
    escal=(dtita(1)*KM1+dtita(2)*KM2)+dtita(3)*KM3
 
-   lapla=(Titaa1(i+1,j,k)+Titaa1(i-1,j,k))+(Titaa1(i,j+1,k)+&
-      Titaa1(i,j-1,k))+Titaa1(i,j,k+1)+Titaa1(i,j,k-1)-&
-      6*Titaa1(i,j,k)
+   lapla=(thermal_property_1(i+1,j,k)+thermal_property_1(i-1,j,k))+(thermal_property_1(i,j+1,k)+&
+      thermal_property_1(i,j-1,k))+thermal_property_1(i,j,k+1)+thermal_property_1(i,j,k-1)-&
+      6*thermal_property_1(i,j,k)
    lapla=lapla+(Tita0(k+1)+Tita0(k-1)-2.*Tita0(k))
 
    turden=dden0z*(Tita0(k+1)-Tita0(k-1))
 
    turbul=3.*cteturb/dx8*(escal+KMM*(4.*lapla+turden))
 
-   Titaa2(i,j,k)=dt1*((advec+verti)/dx2+turbul+calor)+&
-      Titaa1(i,j,k)
+   thermal_property_2(i,j,k)=dt1*((advec+verti)/dx2+turbul+calor)+&
+      thermal_property_1(i,j,k)
 
    !     control de locura
-   if (abs(Titaa2(i,j,k)) > 30) then
+   if (abs(thermal_property_2(i,j,k)) > 30) then
       stop
    endif
 
@@ -51,10 +51,10 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de gotitas
 subroutine corgot
-   USE dimen
-   USE permic
-   USE lmngot
-   USE corgot_vars
+   use dimen
+   use permic
+   use lmngot
+   use corgot_vars
    implicit none
 
    neg1=0.
@@ -90,10 +90,10 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de gotas
 subroutine corllu
-   USE dimen
-   USE permic
-   USE lmnllu
-   USE corgot_vars
+   use dimen
+   use permic
+   use lmnllu
+   use corgot_vars
    implicit none
 
    neg1=0.
@@ -128,10 +128,10 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de cristales
 subroutine corcri
-   USE dimen
-   USE permic
-   USE lmncri
-   USE corgot_vars
+   use dimen
+   use permic
+   use lmncri
+   use corgot_vars
    implicit none
    neg1=0.
    pos1=0.
@@ -166,10 +166,10 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de nieve
 subroutine cornie
-   USE dimen
-   USE permic
-   USE lmnnie
-   USE corgot_vars
+   use dimen
+   use permic
+   use lmnnie
+   use corgot_vars
    implicit none
    neg1=0.
    pos1=0.
@@ -204,10 +204,10 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de granizos
 subroutine corgra
-   USE dimen
-   USE permic
-   USE lmngra
-   USE corgot_vars
+   use dimen
+   use permic
+   use lmngra
+   use corgot_vars
    implicit none
    neg1=0.
    pos1=0.
@@ -242,10 +242,10 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de vapor
 subroutine corvap(Qvapneg)
-   USE dimen
-   USE permic
-   USE estbas
-   USE corvap_vars
+   use dimen
+   use permic
+   use estbas
+   use corvap_vars
    implicit none
 
    real(8), intent(in) :: Qvapneg
@@ -264,10 +264,10 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de aerosoles
 subroutine coraer(aerneg)
-   USE dimen
-   USE permic
-   USE estbas
-   USE coraer_vars
+   use dimen
+   use permic
+   use estbas
+   use coraer_vars
    implicit none
 
    real(8), intent(in) :: aerneg
@@ -283,15 +283,15 @@ subroutine coraer(aerneg)
 end
 
 subroutine daeros(l,m,n)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE estbas
-   USE advecs
-   USE turbvar
-   USE daeros_vars
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use permic
+   use constants
+   use estbas
+   use advecs
+   use turbvar
+   use daeros_vars
    implicit none
 
    integer, intent(in) :: l,m,n
@@ -301,25 +301,25 @@ subroutine daeros(l,m,n)
    daer(3)=aer1(l,m,n+1)-aer1(l,m,n-1)
 
 
-   adv(1)=(((U2(l+1,m,n)+U2(l,m,n))*(aer1(l+1,m,n)+aer1(l,m,n)))-&
-      ((U2(l-1,m,n)+U2(l,m,n))*(aer1(l-1,m,n)+aer1(l,m,n))))/4.
+   adv(1)=(((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(aer1(l+1,m,n)+aer1(l,m,n)))-&
+      ((u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(aer1(l-1,m,n)+aer1(l,m,n))))/4.
    adv(1)=adv(1)+daer(1)/2.*UU(n)
 
-   adv(2)=(((V2(l,m+1,n)+V2(l,m,n))*(aer1(l,m+1,n)+aer1(l,m,n)))&
-      -((V2(l,m-1,n)+V2(l,m,n))*(aer1(l,m-1,n)+aer1(l,m,n))))/4.
+   adv(2)=(((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(aer1(l,m+1,n)+aer1(l,m,n)))&
+      -((v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(aer1(l,m-1,n)+aer1(l,m,n))))/4.
    adv(2)=adv(2)+daer(2)/2.*VV(n)
 
-   advaer2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+   advaer2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
       (aer1(l,m,n)+aer1(l,m,n+1))/4.
 
    adv(3)=advaer2(l,m)-advaer1(l,m)
 
    advec=-(adv(1)+adv(2)+adv(3))
 
-   verti=-((W2(l,m,n+1)+W2(l,m,n))*(aer0(n+1)+aer0(n))-&
-      (W2(l,m,n-1)+W2(l,m,n))*(aer0(n-1)+aer0(n)))/4.
+   verti=-((w_perturbed(l,m,n+1)+w_perturbed(l,m,n))*(aer0(n+1)+aer0(n))-&
+      (w_perturbed(l,m,n-1)+w_perturbed(l,m,n))*(aer0(n-1)+aer0(n)))/4.
 
-   aux=-((U2(l+1,m,n)-U2(l-1,m,n))+(V2(l,m+1,n)-V2(l,m-1,n)))*&
+   aux=-((u_perturbed(l+1,m,n)-u_perturbed(l-1,m,n))+(v_perturbed(l,m+1,n)-v_perturbed(l,m-1,n)))*&
       aer0(n)/2.
 
    escal=daer(1)*KM1+daer(2)*KM2+daer(3)*KM3
@@ -342,15 +342,15 @@ subroutine daeros(l,m,n)
 end
 
 subroutine dgotit(l,m,n)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE estbas
-   USE advecs
-   USE turbvar
-   USE dgotit_vars
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use permic
+   use constants
+   use estbas
+   use advecs
+   use turbvar
+   use dgotit_vars
    implicit none
 
    integer, intent(in) :: l,m,n
@@ -359,18 +359,18 @@ subroutine dgotit(l,m,n)
    dqgot(2)=Qgot1(l,m+1,n)-Qgot1(l,m-1,n)
    dqgot(3)=Qgot1(l,m,n+1)-Qgot1(l,m,n-1)
 
-   adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qgot1(l+1,m,n)+Qgot1(l,m,n))&
-      -(U2(l-1,m,n)+U2(l,m,n))*(Qgot1(l-1,m,n)+Qgot1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qgot1(l+1,m,n)+Qgot1(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qgot1(l-1,m,n)+Qgot1(l,m,n)))/4.
    adv(1)=adv(1)+dqgot(1)/2.*UU(n)
 
-   adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qgot1(l,m+1,n)+Qgot1(l,m,n))&
-      -(V2(l,m-1,n)+V2(l,m,n))*(Qgot1(l,m-1,n)+Qgot1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qgot1(l,m+1,n)+Qgot1(l,m,n))&
+      -(v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qgot1(l,m-1,n)+Qgot1(l,m,n)))/4.
    adv(2)=adv(2)+dqgot(2)/2.*VV(n)
 
-   advgot2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+   advgot2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
       (Qgot1(l,m,n)+Qgot1(l,m,n+1))/4.
    if ((advgot2(l,m)-advgot1(l,m))*dt1/dx1 > Qgot1(l,m,n) .and.&
-      W2(l,m,n) > 0) then
+      w_perturbed(l,m,n) > 0) then
       advgot2(l,m)=advgot1(l,m)+Qgot1(l,m,n)*dx1/dt1
    endif
    adv(3)=advgot2(l,m)-advgot1(l,m)
@@ -393,15 +393,15 @@ subroutine dgotit(l,m,n)
 end
 
 subroutine dvapor(l,m,n)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE estbas
-   USE advecs
-   USE turbvar
-   USE dvapor_vars
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use permic
+   use constants
+   use estbas
+   use advecs
+   use turbvar
+   use dvapor_vars
    implicit none
 
    integer, intent(in) :: l,m,n
@@ -410,29 +410,29 @@ subroutine dvapor(l,m,n)
    dqvap(2)=Qvap1(l,m+1,n)-Qvap1(l,m-1,n)
    dqvap(3)=Qvap1(l,m,n+1)-Qvap1(l,m,n-1)
 
-   adv(1)=(((U2(l+1,m,n)+U2(l,m,n))*&
+   adv(1)=(((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*&
       (Qvap1(l+1,m,n)+Qvap1(l,m,n)))-&
-      ((U2(l-1,m,n)+U2(l,m,n))*&
+      ((u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*&
       (Qvap1(l-1,m,n)+Qvap1(l,m,n))))/4.
    adv(1)=adv(1)+dqvap(1)/2.*UU(n)
 
-   adv(2)=(((V2(l,m+1,n)+V2(l,m,n))*&
+   adv(2)=(((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*&
       (Qvap1(l,m+1,n)+Qvap1(l,m,n)))-&
-      ((V2(l,m-1,n)+V2(l,m,n))*&
+      ((v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*&
       (Qvap1(l,m-1,n)+Qvap1(l,m,n))))/4.
    adv(2)=adv(2)+dqvap(2)/2.*VV(n)
 
-   advvap2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+   advvap2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
       (Qvap1(l,m,n)+Qvap1(l,m,n+1))/4.
 
    adv(3)=advvap2(l,m)-advvap1(l,m)
 
    advec=-((adv(1)+adv(2))+adv(3))
 
-   verti=-((W2(l,m,n+1)+W2(l,m,n))*(Qvap0(n+1)+Qvap0(n))-&
-      (W2(l,m,n-1)+W2(l,m,n))*(Qvap0(n-1)+Qvap0(n)))/4.
+   verti=-((w_perturbed(l,m,n+1)+w_perturbed(l,m,n))*(Qvap0(n+1)+Qvap0(n))-&
+      (w_perturbed(l,m,n-1)+w_perturbed(l,m,n))*(Qvap0(n-1)+Qvap0(n)))/4.
 
-   aux=-(U2(l+1,m,n)-U2(l-1,m,n)+V2(l,m+1,n)-V2(l,m-1,n))*&
+   aux=-(u_perturbed(l+1,m,n)-u_perturbed(l-1,m,n)+v_perturbed(l,m+1,n)-v_perturbed(l,m-1,n))*&
       Qvap0(n)/2.
 
    escal=dqvap(1)*KM1+dqvap(2)*KM2+dqvap(3)*KM3
@@ -454,15 +454,15 @@ subroutine dvapor(l,m,n)
 end
 
 subroutine dlluvi(l,m,n)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE estbas
-   USE advecs
-   USE turbvar
-   USE dlluvi_vars
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use permic
+   use constants
+   use estbas
+   use advecs
+   use turbvar
+   use dlluvi_vars
    implicit none
 
    integer, intent(in) :: l,m,n
@@ -471,15 +471,15 @@ subroutine dlluvi(l,m,n)
    dqllu(2)=Qllu1(l,m+1,n)-Qllu1(l,m-1,n)
    dqllu(3)=Qllu1(l,m,n+1)-Qllu1(l,m,n-1)
 
-   adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qllu1(l+1,m,n)+Qllu1(l,m,n))&
-      -(U2(l-1,m,n)+U2(l,m,n))*(Qllu1(l-1,m,n)+Qllu1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qllu1(l+1,m,n)+Qllu1(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qllu1(l-1,m,n)+Qllu1(l,m,n)))/4.
    adv(1)=adv(1)+dqllu(1)/2.*UU(n)
 
-   adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qllu1(l,m+1,n)+Qllu1(l,m,n))-&
-      (V2(l,m-1,n)+V2(l,m,n))*(Qllu1(l,m-1,n)+Qllu1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qllu1(l,m+1,n)+Qllu1(l,m,n))-&
+      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qllu1(l,m-1,n)+Qllu1(l,m,n)))/4.
    adv(2)=adv(2)+dqllu(2)/2.*VV(n)
 
-   advllu2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+   advllu2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
       (Qllu1(l,m,n)+Qllu1(l,m,n+1))/4.
 
    adv(3)=advllu2(l,m)-advllu1(l,m)
@@ -515,15 +515,15 @@ subroutine dlluvi(l,m,n)
 end
 
 subroutine dcrist(l,m,n)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE estbas
-   USE advecs
-   USE turbvar
-   USE dcrist_vars
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use permic
+   use constants
+   use estbas
+   use advecs
+   use turbvar
+   use dcrist_vars
    implicit none
 
    integer, intent(in) :: l,m,n
@@ -532,15 +532,15 @@ subroutine dcrist(l,m,n)
    dqcri(2)=Qcri1(l,m+1,n)-Qcri1(l,m-1,n)
    dqcri(3)=Qcri1(l,m,n+1)-Qcri1(l,m,n-1)
 
-   adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qcri1(l+1,m,n)+Qcri1(l,m,n))&
-      -(U2(l-1,m,n)+U2(l,m,n))*(Qcri1(l-1,m,n)+Qcri1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qcri1(l+1,m,n)+Qcri1(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qcri1(l-1,m,n)+Qcri1(l,m,n)))/4.
    adv(1)=adv(1)+dqcri(1)/2.*UU(n)
 
-   adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qcri1(l,m+1,n)+Qcri1(l,m,n))-&
-      (V2(l,m-1,n)+V2(l,m,n))*(Qcri1(l,m-1,n)+Qcri1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qcri1(l,m+1,n)+Qcri1(l,m,n))-&
+      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qcri1(l,m-1,n)+Qcri1(l,m,n)))/4.
    adv(2)=adv(2)+dqcri(2)/2.*VV(n)
 
-   advcri2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+   advcri2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
       (Qcri1(l,m,n)+Qcri1(l,m,n+1))/4.
 
    adv(3)=advcri2(l,m)-advcri1(l,m)
@@ -561,15 +561,15 @@ subroutine dcrist(l,m,n)
 end
 
 subroutine dnieve(l,m,n)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE estbas
-   USE advecs
-   USE turbvar
-   USE dnieve_vars
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use permic
+   use constants
+   use estbas
+   use advecs
+   use turbvar
+   use dnieve_vars
    implicit none
 
    integer, intent(in) :: l,m,n
@@ -578,15 +578,15 @@ subroutine dnieve(l,m,n)
    dqnie(2)=Qnie1(l,m+1,n)-Qnie1(l,m-1,n)
    dqnie(3)=Qnie1(l,m,n+1)-Qnie1(l,m,n-1)
 
-   adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qnie1(l+1,m,n)+Qnie1(l,m,n))&
-      -(U2(l-1,m,n)+U2(l,m,n))*(Qnie1(l-1,m,n)+Qnie1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qnie1(l+1,m,n)+Qnie1(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qnie1(l-1,m,n)+Qnie1(l,m,n)))/4.
    adv(1)=adv(1)+dqnie(1)/2.*UU(n)
 
-   adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qnie1(l,m+1,n)+Qnie1(l,m,n))-&
-      (V2(l,m-1,n)+V2(l,m,n))*(Qnie1(l,m-1,n)+Qnie1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qnie1(l,m+1,n)+Qnie1(l,m,n))-&
+      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qnie1(l,m-1,n)+Qnie1(l,m,n)))/4.
    adv(2)=adv(2)+dqnie(2)/2.*VV(n)
 
-   advnie2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+   advnie2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
       (Qnie1(l,m,n)+Qnie1(l,m,n+1))/4.
 
    adv(3)=advnie2(l,m)-advnie1(l,m)
@@ -613,15 +613,15 @@ subroutine dnieve(l,m,n)
 end
 
 subroutine dgrani(l,m,n)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE estbas
-   USE advecs
-   USE turbvar
-   USE dgrani_vars
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use permic
+   use constants
+   use estbas
+   use advecs
+   use turbvar
+   use dgrani_vars
    implicit none
 
    integer, intent(in) :: l,m,n
@@ -630,15 +630,15 @@ subroutine dgrani(l,m,n)
    dqgra(2)=Qgra1(l,m+1,n)-Qgra1(l,m-1,n)
    dqgra(3)=Qgra1(l,m,n+1)-Qgra1(l,m,n-1)
 
-   adv(1)=((U2(l+1,m,n)+U2(l,m,n))*(Qgra1(l+1,m,n)+Qgra1(l,m,n))&
-      -(U2(l-1,m,n)+U2(l,m,n))*(Qgra1(l-1,m,n)+Qgra1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qgra1(l+1,m,n)+Qgra1(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qgra1(l-1,m,n)+Qgra1(l,m,n)))/4.
    adv(1)=adv(1)+dqgra(1)/2.*UU(n)
 
-   adv(2)=((V2(l,m+1,n)+V2(l,m,n))*(Qgra1(l,m+1,n)+Qgra1(l,m,n))-&
-      (V2(l,m-1,n)+V2(l,m,n))*(Qgra1(l,m-1,n)+Qgra1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qgra1(l,m+1,n)+Qgra1(l,m,n))-&
+      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qgra1(l,m-1,n)+Qgra1(l,m,n)))/4.
    adv(2)=adv(2)+dqgra(2)/2.*VV(n)
 
-   advgra2(l,m)=(W2(l,m,n)+W2(l,m,n+1))*&
+   advgra2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
       (Qgra1(l,m,n)+Qgra1(l,m,n+1))/4.
 
    adv(3)=advgra2(l,m)-advgra1(l,m)
@@ -687,23 +687,23 @@ end
  !> Le resta la perturbacion promedio
 !############### calculo de la velocidad y la presion ################
 subroutine speed_pressure()
-   USE cant01
-   USE dimen
-   USE perdim
-   USE const
-   USE estbas
-   USE velpre01
-   USE p3v3
-   USE fuvw
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use constants
+   use estbas
+   use velpre01
+   use p3v3
+   use fuvw
    implicit none
 
    call velpre01_init()
 
    do concurrent (i=0:nx1+1, j=0:nx1+1, k=0:nz1)
-      U2(i,j,k)=U1(i,j,k)
-      V2(i,j,k)=V1(i,j,k)
-      W2(i,j,k)=W1(i,j,k)
-      Pres2(i,j,k)=Pres1(i,j,k)
+      u_perturbed(i,j,k)=u_original(i,j,k)
+      v_perturbed(i,j,k)=v_original(i,j,k)
+      w_perturbed(i,j,k)=w_original(i,j,k)
+      pressure_perturbed(i,j,k)=pressure_original(i,j,k)
    end do
 
    do concurrent(t=1:lt3)
@@ -714,32 +714,32 @@ subroutine speed_pressure()
          vel2=Tita0(k+1)*(Den0(k+1)+.61*Qvap0(k+1))
          vel3=cc2(k)/presi/vel0
          do concurrent (i=1:nx1, j=1:nx1)
-            dprex=Pres2(i+1,j,k)-Pres2(i-1,j,k)
-            dprey=Pres2(i,j+1,k)-Pres2(i,j-1,k)
-            dprez=Pres2(i,j,k+1)-Pres2(i,j,k-1)
+            dprex=pressure_perturbed(i+1,j,k)-pressure_perturbed(i-1,j,k)
+            dprey=pressure_perturbed(i,j+1,k)-pressure_perturbed(i,j-1,k)
+            dprez=pressure_perturbed(i,j,k+1)-pressure_perturbed(i,j,k-1)
 
             presix=presi*dprex/dx2
             presiy=presi*dprey/dx2
             presiz=presi*dprez/dx2
 
-            U3(i,j,k)=dt3*(presix+fu(i,j,k))+U2(i,j,k)
-            V3(i,j,k)=dt3*(presiy+fv(i,j,k))+V2(i,j,k)
-            W3(i,j,k)=dt3*(presiz+fw(i,j,k))+W2(i,j,k)
+            U3(i,j,k)=dt3*(presix+fu(i,j,k))+u_perturbed(i,j,k)
+            V3(i,j,k)=dt3*(presiy+fv(i,j,k))+v_perturbed(i,j,k)
+            W3(i,j,k)=dt3*(presiz+fw(i,j,k))+w_perturbed(i,j,k)
 
 
-            dvx=vel0*(U2(i+1,j,k)-U2(i-1,j,k))
-            dvy=vel0*(V2(i,j+1,k)-V2(i,j-1,k))
+            dvx=vel0*(u_perturbed(i+1,j,k)-u_perturbed(i-1,j,k))
+            dvy=vel0*(v_perturbed(i,j+1,k)-v_perturbed(i,j-1,k))
             if (k == 1) then
-               !      dvz=tiene 80% de (W2(2)-W2(1) y 20% de (W2(1)-W2(0)
-               dvz=(.8*vel2*W2(i,j,k+1)-.8*vel1*W2(i,j,k))*2.
+               !      dvz=tiene 80% de (w_perturbed(2)-w_perturbed(1) y 20% de (w_perturbed(1)-w_perturbed(0)
+               dvz=(.8*vel2*w_perturbed(i,j,k+1)-.8*vel1*w_perturbed(i,j,k))*2.
             else
-               dvz=vel2*W2(i,j,k+1)-vel1*W2(i,j,k-1)
+               dvz=vel2*w_perturbed(i,j,k+1)-vel1*w_perturbed(i,j,k-1)
             endif
 
             diver=vel3*((dvx+dvy)+dvz)/dx2
 
             !      modificado para agrega turbulencia en la P 23/8/97
-            Pres3(i,j,k)=dt3*(diver+fp(i,j,k))+Pres2(i,j,k)
+            Pres3(i,j,k)=dt3*(diver+fp(i,j,k))+pressure_perturbed(i,j,k)
          end do
       end do
 
@@ -759,63 +759,63 @@ subroutine speed_pressure()
       do concurrent(i=1:nx1, j=1:nx1)
          do k=1,nz1-1
             if (k == 1) then
-               U2(i,j,k)=U3(i,j,k)-kkk*&
+               u_perturbed(i,j,k)=U3(i,j,k)-kkk*&
                   (2.*U3(i,j,k)-U3(i,j,k+1))
-               V2(i,j,k)=V3(i,j,k)-kkk*&
+               v_perturbed(i,j,k)=V3(i,j,k)-kkk*&
                   (2.*V3(i,j,k)-V3(i,j,k+1))
-               W2(i,j,k)=W3(i,j,k)-kkk*&
+               w_perturbed(i,j,k)=W3(i,j,k)-kkk*&
                   (2.*W3(i,j,k)-W3(i,j,k+1))
             else
-               U2(i,j,k)=U3(i,j,k)
-               V2(i,j,k)=V3(i,j,k)
-               W2(i,j,k)=W3(i,j,k)
+               u_perturbed(i,j,k)=U3(i,j,k)
+               v_perturbed(i,j,k)=V3(i,j,k)
+               w_perturbed(i,j,k)=W3(i,j,k)
             endif
-            Pres2(i,j,k)=prom1*Pres3(i,j,k)+prom*(&
+            pressure_perturbed(i,j,k)=prom1*Pres3(i,j,k)+prom*(&
                ((Pres3(i+1,j,k)+ Pres3(i-1,j,k))+&
                (Pres3(i,j+1,k)+Pres3(i,j-1,k)))+&
                Pres3(i,j,k+1)+Pres3(i,j,k-1))
-            presprom=Pres2(i,j,k)+presprom
+            presprom=pressure_perturbed(i,j,k)+presprom
          end do
 
-         U2(i,j,0)=0
-         V2(i,j,0)=0
-         W2(i,j,0)=0
-         Pres2(i,j,0)=Pres2(i,j,1)
-         U2(i,j,nz1)=U2(i,j,nz1-1)
-         V2(i,j,nz1)=V2(i,j,nz1-1)
-         W2(i,j,nz1)=W2(i,j,nz1-1)
-         Pres2(i,j,nz1)=Pres2(i,j,nz1-1)
+         u_perturbed(i,j,0)=0
+         v_perturbed(i,j,0)=0
+         w_perturbed(i,j,0)=0
+         pressure_perturbed(i,j,0)=pressure_perturbed(i,j,1)
+         u_perturbed(i,j,nz1)=u_perturbed(i,j,nz1-1)
+         v_perturbed(i,j,nz1)=v_perturbed(i,j,nz1-1)
+         w_perturbed(i,j,nz1)=w_perturbed(i,j,nz1-1)
+         pressure_perturbed(i,j,nz1)=pressure_perturbed(i,j,nz1-1)
       end do
       do concurrent(i=1:nx1, k=0:nz1)
-         U2(0,i,k)=U2(1,i,k)
-         V2(0,i,k)=V2(1,i,k)
-         W2(0,i,k)=W2(1,i,k)
-         Pres2(0,i,k)=Pres2(1,i,k)
-         U2(nx1+1,i,k)=U2(nx1,i,k)
-         V2(nx1+1,i,k)=V2(nx1,i,k)
-         W2(nx1+1,i,k)=W2(nx1,i,k)
-         Pres2(nx1+1,i,k)=Pres2(nx1,i,k)
-         U2(i,0,k)=U2(i,1,k)
-         V2(i,0,k)=V2(i,1,k)
-         W2(i,0,k)=W2(i,1,k)
-         Pres2(i,0,k)=Pres2(i,1,k)
-         U2(i,nx1+1,k)=U2(i,nx1,k)
-         V2(i,nx1+1,k)=V2(i,nx1,k)
-         W2(i,nx1+1,k)=W2(i,nx1,k)
-         Pres2(i,nx1+1,k)=Pres2(i,nx1,k)
+         u_perturbed(0,i,k)=u_perturbed(1,i,k)
+         v_perturbed(0,i,k)=v_perturbed(1,i,k)
+         w_perturbed(0,i,k)=w_perturbed(1,i,k)
+         pressure_perturbed(0,i,k)=pressure_perturbed(1,i,k)
+         u_perturbed(nx1+1,i,k)=u_perturbed(nx1,i,k)
+         v_perturbed(nx1+1,i,k)=v_perturbed(nx1,i,k)
+         w_perturbed(nx1+1,i,k)=w_perturbed(nx1,i,k)
+         pressure_perturbed(nx1+1,i,k)=pressure_perturbed(nx1,i,k)
+         u_perturbed(i,0,k)=u_perturbed(i,1,k)
+         v_perturbed(i,0,k)=v_perturbed(i,1,k)
+         w_perturbed(i,0,k)=w_perturbed(i,1,k)
+         pressure_perturbed(i,0,k)=pressure_perturbed(i,1,k)
+         u_perturbed(i,nx1+1,k)=u_perturbed(i,nx1,k)
+         v_perturbed(i,nx1+1,k)=v_perturbed(i,nx1,k)
+         w_perturbed(i,nx1+1,k)=w_perturbed(i,nx1,k)
+         pressure_perturbed(i,nx1+1,k)=pressure_perturbed(i,nx1,k)
       end do
 
       presprom=presprom/nnn
       do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
-         Pres2(i,j,k)=Pres2(i,j,k)-presprom
+         pressure_perturbed(i,j,k)=pressure_perturbed(i,j,k)-presprom
       end do
 
       if (t == lt3/2) then
          do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
-            U1(i,j,k)=U2(i,j,k)
-            V1(i,j,k)=V2(i,j,k)
-            W1(i,j,k)=W2(i,j,k)
-            Pres1(i,j,k)=Pres2(i,j,k)
+            u_original(i,j,k)=u_perturbed(i,j,k)
+            v_original(i,j,k)=v_perturbed(i,j,k)
+            w_original(i,j,k)=w_perturbed(i,j,k)
+            pressure_original(i,j,k)=pressure_perturbed(i,j,k)
          end do
       endif
 
@@ -824,20 +824,20 @@ subroutine speed_pressure()
    !**********************************************************
    !*    suavizado
 
-   call filtro(Pres1,.15,.15,.1)
+   call filtro(pressure_original,.15,.15,.1)
 
-   call filtro(Pres2,.15,.15,.1)
+   call filtro(pressure_perturbed,.15,.15,.1)
 
-   call filtro(U1,facx,facy,facz)
-   call filtro(U2,facx,facy,facz)
-   call filtro(V1,facx,facy,facz)
-   call filtro(V2,facx,facy,facz)
-   call filtro(W1,facx,facy,facz)
-   call filtro(W2,facx,facy,facz)
+   call filtro(u_original,facx,facy,facz)
+   call filtro(u_perturbed,facx,facy,facz)
+   call filtro(v_original,facx,facy,facz)
+   call filtro(v_perturbed,facx,facy,facz)
+   call filtro(w_original,facx,facy,facz)
+   call filtro(w_perturbed,facx,facy,facz)
 
    do concurrent(i=1:nx1, j=1:nx1)
-      Pres1(i,j,0)=Pres1(i,j,1)
-      Pres2(i,j,0)=Pres2(i,j,1)
+      pressure_original(i,j,0)=pressure_original(i,j,1)
+      pressure_perturbed(i,j,0)=pressure_perturbed(i,j,1)
    end do
    !**********************************************************
 
@@ -850,12 +850,12 @@ end subroutine speed_pressure
 
 subroutine turbu1(kk)
    !> Esta subrutina calcula los Dnm para cada plano Z
-   USE cant01
-   USE dimen
-   USE perdim
-   USE const
-   USE turbvar1
-   USE turbu1_vars
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use constants
+   use turbvar1
+   use turbu1_vars
    implicit none
 
    integer, intent(in) :: kk
@@ -868,9 +868,9 @@ subroutine turbu1(kk)
                D(n,m,i,j,1)=0.
             end do
          end do
-         D(3,1,i,j,1)=U2(i,j,1)
-         D(3,2,i,j,1)=V2(i,j,1)
-         D(3,3,i,j,1)=W2(i,j,1)*2./3.
+         D(3,1,i,j,1)=u_perturbed(i,j,1)
+         D(3,2,i,j,1)=v_perturbed(i,j,1)
+         D(3,3,i,j,1)=w_perturbed(i,j,1)*2./3.
          do concurrent(n=1:3)
             do concurrent(m=1:n)
                D(m,n,i,j,1)=D(n,m,i,j,1)
@@ -879,9 +879,9 @@ subroutine turbu1(kk)
          do concurrent(lx=-1:1, ly=-1:1, lz=-1:1)
             ldis=abs(lx)+abs(ly)+abs(lz)
             if (ldis <= 1) then
-               vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+1)
-               vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+1)
-               vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+1)
+               vel(1,lx,ly,lz)=u_perturbed(lx+i,ly+j,lz+1)
+               vel(2,lx,ly,lz)=v_perturbed(lx+i,ly+j,lz+1)
+               vel(3,lx,ly,lz)=w_perturbed(lx+i,ly+j,lz+1)
             endif
          end do
          !     calculo de Dij
@@ -908,9 +908,9 @@ subroutine turbu1(kk)
       do concurrent(lx=-1:1, ly=-1:1, lz=-1:1)
          ldis=abs(lx)+abs(ly)+abs(lz)
          if (ldis <= 1) then
-            vel(1,lx,ly,lz)=U2(lx+i,ly+j,lz+k)
-            vel(2,lx,ly,lz)=V2(lx+i,ly+j,lz+k)
-            vel(3,lx,ly,lz)=W2(lx+i,ly+j,lz+k)
+            vel(1,lx,ly,lz)=u_perturbed(lx+i,ly+j,lz+k)
+            vel(2,lx,ly,lz)=v_perturbed(lx+i,ly+j,lz+k)
+            vel(3,lx,ly,lz)=w_perturbed(lx+i,ly+j,lz+k)
          endif
       end do
       !     calculo de Dij
@@ -947,10 +947,10 @@ end
  !     revisado : 28/04/97
 
 subroutine turbu2(i,j)
-   USE dimen
-   USE turbvar
-   USE turbvar1
-   USE turbu2_vars
+   use dimen
+   use turbvar
+   use turbvar1
+   use turbu2_vars
    implicit none
    integer, intent(in) :: i,j
    real aux
@@ -1025,10 +1025,10 @@ end
  !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,Naux,auxl,auxs)
-   USE cant01
-   USE dimen
-   USE const
-   USE nuclea61
+   use cant01
+   use dimen
+   use constants
+   use nuclea61
    implicit none
 
    real, intent(in) ::  Naer, rhoa, rs, Lvl, Lvs
@@ -1136,33 +1136,33 @@ end
  !     revisado 12/02/99
  !     Esta subrutina calcula los terminos inomogeneos para las velocidades
 subroutine inomo(i,j,k,dden0z)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE estbas
-   USE turbvar
-   USE fuvw
-   USE inomo_var
+   use cant01
+   use dimen
+   use dinamic_var_perturbation
+   use permic
+   use constants
+   use estbas
+   use turbvar
+   use fuvw
+   use inomo_var
    implicit none
 
    integer, intent(in) :: i,j,k
    real, intent(in) :: dden0z
 
-   dvelxx=(U2(i-2,j,k)-U2(i+2,j,k))+8.*(U2(i+1,j,k)-U2(i-1,j,k))
-   dvelxy=(U2(i,j-2,k)-U2(i,j+2,k))+8.*(U2(i,j+1,k)-U2(i,j-1,k))
-   dvelxz=(U2(i,j,k-2)-U2(i,j,k+2))+8.*(U2(i,j,k+1)-U2(i,j,k-1))
-   dvelyx=(V2(i-2,j,k)-V2(i+2,j,k))+8.*(V2(i+1,j,k)-V2(i-1,j,k))
-   dvelyy=(V2(i,j-2,k)-V2(i,j+2,k))+8.*(V2(i,j+1,k)-V2(i,j-1,k))
-   dvelyz=(V2(i,j,k-2)-V2(i,j,k+2))+8.*(V2(i,j,k+1)-V2(i,j,k-1))
-   dvelzx=(W2(i-2,j,k)-W2(i+2,j,k))+8.*(W2(i+1,j,k)-W2(i-1,j,k))
-   dvelzy=(W2(i,j-2,k)-W2(i,j+2,k))+8.*(W2(i,j+1,k)-W2(i,j-1,k))
-   dvelzz=(W2(i,j,k-2)-W2(i,j,k+2))+8.*(W2(i,j,k+1)-W2(i,j,k-1))
+   dvelxx=(u_perturbed(i-2,j,k)-u_perturbed(i+2,j,k))+8.*(u_perturbed(i+1,j,k)-u_perturbed(i-1,j,k))
+   dvelxy=(u_perturbed(i,j-2,k)-u_perturbed(i,j+2,k))+8.*(u_perturbed(i,j+1,k)-u_perturbed(i,j-1,k))
+   dvelxz=(u_perturbed(i,j,k-2)-u_perturbed(i,j,k+2))+8.*(u_perturbed(i,j,k+1)-u_perturbed(i,j,k-1))
+   dvelyx=(v_perturbed(i-2,j,k)-v_perturbed(i+2,j,k))+8.*(v_perturbed(i+1,j,k)-v_perturbed(i-1,j,k))
+   dvelyy=(v_perturbed(i,j-2,k)-v_perturbed(i,j+2,k))+8.*(v_perturbed(i,j+1,k)-v_perturbed(i,j-1,k))
+   dvelyz=(v_perturbed(i,j,k-2)-v_perturbed(i,j,k+2))+8.*(v_perturbed(i,j,k+1)-v_perturbed(i,j,k-1))
+   dvelzx=(w_perturbed(i-2,j,k)-w_perturbed(i+2,j,k))+8.*(w_perturbed(i+1,j,k)-w_perturbed(i-1,j,k))
+   dvelzy=(w_perturbed(i,j-2,k)-w_perturbed(i,j+2,k))+8.*(w_perturbed(i,j+1,k)-w_perturbed(i,j-1,k))
+   dvelzz=(w_perturbed(i,j,k-2)-w_perturbed(i,j,k+2))+8.*(w_perturbed(i,j,k+1)-w_perturbed(i,j,k-1))
 
-   diverx=(U2(i,j,k)*dvelxx+V2(i,j,k)*dvelxy)+W2(i,j,k)*dvelxz
-   divery=(U2(i,j,k)*dvelyx+V2(i,j,k)*dvelyy)+W2(i,j,k)*dvelyz
-   diverz=(U2(i,j,k)*dvelzx+V2(i,j,k)*dvelzy)+W2(i,j,k)*dvelzz
+   diverx=(u_perturbed(i,j,k)*dvelxx+v_perturbed(i,j,k)*dvelxy)+w_perturbed(i,j,k)*dvelxz
+   divery=(u_perturbed(i,j,k)*dvelyx+v_perturbed(i,j,k)*dvelyy)+w_perturbed(i,j,k)*dvelyz
+   diverz=(u_perturbed(i,j,k)*dvelzx+v_perturbed(i,j,k)*dvelzy)+w_perturbed(i,j,k)*dvelzz
 
    a1=(KM1*DD(1,1)+KM2*DD(1,2))+KM3*DD(1,3)
    a2=KMM*((D1(1)+D2(1))+D3(1))
@@ -1181,19 +1181,19 @@ subroutine inomo(i,j,k,dden0z)
    turbulz=cteturb*((a1+a2)+a3)
 
    !$$
-   grave=G*(Titaa1(i,j,k)/Tita0(k)+(AA*Qvap1(i,j,k)-&
+   grave=G*(thermal_property_1(i,j,k)/Tita0(k)+(AA*Qvap1(i,j,k)-&
       Qgot1(i,j,k)-Qllu1(i,j,k)-Qcri1(i,j,k)-&
       Qnie1(i,j,k)-Qgra1(i,j,k))/Den0(k))
-   !      grave=G*(Titaa1(i,j,k)/Tita0(k))
+   !      grave=G*(thermal_property_1(i,j,k)/Tita0(k))
 
    fu(i,j,k)=turbulx/dx8-diverx/dx12
    fv(i,j,k)=turbuly/dx8-divery/dx12
    fw(i,j,k)=turbulz/dx8-diverz/dx12+grave
 
    !     agregado para la P (23/8/97)
-   laplap=(Pres2(i+1,j,k)+Pres2(i-1,j,k))+(Pres2(i,j+1,k)+&
-      Pres2(i,j-1,k))+Pres2(i,j,k+1)+Pres2(i,j,k-1)-&
-      6.*Pres2(i,j,k)
+   laplap=(pressure_perturbed(i+1,j,k)+pressure_perturbed(i-1,j,k))+(pressure_perturbed(i,j+1,k)+&
+      pressure_perturbed(i,j-1,k))+pressure_perturbed(i,j,k+1)+pressure_perturbed(i,j,k-1)-&
+      6.*pressure_perturbed(i,j,k)
    fp(i,j,k)=cteturb*KMM/dx2*laplap
 
    return
@@ -1209,9 +1209,9 @@ end
  !     pasando un polinomio de grado 4.
 
 subroutine filtro(varia1,facx,facy,facz)
-   !filtro para Titaa1 Qvap1
-   USE dimen
-   USE filtro01
+   !filtro para thermal_property_1 Qvap1
+   use dimen
+   use filtro01
    implicit none
    character*50 text
    REAL, DIMENSION(-3:NX1+3,-3:NX1+3,-2:NZ1+2), intent(inout) :: varia1

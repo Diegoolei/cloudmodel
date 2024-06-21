@@ -5,7 +5,7 @@ module velpre01
       kkk, presprom, nnn
 contains
    subroutine velpre01_init()
-      USE dimen
+      use dimen
       implicit none
       facx=.05
       facy=.05
@@ -30,13 +30,13 @@ contains
    !     Incluye viento de corte, tipo frente
 
    subroutine initial_conditions()
-      USE cant01
-      USE dimen
-      USE permic
-      USE perdim
-      USE const
-      USE estbas
-      USE config
+      use cant01
+      use dimen
+      use permic
+      use dinamic_var_perturbation
+      use constants
+      use estbas
+      use config
 
       implicit none
 
@@ -103,7 +103,7 @@ contains
          endif
 
          UU(k)=UU(k)*0.7
-         VV(k)=VV(k)*0.7
+         VV(k)=VV(k)*0.
       end do
 
 
@@ -148,16 +148,16 @@ contains
       do k=-1,nz1+2
          do concurrent(i=-1:nx1+2, j=-1:nx1+1)
             !     cantidades primas
-            U1(i,j,k)=0.
-            U2(i,j,k)=0.
-            V1(i,j,k)=0.
-            V2(i,j,k)=0.
-            W1(i,j,k)=0.
-            W2(i,j,k)=0.
-            Pres1(i,j,k)=0.
-            Pres2(i,j,k)=0.
-            Titaa2(i,j,k)=0.
-            Titaa1(i,j,k)=0.
+            u_original(i,j,k)=0.
+            u_perturbed(i,j,k)=0.
+            v_original(i,j,k)=0.
+            v_perturbed(i,j,k)=0.
+            w_original(i,j,k)=0.
+            w_perturbed(i,j,k)=0.
+            pressure_original(i,j,k)=0.
+            pressure_perturbed(i,j,k)=0.
+            thermal_property_2(i,j,k)=0.
+            thermal_property_1(i,j,k)=0.
             Qvap1(i,j,k)=0.
             Qvap2(i,j,k)=0.
             Qgot1(i,j,k)=0.
@@ -197,8 +197,8 @@ contains
             ygrie=j*dx1
             G1=exp(-((centx-equis)**2.+(centy-ygrie)**2.)*.5&
                /radiomed**2.)
-            Titaa1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
-            if (Titaa1(i,j,k) < 1e-5) Titaa1(i,j,k)=0.
+            thermal_property_1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
+            if (thermal_property_1(i,j,k) < 1e-5) thermal_property_1(i,j,k)=0.
             aer1(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
          end do
 
@@ -271,12 +271,12 @@ contains
       Qvap0(-1)=0
 
       do concurrent(i=1:nx1, j=1:nx1)
-         Pres1(i,j,0)=Pres1(i,j,1)
-         Pres1(i,j,-1)=Pres1(i,j,1)
-         Pres2(i,j,0)=Pres1(i,j,1)
-         Pres2(i,j,-1)=Pres1(i,j,1)
-         Titaa1(i,j,0)=Titaa1(i,j,1)
-         Titaa1(i,j,-1)=Titaa1(i,j,1)
+         pressure_original(i,j,0)=pressure_original(i,j,1)
+         pressure_original(i,j,-1)=pressure_original(i,j,1)
+         pressure_perturbed(i,j,0)=pressure_original(i,j,1)
+         pressure_perturbed(i,j,-1)=pressure_original(i,j,1)
+         thermal_property_1(i,j,0)=thermal_property_1(i,j,1)
+         thermal_property_1(i,j,-1)=thermal_property_1(i,j,1)
          Qvap1(i,j,0)=Qvap1(i,j,1)
          Qvap1(i,j,-1)=Qvap1(i,j,1)
       end do
@@ -361,7 +361,7 @@ contains
 
    !*****************************************************
    subroutine PP2(G,dx,Den0,Pres00,Pres0)
-      USE dimen
+      use dimen
       integer k
       real Pres00(-3:nz1+3)
       real Den0(-3:nz1+3)
@@ -408,7 +408,7 @@ module model_var
 
    character(len=3) :: file_number
 
-   integer :: tt, t1, t2, n, m, l, i, j, k, lll, s, iT, tte, lvapneg,&
+   integer :: current_time, t1, t2, n, m, l, i, j, k, lll, s, iT, tte, lvapneg,&
       llluneg, lcrineg, laerneg, lnieneg, lgraneg, yy
 
 end module model_var
@@ -432,18 +432,21 @@ module model_initialization
 contains
 
    subroutine initialize_model()
-      USE model_var
-      USE cant01
-      USE dimen
-      USE const
-      USE config
-      USE estbas, only: Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV,&
+      use model_var
+      use cant01, only: total_time, lt2, lt3, cteturb, dx2, dx8, dx12,&
+         AA, ikapa, cteqgot, cteqllu, cteqnie, cteqgra, ini, ltt, ltg, lte,&
+         ltb, ctur, pro1, pro2, pro3, pro4, cteqnie
+      use dimen
+      use constants
+      use config
+      use estbas, only: Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV,&
          Qvaprel, aerrel
-      USE perdim, only: W2, U2, V2, Fcalo, Titaa2, Titaa1, Pres2, Pres1, U1, V1,&
-         W1
-      USE permic, only: aer1, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2,&
+      use dinamic_var_perturbation, only: w_perturbed, u_perturbed, v_perturbed,&
+         heat_force, thermal_property_2, thermal_property_1, pressure_perturbed,&
+         pressure_original, u_original, v_original, w_original
+      use permic, only: aer1, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2,&
          Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, Av, Vtgra0, Vtnie
-      USE model_initial_conditions, only: initial_conditions
+      use model_initial_conditions, only: initial_conditions
       implicit none
       integer :: unit_number
 
@@ -460,7 +463,7 @@ contains
       pro3 = 1. - 2e-2 * (dt1 / 5.)
       pro4 = (1. - pro1) / 4.
 
-      lt1 = nint(ltt / dt1)
+      total_time = nint(ltt / dt1)
       lt2 = nint(dt1 / dt2)                  ! Proporcion Fisica/Microfisica
       lt3 = 2 * nint(dt1 / dt3)
       cteturb = ctur / 2.**.5
@@ -496,10 +499,11 @@ contains
 
          open(newunit=unit_number,file=output_directory//"velos.da",status='unknown',form='unformatted')
          rewind unit_number
-         read(unit_number) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,&
-            Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
-            Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,&
-            aer1,aer2,Fcalo
+         read(unit_number) u_original, u_perturbed, v_original, v_perturbed,&
+            w_original, w_perturbed, thermal_property_1,thermal_property_2,&
+            pressure_original, pressure_perturbed, Qvap1, Qvap2, Qgot1, Qgot2,&
+            Qllu1, Qllu2, Qcri1, Qcri2, Qnie1, Qnie2, Qgra1, Qgra2, aer1, aer2,&
+            heat_force
          close(unit_number)
 
          open(newunit=unit_number,file=output_directory//"varconz.da",status='unknown',form='unformatted')
@@ -516,10 +520,10 @@ contains
    end subroutine initialize_model
 
    subroutine statistics_init()
-      USE model_var
-      USE permic
-      USE perdim
-      USE config
+      use model_var
+      use permic
+      use dinamic_var_perturbation
+      use config
       integer :: unit_number
       umax=0.
       lumax=0
@@ -592,57 +596,57 @@ contains
       qgratot=0.
 
       do concurrent(k=1:nz1, i=1:nx1, j=1:nx1)
-         if (umax < U1(i,j,k)*100) then
-            umax=U1(i,j,k)*100
+         if (umax < u_original(i,j,k)*100) then
+            umax=u_original(i,j,k)*100
             lumax=i
             mumax=j
             numax=k
          endif
 
-         if (umin > U1(i,j,k)*100) then
-            umin=U1(i,j,k)*100
+         if (umin > u_original(i,j,k)*100) then
+            umin=u_original(i,j,k)*100
             lumin=i
             mumin=j
             numin=k
          endif
 
-         if (vmax < V1(i,j,k)*100) then
-            vmax=V1(i,j,k)*100
+         if (vmax < v_original(i,j,k)*100) then
+            vmax=v_original(i,j,k)*100
             lvmax=i
             mvmax=j
             nvmax=k
          endif
 
-         if (vmin > V1(i,j,k)*100) then
-            vmin=V1(i,j,k)*100
+         if (vmin > v_original(i,j,k)*100) then
+            vmin=v_original(i,j,k)*100
             lvmin=i
             mvmin=j
             nvmin=k
          endif
 
-         if (wmax < W1(i,j,k)*100) then
-            wmax=W1(i,j,k)*100
+         if (wmax < w_original(i,j,k)*100) then
+            wmax=w_original(i,j,k)*100
             lwmax=i
             mwmax=j
             nwmax=k
          endif
 
-         if (wmin > W1(i,j,k)*100) then
-            wmin=W1(i,j,k)*100
+         if (wmin > w_original(i,j,k)*100) then
+            wmin=w_original(i,j,k)*100
             lwmin=i
             mwmin=j
             nwmin=k
          endif
 
-         if (titamax < Titaa1(i,j,k)*1000) then
-            titamax=Titaa1(i,j,k)*1000
+         if (titamax < thermal_property_1(i,j,k)*1000) then
+            titamax=thermal_property_1(i,j,k)*1000
             ltitamax=i
             mtitamax=j
             ntitamax=k
          endif
 
-         if (titamin > Titaa1(i,j,k)*1000) then
-            titamin=Titaa1(i,j,k)*1000
+         if (titamin > thermal_property_1(i,j,k)*1000) then
+            titamin=thermal_property_1(i,j,k)*1000
             ltitamin=i
             mtitamin=j
             ntitamin=k
@@ -759,12 +763,12 @@ contains
 
 
    subroutine cloud_position_init()
-      USE model_var
-      USE lmngot
-      USE lmncri
-      USE permic
-      USE estbas
-      USE cant01
+      use model_var
+      use lmngot
+      use lmncri
+      use permic
+      use estbas
+      use cant01
 !     desplazamientos horizontales a partir de la velocidad media de la nube
 !     calculo la altura media de la nube, la velocidad media de la nube
 !     es tomada como la velocidad del aire sin perturbar a esa altura
@@ -805,9 +809,9 @@ contains
 
    subroutine cloud_movement_init()
       !desplazamiento de la nube
-      USE model_var
-      USE perdim
-      USE permic
+      use model_var
+      use dinamic_var_perturbation
+      use permic
       !     movimiento de la nube (4/01/99)
 !     Redefine el valor de todas las variables (deberian
 !      ser las que se graban solamente)
@@ -815,7 +819,7 @@ contains
 !     calculo de la posicion media de la nube, es decir de las gotitas
 !     el centro esta inicialmente en nx1/2+.5, nx1/2+.5
 !     posxx y posyy son siempre en modulo menores que dx1
-!     En posx y posy se guarda para cada tt la posicion en
+!     En posx y posy se guarda para cada current_time la posicion en
 !     puntos de red
 
       if (spos  ==  1) then
@@ -838,72 +842,72 @@ contains
          do concurrent(k=0:nz1+1)
             do concurrent(j=0:nx1+1)
                do concurrent(i=1:nx1+1)
-                  U1(i-1,j,k)=U1(i,j,k)
-                  V1(i-1,j,k)=V1(i,j,k)
-                  W1(i-1,j,k)=W1(i,j,k)
-                  Pres1(i-1,j,k)=Pres1(i,j,k)
-                  U2(i-1,j,k)=U2(i,j,k)
-                  V2(i-1,j,k)=V2(i,j,k)
-                  W2(i-1,j,k)=W2(i,j,k)
-                  Pres2(i-1,j,k)=Pres2(i,j,k)
-                  Titaa1(i-1,j,k)=Titaa1(i,j,k)
+                  u_original(i-1,j,k)=u_original(i,j,k)
+                  v_original(i-1,j,k)=v_original(i,j,k)
+                  w_original(i-1,j,k)=w_original(i,j,k)
+                  pressure_original(i-1,j,k)=pressure_original(i,j,k)
+                  u_perturbed(i-1,j,k)=u_perturbed(i,j,k)
+                  v_perturbed(i-1,j,k)=v_perturbed(i,j,k)
+                  w_perturbed(i-1,j,k)=w_perturbed(i,j,k)
+                  pressure_perturbed(i-1,j,k)=pressure_perturbed(i,j,k)
+                  thermal_property_1(i-1,j,k)=thermal_property_1(i,j,k)
                   Qvap1(i-1,j,k)=Qvap1(i,j,k)
                   Qgot1(i-1,j,k)=Qgot1(i,j,k)
                   Qllu1(i-1,j,k)=Qllu1(i,j,k)
                   Qcri1(i-1,j,k)=Qcri1(i,j,k)
                   Aer1(i-1,j,k)=Aer1(i,j,k)
-                  Fcalo(i-1,j,k)=Fcalo(i,j,k)
+                  heat_force(i-1,j,k)=heat_force(i,j,k)
                end do
                i=nx1+1
-               U1(i,j,k)=U1(i-1,j,k)
-               V1(i,j,k)=V1(i-1,j,k)
-               W1(i,j,k)=W1(i-1,j,k)
-               Pres1(i,j,k)=Pres1(i-1,j,k)
-               U2(i,j,k)=U2(i-1,j,k)
-               V2(i,j,k)=V2(i-1,j,k)
-               W2(i,j,k)=W2(i-1,j,k)
-               Pres2(i,j,k)=Pres2(i-1,j,k)
-               Titaa1(i,j,k)=Titaa1(i-1,j,k)
+               u_original(i,j,k)=u_original(i-1,j,k)
+               v_original(i,j,k)=v_original(i-1,j,k)
+               w_original(i,j,k)=w_original(i-1,j,k)
+               pressure_original(i,j,k)=pressure_original(i-1,j,k)
+               u_perturbed(i,j,k)=u_perturbed(i-1,j,k)
+               v_perturbed(i,j,k)=v_perturbed(i-1,j,k)
+               w_perturbed(i,j,k)=w_perturbed(i-1,j,k)
+               pressure_perturbed(i,j,k)=pressure_perturbed(i-1,j,k)
+               thermal_property_1(i,j,k)=thermal_property_1(i-1,j,k)
                Qvap1(i,j,k)=Qvap1(i-1,j,k)
                Qgot1(i,j,k)=Qgot1(i-1,j,k)
                Qllu1(i,j,k)=Qllu1(i-1,j,k)
                Qcri1(i,j,k)=Qcri1(i-1,j,k)
                Aer1(i,j,k)=Aer1(i-1,j,k)
-               Fcalo(i,j,k)=0.
+               heat_force(i,j,k)=0.
             end do
             i=nx1
             j=0
-            U1(i,j,k)=(U1(i-1,j,k)+U1(i,j+1,k))/2.
-            V1(i,j,k)=(V1(i-1,j,k)+V1(i,j+1,k))/2.
-            W1(i,j,k)=(W1(i-1,j,k)+W1(i,j+1,k))/2.
-            Pres1(i,j,k)=(Pres1(i-1,j,k)+Pres1(i,j+1,k))/2.
-            U2(i,j,k)=(U2(i-1,j,k)+U2(i,j+1,k))/2.
-            V2(i,j,k)=(V2(i-1,j,k)+V2(i,j+1,k))/2.
-            W2(i,j,k)=(W2(i-1,j,k)+W2(i,j+1,k))/2.
-            Pres2(i,j,k)=(Pres2(i-1,j,k)+Pres2(i,j+1,k))/2.
-            Titaa1(i,j,k)=(Titaa1(i-1,j,k)+Titaa1(i,j+1,k))/2.
+            u_original(i,j,k)=(u_original(i-1,j,k)+u_original(i,j+1,k))/2.
+            v_original(i,j,k)=(v_original(i-1,j,k)+v_original(i,j+1,k))/2.
+            w_original(i,j,k)=(w_original(i-1,j,k)+w_original(i,j+1,k))/2.
+            pressure_original(i,j,k)=(pressure_original(i-1,j,k)+pressure_original(i,j+1,k))/2.
+            u_perturbed(i,j,k)=(u_perturbed(i-1,j,k)+u_perturbed(i,j+1,k))/2.
+            v_perturbed(i,j,k)=(v_perturbed(i-1,j,k)+v_perturbed(i,j+1,k))/2.
+            w_perturbed(i,j,k)=(w_perturbed(i-1,j,k)+w_perturbed(i,j+1,k))/2.
+            pressure_perturbed(i,j,k)=(pressure_perturbed(i-1,j,k)+pressure_perturbed(i,j+1,k))/2.
+            thermal_property_1(i,j,k)=(thermal_property_1(i-1,j,k)+thermal_property_1(i,j+1,k))/2.
             Qvap1(i,j,k)=(Qvap1(i-1,j,k)+Qvap1(i,j+1,k))/2.
             Qgot1(i,j,k)=(Qgot1(i-1,j,k)+Qgot1(i,j+1,k))/2.
             Qllu1(i,j,k)=(Qllu1(i-1,j,k)+Qllu1(i,j+1,k))/2.
             Qcri1(i,j,k)=(Qcri1(i-1,j,k)+Qcri1(i,j+1,k))/2.
             Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j+1,k))/2.
-            Fcalo(i,j,k)=0.
+            heat_force(i,j,k)=0.
             j=nx1+1
-            U1(i,j,k)=(U1(i-1,j,k)+U1(i,j-1,k))/2.
-            V1(i,j,k)=(V1(i-1,j,k)+V1(i,j-1,k))/2.
-            W1(i,j,k)=(W1(i-1,j,k)+W1(i,j-1,k))/2.
-            Pres1(i,j,k)=(Pres1(i-1,j,k)+Pres1(i,j-1,k))/2.
-            U2(i,j,k)=(U2(i-1,j,k)+U2(i,j-1,k))/2.
-            V2(i,j,k)=(V2(i-1,j,k)+V2(i,j-1,k))/2.
-            W2(i,j,k)=(W2(i-1,j,k)+W2(i,j-1,k))/2.
-            Pres2(i,j,k)=(Pres2(i-1,j,k)+Pres2(i,j-1,k))/2.
-            Titaa1(i,j,k)=(Titaa1(i-1,j,k)+Titaa1(i,j-1,k))/2.
+            u_original(i,j,k)=(u_original(i-1,j,k)+u_original(i,j-1,k))/2.
+            v_original(i,j,k)=(v_original(i-1,j,k)+v_original(i,j-1,k))/2.
+            w_original(i,j,k)=(w_original(i-1,j,k)+w_original(i,j-1,k))/2.
+            pressure_original(i,j,k)=(pressure_original(i-1,j,k)+pressure_original(i,j-1,k))/2.
+            u_perturbed(i,j,k)=(u_perturbed(i-1,j,k)+u_perturbed(i,j-1,k))/2.
+            v_perturbed(i,j,k)=(v_perturbed(i-1,j,k)+v_perturbed(i,j-1,k))/2.
+            w_perturbed(i,j,k)=(w_perturbed(i-1,j,k)+w_perturbed(i,j-1,k))/2.
+            pressure_perturbed(i,j,k)=(pressure_perturbed(i-1,j,k)+pressure_perturbed(i,j-1,k))/2.
+            thermal_property_1(i,j,k)=(thermal_property_1(i-1,j,k)+thermal_property_1(i,j-1,k))/2.
             Qvap1(i,j,k)=(Qvap1(i-1,j,k)+Qvap1(i,j-1,k))/2.
             Qgot1(i,j,k)=(Qgot1(i-1,j,k)+Qgot1(i,j-1,k))/2.
             Qllu1(i,j,k)=(Qllu1(i-1,j,k)+Qllu1(i,j-1,k))/2.
             Qcri1(i,j,k)=(Qcri1(i-1,j,k)+Qcri1(i,j-1,k))/2.
             Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j-1,k))/2.
-            Fcalo(i,j,k)=0.
+            heat_force(i,j,k)=0.
          end do
       endif
 
@@ -914,72 +918,72 @@ contains
          do concurrent(k=0:nz1+1)
             do concurrent(j=0:nx1+1)
                do concurrent(i=nx1:0) ! TODO Test this loop
-                  U1(i+1,j,k)=U1(i,j,k)
-                  V1(i+1,j,k)=V1(i,j,k)
-                  W1(i+1,j,k)=W1(i,j,k)
-                  Pres1(i+1,j,k)=Pres1(i,j,k)
-                  U2(i+1,j,k)=U2(i,j,k)
-                  V2(i+1,j,k)=V2(i,j,k)
-                  W2(i+1,j,k)=W2(i,j,k)
-                  Pres2(i+1,j,k)=Pres2(i,j,k)
-                  Titaa1(i+1,j,k)=Titaa1(i,j,k)
+                  u_original(i+1,j,k)=u_original(i,j,k)
+                  v_original(i+1,j,k)=v_original(i,j,k)
+                  w_original(i+1,j,k)=w_original(i,j,k)
+                  pressure_original(i+1,j,k)=pressure_original(i,j,k)
+                  u_perturbed(i+1,j,k)=u_perturbed(i,j,k)
+                  v_perturbed(i+1,j,k)=v_perturbed(i,j,k)
+                  w_perturbed(i+1,j,k)=w_perturbed(i,j,k)
+                  pressure_perturbed(i+1,j,k)=pressure_perturbed(i,j,k)
+                  thermal_property_1(i+1,j,k)=thermal_property_1(i,j,k)
                   Qvap1(i+1,j,k)=Qvap1(i,j,k)
                   Qgot1(i+1,j,k)=Qgot1(i,j,k)
                   Qllu1(i+1,j,k)=Qllu1(i,j,k)
                   Qcri1(i+1,j,k)=Qcri1(i,j,k)
                   Aer1(i+1,j,k)=Aer1(i,j,k)
-                  Fcalo(i+1,j,k)=Fcalo(i,j,k)
+                  heat_force(i+1,j,k)=heat_force(i,j,k)
                end do
                i=0
-               U1(i,j,k)=U1(i+1,j,k)
-               V1(i,j,k)=V1(i+1,j,k)
-               W1(i,j,k)=W1(i+1,j,k)
-               Pres1(i,j,k)=Pres1(i+1,j,k)
-               U2(i,j,k)=U2(i+1,j,k)
-               V2(i,j,k)=V2(i+1,j,k)
-               W2(i,j,k)=W2(i+1,j,k)
-               Pres2(i,j,k)=Pres2(i+1,j,k)
-               Titaa1(i,j,k)=Titaa1(i+1,j,k)
+               u_original(i,j,k)=u_original(i+1,j,k)
+               v_original(i,j,k)=v_original(i+1,j,k)
+               w_original(i,j,k)=w_original(i+1,j,k)
+               pressure_original(i,j,k)=pressure_original(i+1,j,k)
+               u_perturbed(i,j,k)=u_perturbed(i+1,j,k)
+               v_perturbed(i,j,k)=v_perturbed(i+1,j,k)
+               w_perturbed(i,j,k)=w_perturbed(i+1,j,k)
+               pressure_perturbed(i,j,k)=pressure_perturbed(i+1,j,k)
+               thermal_property_1(i,j,k)=thermal_property_1(i+1,j,k)
                Qvap1(i,j,k)=Qvap1(i+1,j,k)
                Qgot1(i,j,k)=Qgot1(i+1,j,k)
                Qllu1(i,j,k)=Qllu1(i+1,j,k)
                Qcri1(i,j,k)=Qcri1(i+1,j,k)
                Aer1(i,j,k)=Aer1(i+1,j,k)
-               Fcalo(i,j,k)=0.
+               heat_force(i,j,k)=0.
             end do
             i=1
             j=0
-            U1(i,j,k)=(U1(i+1,j,k)+U1(i,j+1,k))/2.
-            V1(i,j,k)=(V1(i+1,j,k)+V1(i,j+1,k))/2.
-            W1(i,j,k)=(W1(i+1,j,k)+W1(i,j+1,k))/2.
-            Pres1(i,j,k)=(Pres1(i+1,j,k)+Pres1(i,j+1,k))/2.
-            U2(i,j,k)=(U2(i+1,j,k)+U2(i,j+1,k))/2.
-            V2(i,j,k)=(V2(i+1,j,k)+V2(i,j+1,k))/2.
-            W2(i,j,k)=(W2(i+1,j,k)+W2(i,j+1,k))/2.
-            Pres2(i,j,k)=(Pres2(i+1,j,k)+Pres2(i,j+1,k))/2.
-            Titaa1(i,j,k)=(Titaa1(i+1,j,k)+Titaa1(i,j+1,k))/2.
+            u_original(i,j,k)=(u_original(i+1,j,k)+u_original(i,j+1,k))/2.
+            v_original(i,j,k)=(v_original(i+1,j,k)+v_original(i,j+1,k))/2.
+            w_original(i,j,k)=(w_original(i+1,j,k)+w_original(i,j+1,k))/2.
+            pressure_original(i,j,k)=(pressure_original(i+1,j,k)+pressure_original(i,j+1,k))/2.
+            u_perturbed(i,j,k)=(u_perturbed(i+1,j,k)+u_perturbed(i,j+1,k))/2.
+            v_perturbed(i,j,k)=(v_perturbed(i+1,j,k)+v_perturbed(i,j+1,k))/2.
+            w_perturbed(i,j,k)=(w_perturbed(i+1,j,k)+w_perturbed(i,j+1,k))/2.
+            pressure_perturbed(i,j,k)=(pressure_perturbed(i+1,j,k)+pressure_perturbed(i,j+1,k))/2.
+            thermal_property_1(i,j,k)=(thermal_property_1(i+1,j,k)+thermal_property_1(i,j+1,k))/2.
             Qvap1(i,j,k)=(Qvap1(i+1,j,k)+Qvap1(i,j+1,k))/2.
             Qgot1(i,j,k)=(Qgot1(i+1,j,k)+Qgot1(i,j+1,k))/2.
             Qllu1(i,j,k)=(Qllu1(i+1,j,k)+Qllu1(i,j+1,k))/2.
             Qcri1(i,j,k)=(Qcri1(i+1,j,k)+Qcri1(i,j+1,k))/2.
             Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j+1,k))/2.
-            Fcalo(i,j,k)=0.
+            heat_force(i,j,k)=0.
             j=nx1+1
-            U1(i,j,k)=(U1(i+1,j,k)+U1(i,j-1,k))/2.
-            V1(i,j,k)=(V1(i+1,j,k)+V1(i,j-1,k))/2.
-            W1(i,j,k)=(W1(i+1,j,k)+W1(i,j-1,k))/2.
-            Pres1(i,j,k)=(Pres1(i+1,j,k)+Pres1(i,j-1,k))/2.
-            U2(i,j,k)=(U2(i+1,j,k)+U2(i,j-1,k))/2.
-            V2(i,j,k)=(V2(i+1,j,k)+V2(i,j-1,k))/2.
-            W2(i,j,k)=(W2(i+1,j,k)+W2(i,j-1,k))/2.
-            Pres2(i,j,k)=(Pres2(i+1,j,k)+Pres2(i,j-1,k))/2.
-            Titaa1(i,j,k)=(Titaa1(i+1,j,k)+Titaa1(i,j-1,k))/2.
+            u_original(i,j,k)=(u_original(i+1,j,k)+u_original(i,j-1,k))/2.
+            v_original(i,j,k)=(v_original(i+1,j,k)+v_original(i,j-1,k))/2.
+            w_original(i,j,k)=(w_original(i+1,j,k)+w_original(i,j-1,k))/2.
+            pressure_original(i,j,k)=(pressure_original(i+1,j,k)+pressure_original(i,j-1,k))/2.
+            u_perturbed(i,j,k)=(u_perturbed(i+1,j,k)+u_perturbed(i,j-1,k))/2.
+            v_perturbed(i,j,k)=(v_perturbed(i+1,j,k)+v_perturbed(i,j-1,k))/2.
+            w_perturbed(i,j,k)=(w_perturbed(i+1,j,k)+w_perturbed(i,j-1,k))/2.
+            pressure_perturbed(i,j,k)=(pressure_perturbed(i+1,j,k)+pressure_perturbed(i,j-1,k))/2.
+            thermal_property_1(i,j,k)=(thermal_property_1(i+1,j,k)+thermal_property_1(i,j-1,k))/2.
             Qvap1(i,j,k)=(Qvap1(i+1,j,k)+Qvap1(i,j-1,k))/2.
             Qgot1(i,j,k)=(Qgot1(i+1,j,k)+Qgot1(i,j-1,k))/2.
             Qllu1(i,j,k)=(Qllu1(i+1,j,k)+Qllu1(i,j-1,k))/2.
             Qcri1(i,j,k)=(Qcri1(i+1,j,k)+Qcri1(i,j-1,k))/2.
             Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j-1,k))/2.
-            Fcalo(i,j,k)=0.
+            heat_force(i,j,k)=0.
          end do
       endif
 
@@ -993,72 +997,72 @@ contains
          do concurrent(k=0:nz1+1)
             do concurrent(i=0:nx1+1)
                do concurrent(j=1:nx1+1)
-                  U1(i,j-1,k)=U1(i,j,k)
-                  V1(i,j-1,k)=V1(i,j,k)
-                  W1(i,j-1,k)=W1(i,j,k)
-                  Pres1(i,j-1,k)=Pres1(i,j,k)
-                  U2(i,j-1,k)=U2(i,j,k)
-                  V2(i,j-1,k)=V2(i,j,k)
-                  W2(i,j-1,k)=W2(i,j,k)
-                  Pres2(i,j-1,k)=Pres2(i,j,k)
-                  Titaa1(i,j-1,k)=Titaa1(i,j,k)
+                  u_original(i,j-1,k)=u_original(i,j,k)
+                  v_original(i,j-1,k)=v_original(i,j,k)
+                  w_original(i,j-1,k)=w_original(i,j,k)
+                  pressure_original(i,j-1,k)=pressure_original(i,j,k)
+                  u_perturbed(i,j-1,k)=u_perturbed(i,j,k)
+                  v_perturbed(i,j-1,k)=v_perturbed(i,j,k)
+                  w_perturbed(i,j-1,k)=w_perturbed(i,j,k)
+                  pressure_perturbed(i,j-1,k)=pressure_perturbed(i,j,k)
+                  thermal_property_1(i,j-1,k)=thermal_property_1(i,j,k)
                   Qvap1(i,j-1,k)=Qvap1(i,j,k)
                   Qgot1(i,j-1,k)=Qgot1(i,j,k)
                   Qllu1(i,j-1,k)=Qllu1(i,j,k)
                   Qcri1(i,j-1,k)=Qcri1(i,j,k)
                   Aer1(i,j-1,k)=Aer1(i,j,k)
-                  Fcalo(i,j-1,k)=Fcalo(i,j,k)
+                  heat_force(i,j-1,k)=heat_force(i,j,k)
                end do
                j=nx1+1
-               U1(i,j,k)=U1(i,j-1,k)
-               V1(i,j,k)=V1(i,j-1,k)
-               W1(i,j,k)=W1(i,j-1,k)
-               Pres1(i,j,k)=Pres1(i,j-1,k)
-               U2(i,j,k)=U2(i,j-1,k)
-               V2(i,j,k)=V2(i,j-1,k)
-               W2(i,j,k)=W2(i,j-1,k)
-               Pres2(i,j,k)=Pres2(i,j-1,k)
-               Titaa1(i,j,k)=Titaa1(i,j-1,k)
+               u_original(i,j,k)=u_original(i,j-1,k)
+               v_original(i,j,k)=v_original(i,j-1,k)
+               w_original(i,j,k)=w_original(i,j-1,k)
+               pressure_original(i,j,k)=pressure_original(i,j-1,k)
+               u_perturbed(i,j,k)=u_perturbed(i,j-1,k)
+               v_perturbed(i,j,k)=v_perturbed(i,j-1,k)
+               w_perturbed(i,j,k)=w_perturbed(i,j-1,k)
+               pressure_perturbed(i,j,k)=pressure_perturbed(i,j-1,k)
+               thermal_property_1(i,j,k)=thermal_property_1(i,j-1,k)
                Qvap1(i,j,k)=Qvap1(i,j-1,k)
                Qgot1(i,j,k)=Qgot1(i,j-1,k)
                Qllu1(i,j,k)=Qllu1(i,j-1,k)
                Qcri1(i,j,k)=Qcri1(i,j-1,k)
                Aer1(i,j,k)=Aer1(i,j-1,k)
-               Fcalo(i,j,k)=0.
+               heat_force(i,j,k)=0.
             end do
             j=nx1
             i=0
-            U1(i,j,k)=(U1(i,j-1,k)+U1(i+1,j,k))/2.
-            V1(i,j,k)=(V1(i,j-1,k)+V1(i+1,j,k))/2.
-            W1(i,j,k)=(W1(i,j-1,k)+W1(i+1,j,k))/2.
-            Pres1(i,j,k)=(Pres1(i,j-1,k)+Pres1(i+1,j,k))/2.
-            U2(i,j,k)=(U2(i,j-1,k)+U2(i+1,j,k))/2.
-            V2(i,j,k)=(V2(i,j-1,k)+V2(i+1,j,k))/2.
-            W2(i,j,k)=(W2(i,j-1,k)+W2(i+1,j,k))/2.
-            Pres2(i,j,k)=(Pres2(i,j-1,k)+Pres2(i+1,j,k))/2.
-            Titaa1(i,j,k)=(Titaa1(i,j-1,k)+Titaa1(i+1,j,k))/2.
+            u_original(i,j,k)=(u_original(i,j-1,k)+u_original(i+1,j,k))/2.
+            v_original(i,j,k)=(v_original(i,j-1,k)+v_original(i+1,j,k))/2.
+            w_original(i,j,k)=(w_original(i,j-1,k)+w_original(i+1,j,k))/2.
+            pressure_original(i,j,k)=(pressure_original(i,j-1,k)+pressure_original(i+1,j,k))/2.
+            u_perturbed(i,j,k)=(u_perturbed(i,j-1,k)+u_perturbed(i+1,j,k))/2.
+            v_perturbed(i,j,k)=(v_perturbed(i,j-1,k)+v_perturbed(i+1,j,k))/2.
+            w_perturbed(i,j,k)=(w_perturbed(i,j-1,k)+w_perturbed(i+1,j,k))/2.
+            pressure_perturbed(i,j,k)=(pressure_perturbed(i,j-1,k)+pressure_perturbed(i+1,j,k))/2.
+            thermal_property_1(i,j,k)=(thermal_property_1(i,j-1,k)+thermal_property_1(i+1,j,k))/2.
             Qvap1(i,j,k)=(Qvap1(i,j-1,k)+Qvap1(i+1,j,k))/2.
             Qgot1(i,j,k)=(Qgot1(i,j-1,k)+Qgot1(i+1,j,k))/2.
             Qllu1(i,j,k)=(Qllu1(i,j-1,k)+Qllu1(i+1,j,k))/2.
             Qcri1(i,j,k)=(Qcri1(i,j-1,k)+Qcri1(i+1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i+1,j,k))/2.
-            Fcalo(i,j,k)=0.
+            heat_force(i,j,k)=0.
             i=nx1+1
-            U1(i,j,k)=(U1(i,j-1,k)+U1(i-1,j,k))/2.
-            V1(i,j,k)=(V1(i,j-1,k)+V1(i-1,j,k))/2.
-            W1(i,j,k)=(W1(i,j-1,k)+W1(i-1,j,k))/2.
-            Pres1(i,j,k)=(Pres1(i,j-1,k)+Pres1(i-1,j,k))/2.
-            U2(i,j,k)=(U2(i,j-1,k)+U2(i-1,j,k))/2.
-            V2(i,j,k)=(V2(i,j-1,k)+V2(i-1,j,k))/2.
-            W2(i,j,k)=(W2(i,j-1,k)+W2(i-1,j,k))/2.
-            Pres2(i,j,k)=(Pres2(i,j-1,k)+Pres2(i-1,j,k))/2.
-            Titaa1(i,j,k)=(Titaa1(i,j-1,k)+Titaa1(i-1,j,k))/2.
+            u_original(i,j,k)=(u_original(i,j-1,k)+u_original(i-1,j,k))/2.
+            v_original(i,j,k)=(v_original(i,j-1,k)+v_original(i-1,j,k))/2.
+            w_original(i,j,k)=(w_original(i,j-1,k)+w_original(i-1,j,k))/2.
+            pressure_original(i,j,k)=(pressure_original(i,j-1,k)+pressure_original(i-1,j,k))/2.
+            u_perturbed(i,j,k)=(u_perturbed(i,j-1,k)+u_perturbed(i-1,j,k))/2.
+            v_perturbed(i,j,k)=(v_perturbed(i,j-1,k)+v_perturbed(i-1,j,k))/2.
+            w_perturbed(i,j,k)=(w_perturbed(i,j-1,k)+w_perturbed(i-1,j,k))/2.
+            pressure_perturbed(i,j,k)=(pressure_perturbed(i,j-1,k)+pressure_perturbed(i-1,j,k))/2.
+            thermal_property_1(i,j,k)=(thermal_property_1(i,j-1,k)+thermal_property_1(i-1,j,k))/2.
             Qvap1(i,j,k)=(Qvap1(i,j-1,k)+Qvap1(i-1,j,k))/2.
             Qgot1(i,j,k)=(Qgot1(i,j-1,k)+Qgot1(i-1,j,k))/2.
             Qllu1(i,j,k)=(Qllu1(i,j-1,k)+Qllu1(i-1,j,k))/2.
             Qcri1(i,j,k)=(Qcri1(i,j-1,k)+Qcri1(i-1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i-1,j,k))/2.
-            Fcalo(i,j,k)=0.
+            heat_force(i,j,k)=0.
          end do
       endif
 
@@ -1069,72 +1073,72 @@ contains
          do concurrent(k=0:nz1+1)
             do concurrent(i=0:nx1+1)
                do concurrent(j=nx1:0) ! TODO Test this loop
-                  U1(i,j+1,k)=U1(i,j,k)
-                  V1(i,j+1,k)=V1(i,j,k)
-                  W1(i,j+1,k)=W1(i,j,k)
-                  Pres1(i,j+1,k)=Pres1(i,j,k)
-                  U2(i,j+1,k)=U2(i,j,k)
-                  V2(i,j+1,k)=V2(i,j,k)
-                  W2(i,j+1,k)=W2(i,j,k)
-                  Pres2(i,j+1,k)=Pres2(i,j,k)
-                  Titaa1(i,j+1,k)=Titaa1(i,j,k)
+                  u_original(i,j+1,k)=u_original(i,j,k)
+                  v_original(i,j+1,k)=v_original(i,j,k)
+                  w_original(i,j+1,k)=w_original(i,j,k)
+                  pressure_original(i,j+1,k)=pressure_original(i,j,k)
+                  u_perturbed(i,j+1,k)=u_perturbed(i,j,k)
+                  v_perturbed(i,j+1,k)=v_perturbed(i,j,k)
+                  w_perturbed(i,j+1,k)=w_perturbed(i,j,k)
+                  pressure_perturbed(i,j+1,k)=pressure_perturbed(i,j,k)
+                  thermal_property_1(i,j+1,k)=thermal_property_1(i,j,k)
                   Qvap1(i,j+1,k)=Qvap1(i,j,k)
                   Qgot1(i,j+1,k)=Qgot1(i,j,k)
                   Qllu1(i,j+1,k)=Qllu1(i,j,k)
                   Qcri1(i,j+1,k)=Qcri1(i,j,k)
                   Aer1(i,j+1,k)=Aer1(i,j,k)
-                  Fcalo(i,j+1,k)=Fcalo(i,j,k)
+                  heat_force(i,j+1,k)=heat_force(i,j,k)
                end do
                j=0
-               U1(i,j,k)=U1(i,j-1,k)
-               V1(i,j,k)=V1(i,j-1,k)
-               W1(i,j,k)=W1(i,j-1,k)
-               Pres1(i,j,k)=Pres1(i,j-1,k)
-               U2(i,j,k)=U2(i,j-1,k)
-               V2(i,j,k)=V2(i,j-1,k)
-               W2(i,j,k)=W2(i,j-1,k)
-               Pres2(i,j,k)=Pres2(i,j-1,k)
-               Titaa1(i,j,k)=Titaa1(i,j-1,k)
+               u_original(i,j,k)=u_original(i,j-1,k)
+               v_original(i,j,k)=v_original(i,j-1,k)
+               w_original(i,j,k)=w_original(i,j-1,k)
+               pressure_original(i,j,k)=pressure_original(i,j-1,k)
+               u_perturbed(i,j,k)=u_perturbed(i,j-1,k)
+               v_perturbed(i,j,k)=v_perturbed(i,j-1,k)
+               w_perturbed(i,j,k)=w_perturbed(i,j-1,k)
+               pressure_perturbed(i,j,k)=pressure_perturbed(i,j-1,k)
+               thermal_property_1(i,j,k)=thermal_property_1(i,j-1,k)
                Qvap1(i,j,k)=Qvap1(i,j-1,k)
                Qgot1(i,j,k)=Qgot1(i,j-1,k)
                Qllu1(i,j,k)=Qllu1(i,j-1,k)
                Qcri1(i,j,k)=Qcri1(i,j-1,k)
                Aer1(i,j,k)=Aer1(i,j-1,k)
-               Fcalo(i,j,k)=0.
+               heat_force(i,j,k)=0.
             end do
             j=1
             i=0
-            U1(i,j,k)=(U1(i,j+1,k)+U1(i+1,j,k))/2.
-            V1(i,j,k)=(V1(i,j+1,k)+V1(i+1,j,k))/2.
-            W1(i,j,k)=(W1(i,j+1,k)+W1(i+1,j,k))/2.
-            Pres1(i,j,k)=(Pres1(i,j+1,k)+Pres1(i+1,j,k))/2.
-            U2(i,j,k)=(U2(i,j+1,k)+U2(i+1,j,k))/2.
-            V2(i,j,k)=(V2(i,j+1,k)+V2(i+1,j,k))/2.
-            W2(i,j,k)=(W2(i,j+1,k)+W2(i+1,j,k))/2.
-            Pres2(i,j,k)=(Pres2(i,j+1,k)+Pres2(i+1,j,k))/2.
-            Titaa1(i,j,k)=(Titaa1(i,j+1,k)+Titaa1(i+1,j,k))/2.
+            u_original(i,j,k)=(u_original(i,j+1,k)+u_original(i+1,j,k))/2.
+            v_original(i,j,k)=(v_original(i,j+1,k)+v_original(i+1,j,k))/2.
+            w_original(i,j,k)=(w_original(i,j+1,k)+w_original(i+1,j,k))/2.
+            pressure_original(i,j,k)=(pressure_original(i,j+1,k)+pressure_original(i+1,j,k))/2.
+            u_perturbed(i,j,k)=(u_perturbed(i,j+1,k)+u_perturbed(i+1,j,k))/2.
+            v_perturbed(i,j,k)=(v_perturbed(i,j+1,k)+v_perturbed(i+1,j,k))/2.
+            w_perturbed(i,j,k)=(w_perturbed(i,j+1,k)+w_perturbed(i+1,j,k))/2.
+            pressure_perturbed(i,j,k)=(pressure_perturbed(i,j+1,k)+pressure_perturbed(i+1,j,k))/2.
+            thermal_property_1(i,j,k)=(thermal_property_1(i,j+1,k)+thermal_property_1(i+1,j,k))/2.
             Qvap1(i,j,k)=(Qvap1(i,j+1,k)+Qvap1(i+1,j,k))/2.
             Qgot1(i,j,k)=(Qgot1(i,j+1,k)+Qgot1(i+1,j,k))/2.
             Qllu1(i,j,k)=(Qllu1(i,j+1,k)+Qllu1(i+1,j,k))/2.
             Qcri1(i,j,k)=(Qcri1(i,j+1,k)+Qcri1(i+1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i+1,j,k))/2.
-            Fcalo(i,j,k)=0.
+            heat_force(i,j,k)=0.
             i=nx1+1
-            U1(i,j,k)=(U1(i,j+1,k)+U1(i-1,j,k))/2.
-            V1(i,j,k)=(V1(i,j+1,k)+V1(i-1,j,k))/2.
-            W1(i,j,k)=(W1(i,j+1,k)+W1(i-1,j,k))/2.
-            Pres1(i,j,k)=(Pres1(i,j+1,k)+Pres1(i-1,j,k))/2.
-            U2(i,j,k)=(U2(i,j+1,k)+U2(i-1,j,k))/2.
-            V2(i,j,k)=(V2(i,j+1,k)+V2(i-1,j,k))/2.
-            W2(i,j,k)=(W2(i,j+1,k)+W2(i-1,j,k))/2.
-            Pres2(i,j,k)=(Pres2(i,j+1,k)+Pres2(i-1,j,k))/2.
-            Titaa1(i,j,k)=(Titaa1(i,j+1,k)+Titaa1(i-1,j,k))/2.
+            u_original(i,j,k)=(u_original(i,j+1,k)+u_original(i-1,j,k))/2.
+            v_original(i,j,k)=(v_original(i,j+1,k)+v_original(i-1,j,k))/2.
+            w_original(i,j,k)=(w_original(i,j+1,k)+w_original(i-1,j,k))/2.
+            pressure_original(i,j,k)=(pressure_original(i,j+1,k)+pressure_original(i-1,j,k))/2.
+            u_perturbed(i,j,k)=(u_perturbed(i,j+1,k)+u_perturbed(i-1,j,k))/2.
+            v_perturbed(i,j,k)=(v_perturbed(i,j+1,k)+v_perturbed(i-1,j,k))/2.
+            w_perturbed(i,j,k)=(w_perturbed(i,j+1,k)+w_perturbed(i-1,j,k))/2.
+            pressure_perturbed(i,j,k)=(pressure_perturbed(i,j+1,k)+pressure_perturbed(i-1,j,k))/2.
+            thermal_property_1(i,j,k)=(thermal_property_1(i,j+1,k)+thermal_property_1(i-1,j,k))/2.
             Qvap1(i,j,k)=(Qvap1(i,j+1,k)+Qvap1(i-1,j,k))/2.
             Qgot1(i,j,k)=(Qgot1(i,j+1,k)+Qgot1(i-1,j,k))/2.
             Qllu1(i,j,k)=(Qllu1(i,j+1,k)+Qllu1(i-1,j,k))/2.
             Qcri1(i,j,k)=(Qcri1(i,j+1,k)+Qcri1(i-1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i-1,j,k))/2.
-            Fcalo(i,j,k)=0.
+            heat_force(i,j,k)=0.
          end do
 
       endif
@@ -1145,38 +1149,3 @@ contains
    end subroutine cloud_movement_init
 end module model_initialization
 
-module aeroana
-!> No se usa en MODEL31
-!> Variables de aeroana
-   USE dimen
-   integer tt,t1,t2,n,m,l,i,j,k,lll,s,iT,tte, lvapneg,llluneg,lcrineg,&
-      laerneg,lnieneg,lgraneg,yy
-   real T,P, Dv,Lvl,Lvs,Lsl,Vis,Qvap,Qliq,densi,nu, Lsl00, Eaucn,Eaccn,&
-      Eacng, Naer,dqgot,dqcri,daer,daer2, Fcal, elvs,esvs,e1,rl,rs,dden0z,&
-      aux,aux1,aux2,aux3,aux4, cks,turbu,lapla
-   real(8) qgotaux,qvapaux,qlluaux,qcriaux,qnieaux,qgraaux,aeraux, auxx,auxy,&
-      auxz, Taux,Qvapneg,aerneg, ener,ener1,ener2,ener3,ener4,ener5,qv,qg,&
-      daitot,vapt1,vapt2,vapt3,vapt4, gott1,gott2,gott3,gott4, aert1,aert2,&
-      aert3,aert4,totnuc,totmic
-   real aerdif(-3:nx1+3,-3:nx1+3,-3:nz1+3)
-
-contains
-   subroutine aeroana_init()
-      ctur=.5
-      lt2=nint(dt1/dt2)
-      lt3=2*nint(dt1/dt3)
-      cteturb=ctur/2.**.5
-      cks=cteturb*2.
-      dx2=2.*dx1
-      dx8=8.*dx1
-      dx12=12.*dx1
-      AA=1./Eps-1.
-      ikapa=1./Kapa
-      cteqgot=160./3**6.*pi*rhow*N0got
-      cteqllu=8.*pi*rhow*N0llu
-      cteqnie=.6*pi*rhonie*N0nie
-      cteqgra=8.*pi*rhogra*N0gra
-      tte=0
-   end subroutine aeroana_init
-
-end module aeroana

@@ -1,4 +1,4 @@
-lt1 = 1
+total_time = 1
 nx1 = 50
 nz1 = 45
 biased_nx1 = nx1 + 7
@@ -6,11 +6,11 @@ nube31_biased_nz1 = nz1 + 5
 inis_biased_nz1 = nz1 + 7
 
 nube31_var_list = [
-    "U1",
-    "V1",
-    "W1",
-    "Titaa1",
-    "Pres1",
+    "original_x_velocity",
+    "original_y_velocity",
+    "original_z_velocity",
+    "thermal_property_1",
+    "original_pressure",
     "Qvap1",
     "Qgot1",
     "Qllu1",

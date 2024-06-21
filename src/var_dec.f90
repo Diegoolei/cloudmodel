@@ -1,6 +1,6 @@
 module turbvar1
 !> Variables usadas en turbulencia
-   USE dimen
+   use dimen
    real :: D(3, 3, -3:nx1+2, -3:nx1 + 2, 3)
 end module turbvar1
 
@@ -9,7 +9,7 @@ module cant01
    implicit none
    real :: ltt, ltg, lte, ltb, ctur, cteturb, dx2, dx8, dx12, AA, ikapa, pro1,&
       pro2, pro3, pro4, cteqgot, cteqllu, cteqnie, cteqgra
-   integer :: ini, lt1, lt2, lt3
+   integer :: ini, total_time, lt2, lt3
 end module cant01
 
 module turbvar
@@ -21,7 +21,7 @@ end module turbvar
 
 module advecs
 !> Terminos de adveccion
-   USE dimen
+   use dimen
    real, dimension(-2:nx1+2,-2:nx1+2) :: advaer1, advaer2, advgot1, advgot2, advllu1,&
       advllu2, advcri1, advcri2, advnie1, advnie2, advgra1, advgra2, advvap1, advvap2
 
@@ -29,7 +29,7 @@ end module advecs
 
 module estbas
 !> Cantidades no perturbadas
-   USE dimen
+   use dimen
    real, dimension(-3:nz1+3) :: Temp0,Tita0,Pres00,Presi0,UU,VV,cc2,Den0,aer0,Qvap0
    real, dimension(nz1) :: Qvaprel,aerrel
 end module estbas
@@ -109,7 +109,7 @@ end module nuclea61
 
 module p3v3
 !> Velocidades y las presiones
-   USE dimen
+   use dimen
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: U3, V3, W3, Pres3
 end module p3v3
 
@@ -155,14 +155,14 @@ end module dvapor_vars
 
 module filtro01
 !> filtro01
-   USE dimen
+   use dimen
    real varia2(-5:nx1+5,-5:nx1+5,-4:nz1+4)
    real varx,vary,varz, fact
    integer i,j,k
 end module filtro01
 
 module fuvw
-   USE dimen
+   use dimen
    real, dimension(-1:nx1+2,-1:nx1+2,-1:nz1+2) :: fu, fv, fw, fp
 end module fuvw
 
@@ -174,18 +174,30 @@ module inomo_var
 end module inomo_var
 
 module permic
-   USE dimen
+   use dimen
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: Qvap1,Qvap2,Qgot1,Qgot2,aer1,&
       aer2,Qllu1,Qllu2,Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2
    real, dimension(-3:2*nz1+5) :: Av,Vtnie,Vtgra0
 end module permic
 
-module perdim
-!> Perturbaciones de las variables dinamicas
-   USE dimen
-   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: U1,V1,W1,U2,V2,W2,Pres1,Pres2,&
-      Tempa1,Titaa1,Titaa2,Fcalo
-end module perdim
+!> Module: dinamic_var_perturbation
+!! Description: Defines perturbation-related variables for numerical simulations.
+!!              These variables are used in the context of dynamic perturbations.
+module dinamic_var_perturbation
+   use dimen
+   !> Original velocity components (u=x, v=y, w=z)
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_original, v_original, w_original
+   !> Perturbed velocity components (u=x, v=y, w=z)
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_perturbed, v_perturbed, w_perturbed
+   !> Original and perturbed pressure
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: pressure_original, pressure_perturbed
+   !> Ambient temperature
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: ambient_temperature
+   !> Thermodynamic properties
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: thermal_property_1, thermal_property_2
+   !> Heat force
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: heat_force
+ end module dinamic_var_perturbation
 
 !> @file var_dec.f90
 !! @brief This file contains the module declaration for the microf05 module.
