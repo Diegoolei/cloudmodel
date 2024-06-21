@@ -1,7 +1,7 @@
 subroutine tempot(i,j,k,dden0z,Fcal)
    !> heat_force es el calor liberado por cambio de fase, por unidad de masa de aire
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use constants
    use estbas
@@ -51,7 +51,7 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de gotitas
 subroutine corgot
-   use dimen
+   use dimensions
    use permic
    use lmngot
    use corgot_vars
@@ -90,7 +90,7 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de gotas
 subroutine corllu
-   use dimen
+   use dimensions
    use permic
    use lmnllu
    use corgot_vars
@@ -128,7 +128,7 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de cristales
 subroutine corcri
-   use dimen
+   use dimensions
    use permic
    use lmncri
    use corgot_vars
@@ -166,7 +166,7 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de nieve
 subroutine cornie
-   use dimen
+   use dimensions
    use permic
    use lmnnie
    use corgot_vars
@@ -204,7 +204,7 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de granizos
 subroutine corgra
-   use dimen
+   use dimensions
    use permic
    use lmngra
    use corgot_vars
@@ -242,7 +242,7 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de vapor
 subroutine corvap(Qvapneg)
-   use dimen
+   use dimensions
    use permic
    use estbas
    use corvap_vars
@@ -264,7 +264,7 @@ end
  !     Esta subrutina corrige los lugares en donde la dinamica da
  !     negativa la cantidad de aerosoles
 subroutine coraer(aerneg)
-   use dimen
+   use dimensions
    use permic
    use estbas
    use coraer_vars
@@ -284,7 +284,7 @@ end
 
 subroutine daeros(l,m,n)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants
@@ -343,7 +343,7 @@ end
 
 subroutine dgotit(l,m,n)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants
@@ -394,7 +394,7 @@ end
 
 subroutine dvapor(l,m,n)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants
@@ -455,7 +455,7 @@ end
 
 subroutine dlluvi(l,m,n)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants
@@ -516,7 +516,7 @@ end
 
 subroutine dcrist(l,m,n)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants
@@ -562,7 +562,7 @@ end
 
 subroutine dnieve(l,m,n)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants
@@ -614,7 +614,7 @@ end
 
 subroutine dgrani(l,m,n)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants
@@ -688,7 +688,7 @@ end
 !############### calculo de la velocidad y la presion ################
 subroutine speed_pressure()
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use constants
    use estbas
@@ -851,7 +851,7 @@ end subroutine speed_pressure
 subroutine turbu1(kk)
    !> Esta subrutina calcula los Dnm para cada plano Z
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use constants
    use turbvar1
@@ -947,7 +947,7 @@ end
  !     revisado : 28/04/97
 
 subroutine turbu2(i,j)
-   use dimen
+   use dimensions
    use turbvar
    use turbvar1
    use turbu2_vars
@@ -1026,7 +1026,7 @@ end
 
 subroutine nuclea(Qvap,Qliq,Naer,TT,rhoa,e1,esl,ess,rl,rs,Lvl,Lvs,Naux,auxl,auxs)
    use cant01
-   use dimen
+   use dimensions
    use constants
    use nuclea61
    implicit none
@@ -1137,7 +1137,7 @@ end
  !     Esta subrutina calcula los terminos inomogeneos para las velocidades
 subroutine inomo(i,j,k,dden0z)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants
@@ -1210,7 +1210,7 @@ end
 
 subroutine filtro(varia1,facx,facy,facz)
    !filtro para thermal_property_1 Qvap1
-   use dimen
+   use dimensions
    use filtro01
    implicit none
    character*50 text

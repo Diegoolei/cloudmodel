@@ -10,7 +10,7 @@
 subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
    qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,qgraaux,Naer,daer2,nu,yy)
    use cant01
-   use dimen
+   use dimensions
    use dinamic_var_perturbation
    use permic
    use constants

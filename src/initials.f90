@@ -5,7 +5,7 @@ module velpre01
       kkk, presprom, nnn
 contains
    subroutine velpre01_init()
-      use dimen
+      use dimensions
       implicit none
       facx=.05
       facy=.05
@@ -31,7 +31,7 @@ contains
 
    subroutine initial_conditions()
       use cant01
-      use dimen
+      use dimensions
       use permic
       use dinamic_var_perturbation
       use constants
@@ -361,7 +361,7 @@ contains
 
    !*****************************************************
    subroutine PP2(G,dx,Den0,Pres00,Pres0)
-      use dimen
+      use dimensions
       integer k
       real Pres00(-3:nz1+3)
       real Den0(-3:nz1+3)
@@ -436,7 +436,7 @@ contains
       use cant01, only: total_time, lt2, lt3, cteturb, dx2, dx8, dx12,&
          AA, ikapa, cteqgot, cteqllu, cteqnie, cteqgra, ini, ltt, ltg, lte,&
          ltb, ctur, pro1, pro2, pro3, pro4, cteqnie
-      use dimen
+      use dimensions
       use constants
       use config
       use estbas, only: Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV,&

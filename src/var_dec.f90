@@ -1,6 +1,6 @@
 module turbvar1
 !> Variables usadas en turbulencia
-   use dimen
+   use dimensions
    real :: D(3, 3, -3:nx1+2, -3:nx1 + 2, 3)
 end module turbvar1
 
@@ -21,7 +21,7 @@ end module turbvar
 
 module advecs
 !> Terminos de adveccion
-   use dimen
+   use dimensions
    real, dimension(-2:nx1+2,-2:nx1+2) :: advaer1, advaer2, advgot1, advgot2, advllu1,&
       advllu2, advcri1, advcri2, advnie1, advnie2, advgra1, advgra2, advvap1, advvap2
 
@@ -29,7 +29,7 @@ end module advecs
 
 module estbas
 !> Cantidades no perturbadas
-   use dimen
+   use dimensions
    real, dimension(-3:nz1+3) :: Temp0,Tita0,Pres00,Presi0,UU,VV,cc2,Den0,aer0,Qvap0
    real, dimension(nz1) :: Qvaprel,aerrel
 end module estbas
@@ -109,7 +109,7 @@ end module nuclea61
 
 module p3v3
 !> Velocidades y las presiones
-   use dimen
+   use dimensions
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: U3, V3, W3, Pres3
 end module p3v3
 
@@ -155,14 +155,14 @@ end module dvapor_vars
 
 module filtro01
 !> filtro01
-   use dimen
+   use dimensions
    real varia2(-5:nx1+5,-5:nx1+5,-4:nz1+4)
    real varx,vary,varz, fact
    integer i,j,k
 end module filtro01
 
 module fuvw
-   use dimen
+   use dimensions
    real, dimension(-1:nx1+2,-1:nx1+2,-1:nz1+2) :: fu, fv, fw, fp
 end module fuvw
 
@@ -174,7 +174,7 @@ module inomo_var
 end module inomo_var
 
 module permic
-   use dimen
+   use dimensions
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: Qvap1,Qvap2,Qgot1,Qgot2,aer1,&
       aer2,Qllu1,Qllu2,Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2
    real, dimension(-3:2*nz1+5) :: Av,Vtnie,Vtgra0
@@ -184,7 +184,7 @@ end module permic
 !! Description: Defines perturbation-related variables for numerical simulations.
 !!              These variables are used in the context of dynamic perturbations.
 module dinamic_var_perturbation
-   use dimen
+   use dimensions
    !> Original velocity components (u=x, v=y, w=z)
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_original, v_original, w_original
    !> Perturbed velocity components (u=x, v=y, w=z)

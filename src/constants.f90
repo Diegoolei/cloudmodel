@@ -1,8 +1,8 @@
 
-!> Module: dimen
+!> Module: dimensions
 !! Description: Defines parameters related to grid dimensions and intervals.
 !!              These parameters are used in numerical simulations.
-module dimen
+module dimensions
    !> Number of points in the x-direction
    integer, parameter :: nx1 = 50
    !> Number of points in the z-direction (first grid)
@@ -13,9 +13,9 @@ module dimen
    real, parameter :: dx1 = 300.0
    !> Time intervals for various purposes
    real, parameter :: dt1 = 2.0, dt2 = 1.0, dt3 = 0.2
- end module dimen
+ end module dimensions
 
-!> Module: const
+!> Module: constants
 !! Description: Defines mathematical and physical constants relevant to precipitation.
 !!              These constants are used in numerical simulations and atmospheric modeling.
  module constants

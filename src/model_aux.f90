@@ -6,7 +6,7 @@ contains
          advcri1, advaer1
       use permic, only: aer1, Qvap1, Qllu1, Qnie1, Qgra1
       use dinamic_var_perturbation, only: w_perturbed
-      use dimen, only: nx1
+      use dimensions, only: nx1
       implicit none
       integer :: i, j
       do concurrent (i=0:nx1+1, j=0:nx1+1)
@@ -26,7 +26,7 @@ contains
 
    subroutine dinamics()
       !########### calculo de la dinamica y de la termodinamica ############
-      use dimen, only: dt1, dx1, nx1, nz1
+      use dimensions, only: dt1, dx1, nx1, nz1
       use model_var, only: dden0z, ener1, s, llluneg, lcrineg, lnieneg, lgraneg,&
          lvapneg, laerneg, Qvapneg, aerneg
       use estbas, only: Den0, Qvap0, aer0
@@ -204,7 +204,7 @@ contains
 
    subroutine water_calculation
       !primer calculo de agua (sin laterales)
-      use dimen, only: nx1, nz1
+      use dimensions, only: nx1, nz1
       use model_var, only: vapt1, gott1, aert1
       use permic, only: Qvap2, Qgot2, aer2
       use estbas, only: Qvap0
@@ -225,7 +225,7 @@ contains
    end subroutine water_calculation
 
    subroutine microphisics_substring
-      use dimen, only: nx1, nz1, dt1, dx1
+      use dimensions, only: nx1, nz1, dt1, dx1
       use model_var, only: aux, P, T, Qvap, Naer, densi, Dv, iT, aux2, Vis,&
          esvs, elvs, Lvl, Lsl, Lvs, Eaccn, Eaucn, Eacng, nu, lll, current_time, Qliq, e1,&
          rl, rs, yy, daer, dqgot, dqcri, Taux, totnuc, vapt2, gott2, aert2,&
@@ -397,7 +397,7 @@ contains
    end subroutine microphisics_substring
 
    subroutine floor_and_ceiling_contour
-      use dimen, only: nx1, nz1, dt1, dx1
+      use dimensions, only: nx1, nz1, dt1, dx1
       use dinamic_var_perturbation, only: thermal_property_2, thermal_property_1, w_perturbed, u_perturbed, v_perturbed
       use cant01, only: dx2
       use estbas, only: Tita0, Qvap0, aer0
@@ -475,7 +475,7 @@ contains
 
    subroutine lateral_contour
       !contornos laterales
-      use dimen, only: nx1, nz1
+      use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: thermal_property_2
       use permic, only: Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer2
       implicit none
@@ -517,7 +517,7 @@ contains
    end subroutine lateral_contour
 
    subroutine floor_condition_redefinition()
-      use dimen, only: nx1, nz1, dt1, dx1
+      use dimensions, only: nx1, nz1, dt1, dx1
       use dinamic_var_perturbation, only: thermal_property_2, thermal_property_1, w_perturbed
       use cant01, only: pro3, pro4, pro1, pro2
       use permic, only: Qvap1, Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer1,&
@@ -636,7 +636,7 @@ contains
    end subroutine floor_condition_redefinition
 
    subroutine floor_and_ceiling_contour_redefinition()
-      use dimen, only: nx1, nz1
+      use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: thermal_property_1
       use permic, only: Qvap1, aer1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1
       use estbas, only: Qvap0, aer0
@@ -682,7 +682,7 @@ contains
 
    subroutine lateral_contour_redefinition()
       !contornos laterales
-      use dimen, only: nx1, nz1
+      use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: thermal_property_1
       use permic, only: Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1
       implicit none
@@ -726,7 +726,7 @@ contains
 
    subroutine vapour_negative_correction()
       !correccion de negativos para el vapor
-      use dimen, only: nx1, nz1
+      use dimensions, only: nx1, nz1
       use permic, only: Qvap1
       use estbas, only: Qvap0
       implicit none
@@ -742,7 +742,7 @@ contains
       use model_var, only: current_time, tte, posx, posy, Xnub, Ynub, posxx, posyy,&
          file_number, t1
       use cant01, only: lte, ltg, ltb
-      use dimen, only: dt1
+      use dimensions, only: dt1
       use config, only: output_directory
       use dinamic_var_perturbation, only: w_perturbed, u_perturbed, v_perturbed,&
          heat_force, thermal_property_2, thermal_property_1, pressure_perturbed,&

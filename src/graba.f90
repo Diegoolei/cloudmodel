@@ -5,7 +5,7 @@ subroutine graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
    aer2,heat_force,Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,&
    Eautcn,Eacrcn)
 
-   use dimen
+   use dimensions
    use config
    implicit none
    real, dimension(-3:nz1+3), intent(in) :: Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV
@@ -42,7 +42,7 @@ end subroutine graba120
 
 subroutine graba231(k, w_perturbed, thermal_property_1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, file_number)
    !### Grabacion 2D ###
-   use dimen
+   use dimensions
    use config
    implicit none
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: w_perturbed, thermal_property_1, Qvap1, Qllu1, Qgra1, aer1
@@ -103,7 +103,7 @@ end subroutine graba231
 subroutine graba320(u_original, v_original, w_original, thermal_property_1,&
    pressure_original, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, file_number)
    !### Grabacion 3D ###
-   use dimen
+   use dimensions
    use config
    implicit none
 
