@@ -11,13 +11,13 @@ nube31_var_list = [
     "original_z_velocity",
     "thermal_property_1",
     "original_pressure",
-    "Qvap1",
-    "Qgot1",
-    "Qllu1",
-    "Qcri1",
-    "Qnie1",
-    "Qgra1",
-    "aer1",
+    "vapor_amt",
+    "drop_amt",
+    "rain_amt",
+    "crystal_amt",
+    "snow_amt",
+    "hail_amt",
+    "spray_amt",
 ]
 
 inis_var_list = [

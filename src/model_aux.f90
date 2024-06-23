@@ -4,22 +4,22 @@ contains
       !######################## Adveccion de vapores #######################
       use advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
          advcri1, advaer1
-      use permic, only: aer1, Qvap1, Qllu1, Qnie1, Qgra1
+      use microphysics_perturbation, only: spray_amt, vapor_amt, rain_amt, snow_amt, hail_amt
       use dinamic_var_perturbation, only: w_perturbed
       use dimensions, only: nx1
       implicit none
       integer :: i, j
       do concurrent (i=0:nx1+1, j=0:nx1+1)
-         advvap1(i,j)=w_perturbed(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
+         advvap1(i,j)=w_perturbed(i,j,1)*(vapor_amt(i,j,1)+vapor_amt(i,j,0))/4.
          advgot1(i,j)=0.
-         advllu1(i,j)=w_perturbed(i,j,1)*Qllu1(i,j,1)
+         advllu1(i,j)=w_perturbed(i,j,1)*rain_amt(i,j,1)
          if (w_perturbed(i,j,1) > 0) advllu1(i,j)=0.
-         advaer1(i,j)=w_perturbed(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
+         advaer1(i,j)=w_perturbed(i,j,1)*(spray_amt(i,j,1)+spray_amt(i,j,0))/4.
          if(w_perturbed(i,j,1) < 0) advaer1(i,j)=advaer1(i,j)*1.5
          advcri1(i,j)=0.
-         advnie1(i,j)=w_perturbed(i,j,1)*Qnie1(i,j,1)
+         advnie1(i,j)=w_perturbed(i,j,1)*snow_amt(i,j,1)
          if (w_perturbed(i,j,1) > 0) advnie1(i,j)=0.
-         advgra1(i,j)=w_perturbed(i,j,1)*Qgra1(i,j,1)
+         advgra1(i,j)=w_perturbed(i,j,1)*hail_amt(i,j,1)
          if (w_perturbed(i,j,1) > 0) advgra1(i,j)=0.
       end do
    end subroutine vapor_advection
@@ -34,7 +34,9 @@ contains
       use advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
          advcri1, advvap2, advgot2, advllu2, advcri2, advnie2, advgra2, advaer1,&
          advaer2
-      use permic, only: Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2
+      use microphysics_perturbation, only: perturbed_drop_amt, perturbed_rain_amt,&
+         perturbed_crystal_amt, perturbed_snow_amt, perturbed_hail_amt, perturbed_vapor_amt,&
+         perturbed_spray_amt
       use lmngot, only: lgot, mgot, ngot
       use lmnllu, only: lllu, mllu, nllu
       use lmncri, only: lcri, mcri, ncri
@@ -120,7 +122,7 @@ contains
                advaer1(i,j)=advaer2(i,j)
 
                !limites de la nube
-               if(Qgot2(i,j,k) /= 0) then
+               if(perturbed_drop_amt(i,j,k) /= 0) then
                   if (i < lgot(1)) lgot(1)=i
                   if (i > lgot(2)) lgot(2)=i
                   if (j < mgot(1)) mgot(1)=j
@@ -131,7 +133,7 @@ contains
                endif
 
                !limites de la lluvia
-               if(Qllu2(i,j,k) /= 0) then
+               if(perturbed_rain_amt(i,j,k) /= 0) then
                   if (i < lllu(1)) lllu(1)=i
                   if (i > lllu(2)) lllu(2)=i
                   if (j < mllu(1)) mllu(1)=j
@@ -142,7 +144,7 @@ contains
                endif
 
                !limites de los cristales
-               if(Qcri2(i,j,k) /= 0) then
+               if(perturbed_crystal_amt(i,j,k) /= 0) then
                   if (i < lcri(1)) lcri(1)=i
                   if (i > lcri(2)) lcri(2)=i
                   if (j < mcri(1)) mcri(1)=j
@@ -153,7 +155,7 @@ contains
                endif
 
                !limites de la nieve
-               if(Qnie2(i,j,k) /= 0) then
+               if(perturbed_snow_amt(i,j,k) /= 0) then
                   if (i < lnie(1)) lnie(1)=i
                   if (i > lnie(2)) lnie(2)=i
                   if (j < mnie(1)) mnie(1)=j
@@ -164,7 +166,7 @@ contains
                endif
 
                !limites del granizo
-               if(Qgra2(i,j,k) /= 0) then
+               if(perturbed_hail_amt(i,j,k) /= 0) then
                   if (i < lgra(1)) lgra(1)=i
                   if (i > lgra(2)) lgra(2)=i
                   if (j < mgra(1)) mgra(1)=j
@@ -174,13 +176,13 @@ contains
                   lgraneg=1
                endif
 
-               if(Qvap0(k)+Qvap2(i,j,k) < 0) then
-                  Qvapneg=Qvapneg+Qvap0(k)+Qvap2(i,j,k)
+               if(Qvap0(k)+perturbed_vapor_amt(i,j,k) < 0) then
+                  Qvapneg=Qvapneg+Qvap0(k)+perturbed_vapor_amt(i,j,k)
                   lvapneg=1
                endif
 
-               if(aer0(k)+aer2(i,j,k) < 0) then
-                  aerneg=aerneg+aer0(k)+aer2(i,j,k)
+               if(aer0(k)+perturbed_spray_amt(i,j,k) < 0) then
+                  aerneg=aerneg+aer0(k)+perturbed_spray_amt(i,j,k)
                   laerneg=1
                endif
             end do
@@ -206,7 +208,7 @@ contains
       !primer calculo de agua (sin laterales)
       use dimensions, only: nx1, nz1
       use model_var, only: vapt1, gott1, aert1
-      use permic, only: Qvap2, Qgot2, aer2
+      use microphysics_perturbation, only: perturbed_vapor_amt, perturbed_drop_amt, perturbed_spray_amt
       use estbas, only: Qvap0
       implicit none
       integer :: i, j, k
@@ -214,11 +216,11 @@ contains
       gott1=0.
       aert1=0.
       do concurrent (i=1:nx1, j=1:nx1, k=1:nz1-1)
-         vapt1=vapt1+Qvap2(i,j,k)
-         gott1=gott1+Qgot2(i,j,k)
-         aert1=aert1+aer2(i,j,k)
+         vapt1=vapt1+perturbed_vapor_amt(i,j,k)
+         gott1=gott1+perturbed_drop_amt(i,j,k)
+         aert1=aert1+perturbed_spray_amt(i,j,k)
 
-         if(Qvap2(i,j,k)+Qvap0(k) < 0) then
+         if(perturbed_vapor_amt(i,j,k)+Qvap0(k) < 0) then
             stop
          endif
       end do
@@ -227,17 +229,20 @@ contains
    subroutine microphisics_substring
       use dimensions, only: nx1, nz1, dt1, dx1
       use model_var, only: aux, P, T, Qvap, Naer, densi, Dv, iT, aux2, Vis,&
-         esvs, elvs, Lvl, Lsl, Lvs, Eaccn, Eaucn, Eacng, nu, lll, current_time, Qliq, e1,&
-         rl, rs, yy, daer, dqgot, dqcri, Taux, totnuc, vapt2, gott2, aert2,&
-         qgotaux, qvapaux, qlluaux, qcriaux, qnieaux, qgraaux, t2, Lsl00, Fcal,&
-         daer2, totmic, vapt3, gott3, aert3, ener2, ener3, ener4, ener5, qv, qg,&
-         daitot
-      use dinamic_var_perturbation, only: thermal_property_2, pressure_perturbed, ambient_temperature, heat_force
+         esvs, elvs, Lvl, Lsl, Lvs, Eaccn, Eaucn, Eacng, nu, lll, current_time,&
+         Qliq, e1, rl, rs, yy, daer, dqgot, dqcri, Taux, totnuc, vapt2, gott2,&
+         aert2, qgotaux, qvapaux, qlluaux, qcriaux, qnieaux, qgraaux, t2, Lsl00,&
+         Fcal, daer2, totmic, vapt3, gott3, aert3, ener2, ener3, ener4, ener5,&
+         qv, qg, daitot
+      use dinamic_var_perturbation, only: thermal_property_2, pressure_perturbed,&
+         ambient_temperature, heat_force
       use estbas, only: Qvap0, aer0, Tita0, Temp0, Pres00
       use cant01, only: ikapa, AA, lt2
       use constants, only: P00, Rd, Dv0, Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs,&
          Eacrcn, Eautcn, T0, Rv, G, Cp
-      use permic, only: Qvap2, aer2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2
+      use microphysics_perturbation, only: perturbed_vapor_amt, perturbed_spray_amt,&
+         perturbed_drop_amt, perturbed_rain_amt, perturbed_crystal_amt,&
+         perturbed_snow_amt, perturbed_hail_amt
       implicit none
       integer :: k, n, i, l, j, m
       !####################### Sublazo Microfisico #########################
@@ -267,8 +272,8 @@ contains
                P=aux**ikapa*P00
                T=(Tita0(k)+thermal_property_2(i,j,k))*aux
                ambient_temperature(i,j,k)=T-Temp0(k)
-               Qvap=Qvap0(k)+Qvap2(i,j,k)
-               Naer=aer0(k)+aer2(i,j,k)
+               Qvap=Qvap0(k)+perturbed_vapor_amt(i,j,k)
+               Naer=aer0(k)+perturbed_spray_amt(i,j,k)
                densi=P/T/Rd-AA*Qvap
                Dv=Dv0*(T/273.15)**1.94*(P00/P)
 
@@ -294,7 +299,7 @@ contains
                !nucleacion (de ser necesario tiene otro paso de tiempo)
                lll = current_time
 
-               Qliq=Qgot2(i,j,k)
+               Qliq=perturbed_drop_amt(i,j,k)
                e1=Qvap*Rv*T
                rl=(e1-elvs)/elvs
                rs=(e1-esvs)/esvs
@@ -315,24 +320,29 @@ contains
                totnuc=totnuc+daer
 
                !segundo calculo de agua (sin laterales)
-               vapt2=vapt2+Qvap2(i,j,k)
-               gott2=gott2+Qgot2(i,j,k)
-               aert2=aert2+aer2(i,j,k)
-               if (Qgot2(i,j,k) > 0 .or. dqgot > 0 .or.Qllu2(i,j,k) > 0 .or. Qcri2(i,j,k) > 0 .or.Qnie2(i,j,k) > 0) then
-                  qgotaux=Qgot2(i,j,k)
-                  if (Qgot2(i,j,k) == 0) qgotaux=0d0
-                  qvapaux=Qvap2(i,j,k)+Qvap0(k)
-                  qlluaux=Qllu2(i,j,k)
-                  if (Qllu2(i,j,k) == 0) qlluaux=0d0
-                  qcriaux=Qcri2(i,j,k)
-                  if (Qcri2(i,j,k) == 0) then
+               vapt2=vapt2+perturbed_vapor_amt(i,j,k)
+               gott2=gott2+perturbed_drop_amt(i,j,k)
+               aert2=aert2+perturbed_spray_amt(i,j,k)
+               if (perturbed_drop_amt(i,j,k) > 0 &
+                  .or. dqgot > 0 &
+                  .or. perturbed_rain_amt(i,j,k) > 0 &
+                  .or. perturbed_crystal_amt(i,j,k) > 0 &
+                  .or. perturbed_snow_amt(i,j,k) > 0) then
+
+                  qgotaux=perturbed_drop_amt(i,j,k)
+                  if (perturbed_drop_amt(i,j,k) == 0) qgotaux=0d0
+                  qvapaux=perturbed_vapor_amt(i,j,k)+Qvap0(k)
+                  qlluaux=perturbed_rain_amt(i,j,k)
+                  if (perturbed_rain_amt(i,j,k) == 0) qlluaux=0d0
+                  qcriaux=perturbed_crystal_amt(i,j,k)
+                  if (perturbed_crystal_amt(i,j,k) == 0) then
                      qcriaux=0d0
                   endif
-                  qnieaux=Qnie2(i,j,k)
-                  if (Qnie2(i,j,k) == 0) qnieaux=0d0
-                  qgraaux=Qgra2(i,j,k)
-                  if (Qgra2(i,j,k) == 0) qgraaux=0d0
-                  Naer=aer2(i,j,k)+aer0(k)
+                  qnieaux=perturbed_snow_amt(i,j,k)
+                  if (perturbed_snow_amt(i,j,k) == 0) qnieaux=0d0
+                  qgraaux=perturbed_hail_amt(i,j,k)
+                  if (perturbed_hail_amt(i,j,k) == 0) qgraaux=0d0
+                  Naer=perturbed_spray_amt(i,j,k)+aer0(k)
                   T=ambient_temperature(i,j,k)+Temp0(k)
                   do t2=1,lt2
                      qgotaux=qgotaux+dqgot/float(lt2)
@@ -346,21 +356,21 @@ contains
                      aux2=T-iT
                      elvs=Telvs(iT)*(1-aux2)+Telvs(iT+1)*aux2
                      esvs=Tesvs(iT)*(1-aux2)+Tesvs(iT+1)*aux2
-                     call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,&
-                        Lsl00,Fcal,n,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
-                        qgraaux,Naer,daer2,nu,yy)
+                     call microfis(elvs, esvs, Lvl, Lvs, Lsl, T, Dv, Eaccn,&
+                        Eaucn, Eacng, Lsl00, Fcal, n, qvapaux, qgotaux, qlluaux,&
+                        qcriaux,qnieaux, qgraaux, Naer, daer2, nu, yy)
                      heat_force(l,m,n)=heat_force(l,m,n)+Fcal/dt1/densi
                      Naer=Naer+daer2
                      totmic=totmic+daer2
                   end do
 
-                  Qgot2(i,j,k)=qgotaux
-                  Qllu2(i,j,k)=qlluaux
-                  Qcri2(i,j,k)=qcriaux
-                  Qnie2(i,j,k)=qnieaux
-                  Qgra2(i,j,k)=qgraaux
-                  Qvap2(i,j,k)=qvapaux-Qvap0(k)
-                  aer2(i,j,k)=Naer-aer0(k)
+                  perturbed_drop_amt(i,j,k)=qgotaux
+                  perturbed_rain_amt(i,j,k)=qlluaux
+                  perturbed_crystal_amt(i,j,k)=qcriaux
+                  perturbed_snow_amt(i,j,k)=qnieaux
+                  perturbed_hail_amt(i,j,k)=qgraaux
+                  perturbed_vapor_amt(i,j,k)=qvapaux-Qvap0(k)
+                  perturbed_spray_amt(i,j,k)=Naer-aer0(k)
                   ambient_temperature(i,j,k)=T-Temp0(k)
 
                endif
@@ -369,27 +379,27 @@ contains
                   stop
                endif
 
-               if(aer2(i,j,k)+aer0(k) <= 0) then
+               if(perturbed_spray_amt(i,j,k)+aer0(k) <= 0) then
 
-                  if (aer2(i,j,k)+aer0(k) < -aer0(k)*.05) then
+                  if (perturbed_spray_amt(i,j,k)+aer0(k) < -aer0(k)*.05) then
                      stop
                   endif
 
-                  aer2(i,j,k)=-aer0(k)
+                  perturbed_spray_amt(i,j,k)=-aer0(k)
                endif
 
                !tercer calculo de agua (sin laterales)
-               vapt3=vapt3+Qvap2(i,j,k)
-               gott3=gott3+Qgot2(i,j,k)
-               aert3=aert3+aer2(i,j,k)
+               vapt3=vapt3+perturbed_vapor_amt(i,j,k)
+               gott3=gott3+perturbed_drop_amt(i,j,k)
+               aert3=aert3+perturbed_spray_amt(i,j,k)
 
                !calculo de la energia
                ener2=densi*G*k*dx1+ener2
                ener3=densi*(Cp-Rd)*T+ener3
                ener4=P+ener4
-               ener5=(Qvap2(i,j,k)+Qgot2(i,j,k))*G*k*dx1+ener5
-               qv=Qvap2(i,j,k)+qv
-               qg=Qgot2(i,j,k)+qg
+               ener5=(perturbed_vapor_amt(i,j,k)+perturbed_drop_amt(i,j,k))*G*k*dx1+ener5
+               qv=perturbed_vapor_amt(i,j,k)+qv
+               qg=perturbed_drop_amt(i,j,k)+qg
                daitot=densi+daitot
             end do
          end do
@@ -398,61 +408,67 @@ contains
 
    subroutine floor_and_ceiling_contour
       use dimensions, only: nx1, nz1, dt1, dx1
-      use dinamic_var_perturbation, only: thermal_property_2, thermal_property_1, w_perturbed, u_perturbed, v_perturbed
+      use dinamic_var_perturbation, only: thermal_property_2, thermal_property_1,&
+         w_perturbed, u_perturbed, v_perturbed
       use cant01, only: dx2
       use estbas, only: Tita0, Qvap0, aer0
       use model_var, only: auxx, auxy, auxz, turbu, aeraux, lapla, cks, Qvap,&
          qv, qg
-      use permic, only: Qvap1, Qvap2, Qgot2, Qcri2, Qllu2, Qnie2, Qgra2, aer1,&
-         aer2
+      use microphysics_perturbation, only: vapor_amt, perturbed_vapor_amt,&
+         perturbed_drop_amt, perturbed_crystal_amt, perturbed_rain_amt,&
+         perturbed_snow_amt, perturbed_hail_amt, spray_amt, perturbed_spray_amt
       implicit none
       integer :: i, j
 
       Qvap = (qv+qg)/nx1**2.*nz1*.1
       !contornos en el piso y en el techo
       do concurrent (i=1:nx1, j=1:nx1)
-         thermal_property_2(i,j,0)=-w_perturbed(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+thermal_property_1(i,j,0)
+         thermal_property_2(i,j,0) = thermal_property_1(i,j,0) -&
+            w_perturbed(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2
          thermal_property_2(i,j,nz1)=thermal_property_2(i,j,nz1-1)
 
          !suponemos que las velocidades horizontales a nivel de piso son
          !iguales a 1/4 de la correspondiente en el nivel 1
-         auxx=((u_perturbed(i+1,j,1)+u_perturbed(i,j,1))*(Qvap1(i+1,j,0)+Qvap1(i,j,0))&
-            -(u_perturbed(i-1,j,1)+u_perturbed(i,j,1))*(Qvap1(i-1,j,0)+Qvap1(i,j,0)))&
+         !#TODO: Check this
+         auxx = ((u_perturbed(i+1,j,1) + u_perturbed(i,j,1))*(vapor_amt(i+1,j,0) + vapor_amt(i,j,0))&
+            -(u_perturbed(i-1,j,1)+u_perturbed(i,j,1))*(vapor_amt(i-1,j,0)+vapor_amt(i,j,0)))&
             /4.*.25
-         auxy=((v_perturbed(i,j+1,1)+v_perturbed(i,j,1))*(Qvap1(i,j+1,0)+Qvap1(i,j,0))&
-            -(v_perturbed(i,j-1,1)+v_perturbed(i,j,1))*(Qvap1(i,j-1,0)+Qvap1(i,j,0)))&
+
+         auxy=((v_perturbed(i,j+1,1)+v_perturbed(i,j,1))*(vapor_amt(i,j+1,0)+vapor_amt(i,j,0))&
+            -(v_perturbed(i,j-1,1)+v_perturbed(i,j,1))*(vapor_amt(i,j-1,0)+vapor_amt(i,j,0)))&
             /4.*.25
-         auxz=w_perturbed(i,j,1)*((Qvap1(i,j,1)+Qvap1(i,j,0))+Qvap0(1)+Qvap0(0))/2.*.5
 
-         Qvap2(i,j,nz1)=Qvap2(i,j,nz1-1)
+         auxz=w_perturbed(i,j,1)*((vapor_amt(i,j,1)+vapor_amt(i,j,0))+Qvap0(1)+Qvap0(0))/2.*.5
 
-         Qgot2(i,j,0)=Qgot2(i,j,1)
-         Qgot2(i,j,nz1)=Qgot2(i,j,nz1-1)
+         perturbed_vapor_amt(i,j,nz1)=perturbed_vapor_amt(i,j,nz1-1)
 
-         Qcri2(i,j,0)=Qcri2(i,j,1)
-         Qcri2(i,j,nz1)=Qcri2(i,j,nz1-1)
+         perturbed_drop_amt(i,j,0)=perturbed_drop_amt(i,j,1)
+         perturbed_drop_amt(i,j,nz1)=perturbed_drop_amt(i,j,nz1-1)
+
+         perturbed_crystal_amt(i,j,0)=perturbed_crystal_amt(i,j,1)
+         perturbed_crystal_amt(i,j,nz1)=perturbed_crystal_amt(i,j,nz1-1)
 
          !Para que no se acumulen el piso
-         Qllu2(i,j,0)=Qllu2(i,j,1)/2.
-         Qllu2(i,j,nz1)=Qllu2(i,j,nz1-1)
+         perturbed_rain_amt(i,j,0)=perturbed_rain_amt(i,j,1)/2.
+         perturbed_rain_amt(i,j,nz1)=perturbed_rain_amt(i,j,nz1-1)
 
-         Qnie2(i,j,0)=Qnie2(i,j,1)
-         Qnie2(i,j,nz1)=Qnie2(i,j,nz1-1)
+         perturbed_snow_amt(i,j,0)=perturbed_snow_amt(i,j,1)
+         perturbed_snow_amt(i,j,nz1)=perturbed_snow_amt(i,j,nz1-1)
 
          !Para que no se acumulen el piso
-         Qgra2(i,j,0)=Qgra2(i,j,1)/2.
-         Qgra2(i,j,nz1)=Qgra2(i,j,nz1-1)
+         perturbed_hail_amt(i,j,0)=perturbed_hail_amt(i,j,1)/2.
+         perturbed_hail_amt(i,j,nz1)=perturbed_hail_amt(i,j,nz1-1)
 
          !suponemos que las velocidades horizontales a nivel de piso son
          !iguales a 1/4 de la correspondiente en el nivel 1
 
-         auxx=((u_perturbed(i+1,j,1)+u_perturbed(i,j,1))*(aer1(i+1,j,0)+aer1(i,j,0))&
-            -(u_perturbed(i-1,j,1)+u_perturbed(i,j,1))*(aer1(i-1,j,0)+aer1(i,j,0)))&
+         auxx=((u_perturbed(i+1,j,1)+u_perturbed(i,j,1))*(spray_amt(i+1,j,0)+spray_amt(i,j,0))&
+            -(u_perturbed(i-1,j,1)+u_perturbed(i,j,1))*(spray_amt(i-1,j,0)+spray_amt(i,j,0)))&
             /4.*.25
-         auxy=((v_perturbed(i,j+1,1)+v_perturbed(i,j,1))*(aer1(i,j+1,0)+aer1(i,j,0))&
-            -(v_perturbed(i,j-1,1)+v_perturbed(i,j,1))*(aer1(i,j-1,0)+aer1(i,j,0)))&
+         auxy=((v_perturbed(i,j+1,1)+v_perturbed(i,j,1))*(spray_amt(i,j+1,0)+spray_amt(i,j,0))&
+            -(v_perturbed(i,j-1,1)+v_perturbed(i,j,1))*(spray_amt(i,j-1,0)+spray_amt(i,j,0)))&
             /4.*.25
-         auxz=w_perturbed(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+aer0(1)+aer0(0))/2.*.5
+         auxz=w_perturbed(i,j,1)*((spray_amt(i,j,1)+spray_amt(i,j,0))+aer0(1)+aer0(0))/2.*.5
 
          if (w_perturbed(i,j,0) > 0) then
             aeraux=-((auxx+auxy)+2.*auxz)*dt1/dx1
@@ -463,13 +479,20 @@ contains
 
          !agregamos un termino de turbulencia para los aerosoles
          !a nivel de piso
-         turbu=cks/dx1*.25*(abs(u_perturbed(i,j,1))+abs(v_perturbed(i,j,1))+2.*abs(w_perturbed(i,j,1)))
-         lapla=((aer1(i+1,j,0)+aer1(i-1,j,0))+(aer1(i,j+1,0)+aer1(i,j-1,0)+aer1(i,j,1)))-5.*aer1(i,j,0)
-         lapla=lapla+(aer0(1)-aer0(0))
+         turbu = cks/dx1*.25 * (abs(u_perturbed(i,j,1))&
+            + abs(v_perturbed(i,j,1))&
+            + 2.*abs(w_perturbed(i,j,1)))
 
-         aer2(i,j,0)=aeraux+aer1(i,j,0)+turbu*lapla
+         lapla = ((spray_amt(i+1,j,0)+spray_amt(i-1,j,0))&
+            + (spray_amt(i,j+1,0)+spray_amt(i,j-1,0)&
+            + spray_amt(i,j,1)))&
+            - 5.*spray_amt(i,j,0)
 
-         aer2(i,j,nz1)=aer2(i,j,nz1-1)
+         lapla = lapla + (aer0(1) - aer0(0))
+
+         perturbed_spray_amt(i,j,0)=aeraux+spray_amt(i,j,0)+turbu*lapla
+
+         perturbed_spray_amt(i,j,nz1)=perturbed_spray_amt(i,j,nz1-1)
       end do
    end subroutine floor_and_ceiling_contour
 
@@ -477,7 +500,9 @@ contains
       !contornos laterales
       use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: thermal_property_2
-      use permic, only: Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer2
+      use microphysics_perturbation, only: perturbed_vapor_amt, perturbed_drop_amt,&
+         perturbed_rain_amt, perturbed_crystal_amt, perturbed_snow_amt,&
+         perturbed_hail_amt, perturbed_spray_amt
       implicit none
       integer :: j, k
       do concurrent (k=1:nz1-1, j=1:nx1)
@@ -485,43 +510,46 @@ contains
          thermal_property_2(nx1+1,j,k)=thermal_property_2(nx1,j,k)
          thermal_property_2(j,0,k)=thermal_property_2(j,1,k)
          thermal_property_2(j,nx1+1,k)=thermal_property_2(j,nx1,k)
-         Qvap2(0,j,k)=0.
-         Qvap2(nx1+1,j,k)=0.
-         Qvap2(j,0,k)=0.
-         Qvap2(j,nx1+1,k)=0.
-         Qgot2(0,j,k)=Qgot2(1,j,k)
-         Qgot2(nx1+1,j,k)=Qgot2(nx1,j,k)
-         Qgot2(j,0,k)=Qgot2(j,1,k)
-         Qgot2(j,nx1+1,k)=Qgot2(j,nx1,k)
-         Qllu2(0,j,k)=0.
-         Qllu2(nx1+1,j,k)=0.
-         Qllu2(j,0,k)=0.
-         Qllu2(j,nx1+1,k)=0.
-         Qcri2(0,j,k)=Qcri2(1,j,k)
-         Qcri2(nx1+1,j,k)=Qcri2(nx1,j,k)
-         Qcri2(j,0,k)=Qcri2(j,1,k)
-         Qcri2(j,nx1+1,k)=Qcri2(j,nx1,k)
-         Qnie2(0,j,k)=Qnie2(1,j,k)
-         Qnie2(nx1+1,j,k)=Qnie2(nx1,j,k)
-         Qnie2(j,0,k)=Qnie2(j,1,k)
-         Qnie2(j,nx1+1,k)=Qnie2(j,nx1,k)
-         Qgra2(0,j,k)=0.
-         Qgra2(nx1+1,j,k)=0.
-         Qgra2(j,0,k)=0.
-         Qgra2(j,nx1+1,k)=0.
-         aer2(0,j,k)=aer2(1,j,k)
-         aer2(nx1+1,j,k)=aer2(nx1,j,k)
-         aer2(j,0,k)=aer2(j,1,k)
-         aer2(j,nx1+1,k)=aer2(j,nx1,k)
+         perturbed_vapor_amt(0,j,k)=0.
+         perturbed_vapor_amt(nx1+1,j,k)=0.
+         perturbed_vapor_amt(j,0,k)=0.
+         perturbed_vapor_amt(j,nx1+1,k)=0.
+         perturbed_drop_amt(0,j,k)=perturbed_drop_amt(1,j,k)
+         perturbed_drop_amt(nx1+1,j,k)=perturbed_drop_amt(nx1,j,k)
+         perturbed_drop_amt(j,0,k)=perturbed_drop_amt(j,1,k)
+         perturbed_drop_amt(j,nx1+1,k)=perturbed_drop_amt(j,nx1,k)
+         perturbed_rain_amt(0,j,k)=0.
+         perturbed_rain_amt(nx1+1,j,k)=0.
+         perturbed_rain_amt(j,0,k)=0.
+         perturbed_rain_amt(j,nx1+1,k)=0.
+         perturbed_crystal_amt(0,j,k)=perturbed_crystal_amt(1,j,k)
+         perturbed_crystal_amt(nx1+1,j,k)=perturbed_crystal_amt(nx1,j,k)
+         perturbed_crystal_amt(j,0,k)=perturbed_crystal_amt(j,1,k)
+         perturbed_crystal_amt(j,nx1+1,k)=perturbed_crystal_amt(j,nx1,k)
+         perturbed_snow_amt(0,j,k)=perturbed_snow_amt(1,j,k)
+         perturbed_snow_amt(nx1+1,j,k)=perturbed_snow_amt(nx1,j,k)
+         perturbed_snow_amt(j,0,k)=perturbed_snow_amt(j,1,k)
+         perturbed_snow_amt(j,nx1+1,k)=perturbed_snow_amt(j,nx1,k)
+         perturbed_hail_amt(0,j,k)=0.
+         perturbed_hail_amt(nx1+1,j,k)=0.
+         perturbed_hail_amt(j,0,k)=0.
+         perturbed_hail_amt(j,nx1+1,k)=0.
+         perturbed_spray_amt(0,j,k)=perturbed_spray_amt(1,j,k)
+         perturbed_spray_amt(nx1+1,j,k)=perturbed_spray_amt(nx1,j,k)
+         perturbed_spray_amt(j,0,k)=perturbed_spray_amt(j,1,k)
+         perturbed_spray_amt(j,nx1+1,k)=perturbed_spray_amt(j,nx1,k)
       end do
    end subroutine lateral_contour
 
    subroutine floor_condition_redefinition()
       use dimensions, only: nx1, nz1, dt1, dx1
-      use dinamic_var_perturbation, only: thermal_property_2, thermal_property_1, w_perturbed
+      use dinamic_var_perturbation, only: thermal_property_2, thermal_property_1,&
+         w_perturbed
       use cant01, only: pro3, pro4, pro1, pro2
-      use permic, only: Qvap1, Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer1,&
-         aer2, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1
+      use microphysics_perturbation, only: vapor_amt, perturbed_vapor_amt,&
+         perturbed_drop_amt, perturbed_rain_amt, perturbed_crystal_amt,&
+         perturbed_snow_amt, perturbed_hail_amt, spray_amt, perturbed_spray_amt,&
+         drop_amt, rain_amt, crystal_amt, snow_amt, hail_amt
       use estbas, only: aer0
       use model_var, only: aeraux
       implicit none
@@ -530,107 +558,137 @@ contains
       !Redefinicion
       do concurrent (i=1:nx1, j=1:nx1)
          k=0
-         thermal_property_1(i,j,k)=pro3*thermal_property_2(i,j,k)+&
-            pro4*((thermal_property_2(i+1,j,k)+thermal_property_2(i-1,j,k))+&
-            (thermal_property_2(i,j+1,k)+thermal_property_2(i,j-1,k)))
+         thermal_property_1(i,j,k) = pro3*thermal_property_2(i,j,k)+&
+            pro4*(&
+            (thermal_property_2(i+1,j,k) + thermal_property_2(i-1,j,k)) +&
+            (thermal_property_2(i,j+1,k) + thermal_property_2(i,j-1,k)))
 
          if (abs(thermal_property_1(i,j,k)) < 1e-10) thermal_property_1(i,j,k)=0
 
-         Qvap1(i,j,k)=pro3*Qvap2(i,j,k)+&
-            pro4*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+(Qvap2(i,j+1,k)+Qvap2(i,j-1,k)))
+         vapor_amt(i,j,k) = pro3*perturbed_vapor_amt(i,j,k)&
+            + pro4*(&
+            (perturbed_vapor_amt(i+1,j,k) + perturbed_vapor_amt(i-1,j,k)) +&
+            (perturbed_vapor_amt(i,j+1,k) + perturbed_vapor_amt(i,j-1,k)))
 
 
-         if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
+         if (abs(vapor_amt(i,j,k)) < 1e-10) vapor_amt(i,j,k)=0
 
-         Qgot1(i,j,k)=pro3*Qgot2(i,j,k)+&
-            pro4*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+(Qgot2(i,j+1,k)+Qgot2(i,j-1,k)))
+         drop_amt(i,j,k) = pro3*perturbed_drop_amt(i,j,k) +&
+            pro4*(&
+            (perturbed_drop_amt(i+1,j,k) + perturbed_drop_amt(i-1,j,k)) +&
+            (perturbed_drop_amt(i,j+1,k) + perturbed_drop_amt(i,j-1,k)))
 
-         if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
+         if (drop_amt(i,j,k) < 1e-10) drop_amt(i,j,k)=0
 
-         Qllu1(i,j,k)=Qllu2(i,j,k)
+         rain_amt(i,j,k)=perturbed_rain_amt(i,j,k)
 
-         if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
+         if (rain_amt(i,j,k) < 1e-10) rain_amt(i,j,k)=0
 
-         Qcri1(i,j,k)=pro3*Qcri2(i,j,k)+&
-            pro4*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+(Qcri2(i,j+1,k)+Qcri2(i,j-1,k)))
+         crystal_amt(i,j,k) = pro3*perturbed_crystal_amt(i,j,k) +&
+            pro4*(&
+            (perturbed_crystal_amt(i+1,j,k) + perturbed_crystal_amt(i-1,j,k)) +&
+            (perturbed_crystal_amt(i,j+1,k) + perturbed_crystal_amt(i,j-1,k)))
 
-         if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
+         if (crystal_amt(i,j,k) < 1e-10) crystal_amt(i,j,k)=0
 
-         Qnie1(i,j,k)=pro3*Qnie2(i,j,k)+pro4*((Qnie2(i+1,j,k)&
-            +Qnie2(i-1,j,k))+(Qnie2(i,j+1,k)+Qnie2(i,j-1,k)))
+         snow_amt(i,j,k) = pro3*perturbed_snow_amt(i,j,k)+&
+            pro4*(&
+            (perturbed_snow_amt(i+1,j,k) + perturbed_snow_amt(i-1,j,k)) +&
+            (perturbed_snow_amt(i,j+1,k) + perturbed_snow_amt(i,j-1,k)))
 
-         if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
+         if (snow_amt(i,j,k) < 1e-10) snow_amt(i,j,k)=0
 
-         Qgra1(i,j,k)=Qgra2(i,j,k)
+         hail_amt(i,j,k)=perturbed_hail_amt(i,j,k)
 
-         if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
+         if (hail_amt(i,j,k) < 1e-10) hail_amt(i,j,k)=0
 
-         aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
+         spray_amt(i,j,k) = pro3*perturbed_spray_amt(i,j,k) +&
+            pro4*(&
+            (perturbed_spray_amt(i+1,j,k) + perturbed_spray_amt(i-1,j,k))+&
+            (perturbed_spray_amt(i,j+1,k) + perturbed_spray_amt(i,j-1,k)))
 
          !correccion cambiando la absorcion de aerosoles
-         if ((Qllu1(i,j,1)+Qgra1(i,j,1)) > 1e-6 .and.w_perturbed(i,j,1) < 0) then
+         if ((rain_amt(i,j,1)+hail_amt(i,j,1)) > 1e-6 .and.w_perturbed(i,j,1) < 0) then
             aeraux=-w_perturbed(i,j,1)*.5*dt1/(dx1/2)
-            aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
+            spray_amt(i,j,k)=spray_amt(i,j,k)-(spray_amt(i,j,k)+aer0(k))*aeraux
          endif
 
-         if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
+         if (abs(spray_amt(i,j,k)) < 1e-10) spray_amt(i,j,k)=0
 
 
          do concurrent(k=1:nz1-1)
-            thermal_property_1(i,j,k)=pro1*thermal_property_2(i,j,k)+&
+            thermal_property_1(i,j,k) = pro1*thermal_property_2(i,j,k) +&
                pro2*(&
-               (thermal_property_2(i+1,j,k)+thermal_property_2(i-1,j,k))+&
-               (thermal_property_2(i,j+1,k)+thermal_property_2(i,j-1,k))+&
-               thermal_property_2(i,j,k+1)+thermal_property_2(i,j,k-1))
+               (thermal_property_2(i+1,j,k) + thermal_property_2(i-1,j,k))+&
+               (thermal_property_2(i,j+1,k) + thermal_property_2(i,j-1,k))+&
+               thermal_property_2(i,j,k+1) +&
+               thermal_property_2(i,j,k-1))
 
             if (abs(thermal_property_1(i,j,k)) < 1e-10) thermal_property_1(i,j,k)=0
 
-            Qvap1(i,j,k)=pro1*Qvap2(i,j,k)+&
-               pro2*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+&
-               (Qvap2(i,j+1,k)+Qvap2(i,j-1,k))+&
-               Qvap2(i,j,k+1)+Qvap2(i,j,k-1))
+            vapor_amt(i,j,k) = pro1*perturbed_vapor_amt(i,j,k) +&
+               pro2*(&
+               (perturbed_vapor_amt(i+1,j,k) + perturbed_vapor_amt(i-1,j,k)) +&
+               (perturbed_vapor_amt(i,j+1,k) + perturbed_vapor_amt(i,j-1,k)) +&
+               perturbed_vapor_amt(i,j,k+1) +&
+               perturbed_vapor_amt(i,j,k-1))
 
-            if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
+            if (abs(vapor_amt(i,j,k)) < 1e-10) vapor_amt(i,j,k)=0
 
-            Qgot1(i,j,k)=pro1*Qgot2(i,j,k)+&
-               pro2*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+&
-               (Qgot2(i,j+1,k)+Qgot2(i,j-1,k))+&
-               Qgot2(i,j,k+1)+Qgot2(i,j,k-1))
+            drop_amt(i,j,k) = pro1*perturbed_drop_amt(i,j,k) +&
+               pro2*(&
+               (perturbed_drop_amt(i+1,j,k) + perturbed_drop_amt(i-1,j,k)) +&
+               (perturbed_drop_amt(i,j+1,k) + perturbed_drop_amt(i,j-1,k)) +&
+               perturbed_drop_amt(i,j,k+1) +&
+               perturbed_drop_amt(i,j,k-1))
 
-            if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
+            if (drop_amt(i,j,k) < 1e-10) drop_amt(i,j,k)=0
 
-            Qllu1(i,j,k)=pro1*Qllu2(i,j,k)+&
-               pro2*((Qllu2(i+1,j,k)+Qllu2(i-1,j,k))+&
-               (Qllu2(i,j+1,k)+Qllu2(i,j-1,k))+Qllu2(i,j,k+1)+Qllu2(i,j,k-1))
+            rain_amt(i,j,k) = pro1*perturbed_rain_amt(i,j,k) +&
+               pro2*(&
+               (perturbed_rain_amt(i+1,j,k) + perturbed_rain_amt(i-1,j,k)) +&
+               (perturbed_rain_amt(i,j+1,k) + perturbed_rain_amt(i,j-1,k)) +&
+               perturbed_rain_amt(i,j,k+1) +&
+               perturbed_rain_amt(i,j,k-1))
 
-            if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
+            if (rain_amt(i,j,k) < 1e-10) rain_amt(i,j,k)=0
 
-            Qcri1(i,j,k)=pro1*Qcri2(i,j,k)+&
-               pro2*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+&
-               (Qcri2(i,j+1,k)+Qcri2(i,j-1,k))+Qcri2(i,j,k+1)+Qcri2(i,j,k-1))
+            crystal_amt(i,j,k) = pro1*perturbed_crystal_amt(i,j,k) +&
+               pro2*(&
+               (perturbed_crystal_amt(i+1,j,k) + perturbed_crystal_amt(i-1,j,k)) +&
+               (perturbed_crystal_amt(i,j+1,k) + perturbed_crystal_amt(i,j-1,k)) +&
+               perturbed_crystal_amt(i,j,k+1) +&
+               perturbed_crystal_amt(i,j,k-1))
 
-            if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
+            if (crystal_amt(i,j,k) < 1e-10) crystal_amt(i,j,k)=0
 
-            Qnie1(i,j,k)=pro1*Qnie2(i,j,k)+&
-               pro2*((Qnie2(i+1,j,k)+Qnie2(i-1,j,k))+&
-               (Qnie2(i,j+1,k)+Qnie2(i,j-1,k))+&
-               Qnie2(i,j,k+1)+Qnie2(i,j,k-1))
+            snow_amt(i,j,k) = pro1*perturbed_snow_amt(i,j,k) +&
+               pro2*(&
+               (perturbed_snow_amt(i+1,j,k) + perturbed_snow_amt(i-1,j,k)) +&
+               (perturbed_snow_amt(i,j+1,k) + perturbed_snow_amt(i,j-1,k)) +&
+               perturbed_snow_amt(i,j,k+1) +&
+               perturbed_snow_amt(i,j,k-1))
 
-            if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
+            if (snow_amt(i,j,k) < 1e-10) snow_amt(i,j,k)=0
 
-            Qgra1(i,j,k)=pro1*Qgra2(i,j,k)+&
-               pro2*((Qgra2(i+1,j,k)+Qgra2(i-1,j,k))+&
-               (Qgra2(i,j+1,k)+Qgra2(i,j-1,k))+&
-               Qgra2(i,j,k+1)+Qgra2(i,j,k-1))
+            hail_amt(i,j,k) = pro1*perturbed_hail_amt(i,j,k) +&
+               pro2*(&
+               (perturbed_hail_amt(i+1,j,k) + perturbed_hail_amt(i-1,j,k)) +&
+               (perturbed_hail_amt(i,j+1,k) + perturbed_hail_amt(i,j-1,k)) +&
+               perturbed_hail_amt(i,j,k+1) +&
+               perturbed_hail_amt(i,j,k-1))
 
-            if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
+            if (hail_amt(i,j,k) < 1e-10) hail_amt(i,j,k)=0
 
-            aer1(i,j,k)=pro1*aer2(i,j,k)+&
-               pro2*((aer2(i+1,j,k)+aer2(i-1,j,k))+&
-               (aer2(i,j+1,k)+aer2(i,j-1,k))+aer2(i,j,k+1)+aer2(i,j,k-1))
+            spray_amt(i,j,k) = pro1*perturbed_spray_amt(i,j,k) +&
+               pro2*(&
+               (perturbed_spray_amt(i+1,j,k) + perturbed_spray_amt(i-1,j,k)) +&
+               (perturbed_spray_amt(i,j+1,k) + perturbed_spray_amt(i,j-1,k)) +&
+               perturbed_spray_amt(i,j,k+1) +&
+               perturbed_spray_amt(i,j,k-1))
 
 
-            if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
+            if (abs(spray_amt(i,j,k)) < 1e-10) spray_amt(i,j,k)=0
          end do
       end do
    end subroutine floor_condition_redefinition
@@ -638,7 +696,8 @@ contains
    subroutine floor_and_ceiling_contour_redefinition()
       use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: thermal_property_1
-      use permic, only: Qvap1, aer1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1
+      use microphysics_perturbation, only: vapor_amt, spray_amt, drop_amt,&
+         rain_amt, crystal_amt, snow_amt, hail_amt
       use estbas, only: Qvap0, aer0
       implicit none
       integer :: i, j
@@ -651,32 +710,32 @@ contains
          thermal_property_1(i,j,nz1)=thermal_property_1(i,j,nz1-1)
 
          !corregido para el vapor
-         if (Qvap1(i,j,0) > Qvap0(0)*.5) then
-            Qvap1(i,j,0)=.8*Qvap0(0)
+         if (vapor_amt(i,j,0) > Qvap0(0)*.5) then
+            vapor_amt(i,j,0)=.8*Qvap0(0)
          endif
-         if (-Qvap1(i,j,0) > Qvap0(0)*.5) then
-            Qvap1(i,j,0)=-.8*Qvap0(0)
+         if (-vapor_amt(i,j,0) > Qvap0(0)*.5) then
+            vapor_amt(i,j,0)=-.8*Qvap0(0)
          endif
 
-         Qvap1(i,j,nz1)=Qvap1(i,j,nz1-1)
-         Qgot1(i,j,0)=0.
-         Qgot1(i,j,nz1)=Qgot1(i,j,nz1-1)
-         Qllu1(i,j,0)=Qllu1(i,j,0)
-         Qllu1(i,j,nz1)=Qllu1(i,j,nz1-1)
-         Qcri1(i,j,0)=0.
-         Qcri1(i,j,nz1)=Qcri1(i,j,nz1-1)
+         vapor_amt(i,j,nz1)=vapor_amt(i,j,nz1-1)
+         drop_amt(i,j,0)=0.
+         drop_amt(i,j,nz1)=drop_amt(i,j,nz1-1)
+         rain_amt(i,j,0)=rain_amt(i,j,0)
+         rain_amt(i,j,nz1)=rain_amt(i,j,nz1-1)
+         crystal_amt(i,j,0)=0.
+         crystal_amt(i,j,nz1)=crystal_amt(i,j,nz1-1)
 
-         Qnie1(i,j,0)=0.
-         Qnie1(i,j,nz1)=Qnie1(i,j,nz1-1)
+         snow_amt(i,j,0)=0.
+         snow_amt(i,j,nz1)=snow_amt(i,j,nz1-1)
 
-         Qgra1(i,j,0)=Qgra1(i,j,0)
-         Qgra1(i,j,nz1)=Qgra1(i,j,nz1-1)
+         hail_amt(i,j,0)=hail_amt(i,j,0)
+         hail_amt(i,j,nz1)=hail_amt(i,j,nz1-1)
 
          !corregido para los aerosoles
-         if (-aer1(i,j,0) > 0.8*aer0(0)) then
-            aer1(i,j,0)=-.8*aer0(0)
+         if (-spray_amt(i,j,0) > 0.8*aer0(0)) then
+            spray_amt(i,j,0)=-.8*aer0(0)
          endif
-         aer1(i,j,nz1)=aer1(i,j,nz1-1)
+         spray_amt(i,j,nz1)=spray_amt(i,j,nz1-1)
       end do
    end subroutine floor_and_ceiling_contour_redefinition
 
@@ -684,7 +743,8 @@ contains
       !contornos laterales
       use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: thermal_property_1
-      use permic, only: Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1
+      use microphysics_perturbation, only: vapor_amt, drop_amt, rain_amt,&
+         crystal_amt, snow_amt, hail_amt, spray_amt
       implicit none
       integer :: j, k
       do concurrent(k=1:nz1-1, j=1:nx1)
@@ -692,48 +752,48 @@ contains
          thermal_property_1(nx1+1,j,k)=thermal_property_1(nx1,j,k)
          thermal_property_1(j,0,k)=thermal_property_1(j,1,k)
          thermal_property_1(j,nx1+1,k)=thermal_property_1(j,nx1,k)
-         Qvap1(0,j,k)=0.
-         Qvap1(nx1+1,j,k)=0.
-         Qvap1(j,0,k)=0.
-         Qvap1(j,nx1+1,k)=0.
-         Qgot1(0,j,k)=Qgot1(1,j,k)
-         Qgot1(nx1+1,j,k)=Qgot1(nx1,j,k)
-         Qgot1(j,0,k)=Qgot1(j,1,k)
-         Qgot1(j,nx1+1,k)=Qgot1(j,nx1,k)
-         Qllu1(0,j,k)=0.
-         Qllu1(nx1+1,j,k)=0.
-         Qllu1(j,0,k)=0.
-         Qllu1(j,nx1+1,k)=0.
-         Qcri1(0,j,k)=Qcri1(1,j,k)
-         Qcri1(nx1+1,j,k)=Qcri1(nx1,j,k)
-         Qcri1(j,0,k)=Qcri1(j,1,k)
-         Qcri1(j,nx1+1,k)=Qcri1(j,nx1,k)
-         Qnie1(0,j,k)=Qnie1(1,j,k)
-         Qnie1(nx1+1,j,k)=Qnie1(nx1,j,k)
-         Qnie1(j,0,k)=Qnie1(j,1,k)
-         Qnie1(j,nx1+1,k)=Qnie1(j,nx1,k)
-         Qgra1(0,j,k)=0.
-         Qgra1(nx1+1,j,k)=0.
-         Qgra1(j,0,k)=0.
-         Qgra1(j,nx1+1,k)=0.
+         vapor_amt(0,j,k)=0.
+         vapor_amt(nx1+1,j,k)=0.
+         vapor_amt(j,0,k)=0.
+         vapor_amt(j,nx1+1,k)=0.
+         drop_amt(0,j,k)=drop_amt(1,j,k)
+         drop_amt(nx1+1,j,k)=drop_amt(nx1,j,k)
+         drop_amt(j,0,k)=drop_amt(j,1,k)
+         drop_amt(j,nx1+1,k)=drop_amt(j,nx1,k)
+         rain_amt(0,j,k)=0.
+         rain_amt(nx1+1,j,k)=0.
+         rain_amt(j,0,k)=0.
+         rain_amt(j,nx1+1,k)=0.
+         crystal_amt(0,j,k)=crystal_amt(1,j,k)
+         crystal_amt(nx1+1,j,k)=crystal_amt(nx1,j,k)
+         crystal_amt(j,0,k)=crystal_amt(j,1,k)
+         crystal_amt(j,nx1+1,k)=crystal_amt(j,nx1,k)
+         snow_amt(0,j,k)=snow_amt(1,j,k)
+         snow_amt(nx1+1,j,k)=snow_amt(nx1,j,k)
+         snow_amt(j,0,k)=snow_amt(j,1,k)
+         snow_amt(j,nx1+1,k)=snow_amt(j,nx1,k)
+         hail_amt(0,j,k)=0.
+         hail_amt(nx1+1,j,k)=0.
+         hail_amt(j,0,k)=0.
+         hail_amt(j,nx1+1,k)=0.
 
-         aer1(0,j,k)=aer1(1,j,k)
-         aer1(nx1+1,j,k)=aer1(nx1,j,k)
-         aer1(j,0,k)=aer1(j,1,k)
-         aer1(j,nx1+1,k)=aer1(j,nx1,k)
+         spray_amt(0,j,k)=spray_amt(1,j,k)
+         spray_amt(nx1+1,j,k)=spray_amt(nx1,j,k)
+         spray_amt(j,0,k)=spray_amt(j,1,k)
+         spray_amt(j,nx1+1,k)=spray_amt(j,nx1,k)
       end do
    end subroutine lateral_contour_redefinition
 
    subroutine vapour_negative_correction()
       !correccion de negativos para el vapor
       use dimensions, only: nx1, nz1
-      use permic, only: Qvap1
+      use microphysics_perturbation, only: vapor_amt
       use estbas, only: Qvap0
       implicit none
       integer :: i, j, k
       do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
-         if(Qvap1(i,j,k)+Qvap0(k) < 0) then
-            Qvap1(i,j,k)=-Qvap0(k)
+         if(vapor_amt(i,j,k)+Qvap0(k) < 0) then
+            vapor_amt(i,j,k)=-Qvap0(k)
          endif
       end do
    end subroutine vapour_negative_correction
@@ -748,12 +808,16 @@ contains
          heat_force, thermal_property_2, thermal_property_1, pressure_perturbed,&
          pressure_original, u_original, v_original, w_original
       use io, only: str_gen
-      use permic, only: aer1, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2,&
-         Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, Av, Vtgra0, Vtnie
+      use microphysics_perturbation, only: spray_amt, perturbed_drop_amt,&
+         perturbed_rain_amt, perturbed_crystal_amt, perturbed_snow_amt,&
+         perturbed_hail_amt, perturbed_vapor_amt, perturbed_spray_amt,&
+         vapor_amt, drop_amt, rain_amt, crystal_amt, snow_amt, hail_amt,&
+         Av, Vtgra0, Vtnie
       use constants, only: Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs, Eacrcn, Eautcn
       use estbas, only: Den0, Qvap0, aer0, Tita0, Temp0, Pres00, aerrel, cc2,&
          Qvaprel, UU, VV
-      use model_initialization, only: cloud_position_init, cloud_movement_init, statistics_init
+      use model_initialization, only: cloud_position_init, cloud_movement_init,&
+         statistics_init
       implicit none
       integer :: unit_number
       if (current_time/nint(lte/dt1)*nint(lte/dt1) == current_time) then
@@ -762,16 +826,18 @@ contains
          call cloud_position_init()
          call cloud_movement_init()
 
-         open(newunit=unit_number,file=output_directory//"posnub"//'.sa', ACCESS="append")
+         open(newunit=unit_number,file=output_directory//"posnub"//'.sa',&
+            ACCESS="append")
          write(unit_number,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),posxx,posyy
          close(unit_number)
       endif
 
       if (current_time/nint(ltg/dt1)*nint(ltg/dt1) == current_time) then
          file_number = str_gen(t1)
-         !call graba231(k, w_perturbed, thermal_property_1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
+         !call graba231(k, w_perturbed, thermal_property_1, vapor_amt, rain_amt, hail_amt, spray_amt, Qvap0, aer0)
          call graba320(u_original, v_original, w_original, thermal_property_1,&
-            pressure_original, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1, file_number)
+            pressure_original, vapor_amt, drop_amt, rain_amt, crystal_amt,&
+            snow_amt, hail_amt, spray_amt, file_number)
          t1=t1+1
       endif
 
@@ -779,8 +845,10 @@ contains
          call graba120(Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV,&
             u_original, u_perturbed, v_original, v_perturbed, w_original,&
             w_perturbed, thermal_property_1, thermal_property_2, pressure_original,&
-            pressure_perturbed, Qvap1, Qvap2, Qgot1, Qgot2, Qllu1, Qllu2,&
-            Qcri1, Qcri2, Qnie1, Qnie2, Qgra1, Qgra2, aer1, aer2, heat_force,&
+            pressure_perturbed, vapor_amt, perturbed_vapor_amt, drop_amt,&
+            perturbed_drop_amt, rain_amt, perturbed_rain_amt, crystal_amt,&
+            perturbed_crystal_amt, snow_amt, perturbed_snow_amt, hail_amt,&
+            perturbed_hail_amt, spray_amt, perturbed_spray_amt, heat_force,&
             Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, Av, Vtnie, Vtgra0, Qvaprel,&
             aerrel, Eautcn, Eacrcn)
       endif

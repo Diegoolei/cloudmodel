@@ -32,7 +32,7 @@ contains
    subroutine initial_conditions()
       use cant01
       use dimensions
-      use permic
+      use microphysics_perturbation
       use dinamic_var_perturbation
       use constants
       use estbas
@@ -158,20 +158,20 @@ contains
             pressure_perturbed(i,j,k)=0.
             thermal_property_2(i,j,k)=0.
             thermal_property_1(i,j,k)=0.
-            Qvap1(i,j,k)=0.
-            Qvap2(i,j,k)=0.
-            Qgot1(i,j,k)=0.
-            Qgot2(i,j,k)=0.
-            Qllu1(i,j,k)=0.
-            Qllu2(i,j,k)=0.
-            Qcri1(i,j,k)=0.
-            Qcri2(i,j,k)=0.
-            Qnie1(i,j,k)=0.
-            Qnie2(i,j,k)=0.
-            Qgra1(i,j,k)=0.
-            Qgra2(i,j,k)=0.
-            aer1(i,j,k)=0.
-            aer2(i,j,k)=0.
+            vapor_amt(i,j,k)=0.
+            perturbed_vapor_amt(i,j,k)=0.
+            drop_amt(i,j,k)=0.
+            perturbed_drop_amt(i,j,k)=0.
+            rain_amt(i,j,k)=0.
+            perturbed_rain_amt(i,j,k)=0.
+            crystal_amt(i,j,k)=0.
+            perturbed_crystal_amt(i,j,k)=0.
+            snow_amt(i,j,k)=0.
+            perturbed_snow_amt(i,j,k)=0.
+            hail_amt(i,j,k)=0.
+            perturbed_hail_amt(i,j,k)=0.
+            spray_amt(i,j,k)=0.
+            perturbed_spray_amt(i,j,k)=0.
          end do
 
          ! cantidades base
@@ -199,7 +199,7 @@ contains
                /radiomed**2.)
             thermal_property_1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
             if (thermal_property_1(i,j,k) < 1e-5) thermal_property_1(i,j,k)=0.
-            aer1(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
+            spray_amt(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
          end do
 
          !vapor base
@@ -277,8 +277,8 @@ contains
          pressure_perturbed(i,j,-1)=pressure_original(i,j,1)
          thermal_property_1(i,j,0)=thermal_property_1(i,j,1)
          thermal_property_1(i,j,-1)=thermal_property_1(i,j,1)
-         Qvap1(i,j,0)=Qvap1(i,j,1)
-         Qvap1(i,j,-1)=Qvap1(i,j,1)
+         vapor_amt(i,j,0)=vapor_amt(i,j,1)
+         vapor_amt(i,j,-1)=vapor_amt(i,j,1)
       end do
 
       !     calculo del Qvaprel
@@ -444,8 +444,11 @@ contains
       use dinamic_var_perturbation, only: w_perturbed, u_perturbed, v_perturbed,&
          heat_force, thermal_property_2, thermal_property_1, pressure_perturbed,&
          pressure_original, u_original, v_original, w_original
-      use permic, only: aer1, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2,&
-         Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, Av, Vtgra0, Vtnie
+      use microphysics_perturbation, only: spray_amt, perturbed_drop_amt,&
+         perturbed_rain_amt, perturbed_crystal_amt, perturbed_snow_amt,&
+         perturbed_hail_amt, perturbed_vapor_amt, perturbed_spray_amt,&
+         vapor_amt, drop_amt, rain_amt, crystal_amt, snow_amt, hail_amt,&
+         Av, Vtgra0, Vtnie
       use model_initial_conditions, only: initial_conditions
       implicit none
       integer :: unit_number
@@ -493,22 +496,27 @@ contains
          call initial_conditions()
       else
          !si ini=1 el calculo recomienza desde algun paso
-         open(newunit=unit_number,file=output_directory//"inis.da",status='unknown',form='unformatted')
+         open(newunit = unit_number, file=output_directory//"inis.da", status =&
+            'unknown', form = 'unformatted')
          read(unit_number,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
          close(unit_number)
 
-         open(newunit=unit_number,file=output_directory//"velos.da",status='unknown',form='unformatted')
+         open(newunit = unit_number, file = output_directory//"velos.da", status =&
+            'unknown', form = 'unformatted')
          rewind unit_number
          read(unit_number) u_original, u_perturbed, v_original, v_perturbed,&
             w_original, w_perturbed, thermal_property_1,thermal_property_2,&
-            pressure_original, pressure_perturbed, Qvap1, Qvap2, Qgot1, Qgot2,&
-            Qllu1, Qllu2, Qcri1, Qcri2, Qnie1, Qnie2, Qgra1, Qgra2, aer1, aer2,&
-            heat_force
+            pressure_original, pressure_perturbed, vapor_amt, perturbed_vapor_amt,&
+            drop_amt, perturbed_drop_amt, rain_amt, perturbed_rain_amt, crystal_amt,&
+            perturbed_crystal_amt, snow_amt, perturbed_snow_amt, hail_amt,&
+            perturbed_hail_amt, spray_amt, perturbed_spray_amt, heat_force
          close(unit_number)
 
-         open(newunit=unit_number,file=output_directory//"varconz.da",status='unknown',form='unformatted')
+         open(newunit = unit_number, file = output_directory//"varconz.da",&
+            status = 'unknown', form = 'unformatted')
          rewind unit_number
-         read(unit_number)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
+         read(unit_number)  Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, Av, Vtnie,&
+            Vtgra0, Qvaprel, aerrel, Eautcn, Eacrcn
          close(unit_number)
 
       endif
@@ -521,7 +529,7 @@ contains
 
    subroutine statistics_init()
       use model_var
-      use permic
+      use microphysics_perturbation
       use dinamic_var_perturbation
       use config
       integer :: unit_number
@@ -652,62 +660,62 @@ contains
             ntitamin=k
          endif
 
-         if (qvapmax < Qvap1(i,j,k)*1e6) then
-            qvapmax=Qvap1(i,j,k)*1e6
+         if (qvapmax < vapor_amt(i,j,k)*1e6) then
+            qvapmax=vapor_amt(i,j,k)*1e6
             lqvapmax=i
             mqvapmax=j
             nqvapmax=k
          endif
 
-         if (qvapmin > Qvap1(i,j,k)*1e6) then
-            qvapmin=Qvap1(i,j,k)*1e6
+         if (qvapmin > vapor_amt(i,j,k)*1e6) then
+            qvapmin=vapor_amt(i,j,k)*1e6
             lqvapmin=i
             mqvapmin=j
             nqvapmin=k
          endif
 
-         if (qgotmax < Qgot1(i,j,k)*1e6) then
-            qgotmax=Qgot1(i,j,k)*1e6
+         if (qgotmax < drop_amt(i,j,k)*1e6) then
+            qgotmax=drop_amt(i,j,k)*1e6
             lqgotmax=i
             mqgotmax=j
             nqgotmax=k
          endif
-         qgottot=qgottot+Qgot1(i,j,k)*1e6
+         qgottot=qgottot+drop_amt(i,j,k)*1e6
 
-         if (qllumax < Qllu1(i,j,k)*1e6) then
-            qllumax=Qllu1(i,j,k)*1e6
+         if (qllumax < rain_amt(i,j,k)*1e6) then
+            qllumax=rain_amt(i,j,k)*1e6
             lqllumax=i
             mqllumax=j
             nqllumax=k
          endif
-         qllutot=qllutot+Qllu1(i,j,k)*1e6
+         qllutot=qllutot+rain_amt(i,j,k)*1e6
 
-         if (qcrimax < Qcri1(i,j,k)*1e6) then
-            qcrimax=Qcri1(i,j,k)*1e6
+         if (qcrimax < crystal_amt(i,j,k)*1e6) then
+            qcrimax=crystal_amt(i,j,k)*1e6
             lqcrimax=i
             mqcrimax=j
             nqcrimax=k
          endif
-         qcritot=qcritot+Qcri1(i,j,k)*1e6
+         qcritot=qcritot+crystal_amt(i,j,k)*1e6
 
-         if (qniemax < Qnie1(i,j,k)*1e6) then
-            qniemax=Qnie1(i,j,k)*1e6
+         if (qniemax < snow_amt(i,j,k)*1e6) then
+            qniemax=snow_amt(i,j,k)*1e6
             lqniemax=i
             mqniemax=j
             nqniemax=k
          endif
-         qnietot=qnietot+Qnie1(i,j,k)*1e6
+         qnietot=qnietot+snow_amt(i,j,k)*1e6
 
-         if (qgramax < Qgra1(i,j,k)*1e6) then
-            qgramax=Qgra1(i,j,k)*1e6
+         if (qgramax < hail_amt(i,j,k)*1e6) then
+            qgramax=hail_amt(i,j,k)*1e6
             lqgramax=i
             mqgramax=j
             nqgramax=k
          endif
-         qgratot=qgratot+Qgra1(i,j,k)*1e6
+         qgratot=qgratot+hail_amt(i,j,k)*1e6
 
-         if (aermax < aer1(i,j,k)/1000) then
-            aermax=aer1(i,j,k)/1000
+         if (aermax < spray_amt(i,j,k)/1000) then
+            aermax=spray_amt(i,j,k)/1000
             laermax=i
             maermax=j
             naermax=k
@@ -719,9 +727,9 @@ contains
       qniemax=0.
 
       do concurrent(i=-1:1, j=-1:1, k=-1:1)
-         qgotmax=qgotmax+1e5*Qgot1(lqgotmax+i,mqgotmax+j,nqgotmax+k)
-         qcrimax=qcrimax+1e5*Qcri1(lqcrimax+i,mqcrimax+j,nqcrimax+k)
-         qniemax=qniemax+1e5*Qnie1(lqniemax+i,mqniemax+j,nqniemax+k)
+         qgotmax=qgotmax+1e5*drop_amt(lqgotmax+i,mqgotmax+j,nqgotmax+k)
+         qcrimax=qcrimax+1e5*crystal_amt(lqcrimax+i,mqcrimax+j,nqcrimax+k)
+         qniemax=qniemax+1e5*snow_amt(lqniemax+i,mqniemax+j,nqniemax+k)
       end do
 
       qgotmax=qgotmax/27.
@@ -766,7 +774,7 @@ contains
       use model_var
       use lmngot
       use lmncri
-      use permic
+      use microphysics_perturbation
       use estbas
       use cant01
 !     desplazamientos horizontales a partir de la velocidad media de la nube
@@ -791,8 +799,8 @@ contains
          naux2=max(ngot(2),ncri(2))
 
          do concurrent(k=1:naux2, i=laux1:laux2, j=maux1:maux2)
-            Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+&
-               Qnie1(i,j,k)+Qgra1(i,j,k)
+            Qagua=drop_amt(i,j,k)+crystal_amt(i,j,k)+rain_amt(i,j,k)+&
+               snow_amt(i,j,k)+hail_amt(i,j,k)
             zmed=zmed+k*Qagua
             Qaguat=Qaguat+Qagua
          end do
@@ -811,7 +819,7 @@ contains
       !desplazamiento de la nube
       use model_var
       use dinamic_var_perturbation
-      use permic
+      use microphysics_perturbation
       !     movimiento de la nube (4/01/99)
 !     Redefine el valor de todas las variables (deberian
 !      ser las que se graban solamente)
@@ -851,10 +859,10 @@ contains
                   w_perturbed(i-1,j,k)=w_perturbed(i,j,k)
                   pressure_perturbed(i-1,j,k)=pressure_perturbed(i,j,k)
                   thermal_property_1(i-1,j,k)=thermal_property_1(i,j,k)
-                  Qvap1(i-1,j,k)=Qvap1(i,j,k)
-                  Qgot1(i-1,j,k)=Qgot1(i,j,k)
-                  Qllu1(i-1,j,k)=Qllu1(i,j,k)
-                  Qcri1(i-1,j,k)=Qcri1(i,j,k)
+                  vapor_amt(i-1,j,k)=vapor_amt(i,j,k)
+                  drop_amt(i-1,j,k)=drop_amt(i,j,k)
+                  rain_amt(i-1,j,k)=rain_amt(i,j,k)
+                  crystal_amt(i-1,j,k)=crystal_amt(i,j,k)
                   Aer1(i-1,j,k)=Aer1(i,j,k)
                   heat_force(i-1,j,k)=heat_force(i,j,k)
                end do
@@ -868,10 +876,10 @@ contains
                w_perturbed(i,j,k)=w_perturbed(i-1,j,k)
                pressure_perturbed(i,j,k)=pressure_perturbed(i-1,j,k)
                thermal_property_1(i,j,k)=thermal_property_1(i-1,j,k)
-               Qvap1(i,j,k)=Qvap1(i-1,j,k)
-               Qgot1(i,j,k)=Qgot1(i-1,j,k)
-               Qllu1(i,j,k)=Qllu1(i-1,j,k)
-               Qcri1(i,j,k)=Qcri1(i-1,j,k)
+               vapor_amt(i,j,k)=vapor_amt(i-1,j,k)
+               drop_amt(i,j,k)=drop_amt(i-1,j,k)
+               rain_amt(i,j,k)=rain_amt(i-1,j,k)
+               crystal_amt(i,j,k)=crystal_amt(i-1,j,k)
                Aer1(i,j,k)=Aer1(i-1,j,k)
                heat_force(i,j,k)=0.
             end do
@@ -886,10 +894,10 @@ contains
             w_perturbed(i,j,k)=(w_perturbed(i-1,j,k)+w_perturbed(i,j+1,k))/2.
             pressure_perturbed(i,j,k)=(pressure_perturbed(i-1,j,k)+pressure_perturbed(i,j+1,k))/2.
             thermal_property_1(i,j,k)=(thermal_property_1(i-1,j,k)+thermal_property_1(i,j+1,k))/2.
-            Qvap1(i,j,k)=(Qvap1(i-1,j,k)+Qvap1(i,j+1,k))/2.
-            Qgot1(i,j,k)=(Qgot1(i-1,j,k)+Qgot1(i,j+1,k))/2.
-            Qllu1(i,j,k)=(Qllu1(i-1,j,k)+Qllu1(i,j+1,k))/2.
-            Qcri1(i,j,k)=(Qcri1(i-1,j,k)+Qcri1(i,j+1,k))/2.
+            vapor_amt(i,j,k)=(vapor_amt(i-1,j,k)+vapor_amt(i,j+1,k))/2.
+            drop_amt(i,j,k)=(drop_amt(i-1,j,k)+drop_amt(i,j+1,k))/2.
+            rain_amt(i,j,k)=(rain_amt(i-1,j,k)+rain_amt(i,j+1,k))/2.
+            crystal_amt(i,j,k)=(crystal_amt(i-1,j,k)+crystal_amt(i,j+1,k))/2.
             Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j+1,k))/2.
             heat_force(i,j,k)=0.
             j=nx1+1
@@ -902,10 +910,10 @@ contains
             w_perturbed(i,j,k)=(w_perturbed(i-1,j,k)+w_perturbed(i,j-1,k))/2.
             pressure_perturbed(i,j,k)=(pressure_perturbed(i-1,j,k)+pressure_perturbed(i,j-1,k))/2.
             thermal_property_1(i,j,k)=(thermal_property_1(i-1,j,k)+thermal_property_1(i,j-1,k))/2.
-            Qvap1(i,j,k)=(Qvap1(i-1,j,k)+Qvap1(i,j-1,k))/2.
-            Qgot1(i,j,k)=(Qgot1(i-1,j,k)+Qgot1(i,j-1,k))/2.
-            Qllu1(i,j,k)=(Qllu1(i-1,j,k)+Qllu1(i,j-1,k))/2.
-            Qcri1(i,j,k)=(Qcri1(i-1,j,k)+Qcri1(i,j-1,k))/2.
+            vapor_amt(i,j,k)=(vapor_amt(i-1,j,k)+vapor_amt(i,j-1,k))/2.
+            drop_amt(i,j,k)=(drop_amt(i-1,j,k)+drop_amt(i,j-1,k))/2.
+            rain_amt(i,j,k)=(rain_amt(i-1,j,k)+rain_amt(i,j-1,k))/2.
+            crystal_amt(i,j,k)=(crystal_amt(i-1,j,k)+crystal_amt(i,j-1,k))/2.
             Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j-1,k))/2.
             heat_force(i,j,k)=0.
          end do
@@ -927,10 +935,10 @@ contains
                   w_perturbed(i+1,j,k)=w_perturbed(i,j,k)
                   pressure_perturbed(i+1,j,k)=pressure_perturbed(i,j,k)
                   thermal_property_1(i+1,j,k)=thermal_property_1(i,j,k)
-                  Qvap1(i+1,j,k)=Qvap1(i,j,k)
-                  Qgot1(i+1,j,k)=Qgot1(i,j,k)
-                  Qllu1(i+1,j,k)=Qllu1(i,j,k)
-                  Qcri1(i+1,j,k)=Qcri1(i,j,k)
+                  vapor_amt(i+1,j,k)=vapor_amt(i,j,k)
+                  drop_amt(i+1,j,k)=drop_amt(i,j,k)
+                  rain_amt(i+1,j,k)=rain_amt(i,j,k)
+                  crystal_amt(i+1,j,k)=crystal_amt(i,j,k)
                   Aer1(i+1,j,k)=Aer1(i,j,k)
                   heat_force(i+1,j,k)=heat_force(i,j,k)
                end do
@@ -944,10 +952,10 @@ contains
                w_perturbed(i,j,k)=w_perturbed(i+1,j,k)
                pressure_perturbed(i,j,k)=pressure_perturbed(i+1,j,k)
                thermal_property_1(i,j,k)=thermal_property_1(i+1,j,k)
-               Qvap1(i,j,k)=Qvap1(i+1,j,k)
-               Qgot1(i,j,k)=Qgot1(i+1,j,k)
-               Qllu1(i,j,k)=Qllu1(i+1,j,k)
-               Qcri1(i,j,k)=Qcri1(i+1,j,k)
+               vapor_amt(i,j,k)=vapor_amt(i+1,j,k)
+               drop_amt(i,j,k)=drop_amt(i+1,j,k)
+               rain_amt(i,j,k)=rain_amt(i+1,j,k)
+               crystal_amt(i,j,k)=crystal_amt(i+1,j,k)
                Aer1(i,j,k)=Aer1(i+1,j,k)
                heat_force(i,j,k)=0.
             end do
@@ -962,10 +970,10 @@ contains
             w_perturbed(i,j,k)=(w_perturbed(i+1,j,k)+w_perturbed(i,j+1,k))/2.
             pressure_perturbed(i,j,k)=(pressure_perturbed(i+1,j,k)+pressure_perturbed(i,j+1,k))/2.
             thermal_property_1(i,j,k)=(thermal_property_1(i+1,j,k)+thermal_property_1(i,j+1,k))/2.
-            Qvap1(i,j,k)=(Qvap1(i+1,j,k)+Qvap1(i,j+1,k))/2.
-            Qgot1(i,j,k)=(Qgot1(i+1,j,k)+Qgot1(i,j+1,k))/2.
-            Qllu1(i,j,k)=(Qllu1(i+1,j,k)+Qllu1(i,j+1,k))/2.
-            Qcri1(i,j,k)=(Qcri1(i+1,j,k)+Qcri1(i,j+1,k))/2.
+            vapor_amt(i,j,k)=(vapor_amt(i+1,j,k)+vapor_amt(i,j+1,k))/2.
+            drop_amt(i,j,k)=(drop_amt(i+1,j,k)+drop_amt(i,j+1,k))/2.
+            rain_amt(i,j,k)=(rain_amt(i+1,j,k)+rain_amt(i,j+1,k))/2.
+            crystal_amt(i,j,k)=(crystal_amt(i+1,j,k)+crystal_amt(i,j+1,k))/2.
             Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j+1,k))/2.
             heat_force(i,j,k)=0.
             j=nx1+1
@@ -978,10 +986,10 @@ contains
             w_perturbed(i,j,k)=(w_perturbed(i+1,j,k)+w_perturbed(i,j-1,k))/2.
             pressure_perturbed(i,j,k)=(pressure_perturbed(i+1,j,k)+pressure_perturbed(i,j-1,k))/2.
             thermal_property_1(i,j,k)=(thermal_property_1(i+1,j,k)+thermal_property_1(i,j-1,k))/2.
-            Qvap1(i,j,k)=(Qvap1(i+1,j,k)+Qvap1(i,j-1,k))/2.
-            Qgot1(i,j,k)=(Qgot1(i+1,j,k)+Qgot1(i,j-1,k))/2.
-            Qllu1(i,j,k)=(Qllu1(i+1,j,k)+Qllu1(i,j-1,k))/2.
-            Qcri1(i,j,k)=(Qcri1(i+1,j,k)+Qcri1(i,j-1,k))/2.
+            vapor_amt(i,j,k)=(vapor_amt(i+1,j,k)+vapor_amt(i,j-1,k))/2.
+            drop_amt(i,j,k)=(drop_amt(i+1,j,k)+drop_amt(i,j-1,k))/2.
+            rain_amt(i,j,k)=(rain_amt(i+1,j,k)+rain_amt(i,j-1,k))/2.
+            crystal_amt(i,j,k)=(crystal_amt(i+1,j,k)+crystal_amt(i,j-1,k))/2.
             Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j-1,k))/2.
             heat_force(i,j,k)=0.
          end do
@@ -1006,10 +1014,10 @@ contains
                   w_perturbed(i,j-1,k)=w_perturbed(i,j,k)
                   pressure_perturbed(i,j-1,k)=pressure_perturbed(i,j,k)
                   thermal_property_1(i,j-1,k)=thermal_property_1(i,j,k)
-                  Qvap1(i,j-1,k)=Qvap1(i,j,k)
-                  Qgot1(i,j-1,k)=Qgot1(i,j,k)
-                  Qllu1(i,j-1,k)=Qllu1(i,j,k)
-                  Qcri1(i,j-1,k)=Qcri1(i,j,k)
+                  vapor_amt(i,j-1,k)=vapor_amt(i,j,k)
+                  drop_amt(i,j-1,k)=drop_amt(i,j,k)
+                  rain_amt(i,j-1,k)=rain_amt(i,j,k)
+                  crystal_amt(i,j-1,k)=crystal_amt(i,j,k)
                   Aer1(i,j-1,k)=Aer1(i,j,k)
                   heat_force(i,j-1,k)=heat_force(i,j,k)
                end do
@@ -1023,10 +1031,10 @@ contains
                w_perturbed(i,j,k)=w_perturbed(i,j-1,k)
                pressure_perturbed(i,j,k)=pressure_perturbed(i,j-1,k)
                thermal_property_1(i,j,k)=thermal_property_1(i,j-1,k)
-               Qvap1(i,j,k)=Qvap1(i,j-1,k)
-               Qgot1(i,j,k)=Qgot1(i,j-1,k)
-               Qllu1(i,j,k)=Qllu1(i,j-1,k)
-               Qcri1(i,j,k)=Qcri1(i,j-1,k)
+               vapor_amt(i,j,k)=vapor_amt(i,j-1,k)
+               drop_amt(i,j,k)=drop_amt(i,j-1,k)
+               rain_amt(i,j,k)=rain_amt(i,j-1,k)
+               crystal_amt(i,j,k)=crystal_amt(i,j-1,k)
                Aer1(i,j,k)=Aer1(i,j-1,k)
                heat_force(i,j,k)=0.
             end do
@@ -1041,10 +1049,10 @@ contains
             w_perturbed(i,j,k)=(w_perturbed(i,j-1,k)+w_perturbed(i+1,j,k))/2.
             pressure_perturbed(i,j,k)=(pressure_perturbed(i,j-1,k)+pressure_perturbed(i+1,j,k))/2.
             thermal_property_1(i,j,k)=(thermal_property_1(i,j-1,k)+thermal_property_1(i+1,j,k))/2.
-            Qvap1(i,j,k)=(Qvap1(i,j-1,k)+Qvap1(i+1,j,k))/2.
-            Qgot1(i,j,k)=(Qgot1(i,j-1,k)+Qgot1(i+1,j,k))/2.
-            Qllu1(i,j,k)=(Qllu1(i,j-1,k)+Qllu1(i+1,j,k))/2.
-            Qcri1(i,j,k)=(Qcri1(i,j-1,k)+Qcri1(i+1,j,k))/2.
+            vapor_amt(i,j,k)=(vapor_amt(i,j-1,k)+vapor_amt(i+1,j,k))/2.
+            drop_amt(i,j,k)=(drop_amt(i,j-1,k)+drop_amt(i+1,j,k))/2.
+            rain_amt(i,j,k)=(rain_amt(i,j-1,k)+rain_amt(i+1,j,k))/2.
+            crystal_amt(i,j,k)=(crystal_amt(i,j-1,k)+crystal_amt(i+1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i+1,j,k))/2.
             heat_force(i,j,k)=0.
             i=nx1+1
@@ -1057,10 +1065,10 @@ contains
             w_perturbed(i,j,k)=(w_perturbed(i,j-1,k)+w_perturbed(i-1,j,k))/2.
             pressure_perturbed(i,j,k)=(pressure_perturbed(i,j-1,k)+pressure_perturbed(i-1,j,k))/2.
             thermal_property_1(i,j,k)=(thermal_property_1(i,j-1,k)+thermal_property_1(i-1,j,k))/2.
-            Qvap1(i,j,k)=(Qvap1(i,j-1,k)+Qvap1(i-1,j,k))/2.
-            Qgot1(i,j,k)=(Qgot1(i,j-1,k)+Qgot1(i-1,j,k))/2.
-            Qllu1(i,j,k)=(Qllu1(i,j-1,k)+Qllu1(i-1,j,k))/2.
-            Qcri1(i,j,k)=(Qcri1(i,j-1,k)+Qcri1(i-1,j,k))/2.
+            vapor_amt(i,j,k)=(vapor_amt(i,j-1,k)+vapor_amt(i-1,j,k))/2.
+            drop_amt(i,j,k)=(drop_amt(i,j-1,k)+drop_amt(i-1,j,k))/2.
+            rain_amt(i,j,k)=(rain_amt(i,j-1,k)+rain_amt(i-1,j,k))/2.
+            crystal_amt(i,j,k)=(crystal_amt(i,j-1,k)+crystal_amt(i-1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i-1,j,k))/2.
             heat_force(i,j,k)=0.
          end do
@@ -1082,10 +1090,10 @@ contains
                   w_perturbed(i,j+1,k)=w_perturbed(i,j,k)
                   pressure_perturbed(i,j+1,k)=pressure_perturbed(i,j,k)
                   thermal_property_1(i,j+1,k)=thermal_property_1(i,j,k)
-                  Qvap1(i,j+1,k)=Qvap1(i,j,k)
-                  Qgot1(i,j+1,k)=Qgot1(i,j,k)
-                  Qllu1(i,j+1,k)=Qllu1(i,j,k)
-                  Qcri1(i,j+1,k)=Qcri1(i,j,k)
+                  vapor_amt(i,j+1,k)=vapor_amt(i,j,k)
+                  drop_amt(i,j+1,k)=drop_amt(i,j,k)
+                  rain_amt(i,j+1,k)=rain_amt(i,j,k)
+                  crystal_amt(i,j+1,k)=crystal_amt(i,j,k)
                   Aer1(i,j+1,k)=Aer1(i,j,k)
                   heat_force(i,j+1,k)=heat_force(i,j,k)
                end do
@@ -1099,10 +1107,10 @@ contains
                w_perturbed(i,j,k)=w_perturbed(i,j-1,k)
                pressure_perturbed(i,j,k)=pressure_perturbed(i,j-1,k)
                thermal_property_1(i,j,k)=thermal_property_1(i,j-1,k)
-               Qvap1(i,j,k)=Qvap1(i,j-1,k)
-               Qgot1(i,j,k)=Qgot1(i,j-1,k)
-               Qllu1(i,j,k)=Qllu1(i,j-1,k)
-               Qcri1(i,j,k)=Qcri1(i,j-1,k)
+               vapor_amt(i,j,k)=vapor_amt(i,j-1,k)
+               drop_amt(i,j,k)=drop_amt(i,j-1,k)
+               rain_amt(i,j,k)=rain_amt(i,j-1,k)
+               crystal_amt(i,j,k)=crystal_amt(i,j-1,k)
                Aer1(i,j,k)=Aer1(i,j-1,k)
                heat_force(i,j,k)=0.
             end do
@@ -1117,10 +1125,10 @@ contains
             w_perturbed(i,j,k)=(w_perturbed(i,j+1,k)+w_perturbed(i+1,j,k))/2.
             pressure_perturbed(i,j,k)=(pressure_perturbed(i,j+1,k)+pressure_perturbed(i+1,j,k))/2.
             thermal_property_1(i,j,k)=(thermal_property_1(i,j+1,k)+thermal_property_1(i+1,j,k))/2.
-            Qvap1(i,j,k)=(Qvap1(i,j+1,k)+Qvap1(i+1,j,k))/2.
-            Qgot1(i,j,k)=(Qgot1(i,j+1,k)+Qgot1(i+1,j,k))/2.
-            Qllu1(i,j,k)=(Qllu1(i,j+1,k)+Qllu1(i+1,j,k))/2.
-            Qcri1(i,j,k)=(Qcri1(i,j+1,k)+Qcri1(i+1,j,k))/2.
+            vapor_amt(i,j,k)=(vapor_amt(i,j+1,k)+vapor_amt(i+1,j,k))/2.
+            drop_amt(i,j,k)=(drop_amt(i,j+1,k)+drop_amt(i+1,j,k))/2.
+            rain_amt(i,j,k)=(rain_amt(i,j+1,k)+rain_amt(i+1,j,k))/2.
+            crystal_amt(i,j,k)=(crystal_amt(i,j+1,k)+crystal_amt(i+1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i+1,j,k))/2.
             heat_force(i,j,k)=0.
             i=nx1+1
@@ -1133,10 +1141,10 @@ contains
             w_perturbed(i,j,k)=(w_perturbed(i,j+1,k)+w_perturbed(i-1,j,k))/2.
             pressure_perturbed(i,j,k)=(pressure_perturbed(i,j+1,k)+pressure_perturbed(i-1,j,k))/2.
             thermal_property_1(i,j,k)=(thermal_property_1(i,j+1,k)+thermal_property_1(i-1,j,k))/2.
-            Qvap1(i,j,k)=(Qvap1(i,j+1,k)+Qvap1(i-1,j,k))/2.
-            Qgot1(i,j,k)=(Qgot1(i,j+1,k)+Qgot1(i-1,j,k))/2.
-            Qllu1(i,j,k)=(Qllu1(i,j+1,k)+Qllu1(i-1,j,k))/2.
-            Qcri1(i,j,k)=(Qcri1(i,j+1,k)+Qcri1(i-1,j,k))/2.
+            vapor_amt(i,j,k)=(vapor_amt(i,j+1,k)+vapor_amt(i-1,j,k))/2.
+            drop_amt(i,j,k)=(drop_amt(i,j+1,k)+drop_amt(i-1,j,k))/2.
+            rain_amt(i,j,k)=(rain_amt(i,j+1,k)+rain_amt(i-1,j,k))/2.
+            crystal_amt(i,j,k)=(crystal_amt(i,j+1,k)+crystal_amt(i-1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i-1,j,k))/2.
             heat_force(i,j,k)=0.
          end do

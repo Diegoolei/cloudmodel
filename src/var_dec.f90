@@ -173,15 +173,37 @@ module inomo_var
    real diverx,divery,diverz,grave,laplap
 end module inomo_var
 
-module permic
+!> @brief Module declaration for the microphysics_perturbation module.
+!! @details The microphysics_perturbation module defines variables related to cloud microphysics.
+module microphysics_perturbation
    use dimensions
-   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: Qvap1,Qvap2,Qgot1,Qgot2,aer1,&
-      aer2,Qllu1,Qllu2,Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2
-   real, dimension(-3:2*nz1+5) :: Av,Vtnie,Vtgra0
-end module permic
 
-!> Module: dinamic_var_perturbation
-!! Description: Defines perturbation-related variables for numerical simulations.
+   ! Vapor variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: vapor_amt, perturbed_vapor_amt
+
+   ! Drop variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: drop_amt, perturbed_drop_amt
+
+   ! Spray variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: spray_amt, perturbed_spray_amt, Aer1
+
+   ! Liquid cloud variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: rain_amt, perturbed_rain_amt
+
+   ! Crystal variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: crystal_amt, perturbed_crystal_amt
+   
+   ! Snow variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: snow_amt, perturbed_snow_amt
+
+   ! Graupel (snow pellets) variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: hail_amt, perturbed_hail_amt
+
+   ! Other related variables
+   real, dimension(-3:2*nz1+5) :: Av, Vtnie, Vtgra0
+end module microphysics_perturbation
+
+!> Description: Defines perturbation-related variables for numerical simulations.
 !!              These variables are used in the context of dynamic perturbations.
 module dinamic_var_perturbation
    use dimensions
@@ -197,10 +219,9 @@ module dinamic_var_perturbation
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: thermal_property_1, thermal_property_2
    !> Heat force
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: heat_force
- end module dinamic_var_perturbation
+end module dinamic_var_perturbation
 
-!> @file var_dec.f90
-!! @brief This file contains the module declaration for the microf05 module.
+!> @brief This file contains the module declaration for the microf05 module.
 !! @details The microf05 module is responsible for declaring variables used in the Fortran 77 cloud model.
 !!          This module is part of the Fortran 77 Cloud Model project.
 module microf05

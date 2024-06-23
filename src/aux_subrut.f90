@@ -52,7 +52,7 @@ end
  !     negativa la cantidad de gotitas
 subroutine corgot
    use dimensions
-   use permic
+   use microphysics_perturbation
    use lmngot
    use corgot_vars
    implicit none
@@ -60,17 +60,17 @@ subroutine corgot
    neg1=0.
    pos1=0.
    do concurrent(n=ngot(1):ngot(2), l=lgot(1):lgot(2), m=mgot(1):mgot(2))
-      if (Qgot2(l,m,n) < 0.) then
-         neg1=neg1+Qgot2(l,m,n)
-         Qgot2(l,m,n)=0
+      if (perturbed_drop_amt(l,m,n) < 0.) then
+         neg1=neg1+perturbed_drop_amt(l,m,n)
+         perturbed_drop_amt(l,m,n)=0
       else
-         pos1=pos1+Qgot2(l,m,n)
+         pos1=pos1+perturbed_drop_amt(l,m,n)
       endif
    end do
 
    if(pos1 <= -neg1) then
       do concurrent(l=lgot(1):lgot(2), m=mgot(1):mgot(2), n=ngot(1):ngot(2))
-         Qgot2(l,m,n)=0.
+         perturbed_drop_amt(l,m,n)=0.
       end do
       if (-neg1 > 1e-3) then
          stop
@@ -78,8 +78,8 @@ subroutine corgot
    else
       aux1=neg1/pos1
       do concurrent(l=lgot(1):lgot(2), m=mgot(1):mgot(2), n=ngot(1):ngot(2))
-         if(Qgot2(l,m,n) > 0) then
-            Qgot2(l,m,n)=Qgot2(l,m,n)*(1.+aux1)
+         if(perturbed_drop_amt(l,m,n) > 0) then
+            perturbed_drop_amt(l,m,n)=perturbed_drop_amt(l,m,n)*(1.+aux1)
          endif
       end do
    endif
@@ -91,7 +91,7 @@ end
  !     negativa la cantidad de gotas
 subroutine corllu
    use dimensions
-   use permic
+   use microphysics_perturbation
    use lmnllu
    use corgot_vars
    implicit none
@@ -99,17 +99,17 @@ subroutine corllu
    neg1=0.
    pos1=0.
    do concurrent(n=nllu(1):nllu(2), l=lllu(1):lllu(2), m=mllu(1):mllu(2))
-      if (Qllu2(l,m,n) < 0.) then
-         neg1=neg1+Qllu2(l,m,n)
-         Qllu2(l,m,n)=0
+      if (perturbed_rain_amt(l,m,n) < 0.) then
+         neg1=neg1+perturbed_rain_amt(l,m,n)
+         perturbed_rain_amt(l,m,n)=0
       else
-         pos1=pos1+Qllu2(l,m,n)
+         pos1=pos1+perturbed_rain_amt(l,m,n)
       endif
    end do
 
    if(pos1 <= -neg1) then
       do concurrent(l=lllu(1):lllu(2), m=mllu(1):mllu(2), n=nllu(1):nllu(2))
-         Qllu2(l,m,n)=0.
+         perturbed_rain_amt(l,m,n)=0.
       end do
       if (-neg1 > 1e-3) then
          stop
@@ -117,8 +117,8 @@ subroutine corllu
    else
       aux1=neg1/pos1
       do concurrent(l=lllu(1):lllu(2), m=mllu(1):mllu(2), n=nllu(1):nllu(2))
-         if(Qllu2(l,m,n) > 0) then
-            Qllu2(l,m,n)=Qllu2(l,m,n)*(1.+aux1)
+         if(perturbed_rain_amt(l,m,n) > 0) then
+            perturbed_rain_amt(l,m,n)=perturbed_rain_amt(l,m,n)*(1.+aux1)
          endif
       end do
    endif
@@ -129,24 +129,24 @@ end
  !     negativa la cantidad de cristales
 subroutine corcri
    use dimensions
-   use permic
+   use microphysics_perturbation
    use lmncri
    use corgot_vars
    implicit none
    neg1=0.
    pos1=0.
    do concurrent(n=ncri(1):ncri(2), l=lcri(1):lcri(2), m=mcri(1):mcri(2))
-      if (Qcri2(l,m,n) < 0.) then
-         neg1=neg1+Qcri2(l,m,n)
-         Qcri2(l,m,n)=0
+      if (perturbed_crystal_amt(l,m,n) < 0.) then
+         neg1=neg1+perturbed_crystal_amt(l,m,n)
+         perturbed_crystal_amt(l,m,n)=0
       else
-         pos1=pos1+Qcri2(l,m,n)
+         pos1=pos1+perturbed_crystal_amt(l,m,n)
       endif
    end do
 
    if(pos1 <= -neg1) then
       do concurrent(l=lcri(1):lcri(2), m=mcri(1):mcri(2), n=ncri(1):ncri(2))
-         Qcri2(l,m,n)=0.
+         perturbed_crystal_amt(l,m,n)=0.
       end do
       if (-neg1 > 1e-3) then
          stop
@@ -154,8 +154,8 @@ subroutine corcri
    else
       aux1=neg1/pos1
       do concurrent(l=lcri(1):lcri(2), m=mcri(1):mcri(2), n=ncri(1):ncri(2))
-         if(Qcri2(l,m,n) > 0) then
-            Qcri2(l,m,n)=Qcri2(l,m,n)*(1.+aux1)
+         if(perturbed_crystal_amt(l,m,n) > 0) then
+            perturbed_crystal_amt(l,m,n)=perturbed_crystal_amt(l,m,n)*(1.+aux1)
          endif
       end do
    endif
@@ -167,24 +167,24 @@ end
  !     negativa la cantidad de nieve
 subroutine cornie
    use dimensions
-   use permic
+   use microphysics_perturbation
    use lmnnie
    use corgot_vars
    implicit none
    neg1=0.
    pos1=0.
    do concurrent(n=nnie(1):nnie(2), l=lnie(1):lnie(2), m=mnie(1):mnie(2))
-      if (Qnie2(l,m,n) < 0.) then
-         neg1=neg1+Qnie2(l,m,n)
-         Qnie2(l,m,n)=0
+      if (perturbed_snow_amt(l,m,n) < 0.) then
+         neg1=neg1+perturbed_snow_amt(l,m,n)
+         perturbed_snow_amt(l,m,n)=0
       else
-         pos1=pos1+Qnie2(l,m,n)
+         pos1=pos1+perturbed_snow_amt(l,m,n)
       endif
    end do
 
    if(pos1 <= -neg1) then
       do concurrent(l=lnie(1):lnie(2), m=mnie(1):mnie(2), n=nnie(1):nnie(2))
-         Qnie2(l,m,n)=0.
+         perturbed_snow_amt(l,m,n)=0.
       end do
 
       if (-neg1 > 1e-3) then
@@ -193,8 +193,8 @@ subroutine cornie
    else
       aux1=neg1/pos1
       do concurrent(l=lnie(1):lnie(2), m=mnie(1):mnie(2), n=nnie(1):nnie(2))
-         if(Qnie2(l,m,n) > 0) then
-            Qnie2(l,m,n)=Qnie2(l,m,n)*(1.+aux1)
+         if(perturbed_snow_amt(l,m,n) > 0) then
+            perturbed_snow_amt(l,m,n)=perturbed_snow_amt(l,m,n)*(1.+aux1)
          endif
       end do
    endif
@@ -205,24 +205,24 @@ end
  !     negativa la cantidad de granizos
 subroutine corgra
    use dimensions
-   use permic
+   use microphysics_perturbation
    use lmngra
    use corgot_vars
    implicit none
    neg1=0.
    pos1=0.
    do concurrent(n=ngra(1):ngra(2), l=lgra(1):lgra(2), m=mgra(1):mgra(2))
-      if (Qgra2(l,m,n) < 0.) then
-         neg1=neg1+Qgra2(l,m,n)
-         Qgra2(l,m,n)=0
+      if (perturbed_hail_amt(l,m,n) < 0.) then
+         neg1=neg1+perturbed_hail_amt(l,m,n)
+         perturbed_hail_amt(l,m,n)=0
       else
-         pos1=pos1+Qgra2(l,m,n)
+         pos1=pos1+perturbed_hail_amt(l,m,n)
       endif
    end do
 
    if(pos1 <= -neg1) then
       do concurrent(l=lgra(1):lgra(2), m=mgra(1):mgra(2), n=ngra(1):ngra(2))
-         Qgra2(l,m,n)=0.
+         perturbed_hail_amt(l,m,n)=0.
       end do
 
       if (-neg1 > 1e-3) then
@@ -231,8 +231,8 @@ subroutine corgra
    else
       aux1=neg1/pos1
       do concurrent(l=lgra(1):lgra(2), m=mgra(1):mgra(2), n=ngra(1):ngra(2))
-         if(Qgra2(l,m,n) > 0) then
-            Qgra2(l,m,n)=Qgra2(l,m,n)*(1.+aux1)
+         if(perturbed_hail_amt(l,m,n) > 0) then
+            perturbed_hail_amt(l,m,n)=perturbed_hail_amt(l,m,n)*(1.+aux1)
          endif
       end do
    endif
@@ -243,7 +243,7 @@ end
  !     negativa la cantidad de vapor
 subroutine corvap(Qvapneg)
    use dimensions
-   use permic
+   use microphysics_perturbation
    use estbas
    use corvap_vars
    implicit none
@@ -253,8 +253,8 @@ subroutine corvap(Qvapneg)
    do concurrent(k=1:nz1)
       dq=Qvapneg*Qvaprel(k)/nx1**2.
       do concurrent(i=1:nx1, j=1:nx1)
-         Qvap2(i,j,k)=Qvap2(i,j,k)+dq
-         if (Qvap2(i,j,k)+Qvap0(k) < 0) Qvap2(i,j,k)=-Qvap0(k)
+         perturbed_vapor_amt(i,j,k)=perturbed_vapor_amt(i,j,k)+dq
+         if (perturbed_vapor_amt(i,j,k)+Qvap0(k) < 0) perturbed_vapor_amt(i,j,k)=-Qvap0(k)
       end do
    end do
 
@@ -265,7 +265,7 @@ end
  !     negativa la cantidad de aerosoles
 subroutine coraer(aerneg)
    use dimensions
-   use permic
+   use microphysics_perturbation
    use estbas
    use coraer_vars
    implicit none
@@ -275,8 +275,8 @@ subroutine coraer(aerneg)
    do concurrent(k=1:nz1)
       dq=aerneg*aerrel(k)/nx1**2.
       do concurrent(i=1:nx1, j=1:nx1)
-         aer2(i,j,k)=aer2(i,j,k)+dq
-         if (aer2(i,j,k)+aer0(k) < 0) aer2(i,j,k)=-aer0(k)
+         perturbed_spray_amt(i,j,k)=perturbed_spray_amt(i,j,k)+dq
+         if (perturbed_spray_amt(i,j,k)+aer0(k) < 0) perturbed_spray_amt(i,j,k)=-aer0(k)
       end do
    end do
    return
@@ -286,7 +286,7 @@ subroutine daeros(l,m,n)
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use estbas
    use advecs
@@ -296,21 +296,21 @@ subroutine daeros(l,m,n)
 
    integer, intent(in) :: l,m,n
 
-   daer(1)=aer1(l+1,m,n)-aer1(l-1,m,n)
-   daer(2)=aer1(l,m+1,n)-aer1(l,m-1,n)
-   daer(3)=aer1(l,m,n+1)-aer1(l,m,n-1)
+   daer(1)=spray_amt(l+1,m,n)-spray_amt(l-1,m,n)
+   daer(2)=spray_amt(l,m+1,n)-spray_amt(l,m-1,n)
+   daer(3)=spray_amt(l,m,n+1)-spray_amt(l,m,n-1)
 
 
-   adv(1)=(((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(aer1(l+1,m,n)+aer1(l,m,n)))-&
-      ((u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(aer1(l-1,m,n)+aer1(l,m,n))))/4.
+   adv(1)=(((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(spray_amt(l+1,m,n)+spray_amt(l,m,n)))-&
+      ((u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(spray_amt(l-1,m,n)+spray_amt(l,m,n))))/4.
    adv(1)=adv(1)+daer(1)/2.*UU(n)
 
-   adv(2)=(((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(aer1(l,m+1,n)+aer1(l,m,n)))&
-      -((v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(aer1(l,m-1,n)+aer1(l,m,n))))/4.
+   adv(2)=(((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(spray_amt(l,m+1,n)+spray_amt(l,m,n)))&
+      -((v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(spray_amt(l,m-1,n)+spray_amt(l,m,n))))/4.
    adv(2)=adv(2)+daer(2)/2.*VV(n)
 
    advaer2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
-      (aer1(l,m,n)+aer1(l,m,n+1))/4.
+      (spray_amt(l,m,n)+spray_amt(l,m,n+1))/4.
 
    adv(3)=advaer2(l,m)-advaer1(l,m)
 
@@ -324,20 +324,20 @@ subroutine daeros(l,m,n)
 
    escal=daer(1)*KM1+daer(2)*KM2+daer(3)*KM3
 
-   lapla=aer1(l+1,m,n)+aer1(l,m+1,n)+aer1(l,m,n+1)+&
-      aer1(l-1,m,n)+aer1(l,m-1,n)+aer1(l,m,n-1)-&
-      6.*aer1(l,m,n)
+   lapla=spray_amt(l+1,m,n)+spray_amt(l,m+1,n)+spray_amt(l,m,n+1)+&
+      spray_amt(l-1,m,n)+spray_amt(l,m-1,n)+spray_amt(l,m,n-1)-&
+      6.*spray_amt(l,m,n)
 
-   lapla=((aer1(l+1,m,n)+aer1(l-1,m,n))+(aer1(l,m+1,n)+&
-      aer1(l,m-1,n)))+aer1(l,m,n-1)+aer1(l,m,n+1)-&
-      6.*aer1(l,m,n)
+   lapla=((spray_amt(l+1,m,n)+spray_amt(l-1,m,n))+(spray_amt(l,m+1,n)+&
+      spray_amt(l,m-1,n)))+spray_amt(l,m,n-1)+spray_amt(l,m,n+1)-&
+      6.*spray_amt(l,m,n)
 
 
    lapla=lapla+(aer0(n+1)+aer0(n-1)-2.*aer0(n))
 
    turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
-   aer2(l,m,n)=dt1*((advec+verti+aux)/dx1+turbul)+aer1(l,m,n)
+   perturbed_spray_amt(l,m,n)=dt1*((advec+verti+aux)/dx1+turbul)+spray_amt(l,m,n)
    return
 end
 
@@ -345,7 +345,7 @@ subroutine dgotit(l,m,n)
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use estbas
    use advecs
@@ -355,23 +355,23 @@ subroutine dgotit(l,m,n)
 
    integer, intent(in) :: l,m,n
 
-   dqgot(1)=Qgot1(l+1,m,n)-Qgot1(l-1,m,n)
-   dqgot(2)=Qgot1(l,m+1,n)-Qgot1(l,m-1,n)
-   dqgot(3)=Qgot1(l,m,n+1)-Qgot1(l,m,n-1)
+   dqgot(1)=drop_amt(l+1,m,n)-drop_amt(l-1,m,n)
+   dqgot(2)=drop_amt(l,m+1,n)-drop_amt(l,m-1,n)
+   dqgot(3)=drop_amt(l,m,n+1)-drop_amt(l,m,n-1)
 
-   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qgot1(l+1,m,n)+Qgot1(l,m,n))&
-      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qgot1(l-1,m,n)+Qgot1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(drop_amt(l+1,m,n)+drop_amt(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(drop_amt(l-1,m,n)+drop_amt(l,m,n)))/4.
    adv(1)=adv(1)+dqgot(1)/2.*UU(n)
 
-   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qgot1(l,m+1,n)+Qgot1(l,m,n))&
-      -(v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qgot1(l,m-1,n)+Qgot1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(drop_amt(l,m+1,n)+drop_amt(l,m,n))&
+      -(v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(drop_amt(l,m-1,n)+drop_amt(l,m,n)))/4.
    adv(2)=adv(2)+dqgot(2)/2.*VV(n)
 
    advgot2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
-      (Qgot1(l,m,n)+Qgot1(l,m,n+1))/4.
-   if ((advgot2(l,m)-advgot1(l,m))*dt1/dx1 > Qgot1(l,m,n) .and.&
+      (drop_amt(l,m,n)+drop_amt(l,m,n+1))/4.
+   if ((advgot2(l,m)-advgot1(l,m))*dt1/dx1 > drop_amt(l,m,n) .and.&
       w_perturbed(l,m,n) > 0) then
-      advgot2(l,m)=advgot1(l,m)+Qgot1(l,m,n)*dx1/dt1
+      advgot2(l,m)=advgot1(l,m)+drop_amt(l,m,n)*dx1/dt1
    endif
    adv(3)=advgot2(l,m)-advgot1(l,m)
 
@@ -381,13 +381,13 @@ subroutine dgotit(l,m,n)
    escal=dqgot(1)*KM1+dqgot(2)*KM2+dqgot(3)*KM3
 
 
-   lapla=Qgot1(l+1,m,n)+Qgot1(l,m+1,n)+Qgot1(l,m,n+1)+&
-      Qgot1(l-1,m,n)+Qgot1(l,m-1,n)+Qgot1(l,m,n-1)-&
-      6.*Qgot1(l,m,n)
+   lapla=drop_amt(l+1,m,n)+drop_amt(l,m+1,n)+drop_amt(l,m,n+1)+&
+      drop_amt(l-1,m,n)+drop_amt(l,m-1,n)+drop_amt(l,m,n-1)-&
+      6.*drop_amt(l,m,n)
 
    turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
-   Qgot2(l,m,n)=dt1*(advec+turbul)+Qgot1(l,m,n)
+   perturbed_drop_amt(l,m,n)=dt1*(advec+turbul)+drop_amt(l,m,n)
 
    return
 end
@@ -396,7 +396,7 @@ subroutine dvapor(l,m,n)
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use estbas
    use advecs
@@ -406,24 +406,24 @@ subroutine dvapor(l,m,n)
 
    integer, intent(in) :: l,m,n
 
-   dqvap(1)=Qvap1(l+1,m,n)-Qvap1(l-1,m,n)
-   dqvap(2)=Qvap1(l,m+1,n)-Qvap1(l,m-1,n)
-   dqvap(3)=Qvap1(l,m,n+1)-Qvap1(l,m,n-1)
+   dqvap(1)=vapor_amt(l+1,m,n)-vapor_amt(l-1,m,n)
+   dqvap(2)=vapor_amt(l,m+1,n)-vapor_amt(l,m-1,n)
+   dqvap(3)=vapor_amt(l,m,n+1)-vapor_amt(l,m,n-1)
 
    adv(1)=(((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*&
-      (Qvap1(l+1,m,n)+Qvap1(l,m,n)))-&
+      (vapor_amt(l+1,m,n)+vapor_amt(l,m,n)))-&
       ((u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*&
-      (Qvap1(l-1,m,n)+Qvap1(l,m,n))))/4.
+      (vapor_amt(l-1,m,n)+vapor_amt(l,m,n))))/4.
    adv(1)=adv(1)+dqvap(1)/2.*UU(n)
 
    adv(2)=(((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*&
-      (Qvap1(l,m+1,n)+Qvap1(l,m,n)))-&
+      (vapor_amt(l,m+1,n)+vapor_amt(l,m,n)))-&
       ((v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*&
-      (Qvap1(l,m-1,n)+Qvap1(l,m,n))))/4.
+      (vapor_amt(l,m-1,n)+vapor_amt(l,m,n))))/4.
    adv(2)=adv(2)+dqvap(2)/2.*VV(n)
 
    advvap2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
-      (Qvap1(l,m,n)+Qvap1(l,m,n+1))/4.
+      (vapor_amt(l,m,n)+vapor_amt(l,m,n+1))/4.
 
    adv(3)=advvap2(l,m)-advvap1(l,m)
 
@@ -437,18 +437,18 @@ subroutine dvapor(l,m,n)
 
    escal=dqvap(1)*KM1+dqvap(2)*KM2+dqvap(3)*KM3
 
-   lapla=((Qvap1(l+1,m,n)+Qvap1(l-1,m,n))+(Qvap1(l,m+1,n)+&
-      Qvap1(l,m-1,n)))+Qvap1(l,m,n+1)+Qvap1(l,m,n-1)-&
-      6.*Qvap1(l,m,n)
+   lapla=((vapor_amt(l+1,m,n)+vapor_amt(l-1,m,n))+(vapor_amt(l,m+1,n)+&
+      vapor_amt(l,m-1,n)))+vapor_amt(l,m,n+1)+vapor_amt(l,m,n-1)-&
+      6.*vapor_amt(l,m,n)
 
    lapla=lapla+(Qvap0(n+1)+Qvap0(n-1)-2.*Qvap0(n))
 
    turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
-   Qvap2(l,m,n)=dt1*((advec+verti+aux)/dx1+turbul)+Qvap1(l,m,n)
+   perturbed_vapor_amt(l,m,n)=dt1*((advec+verti+aux)/dx1+turbul)+vapor_amt(l,m,n)
 
    aux=dt1/dx1
-   aux=aux*(verti+advec)+dt1*turbul+Qvap1(l,m,n)
+   aux=aux*(verti+advec)+dt1*turbul+vapor_amt(l,m,n)
 
    return
 end
@@ -457,7 +457,7 @@ subroutine dlluvi(l,m,n)
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use estbas
    use advecs
@@ -467,20 +467,20 @@ subroutine dlluvi(l,m,n)
 
    integer, intent(in) :: l,m,n
 
-   dqllu(1)=Qllu1(l+1,m,n)-Qllu1(l-1,m,n)
-   dqllu(2)=Qllu1(l,m+1,n)-Qllu1(l,m-1,n)
-   dqllu(3)=Qllu1(l,m,n+1)-Qllu1(l,m,n-1)
+   dqllu(1)=rain_amt(l+1,m,n)-rain_amt(l-1,m,n)
+   dqllu(2)=rain_amt(l,m+1,n)-rain_amt(l,m-1,n)
+   dqllu(3)=rain_amt(l,m,n+1)-rain_amt(l,m,n-1)
 
-   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qllu1(l+1,m,n)+Qllu1(l,m,n))&
-      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qllu1(l-1,m,n)+Qllu1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(rain_amt(l+1,m,n)+rain_amt(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(rain_amt(l-1,m,n)+rain_amt(l,m,n)))/4.
    adv(1)=adv(1)+dqllu(1)/2.*UU(n)
 
-   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qllu1(l,m+1,n)+Qllu1(l,m,n))-&
-      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qllu1(l,m-1,n)+Qllu1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(rain_amt(l,m+1,n)+rain_amt(l,m,n))-&
+      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(rain_amt(l,m-1,n)+rain_amt(l,m,n)))/4.
    adv(2)=adv(2)+dqllu(2)/2.*VV(n)
 
    advllu2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
-      (Qllu1(l,m,n)+Qllu1(l,m,n+1))/4.
+      (rain_amt(l,m,n)+rain_amt(l,m,n+1))/4.
 
    adv(3)=advllu2(l,m)-advllu1(l,m)
 
@@ -488,29 +488,29 @@ subroutine dlluvi(l,m,n)
 
    escal=dqllu(1)*KM1+dqllu(2)*KM2+dqllu(3)*KM3
 
-   lapla=Qllu1(l+1,m,n)+Qllu1(l,m+1,n)+Qllu1(l,m,n+1)+&
-      Qllu1(l-1,m,n)+Qllu1(l,m-1,n)+Qllu1(l,m,n-1)-&
-      6.*Qllu1(l,m,n)
+   lapla=rain_amt(l+1,m,n)+rain_amt(l,m+1,n)+rain_amt(l,m,n+1)+&
+      rain_amt(l-1,m,n)+rain_amt(l,m-1,n)+rain_amt(l,m,n-1)-&
+      6.*rain_amt(l,m,n)
 
    turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
    !***  termino de sedimentacion
 
-   Qllus=(Qllu1(l,m,n+1)+Qllu1(l,m,n))/2.
-   Qllui=(Qllu1(l,m,n-1)+Qllu1(l,m,n))/2.
+   Qllus=(rain_amt(l,m,n+1)+rain_amt(l,m,n))/2.
+   Qllui=(rain_amt(l,m,n-1)+rain_amt(l,m,n))/2.
    Rms=(Qllus/cteqllu)**.25
-   Rmm=(Qllu1(l,m,n)/cteqllu)**.25
+   Rmm=(rain_amt(l,m,n)/cteqllu)**.25
    Rmi=(Qllui/cteqllu)**.25
    Vtllus=(Av(2*n+1)*Rms**.8+Av(2*n)*Rmm**.8)/2.
    Vtllui=(Av(2*n-1)*Rmi**.8+Av(2*n)*Rmm**.8)/2.
    if (n == 1) then
       Vtllui=Av(2*n)*Rmm**.8
-      Qllui=Qllu1(l,m,n)
+      Qllui=rain_amt(l,m,n)
    endif
 
    sedim=gam4p8/6.*(Qllus*Vtllus-Qllui*Vtllui)
 
-   Qllu2(l,m,n)=dt1*((advec+sedim)/dx1+turbul)+Qllu1(l,m,n)
+   perturbed_rain_amt(l,m,n)=dt1*((advec+sedim)/dx1+turbul)+rain_amt(l,m,n)
    return
 end
 
@@ -518,7 +518,7 @@ subroutine dcrist(l,m,n)
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use estbas
    use advecs
@@ -528,20 +528,20 @@ subroutine dcrist(l,m,n)
 
    integer, intent(in) :: l,m,n
 
-   dqcri(1)=Qcri1(l+1,m,n)-Qcri1(l-1,m,n)
-   dqcri(2)=Qcri1(l,m+1,n)-Qcri1(l,m-1,n)
-   dqcri(3)=Qcri1(l,m,n+1)-Qcri1(l,m,n-1)
+   dqcri(1)=crystal_amt(l+1,m,n)-crystal_amt(l-1,m,n)
+   dqcri(2)=crystal_amt(l,m+1,n)-crystal_amt(l,m-1,n)
+   dqcri(3)=crystal_amt(l,m,n+1)-crystal_amt(l,m,n-1)
 
-   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qcri1(l+1,m,n)+Qcri1(l,m,n))&
-      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qcri1(l-1,m,n)+Qcri1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(crystal_amt(l+1,m,n)+crystal_amt(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(crystal_amt(l-1,m,n)+crystal_amt(l,m,n)))/4.
    adv(1)=adv(1)+dqcri(1)/2.*UU(n)
 
-   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qcri1(l,m+1,n)+Qcri1(l,m,n))-&
-      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qcri1(l,m-1,n)+Qcri1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(crystal_amt(l,m+1,n)+crystal_amt(l,m,n))-&
+      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(crystal_amt(l,m-1,n)+crystal_amt(l,m,n)))/4.
    adv(2)=adv(2)+dqcri(2)/2.*VV(n)
 
    advcri2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
-      (Qcri1(l,m,n)+Qcri1(l,m,n+1))/4.
+      (crystal_amt(l,m,n)+crystal_amt(l,m,n+1))/4.
 
    adv(3)=advcri2(l,m)-advcri1(l,m)
 
@@ -549,13 +549,13 @@ subroutine dcrist(l,m,n)
 
    escal=dqcri(1)*KM1+dqcri(2)*KM2+dqcri(3)*KM3
 
-   lapla=Qcri1(l+1,m,n)+Qcri1(l,m+1,n)+Qcri1(l,m,n+1)+&
-      Qcri1(l-1,m,n)+Qcri1(l,m-1,n)+Qcri1(l,m,n-1)-&
-      6.*Qcri1(l,m,n)
+   lapla=crystal_amt(l+1,m,n)+crystal_amt(l,m+1,n)+crystal_amt(l,m,n+1)+&
+      crystal_amt(l-1,m,n)+crystal_amt(l,m-1,n)+crystal_amt(l,m,n-1)-&
+      6.*crystal_amt(l,m,n)
 
    turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
-   Qcri2(l,m,n)=dt1*(advec+turbul)+Qcri1(l,m,n)
+   perturbed_crystal_amt(l,m,n)=dt1*(advec+turbul)+crystal_amt(l,m,n)
 
    return
 end
@@ -564,7 +564,7 @@ subroutine dnieve(l,m,n)
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use estbas
    use advecs
@@ -574,20 +574,20 @@ subroutine dnieve(l,m,n)
 
    integer, intent(in) :: l,m,n
 
-   dqnie(1)=Qnie1(l+1,m,n)-Qnie1(l-1,m,n)
-   dqnie(2)=Qnie1(l,m+1,n)-Qnie1(l,m-1,n)
-   dqnie(3)=Qnie1(l,m,n+1)-Qnie1(l,m,n-1)
+   dqnie(1)=snow_amt(l+1,m,n)-snow_amt(l-1,m,n)
+   dqnie(2)=snow_amt(l,m+1,n)-snow_amt(l,m-1,n)
+   dqnie(3)=snow_amt(l,m,n+1)-snow_amt(l,m,n-1)
 
-   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qnie1(l+1,m,n)+Qnie1(l,m,n))&
-      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qnie1(l-1,m,n)+Qnie1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(snow_amt(l+1,m,n)+snow_amt(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(snow_amt(l-1,m,n)+snow_amt(l,m,n)))/4.
    adv(1)=adv(1)+dqnie(1)/2.*UU(n)
 
-   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qnie1(l,m+1,n)+Qnie1(l,m,n))-&
-      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qnie1(l,m-1,n)+Qnie1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(snow_amt(l,m+1,n)+snow_amt(l,m,n))-&
+      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(snow_amt(l,m-1,n)+snow_amt(l,m,n)))/4.
    adv(2)=adv(2)+dqnie(2)/2.*VV(n)
 
    advnie2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
-      (Qnie1(l,m,n)+Qnie1(l,m,n+1))/4.
+      (snow_amt(l,m,n)+snow_amt(l,m,n+1))/4.
 
    adv(3)=advnie2(l,m)-advnie1(l,m)
 
@@ -595,19 +595,19 @@ subroutine dnieve(l,m,n)
 
    escal=dqnie(1)*KM1+dqnie(2)*KM2+dqnie(3)*KM3
 
-   lapla=Qnie1(l+1,m,n)+Qnie1(l,m+1,n)+Qnie1(l,m,n+1)+&
-      Qnie1(l-1,m,n)+Qnie1(l,m-1,n)+Qnie1(l,m,n-1)-&
-      6.*Qnie1(l,m,n)
+   lapla=snow_amt(l+1,m,n)+snow_amt(l,m+1,n)+snow_amt(l,m,n+1)+&
+      snow_amt(l-1,m,n)+snow_amt(l,m-1,n)+snow_amt(l,m,n-1)-&
+      6.*snow_amt(l,m,n)
 
    turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
    !***  termino de sedimentacion
 
-   Qnies=(Qnie1(l,m,n+1)+Qnie1(l,m,n))/2.
-   Qniei=(Qnie1(l,m,n-1)+Qnie1(l,m,n))/2.
+   Qnies=(snow_amt(l,m,n+1)+snow_amt(l,m,n))/2.
+   Qniei=(snow_amt(l,m,n-1)+snow_amt(l,m,n))/2.
 
    sedim=Vtnie(2*n+1)*Qnies-Vtnie(2*n-1)*Qniei
-   Qnie2(l,m,n)=dt1*((advec+sedim)/dx1+turbul)+Qnie1(l,m,n)
+   perturbed_snow_amt(l,m,n)=dt1*((advec+sedim)/dx1+turbul)+snow_amt(l,m,n)
 
    return
 end
@@ -616,7 +616,7 @@ subroutine dgrani(l,m,n)
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use estbas
    use advecs
@@ -626,20 +626,20 @@ subroutine dgrani(l,m,n)
 
    integer, intent(in) :: l,m,n
 
-   dqgra(1)=Qgra1(l+1,m,n)-Qgra1(l-1,m,n)
-   dqgra(2)=Qgra1(l,m+1,n)-Qgra1(l,m-1,n)
-   dqgra(3)=Qgra1(l,m,n+1)-Qgra1(l,m,n-1)
+   dqgra(1)=hail_amt(l+1,m,n)-hail_amt(l-1,m,n)
+   dqgra(2)=hail_amt(l,m+1,n)-hail_amt(l,m-1,n)
+   dqgra(3)=hail_amt(l,m,n+1)-hail_amt(l,m,n-1)
 
-   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(Qgra1(l+1,m,n)+Qgra1(l,m,n))&
-      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(Qgra1(l-1,m,n)+Qgra1(l,m,n)))/4.
+   adv(1)=((u_perturbed(l+1,m,n)+u_perturbed(l,m,n))*(hail_amt(l+1,m,n)+hail_amt(l,m,n))&
+      -(u_perturbed(l-1,m,n)+u_perturbed(l,m,n))*(hail_amt(l-1,m,n)+hail_amt(l,m,n)))/4.
    adv(1)=adv(1)+dqgra(1)/2.*UU(n)
 
-   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(Qgra1(l,m+1,n)+Qgra1(l,m,n))-&
-      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(Qgra1(l,m-1,n)+Qgra1(l,m,n)))/4.
+   adv(2)=((v_perturbed(l,m+1,n)+v_perturbed(l,m,n))*(hail_amt(l,m+1,n)+hail_amt(l,m,n))-&
+      (v_perturbed(l,m-1,n)+v_perturbed(l,m,n))*(hail_amt(l,m-1,n)+hail_amt(l,m,n)))/4.
    adv(2)=adv(2)+dqgra(2)/2.*VV(n)
 
    advgra2(l,m)=(w_perturbed(l,m,n)+w_perturbed(l,m,n+1))*&
-      (Qgra1(l,m,n)+Qgra1(l,m,n+1))/4.
+      (hail_amt(l,m,n)+hail_amt(l,m,n+1))/4.
 
    adv(3)=advgra2(l,m)-advgra1(l,m)
 
@@ -647,30 +647,30 @@ subroutine dgrani(l,m,n)
 
    escal=dqgra(1)*KM1+dqgra(2)*KM2+dqgra(3)*KM3
 
-   lapla=Qgra1(l+1,m,n)+Qgra1(l,m+1,n)+Qgra1(l,m,n+1)+&
-      Qgra1(l-1,m,n)+Qgra1(l,m-1,n)+Qgra1(l,m,n-1)-&
-      6.*Qgra1(l,m,n)
+   lapla=hail_amt(l+1,m,n)+hail_amt(l,m+1,n)+hail_amt(l,m,n+1)+&
+      hail_amt(l-1,m,n)+hail_amt(l,m-1,n)+hail_amt(l,m,n-1)-&
+      6.*hail_amt(l,m,n)
 
    turbul=cteturb*(escal/dx8+KMM/dx2*lapla)
 
    !***  termino de sedimentacion
-   Qgras=(Qgra1(l,m,n+1)+Qgra1(l,m,n))/2.
-   Qgrai=(Qgra1(l,m,n-1)+Qgra1(l,m,n))/2.
+   Qgras=(hail_amt(l,m,n+1)+hail_amt(l,m,n))/2.
+   Qgrai=(hail_amt(l,m,n-1)+hail_amt(l,m,n))/2.
    Rms=(Qgras/cteqgra)**.25
-   Rmm=(Qgra1(l,m,n)/cteqgra)**.25
+   Rmm=(hail_amt(l,m,n)/cteqgra)**.25
    Rmi=(Qgrai/cteqgra)**.25
    Vtgras=(Vtgra0(2*n+1)*Rms**.8+Vtgra0(2*n)*Rmm**.8)/2.
    Vtgrai=(Vtgra0(2*n-1)*Rmi**.8+Vtgra0(2*n)*Rmm**.8)/2.
    if (n == 1) then
       Vtgrai=Vtgra0(2*n)*Rmm**.8
-      Qgrai=Qgra1(l,m,n)
+      Qgrai=hail_amt(l,m,n)
    endif
 
    sedim=gam4p8/6.*(Qgras*Vtgras-Qgrai*Vtgrai)
    !***
 
 
-   Qgra2(l,m,n)=dt1*((advec+sedim)/dx1+turbul)+Qgra1(l,m,n)
+   perturbed_hail_amt(l,m,n)=dt1*((advec+sedim)/dx1+turbul)+hail_amt(l,m,n)
 
 
    return
@@ -1139,7 +1139,7 @@ subroutine inomo(i,j,k,dden0z)
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use estbas
    use turbvar
@@ -1181,9 +1181,9 @@ subroutine inomo(i,j,k,dden0z)
    turbulz=cteturb*((a1+a2)+a3)
 
    !$$
-   grave=G*(thermal_property_1(i,j,k)/Tita0(k)+(AA*Qvap1(i,j,k)-&
-      Qgot1(i,j,k)-Qllu1(i,j,k)-Qcri1(i,j,k)-&
-      Qnie1(i,j,k)-Qgra1(i,j,k))/Den0(k))
+   grave=G*(thermal_property_1(i,j,k)/Tita0(k)+(AA*vapor_amt(i,j,k)-&
+      drop_amt(i,j,k)-rain_amt(i,j,k)-crystal_amt(i,j,k)-&
+      snow_amt(i,j,k)-hail_amt(i,j,k))/Den0(k))
    !      grave=G*(thermal_property_1(i,j,k)/Tita0(k))
 
    fu(i,j,k)=turbulx/dx8-diverx/dx12
@@ -1209,7 +1209,7 @@ end
  !     pasando un polinomio de grado 4.
 
 subroutine filtro(varia1,facx,facy,facz)
-   !filtro para thermal_property_1 Qvap1
+   !filtro para thermal_property_1 vapor_amt
    use dimensions
    use filtro01
    implicit none

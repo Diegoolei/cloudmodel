@@ -1,6 +1,5 @@
 
-!> Module: dimensions
-!! Description: Defines parameters related to grid dimensions and intervals.
+!> Description: Defines parameters related to grid dimensions and intervals.
 !!              These parameters are used in numerical simulations.
 module dimensions
    !> Number of points in the x-direction

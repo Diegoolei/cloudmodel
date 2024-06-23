@@ -12,7 +12,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
    use cant01
    use dimensions
    use dinamic_var_perturbation
-   use permic
+   use microphysics_perturbation
    use constants
    use microf05
    implicit none
