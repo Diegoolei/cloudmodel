@@ -20,7 +20,7 @@ contains
    subroutine model()
       use cant01, only: total_time
       use model_var, only: current_time
-      use dinamic_var_perturbation, only: potential_temperature_base
+      use dinamic_var_perturbation, only: theta_base
       use model_initialization, only: initialize_model
       use model_aux, only: vapor_advection, dinamics, negative_correction, water_calculation,&
          microphisics_substring, floor_and_ceiling_contour, lateral_contour,&
@@ -33,11 +33,11 @@ contains
       type(bar_object) :: progress_bar
       real(R8P)        :: progress_percent
       call initialize_model()
-      call progress_bar%initialize(filled_char_string='㊂', empty_char_string='●',&
-         suffix_string='| ', add_progress_percent=.true.,prefix_string='Progress |',&
-         scale_bar_color_fg='blue', scale_bar_style='underline_on', spinner_string='(  ●   )')
+      call progress_bar%initialize(filled_char_string = '㊂', empty_char_string = '●',&
+         suffix_string = '| ', add_progress_percent = .true., prefix_string = 'Progress |',&
+         scale_bar_color_fg = 'blue', scale_bar_style = 'underline_on', spinner_string = '(  ●   )')
       call progress_bar%start
-      do current_time=1, total_time
+      do current_time = 1, total_time
          call vapor_advection()
          call dinamics()
          call negative_correction()
@@ -49,7 +49,7 @@ contains
          call floor_condition_redefinition()
          call floor_and_ceiling_contour_redefinition()
          call lateral_contour_redefinition()
-         call filtro(potential_temperature_base,.01,.01,.02)
+         call filtro(theta_base,.01,.01,.02)
          call vapour_negative_correction()
          call save_backup()
          progress_percent = real(current_time, R8P)/real(total_time, R8P)

@@ -24,15 +24,16 @@ module advecs
    use dimensions
    real, dimension(-2:nx1+2,-2:nx1+2) :: advaer1, advaer2, advgot1, advgot2, advllu1,&
       advllu2, advcri1, advcri2, advnie1, advnie2, advgra1, advgra2, advvap1, advvap2
-
 end module advecs
 
-module estbas
+module initial_z_state
 !> Cantidades no perturbadas
    use dimensions
-   real, dimension(-3:nz1+3) :: Temp0,Tita0,Pres00,Presi0,UU,VV,cc2,Den0,aer0,Qvap0
-   real, dimension(nz1) :: Qvaprel,aerrel
-end module estbas
+   real, dimension(-3:nz1+3) :: temperature_z_initial, theta_z_initial, Pres00,&
+      Presi0, u_z_initial, v_z_initial, cc2, air_density_z_initial,&
+      aerosol_z_initial, vapor_z_initial
+   real, dimension(nz1) :: vapor_z_relative, aerosol_z_relative
+end module initial_z_state
 
 module lmncri
 !> Posiciones en las cuales Qcri<0
@@ -103,7 +104,7 @@ module nuclea61
 
 !> Parametros de las particulas
    real Rgotmin,Acri,Bcri
-   parameter (Rgotmin=5e-6,Acri=1e-11,Bcri=.6)   !A en cm^-3
+   parameter (Rgotmin = 5e-6,Acri = 1e-11,Bcri = .6)   !A en cm^-3
 end module nuclea61
 
 
@@ -135,7 +136,7 @@ end module dgrani_vars
 
 module dimlee_vars
    integer nx2,ny2,nz2
-   parameter(nx2=32,ny2=32,nz2=32)
+   parameter(nx2 = 32,ny2 = 32,nz2 = 32)
 end module dimlee_vars
 
 module dlluvi_vars
@@ -201,16 +202,16 @@ end module microphysics_perturbation
 !!              These variables are used in the context of dynamic perturbations.
 module dinamic_var_perturbation
    use dimensions
-   !> Original velocity components (u=x, v=y, w=z)
+   !> Original velocity component
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_perturbed_base, v_perturbed_base, w_perturbed_base
-   !> Perturbed velocity components (u=x, v=y, w=z)
+   !> Perturbed velocity component
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_perturbed_new, v_perturbed_new, w_perturbed_new
    !> Original and perturbed pressure
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: pressure_base, pressure_new
    !> Ambient temperature
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: temperature
-   !> Thermodynamic properties
-   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: potential_temperature_base, potential_temperature_new
+   !> Potential temperature
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: theta_base, theta_new
    !> Heat force
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: heat_force
 end module dinamic_var_perturbation
@@ -230,13 +231,13 @@ module microf05
       Intvap,Intgot,Intllu,Intcri,Intnie,Intgra,Intaer, cfln1,cfln2
 !     numero de cristales por colision
    real Ncrgrni,Ncrgrgr
-   parameter (Ncrgrni=20.,Ncrgrgr=20.)
+   parameter (Ncrgrni = 20.,Ncrgrgr = 20.)
 !     variables para la evaporacion y la condensacion
    real Qvls,Qvss,Qvls0
 !     parametros de las particulas
    real(8) Rgot,Ngot,Rllu,Nllu,Rcri,Ncri,Rnie,Nnie,Rgra,Ngra, Vtm,Vtgra,Nre,Nsc,A,fventl,&
       fventn,fventgs,fventgl,Rgotmin, qvapaux1,qgotaux1,qlluaux1,qcriaux1,qnieaux1,qgraaux1
-   parameter (Rgotmin=5e-6)
+   parameter (Rgotmin = 5e-6)
    integer s
 !     variables para tgra
    real Tg,agual,hielo,alfagra,fugra,Aalfa,Balfa, A1,A2,A3,A3b,A4,B1,B2b,B3,B4,BB,CC2,CC3,&
@@ -244,8 +245,8 @@ module microf05
    integer crecigra,i
 !     parametros para los cristales
    real Acri,Bcri
-   parameter (Acri=1e-2,Bcri=.6)  !A en m^-3
+   parameter (Acri = 1e-2,Bcri = .6)  !A en m^-3
 !     difusion de aerosoles
    real Dfaer,Efcaer
-   parameter (Dfaer=1e-10,Efcaer=.01)
+   parameter (Dfaer = 1e-10,Efcaer = .01)
 end module microf05

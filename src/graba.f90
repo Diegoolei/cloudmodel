@@ -1,20 +1,24 @@
-subroutine graba120(Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV,&
-   u_perturbed_base, u_perturbed_new, v_perturbed_base, v_perturbed_new, w_perturbed_base, w_perturbed_new,&
-   potential_temperature_base, potential_temperature_new, pressure_base, pressure_new,&
+subroutine graba120(air_density_z_initial, temperature_z_initial, theta_z_initial,&
+   Pres00, vapor_z_initial, cc2, aerosol_z_initial, u_z_initial, v_z_initial,&
+   u_perturbed_base, u_perturbed_new, v_perturbed_base, v_perturbed_new,&
+   w_perturbed_base, w_perturbed_new,&
+   theta_base, theta_new, pressure_base, pressure_new,&
    vapor_base, vapor_new, drop_base, drop_new, rain_base,&
    rain_new, crystal_base, crystal_new, snow_base, snow_new,&
    hail_base, hail_new, aerosol_base, aerosol_new, heat_force, Tvis, Tlvl,&
-   Tlsl, Tlvs, Telvs, Tesvs, Av, Vtnie, Vtgra0, Qvaprel, aerrel, Eautcn, Eacrcn)
+   Tlsl, Tlvs, Telvs, Tesvs, Av, Vtnie, Vtgra0,&
+   vapor_z_relative, aerosol_z_relative, Eautcn, Eacrcn)
 
 
    use dimensions
    use config
    implicit none
-   real, dimension(-3:nz1+3), intent(in) :: Den0, Temp0, Tita0, Pres00, Qvap0,&
-      cc2, aer0, UU, VV
+   real, dimension(-3:nz1+3), intent(in) :: air_density_z_initial,&
+      temperature_z_initial, theta_z_initial, Pres00, vapor_z_initial,&
+      cc2, aerosol_z_initial, u_z_initial, v_z_initial
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: u_perturbed_base,&
-      u_perturbed_new, v_perturbed_base, v_perturbed_new, w_perturbed_base, w_perturbed_new,&
-      potential_temperature_base, potential_temperature_new, pressure_base,&
+      u_perturbed_new, v_perturbed_base, v_perturbed_new, w_perturbed_base,&
+      w_perturbed_new, theta_base, theta_new, pressure_base,&
       pressure_new, heat_force, vapor_base, vapor_new, drop_base,&
       drop_new, aerosol_base, aerosol_new, rain_base,&
       rain_new, crystal_base, crystal_new, snow_base,&
@@ -24,88 +28,89 @@ subroutine graba120(Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV,&
       Eautcn, Eacrcn
 
    real, dimension(-3:2*nz1+5), intent(in) :: Av,Vtnie,Vtgra0
-   real, dimension(nz1), intent(in)  :: Qvaprel,aerrel
+   real, dimension(nz1), intent(in)  :: vapor_z_relative,aerosol_z_relative
    integer :: unit_number
 
    open(newunit = unit_number, file = output_directory//"inis.da", status =&
       'unknown', form = 'unformatted')
-   write(unit_number) Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV
+   write(unit_number) air_density_z_initial, temperature_z_initial, theta_z_initial,&
+      Pres00, vapor_z_initial, cc2, aerosol_z_initial, u_z_initial, v_z_initial
    close(unit_number)
 
    open(newunit = unit_number, file = output_directory//"velos.da", status =&
       'unknown', form = 'unformatted')
    rewind unit_number
    write(unit_number) u_perturbed_base, u_perturbed_new, v_perturbed_base, v_perturbed_new,&
-      w_perturbed_base, w_perturbed_new, potential_temperature_base, potential_temperature_new,&
+      w_perturbed_base, w_perturbed_new, theta_base, theta_new,&
       pressure_base, pressure_new, vapor_base, vapor_new,&
       drop_base, drop_new, rain_base, rain_new, crystal_base,&
       crystal_new, snow_base, snow_new, hail_base,&
       hail_new, aerosol_base, aerosol_new, heat_force
    close(unit_number)
 
-   open(newunit = unit_number, file = output_directory//"varconz.da", status = &
+   open(newunit = unit_number, file = output_directory//"varconz.da", status =&
       'unknown', form = 'unformatted')
    rewind unit_number
    write(unit_number)  Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, Av, Vtnie, Vtgra0,&
-      Qvaprel, aerrel, Eautcn, Eacrcn
+      vapor_z_relative, aerosol_z_relative, Eautcn, Eacrcn
    close(unit_number)
 
 end subroutine graba120
 
-subroutine graba231(k, w_perturbed_new, potential_temperature_base, vapor_base, rain_base,&
-   hail_base, aerosol_base, Qvap0, aer0, file_number)
+subroutine graba231(k, w_perturbed_new, theta_base, vapor_base, rain_base,&
+   hail_base, aerosol_base, vapor_z_initial, aerosol_z_initial, file_number)
    !### Grabacion 2D ###
    use dimensions
    use config
    implicit none
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: w_perturbed_new,&
-      potential_temperature_base, vapor_base, rain_base, hail_base, aerosol_base
-   real, dimension(-3:nz1+3), intent(in) :: Qvap0, aer0
+      theta_base, vapor_base, rain_base, hail_base, aerosol_base
+   real, dimension(-3:nz1+3), intent(in) :: vapor_z_initial, aerosol_z_initial
    integer, intent(in) :: k
-   character(len=3), intent(in) :: file_number
-   character(len=100) :: nombre
+   character(len = 3), intent(in) :: file_number
+   character(len = 100) :: nombre
    integer :: i,j
    integer :: unit_number
 
    nombre = output_directory//'w_perturbed_new'//file_number//'.m'
    open(newunit = unit_number, file = nombre)
-   do i=1,nx1
-      write(unit_number,2000) (w_perturbed_new(i,j,1),j=1,nx1)
+   do i = 1,nx1
+      write(unit_number,2000) (w_perturbed_new(i,j,1),j = 1,nx1)
    end do
    close(unit_number)
 
    nombre = output_directory//'Tita'//file_number//'.m'
    open(newunit = unit_number, file = nombre)
-   do i=1,nx1
-      write(unit_number,2000) (potential_temperature_base(i,j,0),j=1,nx1)
+   do i = 1,nx1
+      write(unit_number,2000) (theta_base(i,j,0),j = 1,nx1)
    end do
    close(unit_number)
 
    nombre = output_directory//'Qvap'//file_number//'.m'
-   open(newunit=unit_number,file=nombre)
-   do i=1,nx1
-      write(unit_number,2000) ((vapor_base(i,j,k)+Qvap0(k)),j=1,nx1)
+   open(newunit = unit_number,file = nombre)
+   do i = 1,nx1
+      write(unit_number,2000) ((vapor_base(i,j,k)+vapor_z_initial(k)),j = 1,nx1)
    end do
    close(unit_number)
 
    nombre = output_directory//'Qllu'//file_number//'.m'
-   open(newunit=unit_number,file=nombre)
-   do i=1,nx1
-      write(unit_number,2000) (rain_base(i,j,1),j=1,nx1)
+   open(newunit = unit_number,file = nombre)
+   do i = 1,nx1
+      write(unit_number,2000) (rain_base(i,j,1),j = 1,nx1)
    end do
    close(unit_number)
 
    nombre = output_directory//'Aero'//file_number//'.m'
-   open(newunit=unit_number,file=nombre)
-   do i=1,nx1
-      write(unit_number,2000) (aerosol_base(i,j,0)+aer0(0),j=1,nx1)
+   open(newunit = unit_number,file = nombre)
+   do i = 1,nx1
+      write(unit_number,2000) (aerosol_base(i,j,0)+aerosol_z_initial(0),j = 1,nx1)
    end do
    close(unit_number)
 
    nombre = output_directory//'Qgra'//file_number//'.m'
-   open(newunit=unit_number,file=nombre)
-   do i=1,nx1
-      write(unit_number,2000) (hail_base(i,j,1),j=1,nx1)
+   open(newunit = unit_number,file = nombre)
+   do i = 1,nx1
+      write(unit_number,2000) (hail_base(i,j,1),j = 1,nx1)
    end do
    close(unit_number)
 
@@ -114,7 +119,7 @@ subroutine graba231(k, w_perturbed_new, potential_temperature_base, vapor_base, 
 
 end subroutine graba231
 
-subroutine graba320(u_perturbed_base, v_perturbed_base, w_perturbed_base, potential_temperature_base,&
+subroutine graba320(u_perturbed_base, v_perturbed_base, w_perturbed_base, theta_base,&
    pressure_base, vapor_base, drop_base, rain_base, crystal_base, snow_base,&
    hail_base, aerosol_base, file_number)
    !### Grabacion 3D ###
@@ -123,17 +128,17 @@ subroutine graba320(u_perturbed_base, v_perturbed_base, w_perturbed_base, potent
    implicit none
 
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: u_perturbed_base,&
-      v_perturbed_base, w_perturbed_base, potential_temperature_base, pressure_base, vapor_base,&
+      v_perturbed_base, w_perturbed_base, theta_base, pressure_base, vapor_base,&
       drop_base, rain_base, crystal_base, snow_base, hail_base, aerosol_base
-   character(len=3), intent(in) :: file_number
-   character(len=30) :: file_name
+   character(len = 3), intent(in) :: file_number
+   character(len = 30) :: file_name
    integer :: unit_number
 
    file_name = output_directory//"nube"//trim(file_number)//'.sal'
    open(newunit = unit_number, file = file_name, status = 'unknown', form =&
       'unformatted')
 
-   write(unit_number) u_perturbed_base, v_perturbed_base, w_perturbed_base, potential_temperature_base,&
+   write(unit_number) u_perturbed_base, v_perturbed_base, w_perturbed_base, theta_base,&
       pressure_base, vapor_base, drop_base, rain_base, crystal_base, snow_base,&
       hail_base, aerosol_base
    close(unit_number)

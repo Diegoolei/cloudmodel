@@ -9,7 +9,7 @@ nube31_var_list = [
     "original_x_velocity",
     "original_y_velocity",
     "original_z_velocity",
-    "potential_temperature_base",
+    "theta_base",
     "original_pressure",
     "vapor_base",
     "drop_base",
@@ -21,15 +21,15 @@ nube31_var_list = [
 ]
 
 inis_var_list = [
-    "Den0",
-    "Temp0",
-    "Tita0",
+    "air_density_z_initial",
+    "temperature_z_initial",
+    "theta_z_initial",
     "Pres00",
-    "Qvap0",
+    "vapor_z_initial",
     "cc2",
-    "aer0",
-    "UU",
-    "VV",
+    "aerosol_z_initial",
+    "u_z_initial",
+    "v_z_initial",
 ]
 
 plot_center = 10  # center of the plot
