@@ -134,10 +134,20 @@ class FileStyle:
         var_iterator = var_index * self.var_structure_size
         return self.get_var_from_data(time, var_iterator)
 
-    def show_var_dataframe(self, var: str, time: int):
-        variable = self.get_var(var, time)
-        df = pd.DataFrame(variable[:, :, 10])
+    def show_var_dataframe(self, var_array, center: tuple, axis: str):
+        match axis:
+            case "x":
+                df = pd.DataFrame(var_array[center[0][0], :, :])
+            case "y":
+                df = pd.DataFrame(var_array[:, center[1][0], :])
+            case "z":
+                df = pd.DataFrame(var_array[:, :, center[2][0]])
+            case _:
+                raise ValueError("Invalid Axis")
         print(df)
+
+    def get_var_max_value_position(self, var_array):
+        return np.where(var_array==np.max(var_array))
 
     def check_path(self, path, selected_file_name=""):
         """Checks if the path exists, if not, creates it
