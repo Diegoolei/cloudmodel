@@ -135,16 +135,19 @@ class FileStyle:
         return self.get_var_from_data(time, var_iterator)
 
     def show_var_dataframe(self, var_array, center: tuple, axis: str):
+        df = pd.DataFrame(self.center_var(var_array, center, axis))
+        print(df)
+
+    def center_var(self, var_array, center: tuple, axis: str):
         match axis:
             case "x":
-                df = pd.DataFrame(var_array[center[0][0], :, :])
+                return var_array[center[0][0], :, :]
             case "y":
-                df = pd.DataFrame(var_array[:, center[1][0], :])
+                return var_array[:, center[1][0], :]
             case "z":
-                df = pd.DataFrame(var_array[:, :, center[2][0]])
+                return var_array[:, :, center[2][0]]
             case _:
                 raise ValueError("Invalid Axis")
-        print(df)
 
     def get_var_max_value_position(self, var_array):
         return np.where(var_array==np.max(var_array))
@@ -200,13 +203,23 @@ class FileStyle:
         else:
             print(f"There is no {self.cmp_output_data_path} folder to compare with")
 
+    def live_var_animation(self, variable):
+        ax = plt.axes(projection='3d')
+        num_layers = 50
+        num_pnt = 57
+        z, x, y = np.meshgrid(np.arange(1, num_layers + 1), np.arange(num_pnt), np.arange(num_pnt), indexing='ij')
+
+        ax.scatter3D(x, y, z, c=variable, cmap='viridis')
+        plt.show()
+
     def plot_style(self, variable):
         match self.img_option:
             case ImageStyle.IMAGE.value:
                 if self.data_dimension == 3:
                     plt.imshow(
+                        self.center_var(variable, self.get_var_max_value_position(variable), "z")
                         #np.flipud(variable[:, :, plot_center])
-                        variable[:, :, plot_center])
+                        )
                 elif self.data_dimension == 2:
                     plt.imshow(variable[:, plot_center])
                 elif self.data_dimension == 1:
@@ -216,7 +229,7 @@ class FileStyle:
                 if self.data_dimension == 3:
                     cs = ax.contour(
                         #np.flipud(variable[:, :, plot_center]),
-                        variable[:, :, plot_center],
+                        self.center_var(variable, self.get_var_max_value_position(variable), "z"),
                         linewidths=0.3,
                         colors="k",
                     )
