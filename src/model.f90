@@ -18,27 +18,26 @@
 module cloud_model
 contains
    subroutine model()
-      USE cant01, only: lt1
-      USE model_var, only: tt
-      USE perdim, only: Titaa1
-      USE model_initialization, only: initialize_model
-      USE model_aux, only: vapor_advection, dinamics, negative_correction, water_calculation,&
+      use cant01, only: total_time
+      use model_var, only: current_time
+      use dinamic_var_perturbation, only: theta_base
+      use model_initialization, only: initialize_model
+      use model_aux, only: vapor_advection, dinamics, negative_correction, water_calculation,&
          microphisics_substring, floor_and_ceiling_contour, lateral_contour,&
          floor_condition_redefinition, floor_and_ceiling_contour_redefinition,&
          lateral_contour_redefinition, vapour_negative_correction, save_backup
-      USE, intrinsic :: iso_fortran_env, only : I4P=>int32, R8P=>real64
+      use, intrinsic :: iso_fortran_env, only : I4P=>int32, R8P=>real64
       use, intrinsic :: iso_fortran_env
-      USE forbear, only: bar_object
+      use forbear, only: bar_object
       implicit none
-      real(R8P)        :: x
-      real(R8P)        :: y
-      type(bar_object) :: bar
+      type(bar_object) :: progress_bar
+      real(R8P)        :: progress_percent
       call initialize_model()
-      call bar%initialize(filled_char_string='㊂', empty_char_string='●',&
-         suffix_string='| ', add_progress_percent=.true.,prefix_string='Progress |',&
-         scale_bar_color_fg='blue', scale_bar_style='underline_on', spinner_string='(  ●   )')
-      call bar%start
-      do tt=1,lt1
+      call progress_bar%initialize(filled_char_string = '㊂', empty_char_string = '●',&
+         suffix_string = '| ', add_progress_percent = .true., prefix_string = 'Progress |',&
+         scale_bar_color_fg = 'blue', scale_bar_style = 'underline_on', spinner_string = '(  ●   )')
+      call progress_bar%start
+      do current_time = 1, total_time
          call vapor_advection()
          call dinamics()
          call negative_correction()
@@ -50,14 +49,13 @@ contains
          call floor_condition_redefinition()
          call floor_and_ceiling_contour_redefinition()
          call lateral_contour_redefinition()
-         call filtro(Titaa1,.01,.01,.02)
+         call filtro(theta_base,.01,.01,.02)
          call vapour_negative_correction()
          call save_backup()
-         x = real(tt, R8P)/real(lt1, R8P)
-         call bar%update(current=x)
-         !write(*,*) '----Tiempo transcurrido:',tt,'de',lt1,'----'
+         progress_percent = real(current_time, R8P)/real(total_time, R8P)
+         call progress_bar%update(current = progress_percent)
       end do
 
-      call bar%destroy
+      call progress_bar%destroy
    end subroutine model
 end module cloud_model

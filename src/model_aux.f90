@@ -2,44 +2,46 @@ module model_aux
 contains
    subroutine vapor_advection()
       !######################## Adveccion de vapores #######################
-      USE advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
+      use advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
          advcri1, advaer1
-      USE permic, only: aer1, Qvap1, Qllu1, Qnie1, Qgra1
-      USE perdim, only: W2
-      USE dimen, only: nx1
+      use microphysics_perturbation, only: aerosol_base, vapor_base, rain_base, snow_base, hail_base
+      use dinamic_var_perturbation, only: w_perturbed_new
+      use dimensions, only: nx1
       implicit none
       integer :: i, j
       do concurrent (i=0:nx1+1, j=0:nx1+1)
-         advvap1(i,j)=W2(i,j,1)*(Qvap1(i,j,1)+Qvap1(i,j,0))/4.
+         advvap1(i,j)=w_perturbed_new(i,j,1)*(vapor_base(i,j,1)+vapor_base(i,j,0))/4.
          advgot1(i,j)=0.
-         advllu1(i,j)=W2(i,j,1)*Qllu1(i,j,1)
-         if (W2(i,j,1) > 0) advllu1(i,j)=0.
-         advaer1(i,j)=W2(i,j,1)*(aer1(i,j,1)+aer1(i,j,0))/4.
-         if(W2(i,j,1) < 0) advaer1(i,j)=advaer1(i,j)*1.5
+         advllu1(i,j)=w_perturbed_new(i,j,1)*rain_base(i,j,1)
+         if (w_perturbed_new(i,j,1) > 0) advllu1(i,j)=0.
+         advaer1(i,j)=w_perturbed_new(i,j,1)*(aerosol_base(i,j,1)+aerosol_base(i,j,0))/4.
+         if(w_perturbed_new(i,j,1) < 0) advaer1(i,j)=advaer1(i,j)*1.5
          advcri1(i,j)=0.
-         advnie1(i,j)=W2(i,j,1)*Qnie1(i,j,1)
-         if (W2(i,j,1) > 0) advnie1(i,j)=0.
-         advgra1(i,j)=W2(i,j,1)*Qgra1(i,j,1)
-         if (W2(i,j,1) > 0) advgra1(i,j)=0.
+         advnie1(i,j)=w_perturbed_new(i,j,1)*snow_base(i,j,1)
+         if (w_perturbed_new(i,j,1) > 0) advnie1(i,j)=0.
+         advgra1(i,j)=w_perturbed_new(i,j,1)*hail_base(i,j,1)
+         if (w_perturbed_new(i,j,1) > 0) advgra1(i,j)=0.
       end do
    end subroutine vapor_advection
 
    subroutine dinamics()
       !########### calculo de la dinamica y de la termodinamica ############
-      USE dimen, only: dt1, dx1, nx1, nz1
-      USE model_var, only: dden0z, ener1, s, llluneg, lcrineg, lnieneg, lgraneg,&
+      use dimensions, only: dt1, dx1, nx1, nz1
+      use model_var, only: dden0z, ener1, s, llluneg, lcrineg, lnieneg, lgraneg,&
          lvapneg, laerneg, Qvapneg, aerneg
-      USE estbas, only: Den0, Qvap0, aer0
-      USE perdim, only: W2, U2, V2, Fcalo
-      USE advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
+      use initial_z_state, only: air_density_z_initial, vapor_z_initial, aerosol_z_initial
+      use dinamic_var_perturbation, only: w_perturbed_new, u_perturbed_new, v_perturbed_new, heat_force
+      use advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
          advcri1, advvap2, advgot2, advllu2, advcri2, advnie2, advgra2, advaer1,&
          advaer2
-      USE permic, only: Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2
-      USE lmngot, only: lgot, mgot, ngot
-      USE lmnllu, only: lllu, mllu, nllu
-      USE lmncri, only: lcri, mcri, ncri
-      USE lmnnie, only: lnie, mnie, nnie
-      USE lmngra, only: lgra, mgra, ngra
+      use microphysics_perturbation, only: drop_new, rain_new,&
+         crystal_new, snow_new, hail_new, vapor_new,&
+         aerosol_new
+      use lmngot, only: lgot, mgot, ngot
+      use lmnllu, only: lllu, mllu, nllu
+      use lmncri, only: lcri, mcri, ncri
+      use lmnnie, only: lnie, mnie, nnie
+      use lmngra, only: lgra, mgra, ngra
       implicit none
       integer :: i, j, k, l, m, n
       s=0
@@ -84,7 +86,7 @@ contains
       ngra(2)=0
       do k=1,nz1-1
          n=k
-         dden0z=(Den0(k+1)-Den0(k-1))/Den0(k)
+         dden0z=(air_density_z_initial(k+1)-air_density_z_initial(k-1))/air_density_z_initial(k)
          call turbu1(n)
          do i=1,nx1
             l=i
@@ -94,14 +96,17 @@ contains
                call turbu2(l,m,n)
 
                !calculo de las inhomogeneidades para las velocidades
-               call inomo(l,m,n,dden0z)
+               call inhomogeneous_velocities(l,m,n,dden0z)
 
                !calculo de la energia cinetica
-               ener1=.5*Den0(k)*(U2(i,j,k)**2.+V2(i,j,k)**2.+W2(i,j,k)**2.)+ener1
+               ener1=.5*air_density_z_initial(k)*(&
+                  u_perturbed_new(i,j,k)**2. +&
+                  v_perturbed_new(i,j,k)**2. +&
+                  w_perturbed_new(i,j,k)**2.) + ener1
 
                !calculo de la temperatura potencial
-               call tempot(l,m,n,dden0z,Fcalo(i,j,k))
-               Fcalo(i,j,k)=0.
+               call tempot(l,m,n,dden0z,heat_force(i,j,k))
+               heat_force(i,j,k)=0.
 
                !dinamica del vapor y de las gotitas
                call dvapor(l,m,n)
@@ -120,7 +125,7 @@ contains
                advaer1(i,j)=advaer2(i,j)
 
                !limites de la nube
-               if(Qgot2(i,j,k) /= 0) then
+               if(drop_new(i,j,k) /= 0) then
                   if (i < lgot(1)) lgot(1)=i
                   if (i > lgot(2)) lgot(2)=i
                   if (j < mgot(1)) mgot(1)=j
@@ -131,7 +136,7 @@ contains
                endif
 
                !limites de la lluvia
-               if(Qllu2(i,j,k) /= 0) then
+               if(rain_new(i,j,k) /= 0) then
                   if (i < lllu(1)) lllu(1)=i
                   if (i > lllu(2)) lllu(2)=i
                   if (j < mllu(1)) mllu(1)=j
@@ -142,7 +147,7 @@ contains
                endif
 
                !limites de los cristales
-               if(Qcri2(i,j,k) /= 0) then
+               if(crystal_new(i,j,k) /= 0) then
                   if (i < lcri(1)) lcri(1)=i
                   if (i > lcri(2)) lcri(2)=i
                   if (j < mcri(1)) mcri(1)=j
@@ -153,7 +158,7 @@ contains
                endif
 
                !limites de la nieve
-               if(Qnie2(i,j,k) /= 0) then
+               if(snow_new(i,j,k) /= 0) then
                   if (i < lnie(1)) lnie(1)=i
                   if (i > lnie(2)) lnie(2)=i
                   if (j < mnie(1)) mnie(1)=j
@@ -164,7 +169,7 @@ contains
                endif
 
                !limites del granizo
-               if(Qgra2(i,j,k) /= 0) then
+               if(hail_new(i,j,k) /= 0) then
                   if (i < lgra(1)) lgra(1)=i
                   if (i > lgra(2)) lgra(2)=i
                   if (j < mgra(1)) mgra(1)=j
@@ -174,13 +179,13 @@ contains
                   lgraneg=1
                endif
 
-               if(Qvap0(k)+Qvap2(i,j,k) < 0) then
-                  Qvapneg=Qvapneg+Qvap0(k)+Qvap2(i,j,k)
+               if(vapor_z_initial(k)+vapor_new(i,j,k) < 0) then
+                  Qvapneg=Qvapneg+vapor_z_initial(k)+vapor_new(i,j,k)
                   lvapneg=1
                endif
 
-               if(aer0(k)+aer2(i,j,k) < 0) then
-                  aerneg=aerneg+aer0(k)+aer2(i,j,k)
+               if(aerosol_z_initial(k)+aerosol_new(i,j,k) < 0) then
+                  aerneg=aerneg+aerosol_z_initial(k)+aerosol_new(i,j,k)
                   laerneg=1
                endif
             end do
@@ -190,7 +195,7 @@ contains
    end subroutine dinamics
 
    subroutine negative_correction
-      USE model_var, only: s, llluneg, lcrineg, lnieneg, lgraneg, lvapneg, laerneg,&
+      use model_var, only: s, llluneg, lcrineg, lnieneg, lgraneg, lvapneg, laerneg,&
          Qvapneg, aerneg
       implicit none
       if(s >= 1) call corgot
@@ -204,40 +209,43 @@ contains
 
    subroutine water_calculation
       !primer calculo de agua (sin laterales)
-      USE dimen, only: nx1, nz1
-      USE model_var, only: vapt1, gott1, aert1
-      USE permic, only: Qvap2, Qgot2, aer2
-      USE estbas, only: Qvap0
+      use dimensions, only: nx1, nz1
+      use model_var, only: vapt1, gott1, aert1
+      use microphysics_perturbation, only: vapor_new, drop_new, aerosol_new
+      use initial_z_state, only: vapor_z_initial
       implicit none
       integer :: i, j, k
       vapt1=0.
       gott1=0.
       aert1=0.
       do concurrent (i=1:nx1, j=1:nx1, k=1:nz1-1)
-         vapt1=vapt1+Qvap2(i,j,k)
-         gott1=gott1+Qgot2(i,j,k)
-         aert1=aert1+aer2(i,j,k)
+         vapt1=vapt1+vapor_new(i,j,k)
+         gott1=gott1+drop_new(i,j,k)
+         aert1=aert1+aerosol_new(i,j,k)
 
-         if(Qvap2(i,j,k)+Qvap0(k) < 0) then
+         if(vapor_new(i,j,k)+vapor_z_initial(k) < 0) then
             stop
          endif
       end do
    end subroutine water_calculation
 
    subroutine microphisics_substring
-      USE dimen, only: nx1, nz1, dt1, dx1
-      USE model_var, only: aux, P, T, Qvap, Naer, densi, Dv, iT, aux2, Vis,&
-         esvs, elvs, Lvl, Lsl, Lvs, Eaccn, Eaucn, Eacng, nu, lll, tt, Qliq, e1,&
-         rl, rs, yy, daer, dqgot, dqcri, Taux, totnuc, vapt2, gott2, aert2,&
-         qgotaux, qvapaux, qlluaux, qcriaux, qnieaux, qgraaux, t2, Lsl00, Fcal,&
-         daer2, totmic, vapt3, gott3, aert3, ener2, ener3, ener4, ener5, qv, qg,&
-         daitot
-      USE perdim, only: Titaa2, Pres2, Tempa1, Fcalo
-      USE estbas, only: Qvap0, aer0, Tita0, Temp0, Pres00
-      USE cant01, only: ikapa, AA, lt2
-      USE const, only: P00, Rd, Dv0, Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs,&
+      use dimensions, only: nx1, nz1, dt1, dx1
+      use model_var, only: aux, P, T, Qvap, Naer, densi, Dv, iT, aux2, Vis,&
+         esvs, elvs, Lvl, Lsl, Lvs, Eaccn, Eaucn, Eacng, nu, lll, current_time,&
+         Qliq, e1, rl, rs, yy, daer, dqgot, dqcri, Taux, totnuc, vapt2, gott2,&
+         aert2, qgotaux, qvapaux, qlluaux, qcriaux, qnieaux, qgraaux, t2, Lsl00,&
+         Fcal, daer2, totmic, vapt3, gott3, aert3, ener2, ener3, ener4, ener5,&
+         qv, qg, daitot
+      use dinamic_var_perturbation, only: theta_new, pressure_new,&
+         temperature, heat_force
+      use initial_z_state, only: vapor_z_initial, aerosol_z_initial, theta_z_initial, temperature_z_initial, Pres00
+      use cant01, only: ikapa, AA, lt2
+      use constants, only: P00, Rd, Dv0, Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs,&
          Eacrcn, Eautcn, T0, Rv, G, Cp
-      USE permic, only: Qvap2, aer2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2
+      use microphysics_perturbation, only: vapor_new, aerosol_new,&
+         drop_new, rain_new, crystal_new,&
+         snow_new, hail_new
       implicit none
       integer :: k, n, i, l, j, m
       !####################### Sublazo Microfisico #########################
@@ -263,12 +271,12 @@ contains
             do j=1,nx1
                m=j
                !calculo de T,P,Densi,Dv,Vis
-               aux=Pres00(k)+Pres2(i,j,k)
+               aux=Pres00(k)+pressure_new(i,j,k)
                P=aux**ikapa*P00
-               T=(Tita0(k)+Titaa2(i,j,k))*aux
-               Tempa1(i,j,k)=T-Temp0(k)
-               Qvap=Qvap0(k)+Qvap2(i,j,k)
-               Naer=aer0(k)+aer2(i,j,k)
+               T=(theta_z_initial(k)+theta_new(i,j,k))*aux
+               temperature(i,j,k)=T-temperature_z_initial(k)
+               Qvap=vapor_z_initial(k)+vapor_new(i,j,k)
+               Naer=aerosol_z_initial(k)+aerosol_new(i,j,k)
                densi=P/T/Rd-AA*Qvap
                Dv=Dv0*(T/273.15)**1.94*(P00/P)
 
@@ -292,9 +300,9 @@ contains
                nu=Vis/densi
 
                !nucleacion (de ser necesario tiene otro paso de tiempo)
-               lll=tt
+               lll=current_time
 
-               Qliq=Qgot2(i,j,k)
+               Qliq=drop_new(i,j,k)
                e1=Qvap*Rv*T
                rl=(e1-elvs)/elvs
                rs=(e1-esvs)/esvs
@@ -302,8 +310,8 @@ contains
 
                if ((rl > 1e-3 .or. rs > 1e-3).and.Naer > 0) then
                   call nuclea(Qvap,Qliq,Naer,T,densi,e1,elvs,esvs,rl,rs,Lvl,Lvs,daer,dqgot,dqcri)
-                  Taux=T-Temp0(k)-Tempa1(i,j,k)
-                  Titaa2(i,j,k)=T/aux-Tita0(k)
+                  Taux=T-temperature_z_initial(k)-temperature(i,j,k)
+                  theta_new(i,j,k)=T/aux-theta_z_initial(k)
                   if (dqgot > 0) yy=1
                else
                   Taux=0.
@@ -315,25 +323,30 @@ contains
                totnuc=totnuc+daer
 
                !segundo calculo de agua (sin laterales)
-               vapt2=vapt2+Qvap2(i,j,k)
-               gott2=gott2+Qgot2(i,j,k)
-               aert2=aert2+aer2(i,j,k)
-               if (Qgot2(i,j,k) > 0 .or. dqgot > 0 .or.Qllu2(i,j,k) > 0 .or. Qcri2(i,j,k) > 0 .or.Qnie2(i,j,k) > 0) then
-                  qgotaux=Qgot2(i,j,k)
-                  if (Qgot2(i,j,k) == 0) qgotaux=0d0
-                  qvapaux=Qvap2(i,j,k)+Qvap0(k)
-                  qlluaux=Qllu2(i,j,k)
-                  if (Qllu2(i,j,k) == 0) qlluaux=0d0
-                  qcriaux=Qcri2(i,j,k)
-                  if (Qcri2(i,j,k) == 0) then
+               vapt2=vapt2+vapor_new(i,j,k)
+               gott2=gott2+drop_new(i,j,k)
+               aert2=aert2+aerosol_new(i,j,k)
+               if (drop_new(i,j,k) > 0 &
+                  .or. dqgot > 0 &
+                  .or. rain_new(i,j,k) > 0 &
+                  .or. crystal_new(i,j,k) > 0 &
+                  .or. snow_new(i,j,k) > 0) then
+
+                  qgotaux=drop_new(i,j,k)
+                  if (drop_new(i,j,k) == 0) qgotaux=0d0
+                  qvapaux=vapor_new(i,j,k)+vapor_z_initial(k)
+                  qlluaux=rain_new(i,j,k)
+                  if (rain_new(i,j,k) == 0) qlluaux=0d0
+                  qcriaux=crystal_new(i,j,k)
+                  if (crystal_new(i,j,k) == 0) then
                      qcriaux=0d0
                   endif
-                  qnieaux=Qnie2(i,j,k)
-                  if (Qnie2(i,j,k) == 0) qnieaux=0d0
-                  qgraaux=Qgra2(i,j,k)
-                  if (Qgra2(i,j,k) == 0) qgraaux=0d0
-                  Naer=aer2(i,j,k)+aer0(k)
-                  T=Tempa1(i,j,k)+Temp0(k)
+                  qnieaux=snow_new(i,j,k)
+                  if (snow_new(i,j,k) == 0) qnieaux=0d0
+                  qgraaux=hail_new(i,j,k)
+                  if (hail_new(i,j,k) == 0) qgraaux=0d0
+                  Naer=aerosol_new(i,j,k)+aerosol_z_initial(k)
+                  T=temperature(i,j,k)+temperature_z_initial(k)
                   do t2=1,lt2
                      qgotaux=qgotaux+dqgot/float(lt2)
                      qcriaux=qcriaux+dqcri/float(lt2)
@@ -346,50 +359,50 @@ contains
                      aux2=T-iT
                      elvs=Telvs(iT)*(1-aux2)+Telvs(iT+1)*aux2
                      esvs=Tesvs(iT)*(1-aux2)+Tesvs(iT+1)*aux2
-                     call microfis(elvs,esvs,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,&
-                        Lsl00,Fcal,n,qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,&
-                        qgraaux,Naer,daer2,nu,yy)
-                     Fcalo(l,m,n)=Fcalo(l,m,n)+Fcal/dt1/densi
+                     call microfis(elvs, esvs, Lvl, Lvs, Lsl, T, Dv, Eaccn,&
+                        Eaucn, Eacng, Lsl00, Fcal, n, qvapaux, qgotaux, qlluaux,&
+                        qcriaux,qnieaux, qgraaux, Naer, daer2, nu, yy)
+                     heat_force(l,m,n)=heat_force(l,m,n)+Fcal/dt1/densi
                      Naer=Naer+daer2
                      totmic=totmic+daer2
                   end do
 
-                  Qgot2(i,j,k)=qgotaux
-                  Qllu2(i,j,k)=qlluaux
-                  Qcri2(i,j,k)=qcriaux
-                  Qnie2(i,j,k)=qnieaux
-                  Qgra2(i,j,k)=qgraaux
-                  Qvap2(i,j,k)=qvapaux-Qvap0(k)
-                  aer2(i,j,k)=Naer-aer0(k)
-                  Tempa1(i,j,k)=T-Temp0(k)
+                  drop_new(i,j,k)=qgotaux
+                  rain_new(i,j,k)=qlluaux
+                  crystal_new(i,j,k)=qcriaux
+                  snow_new(i,j,k)=qnieaux
+                  hail_new(i,j,k)=qgraaux
+                  vapor_new(i,j,k)=qvapaux-vapor_z_initial(k)
+                  aerosol_new(i,j,k)=Naer-aerosol_z_initial(k)
+                  temperature(i,j,k)=T-temperature_z_initial(k)
 
                endif
 
-               if (Tita0(k) < abs(Titaa2(i,j,k))+200.or.Temp0(k) < abs(Tempa1(i,j,k))+200) then
+               if (theta_z_initial(k) < abs(theta_new(i,j,k))+200.or.temperature_z_initial(k) < abs(temperature(i,j,k))+200) then
                   stop
                endif
 
-               if(aer2(i,j,k)+aer0(k) <= 0) then
+               if(aerosol_new(i,j,k)+aerosol_z_initial(k) <= 0) then
 
-                  if (aer2(i,j,k)+aer0(k) < -aer0(k)*.05) then
+                  if (aerosol_new(i,j,k)+aerosol_z_initial(k) < -aerosol_z_initial(k)*.05) then
                      stop
                   endif
 
-                  aer2(i,j,k)=-aer0(k)
+                  aerosol_new(i,j,k)=-aerosol_z_initial(k)
                endif
 
                !tercer calculo de agua (sin laterales)
-               vapt3=vapt3+Qvap2(i,j,k)
-               gott3=gott3+Qgot2(i,j,k)
-               aert3=aert3+aer2(i,j,k)
+               vapt3=vapt3+vapor_new(i,j,k)
+               gott3=gott3+drop_new(i,j,k)
+               aert3=aert3+aerosol_new(i,j,k)
 
                !calculo de la energia
                ener2=densi*G*k*dx1+ener2
                ener3=densi*(Cp-Rd)*T+ener3
                ener4=P+ener4
-               ener5=(Qvap2(i,j,k)+Qgot2(i,j,k))*G*k*dx1+ener5
-               qv=Qvap2(i,j,k)+qv
-               qg=Qgot2(i,j,k)+qg
+               ener5=(vapor_new(i,j,k)+drop_new(i,j,k))*G*k*dx1+ener5
+               qv=vapor_new(i,j,k)+qv
+               qg=drop_new(i,j,k)+qg
                daitot=densi+daitot
             end do
          end do
@@ -397,64 +410,70 @@ contains
    end subroutine microphisics_substring
 
    subroutine floor_and_ceiling_contour
-      USE dimen, only: nx1, nz1, dt1, dx1
-      USE perdim, only: Titaa2, Titaa1, W2, U2, V2
-      USE cant01, only: dx2
-      USE estbas, only: Tita0, Qvap0, aer0
-      USE model_var, only: auxx, auxy, auxz, turbu, aeraux, lapla, cks, Qvap,&
+      use dimensions, only: nx1, nz1, dt1, dx1
+      use dinamic_var_perturbation, only: theta_new, theta_base,&
+         w_perturbed_new, u_perturbed_new, v_perturbed_new
+      use cant01, only: dx2
+      use initial_z_state, only: theta_z_initial, vapor_z_initial, aerosol_z_initial
+      use model_var, only: auxx, auxy, auxz, turbu, aeraux, lapla, cks, Qvap,&
          qv, qg
-      USE permic, only: Qvap1, Qvap2, Qgot2, Qcri2, Qllu2, Qnie2, Qgra2, aer1,&
-         aer2
+      use microphysics_perturbation, only: vapor_base, vapor_new,&
+         drop_new, crystal_new, rain_new,&
+         snow_new, hail_new, aerosol_base, aerosol_new
       implicit none
       integer :: i, j
 
-      Qvap = (qv+qg)/nx1**2.*nz1*.1
+      Qvap=(qv+qg)/nx1**2.*nz1*.1
       !contornos en el piso y en el techo
       do concurrent (i=1:nx1, j=1:nx1)
-         Titaa2(i,j,0)=-W2(i,j,1)*(Tita0(0)+Tita0(1))*dt1/dx2+Titaa1(i,j,0)
-         Titaa2(i,j,nz1)=Titaa2(i,j,nz1-1)
+         theta_new(i,j,0)=theta_base(i,j,0) -&
+            w_perturbed_new(i,j,1)*(theta_z_initial(0)+theta_z_initial(1))*dt1/dx2
+         theta_new(i,j,nz1)=theta_new(i,j,nz1-1)
 
          !suponemos que las velocidades horizontales a nivel de piso son
          !iguales a 1/4 de la correspondiente en el nivel 1
-         auxx=((U2(i+1,j,1)+U2(i,j,1))*(Qvap1(i+1,j,0)+Qvap1(i,j,0))&
-            -(U2(i-1,j,1)+U2(i,j,1))*(Qvap1(i-1,j,0)+Qvap1(i,j,0)))&
+         !#TODO: Check this
+         auxx=((u_perturbed_new(i+1,j,1) + u_perturbed_new(i,j,1))*(vapor_base(i+1,j,0) + vapor_base(i,j,0))&
+            -(u_perturbed_new(i-1,j,1)+u_perturbed_new(i,j,1))*(vapor_base(i-1,j,0)+vapor_base(i,j,0)))&
             /4.*.25
-         auxy=((V2(i,j+1,1)+V2(i,j,1))*(Qvap1(i,j+1,0)+Qvap1(i,j,0))&
-            -(V2(i,j-1,1)+V2(i,j,1))*(Qvap1(i,j-1,0)+Qvap1(i,j,0)))&
+
+         auxy=((v_perturbed_new(i,j+1,1)+v_perturbed_new(i,j,1))*(vapor_base(i,j+1,0)+vapor_base(i,j,0))&
+            -(v_perturbed_new(i,j-1,1)+v_perturbed_new(i,j,1))*(vapor_base(i,j-1,0)+vapor_base(i,j,0)))&
             /4.*.25
-         auxz=W2(i,j,1)*((Qvap1(i,j,1)+Qvap1(i,j,0))+Qvap0(1)+Qvap0(0))/2.*.5
 
-         Qvap2(i,j,nz1)=Qvap2(i,j,nz1-1)
+         auxz=w_perturbed_new(i,j,1)*((vapor_base(i,j,1)+vapor_base(i,j,0))+vapor_z_initial(1)+vapor_z_initial(0))/2.*.5
 
-         Qgot2(i,j,0)=Qgot2(i,j,1)
-         Qgot2(i,j,nz1)=Qgot2(i,j,nz1-1)
+         vapor_new(i,j,nz1)=vapor_new(i,j,nz1-1)
 
-         Qcri2(i,j,0)=Qcri2(i,j,1)
-         Qcri2(i,j,nz1)=Qcri2(i,j,nz1-1)
+         drop_new(i,j,0)=drop_new(i,j,1)
+         drop_new(i,j,nz1)=drop_new(i,j,nz1-1)
+
+         crystal_new(i,j,0)=crystal_new(i,j,1)
+         crystal_new(i,j,nz1)=crystal_new(i,j,nz1-1)
 
          !Para que no se acumulen el piso
-         Qllu2(i,j,0)=Qllu2(i,j,1)/2.
-         Qllu2(i,j,nz1)=Qllu2(i,j,nz1-1)
+         rain_new(i,j,0)=rain_new(i,j,1)/2.
+         rain_new(i,j,nz1)=rain_new(i,j,nz1-1)
 
-         Qnie2(i,j,0)=Qnie2(i,j,1)
-         Qnie2(i,j,nz1)=Qnie2(i,j,nz1-1)
+         snow_new(i,j,0)=snow_new(i,j,1)
+         snow_new(i,j,nz1)=snow_new(i,j,nz1-1)
 
          !Para que no se acumulen el piso
-         Qgra2(i,j,0)=Qgra2(i,j,1)/2.
-         Qgra2(i,j,nz1)=Qgra2(i,j,nz1-1)
+         hail_new(i,j,0)=hail_new(i,j,1)/2.
+         hail_new(i,j,nz1)=hail_new(i,j,nz1-1)
 
          !suponemos que las velocidades horizontales a nivel de piso son
          !iguales a 1/4 de la correspondiente en el nivel 1
 
-         auxx=((U2(i+1,j,1)+U2(i,j,1))*(aer1(i+1,j,0)+aer1(i,j,0))&
-            -(U2(i-1,j,1)+U2(i,j,1))*(aer1(i-1,j,0)+aer1(i,j,0)))&
+         auxx=((u_perturbed_new(i+1,j,1)+u_perturbed_new(i,j,1))*(aerosol_base(i+1,j,0)+aerosol_base(i,j,0))&
+            -(u_perturbed_new(i-1,j,1)+u_perturbed_new(i,j,1))*(aerosol_base(i-1,j,0)+aerosol_base(i,j,0)))&
             /4.*.25
-         auxy=((V2(i,j+1,1)+V2(i,j,1))*(aer1(i,j+1,0)+aer1(i,j,0))&
-            -(V2(i,j-1,1)+V2(i,j,1))*(aer1(i,j-1,0)+aer1(i,j,0)))&
+         auxy=((v_perturbed_new(i,j+1,1)+v_perturbed_new(i,j,1))*(aerosol_base(i,j+1,0)+aerosol_base(i,j,0))&
+            -(v_perturbed_new(i,j-1,1)+v_perturbed_new(i,j,1))*(aerosol_base(i,j-1,0)+aerosol_base(i,j,0)))&
             /4.*.25
-         auxz=W2(i,j,1)*((aer1(i,j,1)+aer1(i,j,0))+aer0(1)+aer0(0))/2.*.5
+         auxz=w_perturbed_new(i,j,1)*((aerosol_base(i,j,1)+aerosol_base(i,j,0))+aerosol_z_initial(1)+aerosol_z_initial(0))/2.*.5
 
-         if (W2(i,j,0) > 0) then
+         if (w_perturbed_new(i,j,0) > 0) then
             aeraux=-((auxx+auxy)+2.*auxz)*dt1/dx1
          else
             !se refleja un 25 % de los aerosoles que caen
@@ -463,320 +482,380 @@ contains
 
          !agregamos un termino de turbulencia para los aerosoles
          !a nivel de piso
-         turbu=cks/dx1*.25*(abs(U2(i,j,1))+abs(V2(i,j,1))+2.*abs(W2(i,j,1)))
-         lapla=((aer1(i+1,j,0)+aer1(i-1,j,0))+(aer1(i,j+1,0)+aer1(i,j-1,0)+aer1(i,j,1)))-5.*aer1(i,j,0)
-         lapla=lapla+(aer0(1)-aer0(0))
+         turbu=cks/dx1*.25 * (abs(u_perturbed_new(i,j,1))&
+            + abs(v_perturbed_new(i,j,1))&
+            + 2.*abs(w_perturbed_new(i,j,1)))
 
-         aer2(i,j,0)=aeraux+aer1(i,j,0)+turbu*lapla
+         lapla=((aerosol_base(i+1,j,0)+aerosol_base(i-1,j,0))&
+            + (aerosol_base(i,j+1,0)+aerosol_base(i,j-1,0)&
+            + aerosol_base(i,j,1)))&
+            - 5.*aerosol_base(i,j,0)
 
-         aer2(i,j,nz1)=aer2(i,j,nz1-1)
+         lapla=lapla + (aerosol_z_initial(1) - aerosol_z_initial(0))
+
+         aerosol_new(i,j,0)=aeraux+aerosol_base(i,j,0)+turbu*lapla
+
+         aerosol_new(i,j,nz1)=aerosol_new(i,j,nz1-1)
       end do
    end subroutine floor_and_ceiling_contour
 
    subroutine lateral_contour
       !contornos laterales
-      USE dimen, only: nx1, nz1
-      USE perdim, only: Titaa2
-      USE permic, only: Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer2
+      use dimensions, only: nx1, nz1
+      use dinamic_var_perturbation, only: theta_new
+      use microphysics_perturbation, only: vapor_new, drop_new,&
+         rain_new, crystal_new, snow_new,&
+         hail_new, aerosol_new
       implicit none
       integer :: j, k
       do concurrent (k=1:nz1-1, j=1:nx1)
-         Titaa2(0,j,k)=Titaa2(1,j,k)
-         Titaa2(nx1+1,j,k)=Titaa2(nx1,j,k)
-         Titaa2(j,0,k)=Titaa2(j,1,k)
-         Titaa2(j,nx1+1,k)=Titaa2(j,nx1,k)
-         Qvap2(0,j,k)=0.
-         Qvap2(nx1+1,j,k)=0.
-         Qvap2(j,0,k)=0.
-         Qvap2(j,nx1+1,k)=0.
-         Qgot2(0,j,k)=Qgot2(1,j,k)
-         Qgot2(nx1+1,j,k)=Qgot2(nx1,j,k)
-         Qgot2(j,0,k)=Qgot2(j,1,k)
-         Qgot2(j,nx1+1,k)=Qgot2(j,nx1,k)
-         Qllu2(0,j,k)=0.
-         Qllu2(nx1+1,j,k)=0.
-         Qllu2(j,0,k)=0.
-         Qllu2(j,nx1+1,k)=0.
-         Qcri2(0,j,k)=Qcri2(1,j,k)
-         Qcri2(nx1+1,j,k)=Qcri2(nx1,j,k)
-         Qcri2(j,0,k)=Qcri2(j,1,k)
-         Qcri2(j,nx1+1,k)=Qcri2(j,nx1,k)
-         Qnie2(0,j,k)=Qnie2(1,j,k)
-         Qnie2(nx1+1,j,k)=Qnie2(nx1,j,k)
-         Qnie2(j,0,k)=Qnie2(j,1,k)
-         Qnie2(j,nx1+1,k)=Qnie2(j,nx1,k)
-         Qgra2(0,j,k)=0.
-         Qgra2(nx1+1,j,k)=0.
-         Qgra2(j,0,k)=0.
-         Qgra2(j,nx1+1,k)=0.
-         aer2(0,j,k)=aer2(1,j,k)
-         aer2(nx1+1,j,k)=aer2(nx1,j,k)
-         aer2(j,0,k)=aer2(j,1,k)
-         aer2(j,nx1+1,k)=aer2(j,nx1,k)
+         theta_new(0,j,k)=theta_new(1,j,k)
+         theta_new(nx1+1,j,k)=theta_new(nx1,j,k)
+         theta_new(j,0,k)=theta_new(j,1,k)
+         theta_new(j,nx1+1,k)=theta_new(j,nx1,k)
+         vapor_new(0,j,k)=0.
+         vapor_new(nx1+1,j,k)=0.
+         vapor_new(j,0,k)=0.
+         vapor_new(j,nx1+1,k)=0.
+         drop_new(0,j,k)=drop_new(1,j,k)
+         drop_new(nx1+1,j,k)=drop_new(nx1,j,k)
+         drop_new(j,0,k)=drop_new(j,1,k)
+         drop_new(j,nx1+1,k)=drop_new(j,nx1,k)
+         rain_new(0,j,k)=0.
+         rain_new(nx1+1,j,k)=0.
+         rain_new(j,0,k)=0.
+         rain_new(j,nx1+1,k)=0.
+         crystal_new(0,j,k)=crystal_new(1,j,k)
+         crystal_new(nx1+1,j,k)=crystal_new(nx1,j,k)
+         crystal_new(j,0,k)=crystal_new(j,1,k)
+         crystal_new(j,nx1+1,k)=crystal_new(j,nx1,k)
+         snow_new(0,j,k)=snow_new(1,j,k)
+         snow_new(nx1+1,j,k)=snow_new(nx1,j,k)
+         snow_new(j,0,k)=snow_new(j,1,k)
+         snow_new(j,nx1+1,k)=snow_new(j,nx1,k)
+         hail_new(0,j,k)=0.
+         hail_new(nx1+1,j,k)=0.
+         hail_new(j,0,k)=0.
+         hail_new(j,nx1+1,k)=0.
+         aerosol_new(0,j,k)=aerosol_new(1,j,k)
+         aerosol_new(nx1+1,j,k)=aerosol_new(nx1,j,k)
+         aerosol_new(j,0,k)=aerosol_new(j,1,k)
+         aerosol_new(j,nx1+1,k)=aerosol_new(j,nx1,k)
       end do
    end subroutine lateral_contour
 
    subroutine floor_condition_redefinition()
-      USE dimen, only: nx1, nz1, dt1, dx1
-      USE perdim, only: Titaa2, Titaa1, W2
-      USE cant01, only: pro3, pro4, pro1, pro2
-      USE permic, only: Qvap1, Qvap2, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, aer1,&
-         aer2, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1
-      USE estbas, only: aer0
-      USE model_var, only: aeraux
+      use dimensions, only: nx1, nz1, dt1, dx1
+      use dinamic_var_perturbation, only: theta_new, theta_base,&
+         w_perturbed_new
+      use cant01, only: pro3, pro4, pro1, pro2
+      use microphysics_perturbation, only: vapor_base, vapor_new,&
+         drop_new, rain_new, crystal_new,&
+         snow_new, hail_new, aerosol_base, aerosol_new,&
+         drop_base, rain_base, crystal_base, snow_base, hail_base
+      use initial_z_state, only: aerosol_z_initial
+      use model_var, only: aeraux
       implicit none
       integer :: i, j, k
       !*** modificada las condiciones en el piso
       !Redefinicion
       do concurrent (i=1:nx1, j=1:nx1)
          k=0
-         Titaa1(i,j,k)=pro3*Titaa2(i,j,k)+&
-            pro4*((Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+(Titaa2(i,j+1,k)+Titaa2(i,j-1,k)))
+         theta_base(i,j,k)=pro3*theta_new(i,j,k)+&
+            pro4*(&
+            (theta_new(i+1,j,k) + theta_new(i-1,j,k)) +&
+            (theta_new(i,j+1,k) + theta_new(i,j-1,k)))
 
-         if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
+         if (abs(theta_base(i,j,k)) < 1e-10) theta_base(i,j,k)=0
 
-         Qvap1(i,j,k)=pro3*Qvap2(i,j,k)+&
-            pro4*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+(Qvap2(i,j+1,k)+Qvap2(i,j-1,k)))
+         vapor_base(i,j,k)=pro3*vapor_new(i,j,k)&
+            + pro4*(&
+            (vapor_new(i+1,j,k) + vapor_new(i-1,j,k)) +&
+            (vapor_new(i,j+1,k) + vapor_new(i,j-1,k)))
 
 
-         if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
+         if (abs(vapor_base(i,j,k)) < 1e-10) vapor_base(i,j,k)=0
 
-         Qgot1(i,j,k)=pro3*Qgot2(i,j,k)+&
-            pro4*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+(Qgot2(i,j+1,k)+Qgot2(i,j-1,k)))
+         drop_base(i,j,k)=pro3*drop_new(i,j,k) +&
+            pro4*(&
+            (drop_new(i+1,j,k) + drop_new(i-1,j,k)) +&
+            (drop_new(i,j+1,k) + drop_new(i,j-1,k)))
 
-         if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
+         if (drop_base(i,j,k) < 1e-10) drop_base(i,j,k)=0
 
-         Qllu1(i,j,k)=Qllu2(i,j,k)
+         rain_base(i,j,k)=rain_new(i,j,k)
 
-         if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
+         if (rain_base(i,j,k) < 1e-10) rain_base(i,j,k)=0
 
-         Qcri1(i,j,k)=pro3*Qcri2(i,j,k)+&
-            pro4*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+(Qcri2(i,j+1,k)+Qcri2(i,j-1,k)))
+         crystal_base(i,j,k)=pro3*crystal_new(i,j,k) +&
+            pro4*(&
+            (crystal_new(i+1,j,k) + crystal_new(i-1,j,k)) +&
+            (crystal_new(i,j+1,k) + crystal_new(i,j-1,k)))
 
-         if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
+         if (crystal_base(i,j,k) < 1e-10) crystal_base(i,j,k)=0
 
-         Qnie1(i,j,k)=pro3*Qnie2(i,j,k)+pro4*((Qnie2(i+1,j,k)&
-            +Qnie2(i-1,j,k))+(Qnie2(i,j+1,k)+Qnie2(i,j-1,k)))
+         snow_base(i,j,k)=pro3*snow_new(i,j,k)+&
+            pro4*(&
+            (snow_new(i+1,j,k) + snow_new(i-1,j,k)) +&
+            (snow_new(i,j+1,k) + snow_new(i,j-1,k)))
 
-         if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
+         if (snow_base(i,j,k) < 1e-10) snow_base(i,j,k)=0
 
-         Qgra1(i,j,k)=Qgra2(i,j,k)
+         hail_base(i,j,k)=hail_new(i,j,k)
 
-         if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
+         if (hail_base(i,j,k) < 1e-10) hail_base(i,j,k)=0
 
-         aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
+         aerosol_base(i,j,k)=pro3*aerosol_new(i,j,k) +&
+            pro4*(&
+            (aerosol_new(i+1,j,k) + aerosol_new(i-1,j,k))+&
+            (aerosol_new(i,j+1,k) + aerosol_new(i,j-1,k)))
 
          !correccion cambiando la absorcion de aerosoles
-         if ((Qllu1(i,j,1)+Qgra1(i,j,1)) > 1e-6 .and.W2(i,j,1) < 0) then
-            aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
-            aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
+         if ((rain_base(i,j,1)+hail_base(i,j,1)) > 1e-6 .and.w_perturbed_new(i,j,1) < 0) then
+            aeraux=-w_perturbed_new(i,j,1)*.5*dt1/(dx1/2)
+            aerosol_base(i,j,k)=aerosol_base(i,j,k)-(aerosol_base(i,j,k)+aerosol_z_initial(k))*aeraux
          endif
 
-         if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
+         if (abs(aerosol_base(i,j,k)) < 1e-10) aerosol_base(i,j,k)=0
 
 
          do concurrent(k=1:nz1-1)
-            Titaa1(i,j,k)=pro1*Titaa2(i,j,k)+&
+            theta_base(i,j,k)=pro1*theta_new(i,j,k) +&
                pro2*(&
-               (Titaa2(i+1,j,k)+Titaa2(i-1,j,k))+&
-               (Titaa2(i,j+1,k)+Titaa2(i,j-1,k))+&
-               Titaa2(i,j,k+1)+Titaa2(i,j,k-1))
+               (theta_new(i+1,j,k) + theta_new(i-1,j,k))+&
+               (theta_new(i,j+1,k) + theta_new(i,j-1,k))+&
+               theta_new(i,j,k+1) +&
+               theta_new(i,j,k-1))
 
-            if (abs(Titaa1(i,j,k)) < 1e-10) Titaa1(i,j,k)=0
+            if (abs(theta_base(i,j,k)) < 1e-10) theta_base(i,j,k)=0
 
-            Qvap1(i,j,k)=pro1*Qvap2(i,j,k)+&
-               pro2*((Qvap2(i+1,j,k)+Qvap2(i-1,j,k))+&
-               (Qvap2(i,j+1,k)+Qvap2(i,j-1,k))+&
-               Qvap2(i,j,k+1)+Qvap2(i,j,k-1))
+            vapor_base(i,j,k)=pro1*vapor_new(i,j,k) +&
+               pro2*(&
+               (vapor_new(i+1,j,k) + vapor_new(i-1,j,k)) +&
+               (vapor_new(i,j+1,k) + vapor_new(i,j-1,k)) +&
+               vapor_new(i,j,k+1) +&
+               vapor_new(i,j,k-1))
 
-            if (abs(Qvap1(i,j,k)) < 1e-10) Qvap1(i,j,k)=0
+            if (abs(vapor_base(i,j,k)) < 1e-10) vapor_base(i,j,k)=0
 
-            Qgot1(i,j,k)=pro1*Qgot2(i,j,k)+&
-               pro2*((Qgot2(i+1,j,k)+Qgot2(i-1,j,k))+&
-               (Qgot2(i,j+1,k)+Qgot2(i,j-1,k))+&
-               Qgot2(i,j,k+1)+Qgot2(i,j,k-1))
+            drop_base(i,j,k)=pro1*drop_new(i,j,k) +&
+               pro2*(&
+               (drop_new(i+1,j,k) + drop_new(i-1,j,k)) +&
+               (drop_new(i,j+1,k) + drop_new(i,j-1,k)) +&
+               drop_new(i,j,k+1) +&
+               drop_new(i,j,k-1))
 
-            if (Qgot1(i,j,k) < 1e-10) Qgot1(i,j,k)=0
+            if (drop_base(i,j,k) < 1e-10) drop_base(i,j,k)=0
 
-            Qllu1(i,j,k)=pro1*Qllu2(i,j,k)+&
-               pro2*((Qllu2(i+1,j,k)+Qllu2(i-1,j,k))+&
-               (Qllu2(i,j+1,k)+Qllu2(i,j-1,k))+Qllu2(i,j,k+1)+Qllu2(i,j,k-1))
+            rain_base(i,j,k)=pro1*rain_new(i,j,k) +&
+               pro2*(&
+               (rain_new(i+1,j,k) + rain_new(i-1,j,k)) +&
+               (rain_new(i,j+1,k) + rain_new(i,j-1,k)) +&
+               rain_new(i,j,k+1) +&
+               rain_new(i,j,k-1))
 
-            if (Qllu1(i,j,k) < 1e-10) Qllu1(i,j,k)=0
+            if (rain_base(i,j,k) < 1e-10) rain_base(i,j,k)=0
 
-            Qcri1(i,j,k)=pro1*Qcri2(i,j,k)+&
-               pro2*((Qcri2(i+1,j,k)+Qcri2(i-1,j,k))+&
-               (Qcri2(i,j+1,k)+Qcri2(i,j-1,k))+Qcri2(i,j,k+1)+Qcri2(i,j,k-1))
+            crystal_base(i,j,k)=pro1*crystal_new(i,j,k) +&
+               pro2*(&
+               (crystal_new(i+1,j,k) + crystal_new(i-1,j,k)) +&
+               (crystal_new(i,j+1,k) + crystal_new(i,j-1,k)) +&
+               crystal_new(i,j,k+1) +&
+               crystal_new(i,j,k-1))
 
-            if (Qcri1(i,j,k) < 1e-10) Qcri1(i,j,k)=0
+            if (crystal_base(i,j,k) < 1e-10) crystal_base(i,j,k)=0
 
-            Qnie1(i,j,k)=pro1*Qnie2(i,j,k)+&
-               pro2*((Qnie2(i+1,j,k)+Qnie2(i-1,j,k))+&
-               (Qnie2(i,j+1,k)+Qnie2(i,j-1,k))+&
-               Qnie2(i,j,k+1)+Qnie2(i,j,k-1))
+            snow_base(i,j,k)=pro1*snow_new(i,j,k) +&
+               pro2*(&
+               (snow_new(i+1,j,k) + snow_new(i-1,j,k)) +&
+               (snow_new(i,j+1,k) + snow_new(i,j-1,k)) +&
+               snow_new(i,j,k+1) +&
+               snow_new(i,j,k-1))
 
-            if (Qnie1(i,j,k) < 1e-10) Qnie1(i,j,k)=0
+            if (snow_base(i,j,k) < 1e-10) snow_base(i,j,k)=0
 
-            Qgra1(i,j,k)=pro1*Qgra2(i,j,k)+&
-               pro2*((Qgra2(i+1,j,k)+Qgra2(i-1,j,k))+&
-               (Qgra2(i,j+1,k)+Qgra2(i,j-1,k))+&
-               Qgra2(i,j,k+1)+Qgra2(i,j,k-1))
+            hail_base(i,j,k)=pro1*hail_new(i,j,k) +&
+               pro2*(&
+               (hail_new(i+1,j,k) + hail_new(i-1,j,k)) +&
+               (hail_new(i,j+1,k) + hail_new(i,j-1,k)) +&
+               hail_new(i,j,k+1) +&
+               hail_new(i,j,k-1))
 
-            if (Qgra1(i,j,k) < 1e-10) Qgra1(i,j,k)=0
+            if (hail_base(i,j,k) < 1e-10) hail_base(i,j,k)=0
 
-            aer1(i,j,k)=pro1*aer2(i,j,k)+&
-               pro2*((aer2(i+1,j,k)+aer2(i-1,j,k))+&
-               (aer2(i,j+1,k)+aer2(i,j-1,k))+aer2(i,j,k+1)+aer2(i,j,k-1))
+            aerosol_base(i,j,k)=pro1*aerosol_new(i,j,k) +&
+               pro2*(&
+               (aerosol_new(i+1,j,k) + aerosol_new(i-1,j,k)) +&
+               (aerosol_new(i,j+1,k) + aerosol_new(i,j-1,k)) +&
+               aerosol_new(i,j,k+1) +&
+               aerosol_new(i,j,k-1))
 
 
-            if (abs(aer1(i,j,k)) < 1e-10) aer1(i,j,k)=0
+            if (abs(aerosol_base(i,j,k)) < 1e-10) aerosol_base(i,j,k)=0
          end do
       end do
    end subroutine floor_condition_redefinition
 
    subroutine floor_and_ceiling_contour_redefinition()
-      USE dimen, only: nx1, nz1
-      USE perdim, only: Titaa1
-      USE permic, only: Qvap1, aer1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1
-      USE estbas, only: Qvap0, aer0
+      use dimensions, only: nx1, nz1
+      use dinamic_var_perturbation, only: theta_base
+      use microphysics_perturbation, only: vapor_base, aerosol_base, drop_base,&
+         rain_base, crystal_base, snow_base, hail_base
+      use initial_z_state, only: vapor_z_initial, aerosol_z_initial
       implicit none
       integer :: i, j
       !contornos en el piso y en el techo
       do concurrent(i=1:nx1, j=1:nx1)
-         Titaa1(i,j,0)=Titaa1(i,j,0)
-         if (Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=.5
-         if (-Titaa1(i,j,0) > 0.5) Titaa1(i,j,0)=-.5
+         theta_base(i,j,0)=theta_base(i,j,0)
+         if (theta_base(i,j,0) > 0.5) theta_base(i,j,0)=.5
+         if (-theta_base(i,j,0) > 0.5) theta_base(i,j,0)=-.5
 
-         Titaa1(i,j,nz1)=Titaa1(i,j,nz1-1)
+         theta_base(i,j,nz1)=theta_base(i,j,nz1-1)
 
          !corregido para el vapor
-         if (Qvap1(i,j,0) > Qvap0(0)*.5) then
-            Qvap1(i,j,0)=.8*Qvap0(0)
+         if (vapor_base(i,j,0) > vapor_z_initial(0)*.5) then
+            vapor_base(i,j,0)=.8*vapor_z_initial(0)
          endif
-         if (-Qvap1(i,j,0) > Qvap0(0)*.5) then
-            Qvap1(i,j,0)=-.8*Qvap0(0)
+         if (-vapor_base(i,j,0) > vapor_z_initial(0)*.5) then
+            vapor_base(i,j,0)=-.8*vapor_z_initial(0)
          endif
 
-         Qvap1(i,j,nz1)=Qvap1(i,j,nz1-1)
-         Qgot1(i,j,0)=0.
-         Qgot1(i,j,nz1)=Qgot1(i,j,nz1-1)
-         Qllu1(i,j,0)=Qllu1(i,j,0)
-         Qllu1(i,j,nz1)=Qllu1(i,j,nz1-1)
-         Qcri1(i,j,0)=0.
-         Qcri1(i,j,nz1)=Qcri1(i,j,nz1-1)
+         vapor_base(i,j,nz1)=vapor_base(i,j,nz1-1)
+         drop_base(i,j,0)=0.
+         drop_base(i,j,nz1)=drop_base(i,j,nz1-1)
+         rain_base(i,j,0)=rain_base(i,j,0)
+         rain_base(i,j,nz1)=rain_base(i,j,nz1-1)
+         crystal_base(i,j,0)=0.
+         crystal_base(i,j,nz1)=crystal_base(i,j,nz1-1)
 
-         Qnie1(i,j,0)=0.
-         Qnie1(i,j,nz1)=Qnie1(i,j,nz1-1)
+         snow_base(i,j,0)=0.
+         snow_base(i,j,nz1)=snow_base(i,j,nz1-1)
 
-         Qgra1(i,j,0)=Qgra1(i,j,0)
-         Qgra1(i,j,nz1)=Qgra1(i,j,nz1-1)
+         hail_base(i,j,0)=hail_base(i,j,0)
+         hail_base(i,j,nz1)=hail_base(i,j,nz1-1)
 
          !corregido para los aerosoles
-         if (-aer1(i,j,0) > 0.8*aer0(0)) then
-            aer1(i,j,0)=-.8*aer0(0)
+         if (-aerosol_base(i,j,0) > 0.8*aerosol_z_initial(0)) then
+            aerosol_base(i,j,0)=-.8*aerosol_z_initial(0)
          endif
-         aer1(i,j,nz1)=aer1(i,j,nz1-1)
+         aerosol_base(i,j,nz1)=aerosol_base(i,j,nz1-1)
       end do
    end subroutine floor_and_ceiling_contour_redefinition
 
    subroutine lateral_contour_redefinition()
       !contornos laterales
-      USE dimen, only: nx1, nz1
-      USE perdim, only: Titaa1
-      USE permic, only: Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1
+      use dimensions, only: nx1, nz1
+      use dinamic_var_perturbation, only: theta_base
+      use microphysics_perturbation, only: vapor_base, drop_base, rain_base,&
+         crystal_base, snow_base, hail_base, aerosol_base
       implicit none
       integer :: j, k
       do concurrent(k=1:nz1-1, j=1:nx1)
-         Titaa1(0,j,k)=Titaa1(1,j,k)
-         Titaa1(nx1+1,j,k)=Titaa1(nx1,j,k)
-         Titaa1(j,0,k)=Titaa1(j,1,k)
-         Titaa1(j,nx1+1,k)=Titaa1(j,nx1,k)
-         Qvap1(0,j,k)=0.
-         Qvap1(nx1+1,j,k)=0.
-         Qvap1(j,0,k)=0.
-         Qvap1(j,nx1+1,k)=0.
-         Qgot1(0,j,k)=Qgot1(1,j,k)
-         Qgot1(nx1+1,j,k)=Qgot1(nx1,j,k)
-         Qgot1(j,0,k)=Qgot1(j,1,k)
-         Qgot1(j,nx1+1,k)=Qgot1(j,nx1,k)
-         Qllu1(0,j,k)=0.
-         Qllu1(nx1+1,j,k)=0.
-         Qllu1(j,0,k)=0.
-         Qllu1(j,nx1+1,k)=0.
-         Qcri1(0,j,k)=Qcri1(1,j,k)
-         Qcri1(nx1+1,j,k)=Qcri1(nx1,j,k)
-         Qcri1(j,0,k)=Qcri1(j,1,k)
-         Qcri1(j,nx1+1,k)=Qcri1(j,nx1,k)
-         Qnie1(0,j,k)=Qnie1(1,j,k)
-         Qnie1(nx1+1,j,k)=Qnie1(nx1,j,k)
-         Qnie1(j,0,k)=Qnie1(j,1,k)
-         Qnie1(j,nx1+1,k)=Qnie1(j,nx1,k)
-         Qgra1(0,j,k)=0.
-         Qgra1(nx1+1,j,k)=0.
-         Qgra1(j,0,k)=0.
-         Qgra1(j,nx1+1,k)=0.
+         theta_base(0,j,k)=theta_base(1,j,k)
+         theta_base(nx1+1,j,k)=theta_base(nx1,j,k)
+         theta_base(j,0,k)=theta_base(j,1,k)
+         theta_base(j,nx1+1,k)=theta_base(j,nx1,k)
+         vapor_base(0,j,k)=0.
+         vapor_base(nx1+1,j,k)=0.
+         vapor_base(j,0,k)=0.
+         vapor_base(j,nx1+1,k)=0.
+         drop_base(0,j,k)=drop_base(1,j,k)
+         drop_base(nx1+1,j,k)=drop_base(nx1,j,k)
+         drop_base(j,0,k)=drop_base(j,1,k)
+         drop_base(j,nx1+1,k)=drop_base(j,nx1,k)
+         rain_base(0,j,k)=0.
+         rain_base(nx1+1,j,k)=0.
+         rain_base(j,0,k)=0.
+         rain_base(j,nx1+1,k)=0.
+         crystal_base(0,j,k)=crystal_base(1,j,k)
+         crystal_base(nx1+1,j,k)=crystal_base(nx1,j,k)
+         crystal_base(j,0,k)=crystal_base(j,1,k)
+         crystal_base(j,nx1+1,k)=crystal_base(j,nx1,k)
+         snow_base(0,j,k)=snow_base(1,j,k)
+         snow_base(nx1+1,j,k)=snow_base(nx1,j,k)
+         snow_base(j,0,k)=snow_base(j,1,k)
+         snow_base(j,nx1+1,k)=snow_base(j,nx1,k)
+         hail_base(0,j,k)=0.
+         hail_base(nx1+1,j,k)=0.
+         hail_base(j,0,k)=0.
+         hail_base(j,nx1+1,k)=0.
 
-         aer1(0,j,k)=aer1(1,j,k)
-         aer1(nx1+1,j,k)=aer1(nx1,j,k)
-         aer1(j,0,k)=aer1(j,1,k)
-         aer1(j,nx1+1,k)=aer1(j,nx1,k)
+         aerosol_base(0,j,k)=aerosol_base(1,j,k)
+         aerosol_base(nx1+1,j,k)=aerosol_base(nx1,j,k)
+         aerosol_base(j,0,k)=aerosol_base(j,1,k)
+         aerosol_base(j,nx1+1,k)=aerosol_base(j,nx1,k)
       end do
    end subroutine lateral_contour_redefinition
 
    subroutine vapour_negative_correction()
       !correccion de negativos para el vapor
-      USE dimen, only: nx1, nz1
-      USE permic, only: Qvap1
-      USE estbas, only: Qvap0
+      use dimensions, only: nx1, nz1
+      use microphysics_perturbation, only: vapor_base
+      use initial_z_state, only: vapor_z_initial
       implicit none
       integer :: i, j, k
       do concurrent(i=0:nx1+1, j=0:nx1+1, k=0:nz1)
-         if(Qvap1(i,j,k)+Qvap0(k) < 0) then
-            Qvap1(i,j,k)=-Qvap0(k)
+         if(vapor_base(i,j,k)+vapor_z_initial(k) < 0) then
+            vapor_base(i,j,k)=-vapor_z_initial(k)
          endif
       end do
    end subroutine vapour_negative_correction
 
    subroutine save_backup()
-      USE model_var, only: tt, tte, posx, posy, Xnub, Ynub, posxx, posyy,&
+      use model_var, only: current_time, tte, posx, posy, Xnub, Ynub, posxx, posyy,&
          file_number, t1
-      USE cant01, only: lte, ltg, ltb
-      USE dimen, only: dt1
-      USE config, only: output_directory
-      USE perdim, only: W2, U2, V2, Fcalo, Titaa2, Titaa1, Pres2, Pres1, U1, V1,&
-         W1
-      USE io, only: str_gen
-      USE permic, only: aer1, Qgot2, Qllu2, Qcri2, Qnie2, Qgra2, Qvap2, aer2,&
-         Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, Av, Vtgra0, Vtnie
-      USE const, only: Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs, Eacrcn, Eautcn
-      USE estbas, only: Den0, Qvap0, aer0, Tita0, Temp0, Pres00, aerrel, cc2,&
-         Qvaprel, UU, VV
-      USE model_initialization, only: cloud_position_init, cloud_movement_init, statistics_init
+      use cant01, only: lte, ltg, ltb
+      use dimensions, only: dt1
+      use config, only: output_directory
+      use dinamic_var_perturbation, only: w_perturbed_new, u_perturbed_new,&
+         v_perturbed_new, heat_force, theta_new, theta_base, pressure_new,&
+         pressure_base, u_perturbed_base, v_perturbed_base, w_perturbed_base
+      use io, only: str_gen
+      use microphysics_perturbation, only: aerosol_base, drop_new,&
+         rain_new, crystal_new, snow_new,&
+         hail_new, vapor_new, aerosol_new,&
+         vapor_base, drop_base, rain_base, crystal_base, snow_base, hail_base,&
+         Av, Vtgra0, Vtnie
+      use constants, only: Tvis, Telvs, Tesvs, Tlvl, Tlsl, Tlvs, Eacrcn, Eautcn
+      use initial_z_state, only: air_density_z_initial, vapor_z_initial,&
+         aerosol_z_initial, theta_z_initial, temperature_z_initial,&
+         Pres00, aerosol_z_relative, cc2,&
+         vapor_z_relative, u_z_initial, v_z_initial
+      use model_initialization, only: cloud_position, cloud_movement,&
+         statistics
       implicit none
       integer :: unit_number
-      if (tt/nint(lte/dt1)*nint(lte/dt1) == tt) then
-         call statistics_init()
+      if (current_time/nint(lte/dt1)*nint(lte/dt1) == current_time) then
+         call statistics()
          tte=tte+1
-         call cloud_position_init()
-         call cloud_movement_init()
+         call cloud_position()
+         call cloud_movement()
 
-         open(newunit=unit_number,file=output_directory//"posnub"//'.sa', ACCESS="append")
+         open(newunit=unit_number,file=output_directory//"posnub"//'.sa',&
+            ACCESS="append")
          write(unit_number,*) tte,posx(tte),posy(tte),Xnub(tte),Ynub(tte),posxx,posyy
          close(unit_number)
       endif
 
-      if (tt/nint(ltg/dt1)*nint(ltg/dt1) == tt) then
-         file_number = str_gen(t1)
-         !call graba231(k, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0)
-         call graba320(U1, V1, W1, Titaa1, Pres1, Qvap1, Qgot1, Qllu1, Qcri1, Qnie1, Qgra1, aer1,file_number)
+      if (current_time/nint(ltg/dt1)*nint(ltg/dt1) == current_time) then
+         file_number=str_gen(t1)
+         call graba320(u_perturbed_base, v_perturbed_base, w_perturbed_base,&
+            theta_base, pressure_base, vapor_base, drop_base,&
+            rain_base, crystal_base, snow_base, hail_base, aerosol_base, file_number)
          t1=t1+1
       endif
 
-      if (tt/nint(ltb/dt1)*nint(ltb/dt1) == tt) then
-         call graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
-            U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
-            Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo,&
-            Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
+      if (current_time/nint(ltb/dt1)*nint(ltb/dt1) == current_time) then
+         call graba120(air_density_z_initial, temperature_z_initial, theta_z_initial,&
+            Pres00, vapor_z_initial, cc2,&
+            aerosol_z_initial, u_z_initial, v_z_initial,&
+            u_perturbed_base, u_perturbed_new, v_perturbed_base, v_perturbed_new,&
+            w_perturbed_base, w_perturbed_new, theta_base,&
+            theta_new, pressure_base, pressure_new, vapor_base,&
+            vapor_new, drop_base, drop_new, rain_base, rain_new, crystal_base,&
+            crystal_new, snow_base, snow_new, hail_base, hail_new, aerosol_base,&
+            aerosol_new, heat_force, Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, Av,&
+            Vtnie, Vtgra0, vapor_z_relative, aerosol_z_relative, Eautcn, Eacrcn)
       endif
    end subroutine save_backup
 end module model_aux

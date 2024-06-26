@@ -1,6 +1,6 @@
 program main
-    USE cloud_model
-    USE config
+    use cloud_model
+    use config
  
     implicit none
     call init_config(sim_time = 45., save_lapse = 3., directory= "Data/new_code/")

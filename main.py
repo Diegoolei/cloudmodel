@@ -29,7 +29,7 @@ def main():
         img_option="Contour",
         folder_handle="Delete",
     )
-    nubes.check_path(nubes.output_data_path)
+    # nubes.check_path(nubes.output_data_path)
     iniciales.parse_status_img()
     nubes.parse_status_img()
 

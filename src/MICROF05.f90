@@ -9,12 +9,12 @@
 !$$
 subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
    qvapaux,qgotaux,qlluaux,qcriaux,qnieaux,qgraaux,Naer,daer2,nu,yy)
-   USE cant01
-   USE dimen
-   USE perdim
-   USE permic
-   USE const
-   USE microf05
+   use cant01
+   use dimensions
+   use dinamic_var_perturbation
+   use microphysics_perturbation
+   use constants
+   use microf05
    implicit none
 
    real, intent(in) :: els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Naer,nu
