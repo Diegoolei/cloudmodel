@@ -20,7 +20,7 @@ contains
    subroutine model()
       use cant01, only: total_time
       use model_var, only: current_time
-      use dinamic_var_perturbation, only: thermal_property_1
+      use dinamic_var_perturbation, only: potential_temperature_base
       use model_initialization, only: initialize_model
       use model_aux, only: vapor_advection, dinamics, negative_correction, water_calculation,&
          microphisics_substring, floor_and_ceiling_contour, lateral_contour,&
@@ -49,7 +49,7 @@ contains
          call floor_condition_redefinition()
          call floor_and_ceiling_contour_redefinition()
          call lateral_contour_redefinition()
-         call filtro(thermal_property_1,.01,.01,.02)
+         call filtro(potential_temperature_base,.01,.01,.02)
          call vapour_negative_correction()
          call save_backup()
          progress_percent = real(current_time, R8P)/real(total_time, R8P)

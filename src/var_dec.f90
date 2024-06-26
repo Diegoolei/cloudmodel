@@ -161,45 +161,39 @@ module filtro01
    integer i,j,k
 end module filtro01
 
-module fuvw
+module sv_inhomogeneous_velocities_and_speed_pressure
    use dimensions
    real, dimension(-1:nx1+2,-1:nx1+2,-1:nz1+2) :: fu, fv, fw, fp
-end module fuvw
+end module sv_inhomogeneous_velocities_and_speed_pressure
 
-module inomo_var
-!> Inomo
-   real(8) dvelxx,dvelxy,dvelxz,dvelyx,dvelyy,dvelyz,dvelzx,dvelzy,dvelzz,&
-      a1,a2,a3, turbulx,turbuly,turbulz
-   real diverx,divery,diverz,grave,laplap
-end module inomo_var
 
 !> @brief Module declaration for the microphysics_perturbation module.
 !! @details The microphysics_perturbation module defines variables related to cloud microphysics.
 module microphysics_perturbation
    use dimensions
 
-   ! Vapor variables
-   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: vapor_amt, perturbed_vapor_amt
+   !> Vapor variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: vapor_base, vapor_new
 
-   ! Drop variables
-   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: drop_amt, perturbed_drop_amt
+   !> Drop variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: drop_base, drop_new
 
-   ! Spray variables
-   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: spray_amt, perturbed_spray_amt, Aer1
+   !> Spray variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: aerosol_base, aerosol_new, Aer1
 
-   ! Liquid cloud variables
-   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: rain_amt, perturbed_rain_amt
+   !> Liquid cloud variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: rain_base, rain_new
 
-   ! Crystal variables
-   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: crystal_amt, perturbed_crystal_amt
-   
-   ! Snow variables
-   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: snow_amt, perturbed_snow_amt
+   !> Crystal variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: crystal_base, crystal_new
 
-   ! Graupel (snow pellets) variables
-   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: hail_amt, perturbed_hail_amt
+   !> Snow variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: snow_base, snow_new
 
-   ! Other related variables
+   !> Graupel (snow pellets) variables
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: hail_base, hail_new
+
+   !> Other related variables
    real, dimension(-3:2*nz1+5) :: Av, Vtnie, Vtgra0
 end module microphysics_perturbation
 
@@ -208,15 +202,15 @@ end module microphysics_perturbation
 module dinamic_var_perturbation
    use dimensions
    !> Original velocity components (u=x, v=y, w=z)
-   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_original, v_original, w_original
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_perturbed_base, v_perturbed_base, w_perturbed_base
    !> Perturbed velocity components (u=x, v=y, w=z)
-   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_perturbed, v_perturbed, w_perturbed
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: u_perturbed_new, v_perturbed_new, w_perturbed_new
    !> Original and perturbed pressure
-   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: pressure_original, pressure_perturbed
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: pressure_base, pressure_new
    !> Ambient temperature
-   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: ambient_temperature
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: temperature
    !> Thermodynamic properties
-   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: thermal_property_1, thermal_property_2
+   real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: potential_temperature_base, potential_temperature_new
    !> Heat force
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2) :: heat_force
 end module dinamic_var_perturbation

@@ -146,34 +146,6 @@ contains
       !**   condiciones de tiempo bueno
       ! TT_f not pure function, do concurrent not allowed
       do k=-1,nz1+2
-         do concurrent(i=-1:nx1+2, j=-1:nx1+1)
-            !     cantidades primas
-            u_original(i,j,k)=0.
-            u_perturbed(i,j,k)=0.
-            v_original(i,j,k)=0.
-            v_perturbed(i,j,k)=0.
-            w_original(i,j,k)=0.
-            w_perturbed(i,j,k)=0.
-            pressure_original(i,j,k)=0.
-            pressure_perturbed(i,j,k)=0.
-            thermal_property_2(i,j,k)=0.
-            thermal_property_1(i,j,k)=0.
-            vapor_amt(i,j,k)=0.
-            perturbed_vapor_amt(i,j,k)=0.
-            drop_amt(i,j,k)=0.
-            perturbed_drop_amt(i,j,k)=0.
-            rain_amt(i,j,k)=0.
-            perturbed_rain_amt(i,j,k)=0.
-            crystal_amt(i,j,k)=0.
-            perturbed_crystal_amt(i,j,k)=0.
-            snow_amt(i,j,k)=0.
-            perturbed_snow_amt(i,j,k)=0.
-            hail_amt(i,j,k)=0.
-            perturbed_hail_amt(i,j,k)=0.
-            spray_amt(i,j,k)=0.
-            perturbed_spray_amt(i,j,k)=0.
-         end do
-
          ! cantidades base
          zeta=k*dx1
          Temp0(k)=TT_f(zeta)
@@ -197,9 +169,9 @@ contains
             ygrie=j*dx1
             G1=exp(-((centx-equis)**2.+(centy-ygrie)**2.)*.5&
                /radiomed**2.)
-            thermal_property_1(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
-            if (thermal_property_1(i,j,k) < 1e-5) thermal_property_1(i,j,k)=0.
-            spray_amt(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
+            potential_temperature_base(i,j,k)=temper*exp(-(zeta-centz)**2./sigmat)*G1
+            if (potential_temperature_base(i,j,k) < 1e-5) potential_temperature_base(i,j,k)=0.
+            aerosol_base(i,j,k)=aerper*exp(-zeta**2./sigmaa)*G1
          end do
 
          !vapor base
@@ -271,14 +243,14 @@ contains
       Qvap0(-1)=0
 
       do concurrent(i=1:nx1, j=1:nx1)
-         pressure_original(i,j,0)=pressure_original(i,j,1)
-         pressure_original(i,j,-1)=pressure_original(i,j,1)
-         pressure_perturbed(i,j,0)=pressure_original(i,j,1)
-         pressure_perturbed(i,j,-1)=pressure_original(i,j,1)
-         thermal_property_1(i,j,0)=thermal_property_1(i,j,1)
-         thermal_property_1(i,j,-1)=thermal_property_1(i,j,1)
-         vapor_amt(i,j,0)=vapor_amt(i,j,1)
-         vapor_amt(i,j,-1)=vapor_amt(i,j,1)
+         pressure_base(i,j,0)=pressure_base(i,j,1)
+         pressure_base(i,j,-1)=pressure_base(i,j,1)
+         pressure_new(i,j,0)=pressure_base(i,j,1)
+         pressure_new(i,j,-1)=pressure_base(i,j,1)
+         potential_temperature_base(i,j,0)=potential_temperature_base(i,j,1)
+         potential_temperature_base(i,j,-1)=potential_temperature_base(i,j,1)
+         vapor_base(i,j,0)=vapor_base(i,j,1)
+         vapor_base(i,j,-1)=vapor_base(i,j,1)
       end do
 
       !     calculo del Qvaprel
@@ -399,7 +371,7 @@ module model_var
       rs, dden0z, aux, aux1, aux2, aux3, aux4, posxx, posyy,cks, turbu, lapla
 
    real(8) :: qgotaux, qvapaux, qlluaux, qcriaux, qnieaux, qgraaux, aeraux,&
-      auxx, auxy, auxz, Taux, Qvapneg, aerneg, ener, ener1, ener2, ener3,&
+      auxx, auxy, auxz, Taux, Qvapneg = 0, aerneg = 0, ener, ener1 = 0, ener2, ener3,&
       ener4, ener5, qv, qg, daitot, vapt1, vapt2, vapt3, vapt4, gott1, gott2,&
       gott3, gott4, aert1, aert2, aert3, aert4, totnuc, totmic
 
@@ -408,8 +380,8 @@ module model_var
 
    character(len=3) :: file_number
 
-   integer :: current_time, t1, t2, n, m, l, i, j, k, lll, s, iT, tte, lvapneg,&
-      llluneg, lcrineg, laerneg, lnieneg, lgraneg, yy
+   integer :: current_time, t1, t2, n, m, l, i, j, k, lll, s = 0, iT, tte, lvapneg = 0,&
+      llluneg = 0, lcrineg = 0, laerneg = 0, lnieneg = 0, lgraneg = 0, yy
 
 end module model_var
 
@@ -441,13 +413,13 @@ contains
       use config
       use estbas, only: Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV,&
          Qvaprel, aerrel
-      use dinamic_var_perturbation, only: w_perturbed, u_perturbed, v_perturbed,&
-         heat_force, thermal_property_2, thermal_property_1, pressure_perturbed,&
-         pressure_original, u_original, v_original, w_original
-      use microphysics_perturbation, only: spray_amt, perturbed_drop_amt,&
-         perturbed_rain_amt, perturbed_crystal_amt, perturbed_snow_amt,&
-         perturbed_hail_amt, perturbed_vapor_amt, perturbed_spray_amt,&
-         vapor_amt, drop_amt, rain_amt, crystal_amt, snow_amt, hail_amt,&
+      use dinamic_var_perturbation, only: w_perturbed_new, u_perturbed_new, v_perturbed_new,&
+         heat_force, potential_temperature_new, potential_temperature_base, pressure_new,&
+         pressure_base, u_perturbed_base, v_perturbed_base, w_perturbed_base
+      use microphysics_perturbation, only: aerosol_base, drop_new,&
+         rain_new, crystal_new, snow_new,&
+         hail_new, vapor_new, aerosol_new,&
+         vapor_base, drop_base, rain_base, crystal_base, snow_base, hail_base,&
          Av, Vtgra0, Vtnie
       use model_initial_conditions, only: initial_conditions
       implicit none
@@ -504,12 +476,12 @@ contains
          open(newunit = unit_number, file = output_directory//"velos.da", status =&
             'unknown', form = 'unformatted')
          rewind unit_number
-         read(unit_number) u_original, u_perturbed, v_original, v_perturbed,&
-            w_original, w_perturbed, thermal_property_1,thermal_property_2,&
-            pressure_original, pressure_perturbed, vapor_amt, perturbed_vapor_amt,&
-            drop_amt, perturbed_drop_amt, rain_amt, perturbed_rain_amt, crystal_amt,&
-            perturbed_crystal_amt, snow_amt, perturbed_snow_amt, hail_amt,&
-            perturbed_hail_amt, spray_amt, perturbed_spray_amt, heat_force
+         read(unit_number) u_perturbed_base, u_perturbed_new, v_perturbed_base, v_perturbed_new,&
+            w_perturbed_base, w_perturbed_new, potential_temperature_base,potential_temperature_new,&
+            pressure_base, pressure_new, vapor_base, vapor_new,&
+            drop_base, drop_new, rain_base, rain_new, crystal_base,&
+            crystal_new, snow_base, snow_new, hail_base,&
+            hail_new, aerosol_base, aerosol_new, heat_force
          close(unit_number)
 
          open(newunit = unit_number, file = output_directory//"varconz.da",&
@@ -527,7 +499,7 @@ contains
 
    end subroutine initialize_model
 
-   subroutine statistics_init()
+   subroutine statistics()
       use model_var
       use microphysics_perturbation
       use dinamic_var_perturbation
@@ -604,118 +576,118 @@ contains
       qgratot=0.
 
       do concurrent(k=1:nz1, i=1:nx1, j=1:nx1)
-         if (umax < u_original(i,j,k)*100) then
-            umax=u_original(i,j,k)*100
+         if (umax < u_perturbed_base(i,j,k)*100) then
+            umax=u_perturbed_base(i,j,k)*100
             lumax=i
             mumax=j
             numax=k
          endif
 
-         if (umin > u_original(i,j,k)*100) then
-            umin=u_original(i,j,k)*100
+         if (umin > u_perturbed_base(i,j,k)*100) then
+            umin=u_perturbed_base(i,j,k)*100
             lumin=i
             mumin=j
             numin=k
          endif
 
-         if (vmax < v_original(i,j,k)*100) then
-            vmax=v_original(i,j,k)*100
+         if (vmax < v_perturbed_base(i,j,k)*100) then
+            vmax=v_perturbed_base(i,j,k)*100
             lvmax=i
             mvmax=j
             nvmax=k
          endif
 
-         if (vmin > v_original(i,j,k)*100) then
-            vmin=v_original(i,j,k)*100
+         if (vmin > v_perturbed_base(i,j,k)*100) then
+            vmin=v_perturbed_base(i,j,k)*100
             lvmin=i
             mvmin=j
             nvmin=k
          endif
 
-         if (wmax < w_original(i,j,k)*100) then
-            wmax=w_original(i,j,k)*100
+         if (wmax < w_perturbed_base(i,j,k)*100) then
+            wmax=w_perturbed_base(i,j,k)*100
             lwmax=i
             mwmax=j
             nwmax=k
          endif
 
-         if (wmin > w_original(i,j,k)*100) then
-            wmin=w_original(i,j,k)*100
+         if (wmin > w_perturbed_base(i,j,k)*100) then
+            wmin=w_perturbed_base(i,j,k)*100
             lwmin=i
             mwmin=j
             nwmin=k
          endif
 
-         if (titamax < thermal_property_1(i,j,k)*1000) then
-            titamax=thermal_property_1(i,j,k)*1000
+         if (titamax < potential_temperature_base(i,j,k)*1000) then
+            titamax=potential_temperature_base(i,j,k)*1000
             ltitamax=i
             mtitamax=j
             ntitamax=k
          endif
 
-         if (titamin > thermal_property_1(i,j,k)*1000) then
-            titamin=thermal_property_1(i,j,k)*1000
+         if (titamin > potential_temperature_base(i,j,k)*1000) then
+            titamin=potential_temperature_base(i,j,k)*1000
             ltitamin=i
             mtitamin=j
             ntitamin=k
          endif
 
-         if (qvapmax < vapor_amt(i,j,k)*1e6) then
-            qvapmax=vapor_amt(i,j,k)*1e6
+         if (qvapmax < vapor_base(i,j,k)*1e6) then
+            qvapmax=vapor_base(i,j,k)*1e6
             lqvapmax=i
             mqvapmax=j
             nqvapmax=k
          endif
 
-         if (qvapmin > vapor_amt(i,j,k)*1e6) then
-            qvapmin=vapor_amt(i,j,k)*1e6
+         if (qvapmin > vapor_base(i,j,k)*1e6) then
+            qvapmin=vapor_base(i,j,k)*1e6
             lqvapmin=i
             mqvapmin=j
             nqvapmin=k
          endif
 
-         if (qgotmax < drop_amt(i,j,k)*1e6) then
-            qgotmax=drop_amt(i,j,k)*1e6
+         if (qgotmax < drop_base(i,j,k)*1e6) then
+            qgotmax=drop_base(i,j,k)*1e6
             lqgotmax=i
             mqgotmax=j
             nqgotmax=k
          endif
-         qgottot=qgottot+drop_amt(i,j,k)*1e6
+         qgottot=qgottot+drop_base(i,j,k)*1e6
 
-         if (qllumax < rain_amt(i,j,k)*1e6) then
-            qllumax=rain_amt(i,j,k)*1e6
+         if (qllumax < rain_base(i,j,k)*1e6) then
+            qllumax=rain_base(i,j,k)*1e6
             lqllumax=i
             mqllumax=j
             nqllumax=k
          endif
-         qllutot=qllutot+rain_amt(i,j,k)*1e6
+         qllutot=qllutot+rain_base(i,j,k)*1e6
 
-         if (qcrimax < crystal_amt(i,j,k)*1e6) then
-            qcrimax=crystal_amt(i,j,k)*1e6
+         if (qcrimax < crystal_base(i,j,k)*1e6) then
+            qcrimax=crystal_base(i,j,k)*1e6
             lqcrimax=i
             mqcrimax=j
             nqcrimax=k
          endif
-         qcritot=qcritot+crystal_amt(i,j,k)*1e6
+         qcritot=qcritot+crystal_base(i,j,k)*1e6
 
-         if (qniemax < snow_amt(i,j,k)*1e6) then
-            qniemax=snow_amt(i,j,k)*1e6
+         if (qniemax < snow_base(i,j,k)*1e6) then
+            qniemax=snow_base(i,j,k)*1e6
             lqniemax=i
             mqniemax=j
             nqniemax=k
          endif
-         qnietot=qnietot+snow_amt(i,j,k)*1e6
+         qnietot=qnietot+snow_base(i,j,k)*1e6
 
-         if (qgramax < hail_amt(i,j,k)*1e6) then
-            qgramax=hail_amt(i,j,k)*1e6
+         if (qgramax < hail_base(i,j,k)*1e6) then
+            qgramax=hail_base(i,j,k)*1e6
             lqgramax=i
             mqgramax=j
             nqgramax=k
          endif
-         qgratot=qgratot+hail_amt(i,j,k)*1e6
+         qgratot=qgratot+hail_base(i,j,k)*1e6
 
-         if (aermax < spray_amt(i,j,k)/1000) then
-            aermax=spray_amt(i,j,k)/1000
+         if (aermax < aerosol_base(i,j,k)/1000) then
+            aermax=aerosol_base(i,j,k)/1000
             laermax=i
             maermax=j
             naermax=k
@@ -727,9 +699,9 @@ contains
       qniemax=0.
 
       do concurrent(i=-1:1, j=-1:1, k=-1:1)
-         qgotmax=qgotmax+1e5*drop_amt(lqgotmax+i,mqgotmax+j,nqgotmax+k)
-         qcrimax=qcrimax+1e5*crystal_amt(lqcrimax+i,mqcrimax+j,nqcrimax+k)
-         qniemax=qniemax+1e5*snow_amt(lqniemax+i,mqniemax+j,nqniemax+k)
+         qgotmax=qgotmax+1e5*drop_base(lqgotmax+i,mqgotmax+j,nqgotmax+k)
+         qcrimax=qcrimax+1e5*crystal_base(lqcrimax+i,mqcrimax+j,nqcrimax+k)
+         qniemax=qniemax+1e5*snow_base(lqniemax+i,mqniemax+j,nqniemax+k)
       end do
 
       qgotmax=qgotmax/27.
@@ -767,10 +739,10 @@ contains
       close(unit_number)
 710   format(16i5,48i4)
 715   format(5i9)
-   end subroutine statistics_init
+   end subroutine statistics
 
 
-   subroutine cloud_position_init()
+   subroutine cloud_position()
       use model_var
       use lmngot
       use lmncri
@@ -799,8 +771,8 @@ contains
          naux2=max(ngot(2),ncri(2))
 
          do concurrent(k=1:naux2, i=laux1:laux2, j=maux1:maux2)
-            Qagua=drop_amt(i,j,k)+crystal_amt(i,j,k)+rain_amt(i,j,k)+&
-               snow_amt(i,j,k)+hail_amt(i,j,k)
+            Qagua=drop_base(i,j,k)+crystal_base(i,j,k)+rain_base(i,j,k)+&
+               snow_base(i,j,k)+hail_base(i,j,k)
             zmed=zmed+k*Qagua
             Qaguat=Qaguat+Qagua
          end do
@@ -813,9 +785,9 @@ contains
 
       endif
 
-   end subroutine cloud_position_init
+   end subroutine cloud_position
 
-   subroutine cloud_movement_init()
+   subroutine cloud_movement()
       !desplazamiento de la nube
       use model_var
       use dinamic_var_perturbation
@@ -850,70 +822,70 @@ contains
          do concurrent(k=0:nz1+1)
             do concurrent(j=0:nx1+1)
                do concurrent(i=1:nx1+1)
-                  u_original(i-1,j,k)=u_original(i,j,k)
-                  v_original(i-1,j,k)=v_original(i,j,k)
-                  w_original(i-1,j,k)=w_original(i,j,k)
-                  pressure_original(i-1,j,k)=pressure_original(i,j,k)
-                  u_perturbed(i-1,j,k)=u_perturbed(i,j,k)
-                  v_perturbed(i-1,j,k)=v_perturbed(i,j,k)
-                  w_perturbed(i-1,j,k)=w_perturbed(i,j,k)
-                  pressure_perturbed(i-1,j,k)=pressure_perturbed(i,j,k)
-                  thermal_property_1(i-1,j,k)=thermal_property_1(i,j,k)
-                  vapor_amt(i-1,j,k)=vapor_amt(i,j,k)
-                  drop_amt(i-1,j,k)=drop_amt(i,j,k)
-                  rain_amt(i-1,j,k)=rain_amt(i,j,k)
-                  crystal_amt(i-1,j,k)=crystal_amt(i,j,k)
+                  u_perturbed_base(i-1,j,k)=u_perturbed_base(i,j,k)
+                  v_perturbed_base(i-1,j,k)=v_perturbed_base(i,j,k)
+                  w_perturbed_base(i-1,j,k)=w_perturbed_base(i,j,k)
+                  pressure_base(i-1,j,k)=pressure_base(i,j,k)
+                  u_perturbed_new(i-1,j,k)=u_perturbed_new(i,j,k)
+                  v_perturbed_new(i-1,j,k)=v_perturbed_new(i,j,k)
+                  w_perturbed_new(i-1,j,k)=w_perturbed_new(i,j,k)
+                  pressure_new(i-1,j,k)=pressure_new(i,j,k)
+                  potential_temperature_base(i-1,j,k)=potential_temperature_base(i,j,k)
+                  vapor_base(i-1,j,k)=vapor_base(i,j,k)
+                  drop_base(i-1,j,k)=drop_base(i,j,k)
+                  rain_base(i-1,j,k)=rain_base(i,j,k)
+                  crystal_base(i-1,j,k)=crystal_base(i,j,k)
                   Aer1(i-1,j,k)=Aer1(i,j,k)
                   heat_force(i-1,j,k)=heat_force(i,j,k)
                end do
                i=nx1+1
-               u_original(i,j,k)=u_original(i-1,j,k)
-               v_original(i,j,k)=v_original(i-1,j,k)
-               w_original(i,j,k)=w_original(i-1,j,k)
-               pressure_original(i,j,k)=pressure_original(i-1,j,k)
-               u_perturbed(i,j,k)=u_perturbed(i-1,j,k)
-               v_perturbed(i,j,k)=v_perturbed(i-1,j,k)
-               w_perturbed(i,j,k)=w_perturbed(i-1,j,k)
-               pressure_perturbed(i,j,k)=pressure_perturbed(i-1,j,k)
-               thermal_property_1(i,j,k)=thermal_property_1(i-1,j,k)
-               vapor_amt(i,j,k)=vapor_amt(i-1,j,k)
-               drop_amt(i,j,k)=drop_amt(i-1,j,k)
-               rain_amt(i,j,k)=rain_amt(i-1,j,k)
-               crystal_amt(i,j,k)=crystal_amt(i-1,j,k)
+               u_perturbed_base(i,j,k)=u_perturbed_base(i-1,j,k)
+               v_perturbed_base(i,j,k)=v_perturbed_base(i-1,j,k)
+               w_perturbed_base(i,j,k)=w_perturbed_base(i-1,j,k)
+               pressure_base(i,j,k)=pressure_base(i-1,j,k)
+               u_perturbed_new(i,j,k)=u_perturbed_new(i-1,j,k)
+               v_perturbed_new(i,j,k)=v_perturbed_new(i-1,j,k)
+               w_perturbed_new(i,j,k)=w_perturbed_new(i-1,j,k)
+               pressure_new(i,j,k)=pressure_new(i-1,j,k)
+               potential_temperature_base(i,j,k)=potential_temperature_base(i-1,j,k)
+               vapor_base(i,j,k)=vapor_base(i-1,j,k)
+               drop_base(i,j,k)=drop_base(i-1,j,k)
+               rain_base(i,j,k)=rain_base(i-1,j,k)
+               crystal_base(i,j,k)=crystal_base(i-1,j,k)
                Aer1(i,j,k)=Aer1(i-1,j,k)
                heat_force(i,j,k)=0.
             end do
             i=nx1
             j=0
-            u_original(i,j,k)=(u_original(i-1,j,k)+u_original(i,j+1,k))/2.
-            v_original(i,j,k)=(v_original(i-1,j,k)+v_original(i,j+1,k))/2.
-            w_original(i,j,k)=(w_original(i-1,j,k)+w_original(i,j+1,k))/2.
-            pressure_original(i,j,k)=(pressure_original(i-1,j,k)+pressure_original(i,j+1,k))/2.
-            u_perturbed(i,j,k)=(u_perturbed(i-1,j,k)+u_perturbed(i,j+1,k))/2.
-            v_perturbed(i,j,k)=(v_perturbed(i-1,j,k)+v_perturbed(i,j+1,k))/2.
-            w_perturbed(i,j,k)=(w_perturbed(i-1,j,k)+w_perturbed(i,j+1,k))/2.
-            pressure_perturbed(i,j,k)=(pressure_perturbed(i-1,j,k)+pressure_perturbed(i,j+1,k))/2.
-            thermal_property_1(i,j,k)=(thermal_property_1(i-1,j,k)+thermal_property_1(i,j+1,k))/2.
-            vapor_amt(i,j,k)=(vapor_amt(i-1,j,k)+vapor_amt(i,j+1,k))/2.
-            drop_amt(i,j,k)=(drop_amt(i-1,j,k)+drop_amt(i,j+1,k))/2.
-            rain_amt(i,j,k)=(rain_amt(i-1,j,k)+rain_amt(i,j+1,k))/2.
-            crystal_amt(i,j,k)=(crystal_amt(i-1,j,k)+crystal_amt(i,j+1,k))/2.
+            u_perturbed_base(i,j,k)=(u_perturbed_base(i-1,j,k)+u_perturbed_base(i,j+1,k))/2.
+            v_perturbed_base(i,j,k)=(v_perturbed_base(i-1,j,k)+v_perturbed_base(i,j+1,k))/2.
+            w_perturbed_base(i,j,k)=(w_perturbed_base(i-1,j,k)+w_perturbed_base(i,j+1,k))/2.
+            pressure_base(i,j,k)=(pressure_base(i-1,j,k)+pressure_base(i,j+1,k))/2.
+            u_perturbed_new(i,j,k)=(u_perturbed_new(i-1,j,k)+u_perturbed_new(i,j+1,k))/2.
+            v_perturbed_new(i,j,k)=(v_perturbed_new(i-1,j,k)+v_perturbed_new(i,j+1,k))/2.
+            w_perturbed_new(i,j,k)=(w_perturbed_new(i-1,j,k)+w_perturbed_new(i,j+1,k))/2.
+            pressure_new(i,j,k)=(pressure_new(i-1,j,k)+pressure_new(i,j+1,k))/2.
+            potential_temperature_base(i,j,k)=(potential_temperature_base(i-1,j,k)+potential_temperature_base(i,j+1,k))/2.
+            vapor_base(i,j,k)=(vapor_base(i-1,j,k)+vapor_base(i,j+1,k))/2.
+            drop_base(i,j,k)=(drop_base(i-1,j,k)+drop_base(i,j+1,k))/2.
+            rain_base(i,j,k)=(rain_base(i-1,j,k)+rain_base(i,j+1,k))/2.
+            crystal_base(i,j,k)=(crystal_base(i-1,j,k)+crystal_base(i,j+1,k))/2.
             Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j+1,k))/2.
             heat_force(i,j,k)=0.
             j=nx1+1
-            u_original(i,j,k)=(u_original(i-1,j,k)+u_original(i,j-1,k))/2.
-            v_original(i,j,k)=(v_original(i-1,j,k)+v_original(i,j-1,k))/2.
-            w_original(i,j,k)=(w_original(i-1,j,k)+w_original(i,j-1,k))/2.
-            pressure_original(i,j,k)=(pressure_original(i-1,j,k)+pressure_original(i,j-1,k))/2.
-            u_perturbed(i,j,k)=(u_perturbed(i-1,j,k)+u_perturbed(i,j-1,k))/2.
-            v_perturbed(i,j,k)=(v_perturbed(i-1,j,k)+v_perturbed(i,j-1,k))/2.
-            w_perturbed(i,j,k)=(w_perturbed(i-1,j,k)+w_perturbed(i,j-1,k))/2.
-            pressure_perturbed(i,j,k)=(pressure_perturbed(i-1,j,k)+pressure_perturbed(i,j-1,k))/2.
-            thermal_property_1(i,j,k)=(thermal_property_1(i-1,j,k)+thermal_property_1(i,j-1,k))/2.
-            vapor_amt(i,j,k)=(vapor_amt(i-1,j,k)+vapor_amt(i,j-1,k))/2.
-            drop_amt(i,j,k)=(drop_amt(i-1,j,k)+drop_amt(i,j-1,k))/2.
-            rain_amt(i,j,k)=(rain_amt(i-1,j,k)+rain_amt(i,j-1,k))/2.
-            crystal_amt(i,j,k)=(crystal_amt(i-1,j,k)+crystal_amt(i,j-1,k))/2.
+            u_perturbed_base(i,j,k)=(u_perturbed_base(i-1,j,k)+u_perturbed_base(i,j-1,k))/2.
+            v_perturbed_base(i,j,k)=(v_perturbed_base(i-1,j,k)+v_perturbed_base(i,j-1,k))/2.
+            w_perturbed_base(i,j,k)=(w_perturbed_base(i-1,j,k)+w_perturbed_base(i,j-1,k))/2.
+            pressure_base(i,j,k)=(pressure_base(i-1,j,k)+pressure_base(i,j-1,k))/2.
+            u_perturbed_new(i,j,k)=(u_perturbed_new(i-1,j,k)+u_perturbed_new(i,j-1,k))/2.
+            v_perturbed_new(i,j,k)=(v_perturbed_new(i-1,j,k)+v_perturbed_new(i,j-1,k))/2.
+            w_perturbed_new(i,j,k)=(w_perturbed_new(i-1,j,k)+w_perturbed_new(i,j-1,k))/2.
+            pressure_new(i,j,k)=(pressure_new(i-1,j,k)+pressure_new(i,j-1,k))/2.
+            potential_temperature_base(i,j,k)=(potential_temperature_base(i-1,j,k)+potential_temperature_base(i,j-1,k))/2.
+            vapor_base(i,j,k)=(vapor_base(i-1,j,k)+vapor_base(i,j-1,k))/2.
+            drop_base(i,j,k)=(drop_base(i-1,j,k)+drop_base(i,j-1,k))/2.
+            rain_base(i,j,k)=(rain_base(i-1,j,k)+rain_base(i,j-1,k))/2.
+            crystal_base(i,j,k)=(crystal_base(i-1,j,k)+crystal_base(i,j-1,k))/2.
             Aer1(i,j,k)=(Aer1(i-1,j,k)+Aer1(i,j-1,k))/2.
             heat_force(i,j,k)=0.
          end do
@@ -926,70 +898,70 @@ contains
          do concurrent(k=0:nz1+1)
             do concurrent(j=0:nx1+1)
                do concurrent(i=nx1:0) ! TODO Test this loop
-                  u_original(i+1,j,k)=u_original(i,j,k)
-                  v_original(i+1,j,k)=v_original(i,j,k)
-                  w_original(i+1,j,k)=w_original(i,j,k)
-                  pressure_original(i+1,j,k)=pressure_original(i,j,k)
-                  u_perturbed(i+1,j,k)=u_perturbed(i,j,k)
-                  v_perturbed(i+1,j,k)=v_perturbed(i,j,k)
-                  w_perturbed(i+1,j,k)=w_perturbed(i,j,k)
-                  pressure_perturbed(i+1,j,k)=pressure_perturbed(i,j,k)
-                  thermal_property_1(i+1,j,k)=thermal_property_1(i,j,k)
-                  vapor_amt(i+1,j,k)=vapor_amt(i,j,k)
-                  drop_amt(i+1,j,k)=drop_amt(i,j,k)
-                  rain_amt(i+1,j,k)=rain_amt(i,j,k)
-                  crystal_amt(i+1,j,k)=crystal_amt(i,j,k)
+                  u_perturbed_base(i+1,j,k)=u_perturbed_base(i,j,k)
+                  v_perturbed_base(i+1,j,k)=v_perturbed_base(i,j,k)
+                  w_perturbed_base(i+1,j,k)=w_perturbed_base(i,j,k)
+                  pressure_base(i+1,j,k)=pressure_base(i,j,k)
+                  u_perturbed_new(i+1,j,k)=u_perturbed_new(i,j,k)
+                  v_perturbed_new(i+1,j,k)=v_perturbed_new(i,j,k)
+                  w_perturbed_new(i+1,j,k)=w_perturbed_new(i,j,k)
+                  pressure_new(i+1,j,k)=pressure_new(i,j,k)
+                  potential_temperature_base(i+1,j,k)=potential_temperature_base(i,j,k)
+                  vapor_base(i+1,j,k)=vapor_base(i,j,k)
+                  drop_base(i+1,j,k)=drop_base(i,j,k)
+                  rain_base(i+1,j,k)=rain_base(i,j,k)
+                  crystal_base(i+1,j,k)=crystal_base(i,j,k)
                   Aer1(i+1,j,k)=Aer1(i,j,k)
                   heat_force(i+1,j,k)=heat_force(i,j,k)
                end do
                i=0
-               u_original(i,j,k)=u_original(i+1,j,k)
-               v_original(i,j,k)=v_original(i+1,j,k)
-               w_original(i,j,k)=w_original(i+1,j,k)
-               pressure_original(i,j,k)=pressure_original(i+1,j,k)
-               u_perturbed(i,j,k)=u_perturbed(i+1,j,k)
-               v_perturbed(i,j,k)=v_perturbed(i+1,j,k)
-               w_perturbed(i,j,k)=w_perturbed(i+1,j,k)
-               pressure_perturbed(i,j,k)=pressure_perturbed(i+1,j,k)
-               thermal_property_1(i,j,k)=thermal_property_1(i+1,j,k)
-               vapor_amt(i,j,k)=vapor_amt(i+1,j,k)
-               drop_amt(i,j,k)=drop_amt(i+1,j,k)
-               rain_amt(i,j,k)=rain_amt(i+1,j,k)
-               crystal_amt(i,j,k)=crystal_amt(i+1,j,k)
+               u_perturbed_base(i,j,k)=u_perturbed_base(i+1,j,k)
+               v_perturbed_base(i,j,k)=v_perturbed_base(i+1,j,k)
+               w_perturbed_base(i,j,k)=w_perturbed_base(i+1,j,k)
+               pressure_base(i,j,k)=pressure_base(i+1,j,k)
+               u_perturbed_new(i,j,k)=u_perturbed_new(i+1,j,k)
+               v_perturbed_new(i,j,k)=v_perturbed_new(i+1,j,k)
+               w_perturbed_new(i,j,k)=w_perturbed_new(i+1,j,k)
+               pressure_new(i,j,k)=pressure_new(i+1,j,k)
+               potential_temperature_base(i,j,k)=potential_temperature_base(i+1,j,k)
+               vapor_base(i,j,k)=vapor_base(i+1,j,k)
+               drop_base(i,j,k)=drop_base(i+1,j,k)
+               rain_base(i,j,k)=rain_base(i+1,j,k)
+               crystal_base(i,j,k)=crystal_base(i+1,j,k)
                Aer1(i,j,k)=Aer1(i+1,j,k)
                heat_force(i,j,k)=0.
             end do
             i=1
             j=0
-            u_original(i,j,k)=(u_original(i+1,j,k)+u_original(i,j+1,k))/2.
-            v_original(i,j,k)=(v_original(i+1,j,k)+v_original(i,j+1,k))/2.
-            w_original(i,j,k)=(w_original(i+1,j,k)+w_original(i,j+1,k))/2.
-            pressure_original(i,j,k)=(pressure_original(i+1,j,k)+pressure_original(i,j+1,k))/2.
-            u_perturbed(i,j,k)=(u_perturbed(i+1,j,k)+u_perturbed(i,j+1,k))/2.
-            v_perturbed(i,j,k)=(v_perturbed(i+1,j,k)+v_perturbed(i,j+1,k))/2.
-            w_perturbed(i,j,k)=(w_perturbed(i+1,j,k)+w_perturbed(i,j+1,k))/2.
-            pressure_perturbed(i,j,k)=(pressure_perturbed(i+1,j,k)+pressure_perturbed(i,j+1,k))/2.
-            thermal_property_1(i,j,k)=(thermal_property_1(i+1,j,k)+thermal_property_1(i,j+1,k))/2.
-            vapor_amt(i,j,k)=(vapor_amt(i+1,j,k)+vapor_amt(i,j+1,k))/2.
-            drop_amt(i,j,k)=(drop_amt(i+1,j,k)+drop_amt(i,j+1,k))/2.
-            rain_amt(i,j,k)=(rain_amt(i+1,j,k)+rain_amt(i,j+1,k))/2.
-            crystal_amt(i,j,k)=(crystal_amt(i+1,j,k)+crystal_amt(i,j+1,k))/2.
+            u_perturbed_base(i,j,k)=(u_perturbed_base(i+1,j,k)+u_perturbed_base(i,j+1,k))/2.
+            v_perturbed_base(i,j,k)=(v_perturbed_base(i+1,j,k)+v_perturbed_base(i,j+1,k))/2.
+            w_perturbed_base(i,j,k)=(w_perturbed_base(i+1,j,k)+w_perturbed_base(i,j+1,k))/2.
+            pressure_base(i,j,k)=(pressure_base(i+1,j,k)+pressure_base(i,j+1,k))/2.
+            u_perturbed_new(i,j,k)=(u_perturbed_new(i+1,j,k)+u_perturbed_new(i,j+1,k))/2.
+            v_perturbed_new(i,j,k)=(v_perturbed_new(i+1,j,k)+v_perturbed_new(i,j+1,k))/2.
+            w_perturbed_new(i,j,k)=(w_perturbed_new(i+1,j,k)+w_perturbed_new(i,j+1,k))/2.
+            pressure_new(i,j,k)=(pressure_new(i+1,j,k)+pressure_new(i,j+1,k))/2.
+            potential_temperature_base(i,j,k)=(potential_temperature_base(i+1,j,k)+potential_temperature_base(i,j+1,k))/2.
+            vapor_base(i,j,k)=(vapor_base(i+1,j,k)+vapor_base(i,j+1,k))/2.
+            drop_base(i,j,k)=(drop_base(i+1,j,k)+drop_base(i,j+1,k))/2.
+            rain_base(i,j,k)=(rain_base(i+1,j,k)+rain_base(i,j+1,k))/2.
+            crystal_base(i,j,k)=(crystal_base(i+1,j,k)+crystal_base(i,j+1,k))/2.
             Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j+1,k))/2.
             heat_force(i,j,k)=0.
             j=nx1+1
-            u_original(i,j,k)=(u_original(i+1,j,k)+u_original(i,j-1,k))/2.
-            v_original(i,j,k)=(v_original(i+1,j,k)+v_original(i,j-1,k))/2.
-            w_original(i,j,k)=(w_original(i+1,j,k)+w_original(i,j-1,k))/2.
-            pressure_original(i,j,k)=(pressure_original(i+1,j,k)+pressure_original(i,j-1,k))/2.
-            u_perturbed(i,j,k)=(u_perturbed(i+1,j,k)+u_perturbed(i,j-1,k))/2.
-            v_perturbed(i,j,k)=(v_perturbed(i+1,j,k)+v_perturbed(i,j-1,k))/2.
-            w_perturbed(i,j,k)=(w_perturbed(i+1,j,k)+w_perturbed(i,j-1,k))/2.
-            pressure_perturbed(i,j,k)=(pressure_perturbed(i+1,j,k)+pressure_perturbed(i,j-1,k))/2.
-            thermal_property_1(i,j,k)=(thermal_property_1(i+1,j,k)+thermal_property_1(i,j-1,k))/2.
-            vapor_amt(i,j,k)=(vapor_amt(i+1,j,k)+vapor_amt(i,j-1,k))/2.
-            drop_amt(i,j,k)=(drop_amt(i+1,j,k)+drop_amt(i,j-1,k))/2.
-            rain_amt(i,j,k)=(rain_amt(i+1,j,k)+rain_amt(i,j-1,k))/2.
-            crystal_amt(i,j,k)=(crystal_amt(i+1,j,k)+crystal_amt(i,j-1,k))/2.
+            u_perturbed_base(i,j,k)=(u_perturbed_base(i+1,j,k)+u_perturbed_base(i,j-1,k))/2.
+            v_perturbed_base(i,j,k)=(v_perturbed_base(i+1,j,k)+v_perturbed_base(i,j-1,k))/2.
+            w_perturbed_base(i,j,k)=(w_perturbed_base(i+1,j,k)+w_perturbed_base(i,j-1,k))/2.
+            pressure_base(i,j,k)=(pressure_base(i+1,j,k)+pressure_base(i,j-1,k))/2.
+            u_perturbed_new(i,j,k)=(u_perturbed_new(i+1,j,k)+u_perturbed_new(i,j-1,k))/2.
+            v_perturbed_new(i,j,k)=(v_perturbed_new(i+1,j,k)+v_perturbed_new(i,j-1,k))/2.
+            w_perturbed_new(i,j,k)=(w_perturbed_new(i+1,j,k)+w_perturbed_new(i,j-1,k))/2.
+            pressure_new(i,j,k)=(pressure_new(i+1,j,k)+pressure_new(i,j-1,k))/2.
+            potential_temperature_base(i,j,k)=(potential_temperature_base(i+1,j,k)+potential_temperature_base(i,j-1,k))/2.
+            vapor_base(i,j,k)=(vapor_base(i+1,j,k)+vapor_base(i,j-1,k))/2.
+            drop_base(i,j,k)=(drop_base(i+1,j,k)+drop_base(i,j-1,k))/2.
+            rain_base(i,j,k)=(rain_base(i+1,j,k)+rain_base(i,j-1,k))/2.
+            crystal_base(i,j,k)=(crystal_base(i+1,j,k)+crystal_base(i,j-1,k))/2.
             Aer1(i,j,k)=(Aer1(i+1,j,k)+Aer1(i,j-1,k))/2.
             heat_force(i,j,k)=0.
          end do
@@ -1005,70 +977,70 @@ contains
          do concurrent(k=0:nz1+1)
             do concurrent(i=0:nx1+1)
                do concurrent(j=1:nx1+1)
-                  u_original(i,j-1,k)=u_original(i,j,k)
-                  v_original(i,j-1,k)=v_original(i,j,k)
-                  w_original(i,j-1,k)=w_original(i,j,k)
-                  pressure_original(i,j-1,k)=pressure_original(i,j,k)
-                  u_perturbed(i,j-1,k)=u_perturbed(i,j,k)
-                  v_perturbed(i,j-1,k)=v_perturbed(i,j,k)
-                  w_perturbed(i,j-1,k)=w_perturbed(i,j,k)
-                  pressure_perturbed(i,j-1,k)=pressure_perturbed(i,j,k)
-                  thermal_property_1(i,j-1,k)=thermal_property_1(i,j,k)
-                  vapor_amt(i,j-1,k)=vapor_amt(i,j,k)
-                  drop_amt(i,j-1,k)=drop_amt(i,j,k)
-                  rain_amt(i,j-1,k)=rain_amt(i,j,k)
-                  crystal_amt(i,j-1,k)=crystal_amt(i,j,k)
+                  u_perturbed_base(i,j-1,k)=u_perturbed_base(i,j,k)
+                  v_perturbed_base(i,j-1,k)=v_perturbed_base(i,j,k)
+                  w_perturbed_base(i,j-1,k)=w_perturbed_base(i,j,k)
+                  pressure_base(i,j-1,k)=pressure_base(i,j,k)
+                  u_perturbed_new(i,j-1,k)=u_perturbed_new(i,j,k)
+                  v_perturbed_new(i,j-1,k)=v_perturbed_new(i,j,k)
+                  w_perturbed_new(i,j-1,k)=w_perturbed_new(i,j,k)
+                  pressure_new(i,j-1,k)=pressure_new(i,j,k)
+                  potential_temperature_base(i,j-1,k)=potential_temperature_base(i,j,k)
+                  vapor_base(i,j-1,k)=vapor_base(i,j,k)
+                  drop_base(i,j-1,k)=drop_base(i,j,k)
+                  rain_base(i,j-1,k)=rain_base(i,j,k)
+                  crystal_base(i,j-1,k)=crystal_base(i,j,k)
                   Aer1(i,j-1,k)=Aer1(i,j,k)
                   heat_force(i,j-1,k)=heat_force(i,j,k)
                end do
                j=nx1+1
-               u_original(i,j,k)=u_original(i,j-1,k)
-               v_original(i,j,k)=v_original(i,j-1,k)
-               w_original(i,j,k)=w_original(i,j-1,k)
-               pressure_original(i,j,k)=pressure_original(i,j-1,k)
-               u_perturbed(i,j,k)=u_perturbed(i,j-1,k)
-               v_perturbed(i,j,k)=v_perturbed(i,j-1,k)
-               w_perturbed(i,j,k)=w_perturbed(i,j-1,k)
-               pressure_perturbed(i,j,k)=pressure_perturbed(i,j-1,k)
-               thermal_property_1(i,j,k)=thermal_property_1(i,j-1,k)
-               vapor_amt(i,j,k)=vapor_amt(i,j-1,k)
-               drop_amt(i,j,k)=drop_amt(i,j-1,k)
-               rain_amt(i,j,k)=rain_amt(i,j-1,k)
-               crystal_amt(i,j,k)=crystal_amt(i,j-1,k)
+               u_perturbed_base(i,j,k)=u_perturbed_base(i,j-1,k)
+               v_perturbed_base(i,j,k)=v_perturbed_base(i,j-1,k)
+               w_perturbed_base(i,j,k)=w_perturbed_base(i,j-1,k)
+               pressure_base(i,j,k)=pressure_base(i,j-1,k)
+               u_perturbed_new(i,j,k)=u_perturbed_new(i,j-1,k)
+               v_perturbed_new(i,j,k)=v_perturbed_new(i,j-1,k)
+               w_perturbed_new(i,j,k)=w_perturbed_new(i,j-1,k)
+               pressure_new(i,j,k)=pressure_new(i,j-1,k)
+               potential_temperature_base(i,j,k)=potential_temperature_base(i,j-1,k)
+               vapor_base(i,j,k)=vapor_base(i,j-1,k)
+               drop_base(i,j,k)=drop_base(i,j-1,k)
+               rain_base(i,j,k)=rain_base(i,j-1,k)
+               crystal_base(i,j,k)=crystal_base(i,j-1,k)
                Aer1(i,j,k)=Aer1(i,j-1,k)
                heat_force(i,j,k)=0.
             end do
             j=nx1
             i=0
-            u_original(i,j,k)=(u_original(i,j-1,k)+u_original(i+1,j,k))/2.
-            v_original(i,j,k)=(v_original(i,j-1,k)+v_original(i+1,j,k))/2.
-            w_original(i,j,k)=(w_original(i,j-1,k)+w_original(i+1,j,k))/2.
-            pressure_original(i,j,k)=(pressure_original(i,j-1,k)+pressure_original(i+1,j,k))/2.
-            u_perturbed(i,j,k)=(u_perturbed(i,j-1,k)+u_perturbed(i+1,j,k))/2.
-            v_perturbed(i,j,k)=(v_perturbed(i,j-1,k)+v_perturbed(i+1,j,k))/2.
-            w_perturbed(i,j,k)=(w_perturbed(i,j-1,k)+w_perturbed(i+1,j,k))/2.
-            pressure_perturbed(i,j,k)=(pressure_perturbed(i,j-1,k)+pressure_perturbed(i+1,j,k))/2.
-            thermal_property_1(i,j,k)=(thermal_property_1(i,j-1,k)+thermal_property_1(i+1,j,k))/2.
-            vapor_amt(i,j,k)=(vapor_amt(i,j-1,k)+vapor_amt(i+1,j,k))/2.
-            drop_amt(i,j,k)=(drop_amt(i,j-1,k)+drop_amt(i+1,j,k))/2.
-            rain_amt(i,j,k)=(rain_amt(i,j-1,k)+rain_amt(i+1,j,k))/2.
-            crystal_amt(i,j,k)=(crystal_amt(i,j-1,k)+crystal_amt(i+1,j,k))/2.
+            u_perturbed_base(i,j,k)=(u_perturbed_base(i,j-1,k)+u_perturbed_base(i+1,j,k))/2.
+            v_perturbed_base(i,j,k)=(v_perturbed_base(i,j-1,k)+v_perturbed_base(i+1,j,k))/2.
+            w_perturbed_base(i,j,k)=(w_perturbed_base(i,j-1,k)+w_perturbed_base(i+1,j,k))/2.
+            pressure_base(i,j,k)=(pressure_base(i,j-1,k)+pressure_base(i+1,j,k))/2.
+            u_perturbed_new(i,j,k)=(u_perturbed_new(i,j-1,k)+u_perturbed_new(i+1,j,k))/2.
+            v_perturbed_new(i,j,k)=(v_perturbed_new(i,j-1,k)+v_perturbed_new(i+1,j,k))/2.
+            w_perturbed_new(i,j,k)=(w_perturbed_new(i,j-1,k)+w_perturbed_new(i+1,j,k))/2.
+            pressure_new(i,j,k)=(pressure_new(i,j-1,k)+pressure_new(i+1,j,k))/2.
+            potential_temperature_base(i,j,k)=(potential_temperature_base(i,j-1,k)+potential_temperature_base(i+1,j,k))/2.
+            vapor_base(i,j,k)=(vapor_base(i,j-1,k)+vapor_base(i+1,j,k))/2.
+            drop_base(i,j,k)=(drop_base(i,j-1,k)+drop_base(i+1,j,k))/2.
+            rain_base(i,j,k)=(rain_base(i,j-1,k)+rain_base(i+1,j,k))/2.
+            crystal_base(i,j,k)=(crystal_base(i,j-1,k)+crystal_base(i+1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i+1,j,k))/2.
             heat_force(i,j,k)=0.
             i=nx1+1
-            u_original(i,j,k)=(u_original(i,j-1,k)+u_original(i-1,j,k))/2.
-            v_original(i,j,k)=(v_original(i,j-1,k)+v_original(i-1,j,k))/2.
-            w_original(i,j,k)=(w_original(i,j-1,k)+w_original(i-1,j,k))/2.
-            pressure_original(i,j,k)=(pressure_original(i,j-1,k)+pressure_original(i-1,j,k))/2.
-            u_perturbed(i,j,k)=(u_perturbed(i,j-1,k)+u_perturbed(i-1,j,k))/2.
-            v_perturbed(i,j,k)=(v_perturbed(i,j-1,k)+v_perturbed(i-1,j,k))/2.
-            w_perturbed(i,j,k)=(w_perturbed(i,j-1,k)+w_perturbed(i-1,j,k))/2.
-            pressure_perturbed(i,j,k)=(pressure_perturbed(i,j-1,k)+pressure_perturbed(i-1,j,k))/2.
-            thermal_property_1(i,j,k)=(thermal_property_1(i,j-1,k)+thermal_property_1(i-1,j,k))/2.
-            vapor_amt(i,j,k)=(vapor_amt(i,j-1,k)+vapor_amt(i-1,j,k))/2.
-            drop_amt(i,j,k)=(drop_amt(i,j-1,k)+drop_amt(i-1,j,k))/2.
-            rain_amt(i,j,k)=(rain_amt(i,j-1,k)+rain_amt(i-1,j,k))/2.
-            crystal_amt(i,j,k)=(crystal_amt(i,j-1,k)+crystal_amt(i-1,j,k))/2.
+            u_perturbed_base(i,j,k)=(u_perturbed_base(i,j-1,k)+u_perturbed_base(i-1,j,k))/2.
+            v_perturbed_base(i,j,k)=(v_perturbed_base(i,j-1,k)+v_perturbed_base(i-1,j,k))/2.
+            w_perturbed_base(i,j,k)=(w_perturbed_base(i,j-1,k)+w_perturbed_base(i-1,j,k))/2.
+            pressure_base(i,j,k)=(pressure_base(i,j-1,k)+pressure_base(i-1,j,k))/2.
+            u_perturbed_new(i,j,k)=(u_perturbed_new(i,j-1,k)+u_perturbed_new(i-1,j,k))/2.
+            v_perturbed_new(i,j,k)=(v_perturbed_new(i,j-1,k)+v_perturbed_new(i-1,j,k))/2.
+            w_perturbed_new(i,j,k)=(w_perturbed_new(i,j-1,k)+w_perturbed_new(i-1,j,k))/2.
+            pressure_new(i,j,k)=(pressure_new(i,j-1,k)+pressure_new(i-1,j,k))/2.
+            potential_temperature_base(i,j,k)=(potential_temperature_base(i,j-1,k)+potential_temperature_base(i-1,j,k))/2.
+            vapor_base(i,j,k)=(vapor_base(i,j-1,k)+vapor_base(i-1,j,k))/2.
+            drop_base(i,j,k)=(drop_base(i,j-1,k)+drop_base(i-1,j,k))/2.
+            rain_base(i,j,k)=(rain_base(i,j-1,k)+rain_base(i-1,j,k))/2.
+            crystal_base(i,j,k)=(crystal_base(i,j-1,k)+crystal_base(i-1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j-1,k)+Aer1(i-1,j,k))/2.
             heat_force(i,j,k)=0.
          end do
@@ -1081,70 +1053,70 @@ contains
          do concurrent(k=0:nz1+1)
             do concurrent(i=0:nx1+1)
                do concurrent(j=nx1:0) ! TODO Test this loop
-                  u_original(i,j+1,k)=u_original(i,j,k)
-                  v_original(i,j+1,k)=v_original(i,j,k)
-                  w_original(i,j+1,k)=w_original(i,j,k)
-                  pressure_original(i,j+1,k)=pressure_original(i,j,k)
-                  u_perturbed(i,j+1,k)=u_perturbed(i,j,k)
-                  v_perturbed(i,j+1,k)=v_perturbed(i,j,k)
-                  w_perturbed(i,j+1,k)=w_perturbed(i,j,k)
-                  pressure_perturbed(i,j+1,k)=pressure_perturbed(i,j,k)
-                  thermal_property_1(i,j+1,k)=thermal_property_1(i,j,k)
-                  vapor_amt(i,j+1,k)=vapor_amt(i,j,k)
-                  drop_amt(i,j+1,k)=drop_amt(i,j,k)
-                  rain_amt(i,j+1,k)=rain_amt(i,j,k)
-                  crystal_amt(i,j+1,k)=crystal_amt(i,j,k)
+                  u_perturbed_base(i,j+1,k)=u_perturbed_base(i,j,k)
+                  v_perturbed_base(i,j+1,k)=v_perturbed_base(i,j,k)
+                  w_perturbed_base(i,j+1,k)=w_perturbed_base(i,j,k)
+                  pressure_base(i,j+1,k)=pressure_base(i,j,k)
+                  u_perturbed_new(i,j+1,k)=u_perturbed_new(i,j,k)
+                  v_perturbed_new(i,j+1,k)=v_perturbed_new(i,j,k)
+                  w_perturbed_new(i,j+1,k)=w_perturbed_new(i,j,k)
+                  pressure_new(i,j+1,k)=pressure_new(i,j,k)
+                  potential_temperature_base(i,j+1,k)=potential_temperature_base(i,j,k)
+                  vapor_base(i,j+1,k)=vapor_base(i,j,k)
+                  drop_base(i,j+1,k)=drop_base(i,j,k)
+                  rain_base(i,j+1,k)=rain_base(i,j,k)
+                  crystal_base(i,j+1,k)=crystal_base(i,j,k)
                   Aer1(i,j+1,k)=Aer1(i,j,k)
                   heat_force(i,j+1,k)=heat_force(i,j,k)
                end do
                j=0
-               u_original(i,j,k)=u_original(i,j-1,k)
-               v_original(i,j,k)=v_original(i,j-1,k)
-               w_original(i,j,k)=w_original(i,j-1,k)
-               pressure_original(i,j,k)=pressure_original(i,j-1,k)
-               u_perturbed(i,j,k)=u_perturbed(i,j-1,k)
-               v_perturbed(i,j,k)=v_perturbed(i,j-1,k)
-               w_perturbed(i,j,k)=w_perturbed(i,j-1,k)
-               pressure_perturbed(i,j,k)=pressure_perturbed(i,j-1,k)
-               thermal_property_1(i,j,k)=thermal_property_1(i,j-1,k)
-               vapor_amt(i,j,k)=vapor_amt(i,j-1,k)
-               drop_amt(i,j,k)=drop_amt(i,j-1,k)
-               rain_amt(i,j,k)=rain_amt(i,j-1,k)
-               crystal_amt(i,j,k)=crystal_amt(i,j-1,k)
+               u_perturbed_base(i,j,k)=u_perturbed_base(i,j-1,k)
+               v_perturbed_base(i,j,k)=v_perturbed_base(i,j-1,k)
+               w_perturbed_base(i,j,k)=w_perturbed_base(i,j-1,k)
+               pressure_base(i,j,k)=pressure_base(i,j-1,k)
+               u_perturbed_new(i,j,k)=u_perturbed_new(i,j-1,k)
+               v_perturbed_new(i,j,k)=v_perturbed_new(i,j-1,k)
+               w_perturbed_new(i,j,k)=w_perturbed_new(i,j-1,k)
+               pressure_new(i,j,k)=pressure_new(i,j-1,k)
+               potential_temperature_base(i,j,k)=potential_temperature_base(i,j-1,k)
+               vapor_base(i,j,k)=vapor_base(i,j-1,k)
+               drop_base(i,j,k)=drop_base(i,j-1,k)
+               rain_base(i,j,k)=rain_base(i,j-1,k)
+               crystal_base(i,j,k)=crystal_base(i,j-1,k)
                Aer1(i,j,k)=Aer1(i,j-1,k)
                heat_force(i,j,k)=0.
             end do
             j=1
             i=0
-            u_original(i,j,k)=(u_original(i,j+1,k)+u_original(i+1,j,k))/2.
-            v_original(i,j,k)=(v_original(i,j+1,k)+v_original(i+1,j,k))/2.
-            w_original(i,j,k)=(w_original(i,j+1,k)+w_original(i+1,j,k))/2.
-            pressure_original(i,j,k)=(pressure_original(i,j+1,k)+pressure_original(i+1,j,k))/2.
-            u_perturbed(i,j,k)=(u_perturbed(i,j+1,k)+u_perturbed(i+1,j,k))/2.
-            v_perturbed(i,j,k)=(v_perturbed(i,j+1,k)+v_perturbed(i+1,j,k))/2.
-            w_perturbed(i,j,k)=(w_perturbed(i,j+1,k)+w_perturbed(i+1,j,k))/2.
-            pressure_perturbed(i,j,k)=(pressure_perturbed(i,j+1,k)+pressure_perturbed(i+1,j,k))/2.
-            thermal_property_1(i,j,k)=(thermal_property_1(i,j+1,k)+thermal_property_1(i+1,j,k))/2.
-            vapor_amt(i,j,k)=(vapor_amt(i,j+1,k)+vapor_amt(i+1,j,k))/2.
-            drop_amt(i,j,k)=(drop_amt(i,j+1,k)+drop_amt(i+1,j,k))/2.
-            rain_amt(i,j,k)=(rain_amt(i,j+1,k)+rain_amt(i+1,j,k))/2.
-            crystal_amt(i,j,k)=(crystal_amt(i,j+1,k)+crystal_amt(i+1,j,k))/2.
+            u_perturbed_base(i,j,k)=(u_perturbed_base(i,j+1,k)+u_perturbed_base(i+1,j,k))/2.
+            v_perturbed_base(i,j,k)=(v_perturbed_base(i,j+1,k)+v_perturbed_base(i+1,j,k))/2.
+            w_perturbed_base(i,j,k)=(w_perturbed_base(i,j+1,k)+w_perturbed_base(i+1,j,k))/2.
+            pressure_base(i,j,k)=(pressure_base(i,j+1,k)+pressure_base(i+1,j,k))/2.
+            u_perturbed_new(i,j,k)=(u_perturbed_new(i,j+1,k)+u_perturbed_new(i+1,j,k))/2.
+            v_perturbed_new(i,j,k)=(v_perturbed_new(i,j+1,k)+v_perturbed_new(i+1,j,k))/2.
+            w_perturbed_new(i,j,k)=(w_perturbed_new(i,j+1,k)+w_perturbed_new(i+1,j,k))/2.
+            pressure_new(i,j,k)=(pressure_new(i,j+1,k)+pressure_new(i+1,j,k))/2.
+            potential_temperature_base(i,j,k)=(potential_temperature_base(i,j+1,k)+potential_temperature_base(i+1,j,k))/2.
+            vapor_base(i,j,k)=(vapor_base(i,j+1,k)+vapor_base(i+1,j,k))/2.
+            drop_base(i,j,k)=(drop_base(i,j+1,k)+drop_base(i+1,j,k))/2.
+            rain_base(i,j,k)=(rain_base(i,j+1,k)+rain_base(i+1,j,k))/2.
+            crystal_base(i,j,k)=(crystal_base(i,j+1,k)+crystal_base(i+1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i+1,j,k))/2.
             heat_force(i,j,k)=0.
             i=nx1+1
-            u_original(i,j,k)=(u_original(i,j+1,k)+u_original(i-1,j,k))/2.
-            v_original(i,j,k)=(v_original(i,j+1,k)+v_original(i-1,j,k))/2.
-            w_original(i,j,k)=(w_original(i,j+1,k)+w_original(i-1,j,k))/2.
-            pressure_original(i,j,k)=(pressure_original(i,j+1,k)+pressure_original(i-1,j,k))/2.
-            u_perturbed(i,j,k)=(u_perturbed(i,j+1,k)+u_perturbed(i-1,j,k))/2.
-            v_perturbed(i,j,k)=(v_perturbed(i,j+1,k)+v_perturbed(i-1,j,k))/2.
-            w_perturbed(i,j,k)=(w_perturbed(i,j+1,k)+w_perturbed(i-1,j,k))/2.
-            pressure_perturbed(i,j,k)=(pressure_perturbed(i,j+1,k)+pressure_perturbed(i-1,j,k))/2.
-            thermal_property_1(i,j,k)=(thermal_property_1(i,j+1,k)+thermal_property_1(i-1,j,k))/2.
-            vapor_amt(i,j,k)=(vapor_amt(i,j+1,k)+vapor_amt(i-1,j,k))/2.
-            drop_amt(i,j,k)=(drop_amt(i,j+1,k)+drop_amt(i-1,j,k))/2.
-            rain_amt(i,j,k)=(rain_amt(i,j+1,k)+rain_amt(i-1,j,k))/2.
-            crystal_amt(i,j,k)=(crystal_amt(i,j+1,k)+crystal_amt(i-1,j,k))/2.
+            u_perturbed_base(i,j,k)=(u_perturbed_base(i,j+1,k)+u_perturbed_base(i-1,j,k))/2.
+            v_perturbed_base(i,j,k)=(v_perturbed_base(i,j+1,k)+v_perturbed_base(i-1,j,k))/2.
+            w_perturbed_base(i,j,k)=(w_perturbed_base(i,j+1,k)+w_perturbed_base(i-1,j,k))/2.
+            pressure_base(i,j,k)=(pressure_base(i,j+1,k)+pressure_base(i-1,j,k))/2.
+            u_perturbed_new(i,j,k)=(u_perturbed_new(i,j+1,k)+u_perturbed_new(i-1,j,k))/2.
+            v_perturbed_new(i,j,k)=(v_perturbed_new(i,j+1,k)+v_perturbed_new(i-1,j,k))/2.
+            w_perturbed_new(i,j,k)=(w_perturbed_new(i,j+1,k)+w_perturbed_new(i-1,j,k))/2.
+            pressure_new(i,j,k)=(pressure_new(i,j+1,k)+pressure_new(i-1,j,k))/2.
+            potential_temperature_base(i,j,k)=(potential_temperature_base(i,j+1,k)+potential_temperature_base(i-1,j,k))/2.
+            vapor_base(i,j,k)=(vapor_base(i,j+1,k)+vapor_base(i-1,j,k))/2.
+            drop_base(i,j,k)=(drop_base(i,j+1,k)+drop_base(i-1,j,k))/2.
+            rain_base(i,j,k)=(rain_base(i,j+1,k)+rain_base(i-1,j,k))/2.
+            crystal_base(i,j,k)=(crystal_base(i,j+1,k)+crystal_base(i-1,j,k))/2.
             Aer1(i,j,k)=(Aer1(i,j+1,k)+Aer1(i-1,j,k))/2.
             heat_force(i,j,k)=0.
          end do
@@ -1154,6 +1126,6 @@ contains
       posxx=posx(tte)*dx1+Xnub(tte)
       posyy=posy(tte)*dx1+Ynub(tte)
 
-   end subroutine cloud_movement_init
+   end subroutine cloud_movement
 end module model_initialization
 

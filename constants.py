@@ -9,15 +9,15 @@ nube31_var_list = [
     "original_x_velocity",
     "original_y_velocity",
     "original_z_velocity",
-    "thermal_property_1",
+    "potential_temperature_base",
     "original_pressure",
-    "vapor_amt",
-    "drop_amt",
-    "rain_amt",
-    "crystal_amt",
-    "snow_amt",
-    "hail_amt",
-    "spray_amt",
+    "vapor_base",
+    "drop_base",
+    "rain_base",
+    "crystal_base",
+    "snow_base",
+    "hail_base",
+    "aerosol_base",
 ]
 
 inis_var_list = [
