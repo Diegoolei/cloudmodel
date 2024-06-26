@@ -873,7 +873,7 @@ contains
                   drop_base(i-1,j,k) = drop_base(i,j,k)
                   rain_base(i-1,j,k) = rain_base(i,j,k)
                   crystal_base(i-1,j,k) = crystal_base(i,j,k)
-                  Aer1(i-1,j,k) = Aer1(i,j,k)
+                  aerosol_base(i-1,j,k) = aerosol_base(i,j,k)
                   heat_force(i-1,j,k) = heat_force(i,j,k)
                end do
                i = nx1+1
@@ -890,7 +890,7 @@ contains
                drop_base(i,j,k) = drop_base(i-1,j,k)
                rain_base(i,j,k) = rain_base(i-1,j,k)
                crystal_base(i,j,k) = crystal_base(i-1,j,k)
-               Aer1(i,j,k) = Aer1(i-1,j,k)
+               aerosol_base(i,j,k) = aerosol_base(i-1,j,k)
                heat_force(i,j,k) = 0.
             end do
             i = nx1
@@ -921,8 +921,8 @@ contains
                + rain_base(i,j+1,k))/2.
             crystal_base(i,j,k) = (crystal_base(i-1,j,k)&
                + crystal_base(i,j+1,k))/2.
-            Aer1(i,j,k) = (Aer1(i-1,j,k)&
-               + Aer1(i,j+1,k))/2.
+            aerosol_base(i,j,k) = (aerosol_base(i-1,j,k)&
+               + aerosol_base(i,j+1,k))/2.
             heat_force(i,j,k) = 0.
             j = nx1+1
             u_perturbed_base(i,j,k) = (u_perturbed_base(i-1,j,k)+u_perturbed_base(i,j-1,k))/2.
@@ -938,7 +938,7 @@ contains
             drop_base(i,j,k) = (drop_base(i-1,j,k)+drop_base(i,j-1,k))/2.
             rain_base(i,j,k) = (rain_base(i-1,j,k)+rain_base(i,j-1,k))/2.
             crystal_base(i,j,k) = (crystal_base(i-1,j,k)+crystal_base(i,j-1,k))/2.
-            Aer1(i,j,k) = (Aer1(i-1,j,k)+Aer1(i,j-1,k))/2.
+            aerosol_base(i,j,k) = (aerosol_base(i-1,j,k)+aerosol_base(i,j-1,k))/2.
             heat_force(i,j,k) = 0.
          end do
       endif
@@ -963,7 +963,7 @@ contains
                   drop_base(i+1,j,k) = drop_base(i,j,k)
                   rain_base(i+1,j,k) = rain_base(i,j,k)
                   crystal_base(i+1,j,k) = crystal_base(i,j,k)
-                  Aer1(i+1,j,k) = Aer1(i,j,k)
+                  aerosol_base(i+1,j,k) = aerosol_base(i,j,k)
                   heat_force(i+1,j,k) = heat_force(i,j,k)
                end do
                i = 0
@@ -980,7 +980,7 @@ contains
                drop_base(i,j,k) = drop_base(i+1,j,k)
                rain_base(i,j,k) = rain_base(i+1,j,k)
                crystal_base(i,j,k) = crystal_base(i+1,j,k)
-               Aer1(i,j,k) = Aer1(i+1,j,k)
+               aerosol_base(i,j,k) = aerosol_base(i+1,j,k)
                heat_force(i,j,k) = 0.
             end do
             i = 1
@@ -1011,8 +1011,8 @@ contains
                + rain_base(i,j+1,k))/2.
             crystal_base(i,j,k) = (crystal_base(i+1,j,k)&
                + crystal_base(i,j+1,k))/2.
-            Aer1(i,j,k) = (Aer1(i+1,j,k)&
-               + Aer1(i,j+1,k))/2.
+            aerosol_base(i,j,k) = (aerosol_base(i+1,j,k)&
+               + aerosol_base(i,j+1,k))/2.
             heat_force(i,j,k) = 0.
             j = nx1+1
             u_perturbed_base(i,j,k) = (u_perturbed_base(i+1,j,k)&
@@ -1041,8 +1041,8 @@ contains
                + rain_base(i,j-1,k))/2.
             crystal_base(i,j,k) = (crystal_base(i+1,j,k)&
                + crystal_base(i,j-1,k))/2.
-            Aer1(i,j,k) = (Aer1(i+1,j,k)&
-               + Aer1(i,j-1,k))/2.
+            aerosol_base(i,j,k) = (aerosol_base(i+1,j,k)&
+               + aerosol_base(i,j-1,k))/2.
             heat_force(i,j,k) = 0.
          end do
       endif
@@ -1070,7 +1070,7 @@ contains
                   drop_base(i,j-1,k) = drop_base(i,j,k)
                   rain_base(i,j-1,k) = rain_base(i,j,k)
                   crystal_base(i,j-1,k) = crystal_base(i,j,k)
-                  Aer1(i,j-1,k) = Aer1(i,j,k)
+                  aerosol_base(i,j-1,k) = aerosol_base(i,j,k)
                   heat_force(i,j-1,k) = heat_force(i,j,k)
                end do
                j = nx1+1
@@ -1087,7 +1087,7 @@ contains
                drop_base(i,j,k) = drop_base(i,j-1,k)
                rain_base(i,j,k) = rain_base(i,j-1,k)
                crystal_base(i,j,k) = crystal_base(i,j-1,k)
-               Aer1(i,j,k) = Aer1(i,j-1,k)
+               aerosol_base(i,j,k) = aerosol_base(i,j-1,k)
                heat_force(i,j,k) = 0.
             end do
             j = nx1
@@ -1118,8 +1118,8 @@ contains
                + rain_base(i+1,j,k))/2.
             crystal_base(i,j,k) = (crystal_base(i,j-1,k)&
                + crystal_base(i+1,j,k))/2.
-            Aer1(i,j,k) = (Aer1(i,j-1,k)&
-               + Aer1(i+1,j,k))/2.
+            aerosol_base(i,j,k) = (aerosol_base(i,j-1,k)&
+               + aerosol_base(i+1,j,k))/2.
             heat_force(i,j,k) = 0.
             i = nx1+1
             u_perturbed_base(i,j,k) = (u_perturbed_base(i,j-1,k)&
@@ -1148,8 +1148,8 @@ contains
                + rain_base(i-1,j,k))/2.
             crystal_base(i,j,k) = (crystal_base(i,j-1,k)&
                + crystal_base(i-1,j,k))/2.
-            Aer1(i,j,k) = (Aer1(i,j-1,k)&
-               + Aer1(i-1,j,k))/2.
+            aerosol_base(i,j,k) = (aerosol_base(i,j-1,k)&
+               + aerosol_base(i-1,j,k))/2.
             heat_force(i,j,k) = 0.
          end do
       endif
@@ -1174,7 +1174,7 @@ contains
                   drop_base(i,j+1,k) = drop_base(i,j,k)
                   rain_base(i,j+1,k) = rain_base(i,j,k)
                   crystal_base(i,j+1,k) = crystal_base(i,j,k)
-                  Aer1(i,j+1,k) = Aer1(i,j,k)
+                  aerosol_base(i,j+1,k) = aerosol_base(i,j,k)
                   heat_force(i,j+1,k) = heat_force(i,j,k)
                end do
                j = 0
@@ -1191,7 +1191,7 @@ contains
                drop_base(i,j,k) = drop_base(i,j-1,k)
                rain_base(i,j,k) = rain_base(i,j-1,k)
                crystal_base(i,j,k) = crystal_base(i,j-1,k)
-               Aer1(i,j,k) = Aer1(i,j-1,k)
+               aerosol_base(i,j,k) = aerosol_base(i,j-1,k)
                heat_force(i,j,k) = 0.
             end do
             j = 1
@@ -1222,10 +1222,10 @@ contains
                + rain_base(i+1,j,k))/2.
             crystal_base(i,j,k) = (crystal_base(i,j+1,k)&
                + crystal_base(i+1,j,k))/2.
-            Aer1(i,j,k) = (Aer1(i,j+1,k)&
-               + Aer1(i+1,j,k))/2.
+            aerosol_base(i,j,k) = (aerosol_base(i,j+1,k)&
+               + aerosol_base(i+1,j,k))/2.
             heat_force(i,j,k) = 0.
-            
+
             i = nx1+1
             u_perturbed_base(i,j,k) = (u_perturbed_base(i,j+1,k)&
                + u_perturbed_base(i-1,j,k))/2.
@@ -1253,8 +1253,8 @@ contains
                + rain_base(i-1,j,k))/2.
             crystal_base(i,j,k) = (crystal_base(i,j+1,k)&
                + crystal_base(i-1,j,k))/2.
-            Aer1(i,j,k) = (Aer1(i,j+1,k)&
-               + Aer1(i-1,j,k))/2.
+            aerosol_base(i,j,k) = (aerosol_base(i,j+1,k)&
+               + aerosol_base(i-1,j,k))/2.
             heat_force(i,j,k) = 0.
          end do
 

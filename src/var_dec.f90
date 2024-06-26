@@ -180,7 +180,7 @@ module microphysics_perturbation
    real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: drop_base, drop_new
 
    !> Spray variables
-   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: aerosol_base, aerosol_new, Aer1
+   real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: aerosol_base, aerosol_new
 
    !> Liquid cloud variables
    real, dimension(-3:nx1+3, -3:nx1+3, -2:nz1+2) :: rain_base, rain_new
