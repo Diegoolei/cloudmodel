@@ -21,15 +21,15 @@ end module velpre01
 
 module model_initial_conditions
 contains
-   !     Condiciones iniciales para las variables dinamicas
-   !     Corresponde a una nube con hielo
-   !     Calcula la presion inicial en forma iterativa, primero supone aire
-   !      seco y luego integra considerando la densidad total, incluyendo el
-   !      vapor.
-   !     Solo hay una perturbacion en temperatura para iniciar la conveccion
-   !     Incluye viento de corte, tipo frente
 
    subroutine initial_conditions()
+      !!     Condiciones iniciales para las variables dinamicas
+      !!     Corresponde a una nube con hielo
+      !!     Calcula la presion inicial en forma iterativa, primero supone aire
+      !!      seco y luego integra considerando la densidad total, incluyendo el
+      !!      vapor.
+      !!     Solo hay una perturbacion en temperatura para iniciar la conveccion
+      !!     Incluye viento de corte, tipo frente
       use cant01
       use dimensions
       use microphysics_perturbation
@@ -46,9 +46,14 @@ contains
       real vapor_total, aerosol_total, base_horizontal_velocity, z_reference,&
          gaussian
 
-      real initial_x_perturbation, initial_y_perturbation, initial_z_perturbation,&
-         sigma_t, sigma_a,perturbation_width, temperature_max_perturbation,&
-         aerosol_max_perturbation
+      real :: initial_x_perturbation = (nx1+1.)*dx1/2.  !! Initial disturbance’s x-coordinate
+      real :: initial_y_perturbation = (nx1+1.)*dx1/2.  !! Initial disturbance’s y-coordinate
+      real :: initial_z_perturbation = 0. !! Initial disturbance’s z-coordinate
+      real :: sigma_t = 2*1000.**2.   !! z decay of the perturbation in T
+      real :: sigma_a = 200.**2. !! z decay of the perturbation in A
+      real :: perturbation_width = 2000. !! perturbation_width
+      real :: temperature_max_perturbation = .7  !! Maximum temperature perturbation
+      real :: aerosol_max_perturbation = 10000. !! Maximum aerosol perturbation
 
       real intercept_lv_saturation, slope_lv_saturation, quadratic_lv_saturation,&
          cubic_lv_saturation, quartic_lv_saturation, quintic_lv_saturation,&
@@ -59,15 +64,6 @@ contains
          sextic_sv_saturation
 
       integer i, j, k, n, unit
-
-      initial_x_perturbation = (nx1+1.)*dx1/2.  !! Initial disturbance’s x-coordinate
-      initial_y_perturbation = (nx1+1.)*dx1/2.  !! Initial disturbance’s y-coordinate
-      initial_z_perturbation = 0.               !! Initial disturbance’s z-coordinate
-      sigma_t = 2*1000.**2.                     !! Decaimiento en z de la perturbacion en T
-      sigma_a = 200.**2.                        !! Decaimiento en z de la perturbacion en A
-      perturbation_width = 2000.                !! Ancho de la perturbacion
-      temperature_max_perturbation = .7         !! Perturbacion maxima de temperatura
-      aerosol_max_perturbation = 10000.         !! Perturbacion maxima de aerosoles
 
       intercept_lv_saturation = 6.10780
       slope_lv_saturation = 4.43652e-1
@@ -287,7 +283,7 @@ contains
          vapor_base(i,j,-1) = vapor_base(i,j,1)
       end do
 
-      !     calculo del vapor_z_relative
+      ! calculo del vapor_z_relative
       vapor_total = 0.
       do concurrent(k = 1:nz1)
          vapor_total = vapor_total+vapor_z_initial(k)
@@ -310,8 +306,6 @@ contains
 
    end subroutine initial_conditions
 
-   !*********************************************************
-
    function TT_f (z_aux)
       real :: a, xx, TT_f
       a = 298.15
@@ -333,7 +327,7 @@ contains
          TT_f = a - 77.5 + 50. * (xx / 9000.)**2.
       endif
    end function TT_f
-   !*****************************************************
+
    subroutine PP(G,Rd,dx,nz1,Pres,Pres0)
       integer k,nz1,nx4
       parameter (nx4 = 500)
@@ -365,7 +359,6 @@ contains
       return
    end subroutine PP
 
-   !*****************************************************
    subroutine PP2(G,dx,air_density_z_initial,Pres00,Pres0)
       use dimensions
       integer k
@@ -414,7 +407,9 @@ module model_var
 
    character(len = 3) :: file_number
 
-   integer :: current_time, t1, t2, n, m, l, i, j, k, lll, s, iT, tte, lvapneg,&
+   integer :: current_time
+   integer :: t1  !! paso a inicio (si ini = 0->t1 = 0)
+   integer :: t2, n, m, l, i, j, k, lll, s, iT, tte, lvapneg,&
       llluneg, lcrineg, laerneg, lnieneg, lgraneg, yy
 
 end module model_var
@@ -461,12 +456,12 @@ contains
       implicit none
       integer :: unit_number
 
-      ini = 0                                   !inicio por vez primera =  0
-      t1 = 0                                    !paso a inicio (si ini = 0->t1 = 0)
-      ltt = sim_time_minutes * 60. * 2.         !tiempo total de simulacion
-      ltg = save_lapse_minutes * 60. * 2.       !tiempo de grabacion
-      lte = 3. * 60. * 2.                       !tiempo de grabacion estadistica
-      ltb = 3. * 60. * 2.                       !tiempo de backup
+      ini = 0
+      t1 = 0
+      ltt = sim_time_minutes * 60. * 2.
+      ltg = save_lapse_minutes * 60. * 2.
+      lte = 3. * 60. * 2.
+      ltb = 3. * 60. * 2.
       ctur = 0.5
 
       pro1 = 1. - 2e-2 * (dt1 / 5.)
@@ -475,7 +470,7 @@ contains
       pro4 = (1. - pro1) / 4.
 
       total_time = nint(ltt / dt1)
-      lt2 = nint(dt1 / dt2)                  ! Proporcion Fisica/Microfisica
+      lt2 = nint(dt1 / dt2)
       lt3 = 2 * nint(dt1 / dt3)
       cteturb = ctur / 2.**.5
 
@@ -500,10 +495,8 @@ contains
       tte = 0
 
       if (ini == 0) then
-         !Si ini = 0 el calculo empieza por primera###
          call initial_conditions()
       else
-         !si ini = 1 el calculo recomienza desde algun paso
          open(newunit = unit_number, file = output_directory//"inis.da", status =&
             'unknown', form = 'unformatted')
          read(unit_number,*) air_density_z_initial, temperature_z_initial,&
@@ -781,16 +774,15 @@ contains
 
 
    subroutine cloud_position()
+      !! desplazamientos horizontales a partir de la velocidad media de la nube
+      !! calculo la altura media de la nube, la velocidad media de la nube
+      !! es tomada como la velocidad del aire sin perturbar a esa altura
       use model_var
       use lmngot
       use lmncri
       use microphysics_perturbation
       use initial_z_state
       use cant01
-!     desplazamientos horizontales a partir de la velocidad media de la nube
-!     calculo la altura media de la nube, la velocidad media de la nube
-!     es tomada como la velocidad del aire sin perturbar a esa altura
-!                  (1/3/2000)
 
       if (ngot(2) >= 1 .or. ncri(2) > 1) then
 
@@ -826,19 +818,18 @@ contains
    end subroutine cloud_position
 
    subroutine cloud_movement()
-      !desplazamiento de la nube
+      !! desplazamiento de la nube
+      !! Redefine el valor de todas las variables (deberian
+      !! ser las que se graban solamente)
+      !! calculo de la posicion media de la nube, es decir de las gotitas
+      !! el centro esta inicialmente en nx1/2+.5, nx1/2+.5
+      !! posxx y posyy son siempre en modulo menores que dx1
+      !! En posx y posy se guarda para cada current_time la posicion en
+      !! puntos de red
       use model_var
       use dinamic_var_perturbation
       use microphysics_perturbation
-      !     movimiento de la nube (4/01/99)
-!     Redefine el valor de todas las variables (deberian
-!      ser las que se graban solamente)
 
-!     calculo de la posicion media de la nube, es decir de las gotitas
-!     el centro esta inicialmente en nx1/2+.5, nx1/2+.5
-!     posxx y posyy son siempre en modulo menores que dx1
-!     En posx y posy se guarda para cada current_time la posicion en
-!     puntos de red
 
       if (spos  ==  1) then
          posxx = Xnub(tte)
@@ -851,8 +842,7 @@ contains
       posx(tte) = posx(tte-1)
       posy(tte) = posy(tte-1)
 
-!*    corrimiento en x
-
+      !*    corrimiento en x
       if (posxx > dx1) then
          posx(tte) = posx(tte)+1
          Xnub(tte) = Xnub(tte)-dx1
@@ -1047,7 +1037,7 @@ contains
          end do
       endif
 
-!*    corrimiento en y
+      !*    corrimiento en y
 
       if (posyy > dx1) then
          posy(tte) = posy(tte)+1

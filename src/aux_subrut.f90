@@ -1,7 +1,7 @@
 module extra_subrut
 contains
    subroutine turbu1(kk)
-      !> Esta subrutina calcula los Dnm para cada plano Z
+      !! Esta subrutina calcula los Dnm para cada plano Z
       use cant01
       use dimensions
       use dinamic_var_perturbation
@@ -82,19 +82,16 @@ contains
       return
    end subroutine turbu1
 
-
-   !      Esta subrutina calcula las cantidades referida a los terminos de
-   !      turbulencia: K, DK, DDij
-   !      Dij viene de turbu1
-   !     En realidad para tener los valores de las 4 cantidades falta
-   !     multiplicarlas por:
-   !                      KMM : cteturb*dx1/2
-   !                      DK  : cteturb/4
-   !                      Dij : 1/dx2 (simetrico)
-   !                      DDij: 1/dx2**2
-   !     revisado : 28/04/97
-
    subroutine turbu2(i,j)
+      !!      Esta subrutina calcula las cantidades referida a los terminos de
+      !!      turbulencia: K, DK, DDij
+      !!      Dij viene de turbu1
+      !!     En realidad para tener los valores de las 4 cantidades falta
+      !!     multiplicarlas por:
+      !!                      KMM : cteturb*dx1/2
+      !!                      DK  : cteturb/4
+      !!                      Dij : 1/dx2 (simetrico)
+      !!                      DDij: 1/dx2**2
       use dimensions
       use turbvar
       use turbvar1
@@ -146,8 +143,8 @@ contains
    end subroutine turbu2
 
 
-   !     Esta subrutina calcula los terminos inomogeneos para las velocidades
    subroutine inhomogeneous_velocities(i,j,k,dden0z)
+      !! Esta subrutina calcula los terminos inomogeneos para las velocidades
       use cant01
       use dimensions
       use dinamic_var_perturbation
@@ -161,17 +158,28 @@ contains
       integer, intent(in) :: i,j,k
       real, intent(in) :: dden0z
 
-      !> Variables related to velocity components
-      real(8) :: velocity_xx, velocity_xy, velocity_xz, velocity_yx, velocity_yy,&
-         velocity_yz, velocity_zx, velocity_zy, velocity_zz
+      real(8) :: velocity_xx !! Velocity component xx
+      real(8) :: velocity_xy !! Velocity component xy
+      real(8) :: velocity_xz !! Velocity component xz
+      real(8) :: velocity_yx !! Velocity component yx
+      real(8) :: velocity_yy !! Velocity component yy
+      real(8) :: velocity_yz !! Velocity component yz
+      real(8) :: velocity_zx !! Velocity component zx
+      real(8) :: velocity_zy !! Velocity component zy
+      real(8) :: velocity_zz !! Velocity component zz
 
-      !> Coefficients and turbulence parameters
-      real(8) :: coefficient_a1, coefficient_a2, coefficient_a3,&
-         turbulence_x, turbulence_y, turbulence_z
+      real(8) :: coefficient_a1 !! Coefficient a1
+      real(8) :: coefficient_a2 !! Coefficient a2
+      real(8) :: coefficient_a3 !! Coefficient a3
+      real(8) :: turbulence_x !! Turbulence x
+      real(8) :: turbulence_y !! Turbulence y
+      real(8) :: turbulence_z !! Turbulence z
 
-      !> Divergence and other physical quantities
-      real(8) :: divergence_x, divergence_y, divergence_z, gravitational_acceleration,&
-         laplacian_of_laplacian
+      real(8) :: divergence_x !! Divergence x
+      real(8) :: divergence_y !! Divergence y
+      real(8) :: divergence_z !! Divergence z
+      real(8) :: gravitational_acceleration !! Gravitational acceleration
+      real(8) :: laplacian_of_laplacian !! Laplacian of laplacian
 
 
       velocity_xx = (u_perturbed_new(i-2,j,k) - u_perturbed_new(i+2,j,k))&
@@ -239,7 +247,7 @@ contains
    end subroutine inhomogeneous_velocities
 
    subroutine tempot(i,j,k,dden0z,Fcal)
-      !> heat_force es el calor liberado por cambio de fase, por unidad de masa de aire
+      !! heat_force es el calor liberado por cambio de fase, por unidad de masa de aire
       use cant01
       use dimensions
       use dinamic_var_perturbation
@@ -682,9 +690,9 @@ contains
       return
    end subroutine daeros
 
-   !     Esta subrutina corrige los lugares en donde la dinamica da
-   !     negativa la cantidad de gotitas
    subroutine corgot
+      !! Esta subrutina corrige los lugares en donde la dinamica da
+      !! negativa la cantidad de gotitas
       use dimensions
       use microphysics_perturbation
       use lmngot
@@ -721,9 +729,9 @@ contains
       return
    end subroutine corgot
 
-   !     Esta subrutina corrige los lugares en donde la dinamica da
-   !     negativa la cantidad de gotas
    subroutine corllu
+      !! Esta subrutina corrige los lugares en donde la dinamica da
+      !! negativa la cantidad de gotas
       use dimensions
       use microphysics_perturbation
       use lmnllu
@@ -759,9 +767,9 @@ contains
       return
    end subroutine corllu
 
-   !     Esta subrutina corrige los lugares en donde la dinamica da
-   !     negativa la cantidad de cristales
    subroutine corcri
+      !! Esta subrutina corrige los lugares en donde la dinamica da
+      !! negativa la cantidad de cristales
       use dimensions
       use microphysics_perturbation
       use lmncri
@@ -797,9 +805,9 @@ contains
       return
    end subroutine corcri
 
-   !     Esta subrutina corrige los lugares en donde la dinamica da
-   !     negativa la cantidad de nieve
    subroutine cornie
+      !! Esta subrutina corrige los lugares en donde la dinamica da
+      !! negativa la cantidad de nieve
       use dimensions
       use microphysics_perturbation
       use lmnnie
@@ -835,9 +843,9 @@ contains
       return
    end subroutine cornie
 
-   !     Esta subrutina corrige los lugares en donde la dinamica da
-   !     negativa la cantidad de granizos
    subroutine corgra
+      !! Esta subrutina corrige los lugares en donde la dinamica da
+      !! negativa la cantidad de granizos
       use dimensions
       use microphysics_perturbation
       use lmngra
@@ -873,9 +881,9 @@ contains
       return
    end subroutine corgra
 
-   !     Esta subrutina corrige los lugares en donde la dinamica da
-   !     negativa la cantidad de vapor
    subroutine corvap(Qvapneg)
+      !! Esta subrutina corrige los lugares en donde la dinamica da
+      !! negativa la cantidad de vapor
       use dimensions
       use microphysics_perturbation
       use initial_z_state
@@ -895,9 +903,9 @@ contains
       return
    end subroutine corvap
 
-   !     Esta subrutina corrige los lugares en donde la dinamica da
-   !     negativa la cantidad de aerosoles
    subroutine coraer(aerneg)
+      !! Esta subrutina corrige los lugares en donde la dinamica da
+      !! negativa la cantidad de aerosoles
       use dimensions
       use microphysics_perturbation
       use initial_z_state
@@ -916,7 +924,6 @@ contains
       return
    end subroutine coraer
 
-   !*********************************************************************
    subroutine suma(sum,a1,a2,a3)
       implicit none
       real a1,a2,a3,sum,aux

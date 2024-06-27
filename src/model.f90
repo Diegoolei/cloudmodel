@@ -1,23 +1,25 @@
-!     Incluye microfisica con vapor, gotitas, lluvia, cristales, nieve
-!      y granizos (por unidad de volumen)
-!     Con viento de corte.
-!     Este modelo simula una nube tridimensional, con diferencias
-!      finitas adelantadas en el tiempo y centradas en el espacio
-!     Este modelo (asi como sus variantes) sirve de test
-!     Las grillas son las mismas para las cantidades dinamicas y
-!      microfisicas, como asi tambien los intervalos de tiempo.
-!     Todas las variables son reales*4
-!     Condiciones de contorno homogeneas para las variables microfisicas
-!     Graba el valor de todas las variables cada ltb segundos.
-!     Graba el valor de las variables para analisis cada ltg segundos.
-!     Condicion de contorno nula para el vapor
-!     Contempla el desplazamiento de la nube.
-!     Mejora la condicion en el piso para los aerosoles cuando hay agua (815)
 
-!> @brief This module contains the cloud model implementation.
+
 module cloud_model
+   !! This module contains the cloud model implementation.
 contains
    subroutine model()
+      !! Incluye microfisica con vapor, gotitas, lluvia, cristales, nieve
+      !! y granizos (por unidad de volumen)
+      !! Con viento de corte.
+      !! Este modelo simula una nube tridimensional, con diferencias
+      !! finitas adelantadas en el tiempo y centradas en el espacio
+      !! Este modelo (asi como sus variantes) sirve de test
+      !! Las grillas son las mismas para las cantidades dinamicas y
+      !! microfisicas, como asi tambien los intervalos de tiempo.
+      !! Todas las variables son reales*4
+      !! Condiciones de contorno homogeneas para las variables microfisicas
+      !! Graba el valor de todas las variables cada ltb segundos.
+      !! Graba el valor de las variables para analisis cada ltg segundos.
+      !! Condicion de contorno nula para el vapor
+      !! Contempla el desplazamiento de la nube.
+      !! Mejora la condicion en el piso para los aerosoles cuando hay agua (815)
+
       use cant01, only: total_time
       use model_var, only: current_time
       use dinamic_var_perturbation, only: theta_base

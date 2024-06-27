@@ -1,7 +1,7 @@
 module model_aux
 contains
    subroutine vapor_advection()
-      !######################## Adveccion de vapores #######################
+      !!Adveccion de vapores
       use advecs, only: advllu1, advaer1, advnie1, advgra1, advvap1, advgot1,&
          advcri1, advaer1
       use microphysics_perturbation, only: aerosol_base, vapor_base, rain_base, snow_base, hail_base
@@ -25,7 +25,7 @@ contains
    end subroutine vapor_advection
 
    subroutine dinamics()
-      !########### calculo de la dinamica y de la termodinamica ############
+      !! calculo de la dinamica y de la termodinamica
       use dimensions, only: dt1, dx1, nx1, nz1
       use model_var, only: dden0z, ener1, s, llluneg, lcrineg, lnieneg, lgraneg,&
          lvapneg, laerneg, Qvapneg, aerneg
@@ -211,7 +211,7 @@ contains
    end subroutine negative_correction
 
    subroutine water_calculation
-      !primer calculo de agua (sin laterales)
+      !! primer calculo de agua (sin laterales)
       use dimensions, only: nx1, nz1
       use model_var, only: vapt1, gott1, aert1
       use microphysics_perturbation, only: vapor_new, drop_new, aerosol_new
@@ -233,6 +233,7 @@ contains
    end subroutine water_calculation
 
    subroutine microphisics_substring
+      !! Sublazo Microfisico
       use dimensions, only: nx1, nz1, dt1, dx1
       use model_var, only: aux, P, T, Qvap, Naer, densi, Dv, iT, aux2, Vis,&
          esvs, elvs, Lvl, Lsl, Lvs, Eaccn, Eaucn, Eacng, nu, lll, current_time,&
@@ -250,9 +251,9 @@ contains
          drop_new, rain_new, crystal_new,&
          snow_new, hail_new
       use extra_subrut, only: nuclea
+      use microphysics, only: microfis
       implicit none
       integer :: k, n, i, l, j, m
-      !####################### Sublazo Microfisico #########################
       totnuc=0.
       vapt2=0.
       gott2=0.
@@ -414,6 +415,7 @@ contains
    end subroutine microphisics_substring
 
    subroutine floor_and_ceiling_contour
+      !! contornos en el piso y en el techo
       use dimensions, only: nx1, nz1, dt1, dx1
       use dinamic_var_perturbation, only: theta_new, theta_base,&
          w_perturbed_new, u_perturbed_new, v_perturbed_new
@@ -428,7 +430,6 @@ contains
       integer :: i, j
 
       Qvap=(qv+qg)/nx1**2.*nz1*.1
-      !contornos en el piso y en el techo
       do concurrent (i=1:nx1, j=1:nx1)
          theta_new(i,j,0)=theta_base(i,j,0) -&
             w_perturbed_new(i,j,1)*(theta_z_initial(0)+theta_z_initial(1))*dt1/dx2
@@ -436,7 +437,6 @@ contains
 
          !suponemos que las velocidades horizontales a nivel de piso son
          !iguales a 1/4 de la correspondiente en el nivel 1
-         !#TODO: Check this
          auxx=((u_perturbed_new(i+1,j,1) + u_perturbed_new(i,j,1))*(vapor_base(i+1,j,0) + vapor_base(i,j,0))&
             -(u_perturbed_new(i-1,j,1)+u_perturbed_new(i,j,1))*(vapor_base(i-1,j,0)+vapor_base(i,j,0)))&
             /4.*.25
@@ -504,7 +504,7 @@ contains
    end subroutine floor_and_ceiling_contour
 
    subroutine lateral_contour
-      !contornos laterales
+      !! contornos laterales
       use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: theta_new
       use microphysics_perturbation, only: vapor_new, drop_new,&
@@ -548,11 +548,11 @@ contains
       end do
    end subroutine lateral_contour
 
-   !> Calcula la evolucion del la presion y las velocidades con un paso de tiempo menor lt3
-   !> Las cantidades 1 son las presentes en el paso grande y las 2 son las del paso futuro, las 3 son auxiliares
-   !> Le resta la perturbacion promedio
-!############### calculo de la velocidad y la presion ################
    subroutine speed_pressure()
+      !! calculo de la velocidad y la presion
+      !! Calcula la evolucion del la presion y las velocidades con un paso de tiempo menor lt3
+      !! Las cantidades 1 son las presentes en el paso grande y las 2 son las del paso futuro, las 3 son auxiliares
+      !! Le resta la perturbacion promedio
       use cant01
       use dimensions
       use dinamic_var_perturbation
@@ -710,13 +710,12 @@ contains
       return
    end subroutine speed_pressure
 
-   !     Esta subrutina filtra componentes de alta frecuencia espacial.
-   !     El valor de la variable del punto j se filtra con los valores
-   !     extrapolados linalmente de los puntos j-3 y j-1 y similares,
-   !     pasando un polinomio de grado 4.
-
    subroutine filtro(varia1,facx,facy,facz)
-      !filtro para theta_base vapor_base
+      !! filtro para theta_base vapor_base
+      !! Esta subrutina filtra componentes de alta frecuencia espacial.
+      !! El valor de la variable del punto j se filtra con los valores
+      !! extrapolados linalmente de los puntos j-3 y j-1 y similares,
+      !! pasando un polinomio de grado 4
       use dimensions
       use filtro01
       implicit none
@@ -784,6 +783,8 @@ contains
    end subroutine filtro
 
    subroutine floor_condition_redefinition()
+      !! modificada las condiciones en el piso
+      !! Redefinicion
       use dimensions, only: nx1, nz1, dt1, dx1
       use dinamic_var_perturbation, only: theta_new, theta_base,&
          w_perturbed_new
@@ -796,8 +797,6 @@ contains
       use model_var, only: aeraux
       implicit none
       integer :: i, j, k
-      !*** modificada las condiciones en el piso
-      !Redefinicion
       do concurrent (i=1:nx1, j=1:nx1)
          k=0
          theta_base(i,j,k)=pro3*theta_new(i,j,k)+&
@@ -936,6 +935,7 @@ contains
    end subroutine floor_condition_redefinition
 
    subroutine floor_and_ceiling_contour_redefinition()
+      !! contornos en el piso y en el techo
       use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: theta_base
       use microphysics_perturbation, only: vapor_base, aerosol_base, drop_base,&
@@ -943,7 +943,6 @@ contains
       use initial_z_state, only: vapor_z_initial, aerosol_z_initial
       implicit none
       integer :: i, j
-      !contornos en el piso y en el techo
       do concurrent(i=1:nx1, j=1:nx1)
          theta_base(i,j,0)=theta_base(i,j,0)
          if (theta_base(i,j,0) > 0.5) theta_base(i,j,0)=.5
@@ -982,7 +981,7 @@ contains
    end subroutine floor_and_ceiling_contour_redefinition
 
    subroutine lateral_contour_redefinition()
-      !contornos laterales
+      !! contornos laterales
       use dimensions, only: nx1, nz1
       use dinamic_var_perturbation, only: theta_base
       use microphysics_perturbation, only: vapor_base, drop_base, rain_base,&
@@ -1027,7 +1026,7 @@ contains
    end subroutine lateral_contour_redefinition
 
    subroutine vapour_negative_correction()
-      !correccion de negativos para el vapor
+      !! correccion de negativos para el vapor
       use dimensions, only: nx1, nz1
       use microphysics_perturbation, only: vapor_base
       use initial_z_state, only: vapor_z_initial

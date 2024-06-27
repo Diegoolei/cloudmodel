@@ -3,7 +3,7 @@ module config
    real :: sim_time_minutes, save_lapse_minutes
 
 contains
-      subroutine init_config(sim_time, save_lapse, directory)
+   subroutine init_config(sim_time, save_lapse, directory)
       !! Initializes the configuration for the simulation.
       character(len=*), intent(in) :: directory
       real, intent(in) :: sim_time !! simulation time in minutes
