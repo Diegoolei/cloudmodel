@@ -1,6 +1,6 @@
 
 module dimensions
-!! Description: Defines parameters related to grid dimensions and intervals.
+!!Defines parameters related to grid dimensions and intervals.
 !!              These parameters are used in numerical simulations.
 
    integer, parameter :: nx1 = 50 !! Number of points in the x-direction
@@ -17,9 +17,9 @@ module dimensions
 end module dimensions
 
 module constants
-!! Module: constants
-!! Description: Defines mathematical and physical constants relevant to precipitation.
-!!              These constants are used in numerical simulations and atmospheric modeling.
+!! constants
+!! Defines mathematical and physical constants relevant to precipitation.
+!! These constants are used in numerical simulations and atmospheric modeling.
 
    real, parameter :: pi = 3.1415926  !! Mathematical constants
 
