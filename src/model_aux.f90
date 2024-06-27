@@ -42,6 +42,8 @@ contains
       use lmncri, only: lcri, mcri, ncri
       use lmnnie, only: lnie, mnie, nnie
       use lmngra, only: lgra, mgra, ngra
+      use extra_subrut, only: turbu1, turbu2, inhomogeneous_velocities,&
+         tempot, dvapor, dgotit, dlluvi, dcrist, dnieve, dgrani, daeros
       implicit none
       integer :: i, j, k, l, m, n
       s=0
@@ -93,7 +95,7 @@ contains
             do j=1,nx1
                m=j
                !calculo del coeficiente de turbulencia y derivadas
-               call turbu2(l,m,n)
+               call turbu2(l,m)
 
                !calculo de las inhomogeneidades para las velocidades
                call inhomogeneous_velocities(l,m,n,dden0z)
@@ -197,6 +199,7 @@ contains
    subroutine negative_correction
       use model_var, only: s, llluneg, lcrineg, lnieneg, lgraneg, lvapneg, laerneg,&
          Qvapneg, aerneg
+      use extra_subrut, only: corgot, corllu, corcri, cornie, corgra, corvap, coraer
       implicit none
       if(s >= 1) call corgot
       if (llluneg == 1) call corllu
@@ -246,6 +249,7 @@ contains
       use microphysics_perturbation, only: vapor_new, aerosol_new,&
          drop_new, rain_new, crystal_new,&
          snow_new, hail_new
+      use extra_subrut, only: nuclea
       implicit none
       integer :: k, n, i, l, j, m
       !####################### Sublazo Microfisico #########################
@@ -543,6 +547,241 @@ contains
          aerosol_new(j,nx1+1,k)=aerosol_new(j,nx1,k)
       end do
    end subroutine lateral_contour
+
+   !> Calcula la evolucion del la presion y las velocidades con un paso de tiempo menor lt3
+   !> Las cantidades 1 son las presentes en el paso grande y las 2 son las del paso futuro, las 3 son auxiliares
+   !> Le resta la perturbacion promedio
+!############### calculo de la velocidad y la presion ################
+   subroutine speed_pressure()
+      use cant01
+      use dimensions
+      use dinamic_var_perturbation
+      use constants
+      use initial_z_state
+      use velpre01
+      use p3v3
+      use sv_inhomogeneous_velocities_and_speed_pressure, only: fu, fv, fw, fp
+      implicit none
+
+      call velpre01_init()
+
+      do concurrent (i = 0:nx1+1, j = 0:nx1+1, k = 0:nz1)
+         u_perturbed_new(i,j,k) = u_perturbed_base(i,j,k)
+         v_perturbed_new(i,j,k) = v_perturbed_base(i,j,k)
+         w_perturbed_new(i,j,k) = w_perturbed_base(i,j,k)
+         pressure_new(i,j,k) = pressure_base(i,j,k)
+      end do
+
+      do concurrent(t = 1:lt3)
+         do concurrent(k = 1:nz1-1)
+            presi = -Cp*theta_z_initial(k)*(1.+.61*vapor_z_initial(k)/air_density_z_initial(k))
+            vel0 = theta_z_initial(k)*(air_density_z_initial(k)+.61*vapor_z_initial(k))
+            vel1 = theta_z_initial(k-1)*(air_density_z_initial(k-1)+.61*vapor_z_initial(k-1))
+            vel2 = theta_z_initial(k+1)*(air_density_z_initial(k+1)+.61*vapor_z_initial(k+1))
+            vel3 = cc2(k)/presi/vel0
+            do concurrent (i = 1:nx1, j = 1:nx1)
+               dprex = pressure_new(i+1,j,k)-pressure_new(i-1,j,k)
+               dprey = pressure_new(i,j+1,k)-pressure_new(i,j-1,k)
+               dprez = pressure_new(i,j,k+1)-pressure_new(i,j,k-1)
+
+               presix = presi*dprex/dx2
+               presiy = presi*dprey/dx2
+               presiz = presi*dprez/dx2
+
+               U3(i,j,k) = dt3*(presix+fu(i,j,k))+u_perturbed_new(i,j,k)
+               V3(i,j,k) = dt3*(presiy+fv(i,j,k))+v_perturbed_new(i,j,k)
+               W3(i,j,k) = dt3*(presiz+fw(i,j,k))+w_perturbed_new(i,j,k)
+
+
+               dvx = vel0*(u_perturbed_new(i+1,j,k)-u_perturbed_new(i-1,j,k))
+               dvy = vel0*(v_perturbed_new(i,j+1,k)-v_perturbed_new(i,j-1,k))
+               if (k == 1) then
+                  !      dvz = tiene 80% de (w_perturbed_new(2)-w_perturbed_new(1) y 20% de (w_perturbed_new(1)-w_perturbed_new(0)
+                  dvz = (.8*vel2*w_perturbed_new(i,j,k+1)-.8*vel1*w_perturbed_new(i,j,k))*2.
+               else
+                  dvz = vel2*w_perturbed_new(i,j,k+1)-vel1*w_perturbed_new(i,j,k-1)
+               endif
+
+               diver = vel3*((dvx+dvy)+dvz)/dx2
+
+               !      modificado para agrega turbulencia en la P 23/8/97
+               Pres3(i,j,k) = dt3*(diver+fp(i,j,k))+pressure_new(i,j,k)
+            end do
+         end do
+
+         !*      redefiniciones y contornos
+         do concurrent(i = 1:nx1, j = 1:nx1)
+            Pres3(i,j,0) = Pres3(i,j,1)
+            Pres3(i,j,nz1) = Pres3(i,j,nz1-1)
+         end do
+         do concurrent(i = 1:nx1, k = 0:nz1)
+            Pres3(i,0,k) = Pres3(i,1,k)
+            Pres3(i,nx1+1,k) = Pres3(i,nx1,k)
+            Pres3(0,i,k) = Pres3(1,i,k)
+            Pres3(nx1+1,i,k) = Pres3(nx1,i,k)
+         end do
+
+         presprom = 0.
+         do concurrent(i = 1:nx1, j = 1:nx1)
+            do k = 1,nz1-1
+               if (k == 1) then
+                  u_perturbed_new(i,j,k) = U3(i,j,k)-kkk*&
+                     (2.*U3(i,j,k)-U3(i,j,k+1))
+                  v_perturbed_new(i,j,k) = V3(i,j,k)-kkk*&
+                     (2.*V3(i,j,k)-V3(i,j,k+1))
+                  w_perturbed_new(i,j,k) = W3(i,j,k)-kkk*&
+                     (2.*W3(i,j,k)-W3(i,j,k+1))
+               else
+                  u_perturbed_new(i,j,k) = U3(i,j,k)
+                  v_perturbed_new(i,j,k) = V3(i,j,k)
+                  w_perturbed_new(i,j,k) = W3(i,j,k)
+               endif
+               pressure_new(i,j,k) = prom1*Pres3(i,j,k)+prom*(&
+                  ((Pres3(i+1,j,k)+ Pres3(i-1,j,k))+&
+                  (Pres3(i,j+1,k)+Pres3(i,j-1,k)))+&
+                  Pres3(i,j,k+1)+Pres3(i,j,k-1))
+               presprom = pressure_new(i,j,k)+presprom
+            end do
+
+            u_perturbed_new(i,j,0) = 0
+            v_perturbed_new(i,j,0) = 0
+            w_perturbed_new(i,j,0) = 0
+            pressure_new(i,j,0) = pressure_new(i,j,1)
+            u_perturbed_new(i,j,nz1) = u_perturbed_new(i,j,nz1-1)
+            v_perturbed_new(i,j,nz1) = v_perturbed_new(i,j,nz1-1)
+            w_perturbed_new(i,j,nz1) = w_perturbed_new(i,j,nz1-1)
+            pressure_new(i,j,nz1) = pressure_new(i,j,nz1-1)
+         end do
+         do concurrent(i = 1:nx1, k = 0:nz1)
+            u_perturbed_new(0,i,k) = u_perturbed_new(1,i,k)
+            v_perturbed_new(0,i,k) = v_perturbed_new(1,i,k)
+            w_perturbed_new(0,i,k) = w_perturbed_new(1,i,k)
+            pressure_new(0,i,k) = pressure_new(1,i,k)
+            u_perturbed_new(nx1+1,i,k) = u_perturbed_new(nx1,i,k)
+            v_perturbed_new(nx1+1,i,k) = v_perturbed_new(nx1,i,k)
+            w_perturbed_new(nx1+1,i,k) = w_perturbed_new(nx1,i,k)
+            pressure_new(nx1+1,i,k) = pressure_new(nx1,i,k)
+            u_perturbed_new(i,0,k) = u_perturbed_new(i,1,k)
+            v_perturbed_new(i,0,k) = v_perturbed_new(i,1,k)
+            w_perturbed_new(i,0,k) = w_perturbed_new(i,1,k)
+            pressure_new(i,0,k) = pressure_new(i,1,k)
+            u_perturbed_new(i,nx1+1,k) = u_perturbed_new(i,nx1,k)
+            v_perturbed_new(i,nx1+1,k) = v_perturbed_new(i,nx1,k)
+            w_perturbed_new(i,nx1+1,k) = w_perturbed_new(i,nx1,k)
+            pressure_new(i,nx1+1,k) = pressure_new(i,nx1,k)
+         end do
+
+         presprom = presprom/nnn
+         do concurrent(i = 0:nx1+1, j = 0:nx1+1, k = 0:nz1)
+            pressure_new(i,j,k) = pressure_new(i,j,k)-presprom
+         end do
+
+         if (t == lt3/2) then
+            do concurrent(i = 0:nx1+1, j = 0:nx1+1, k = 0:nz1)
+               u_perturbed_base(i,j,k) = u_perturbed_new(i,j,k)
+               v_perturbed_base(i,j,k) = v_perturbed_new(i,j,k)
+               w_perturbed_base(i,j,k) = w_perturbed_new(i,j,k)
+               pressure_base(i,j,k) = pressure_new(i,j,k)
+            end do
+         endif
+
+      end do
+
+      !**********************************************************
+      !*    suavizado
+
+      call filtro(pressure_base,.15,.15,.1)
+
+      call filtro(pressure_new,.15,.15,.1)
+
+      call filtro(u_perturbed_base,facx,facy,facz)
+      call filtro(u_perturbed_new,facx,facy,facz)
+      call filtro(v_perturbed_base,facx,facy,facz)
+      call filtro(v_perturbed_new,facx,facy,facz)
+      call filtro(w_perturbed_base,facx,facy,facz)
+      call filtro(w_perturbed_new,facx,facy,facz)
+
+      do concurrent(i = 1:nx1, j = 1:nx1)
+         pressure_base(i,j,0) = pressure_base(i,j,1)
+         pressure_new(i,j,0) = pressure_new(i,j,1)
+      end do
+      !**********************************************************
+
+      return
+   end subroutine speed_pressure
+
+   !     Esta subrutina filtra componentes de alta frecuencia espacial.
+   !     El valor de la variable del punto j se filtra con los valores
+   !     extrapolados linalmente de los puntos j-3 y j-1 y similares,
+   !     pasando un polinomio de grado 4.
+
+   subroutine filtro(varia1,facx,facy,facz)
+      !filtro para theta_base vapor_base
+      use dimensions
+      use filtro01
+      implicit none
+      character*50 text
+      REAL, DIMENSION(-3:NX1+3,-3:NX1+3,-2:NZ1+2), intent(inout) :: varia1
+      real, intent(in) :: facx,facy,facz
+      fact = 1.-(facx+facy+facz)
+
+      if (fact < 0.25) then
+         stop
+      endif
+
+      !**********************************************************
+      !     Redefiniciones y contornos
+
+      do concurrent(i = 0:nx1+1, j = 0:nx1+1, k = 0:nz1)
+         varia2(i,j,k) = varia1(i,j,k)
+      end do
+
+      do concurrent(k = 0:nz1, i = 0:nx1)
+         varia2(i,-1,k) = varia2(i,1,k)
+         varia2(i,-2,k) = varia2(i,1,k)
+         varia2(i,nx1+2,k) = varia2(i,nx1,k)
+         varia2(i,nx1+3,k) = varia2(i,nx1,k)
+         varia2(-1,i,k) = varia2(1,i,k)
+         varia2(-2,i,k) = varia2(1,i,k)
+         varia2(nx1+2,i,k) = varia2(nx1,i,k)
+         varia2(nx1+3,i,k) = varia2(nx1,i,k)
+      end do
+
+      do concurrent(i = 1:nx1, j = 1:nx1)
+         varia2(i,j,-1) = varia2(i,j,0)
+         varia2(i,j,-2) = varia2(i,j,0)
+         varia2(i,j,nz1+1) = varia2(i,j,nz1)
+         varia2(i,j,nz1+2) = varia2(i,j,nz1)
+      end do
+
+      !**********************************************************
+      !     Filtro
+
+      do concurrent(i = 1:nx1, j = 1:nx1, k = 1:nz1-1)
+         varx = (9.*(varia2(i-1,j,k)+varia2(i+1,j,k))-&
+            (varia2(i-3,j,k)+varia2(i+3,j,k)))/16.
+         vary = (9.*(varia2(i,j-1,k)+varia2(i,j+1,k))-&
+            (varia2(i,j-3,k)+varia2(i,j+3,k)))/16.
+         varz = (9.*(varia2(i,j,k-1)+varia2(i,j,k+1))-&
+            (varia2(i,j,k-3)+varia2(i,j,k+3)))/16.
+
+         varia1(i,j,k) = ((facx*varx+facy*vary)+facz*varz)+&
+            fact*varia2(i,j,k)
+      end do
+
+      do concurrent(k = 1:nz1-1, i = 1:nx1)
+         varia1(i,0,k) = varia1(i,1,k)
+         varia1(i,nx1+1,k) = varia1(i,nx1,k)
+         varia1(0,i,k) = varia1(1,i,k)
+         varia1(nx1+1,i,k) = varia1(nx1,i,k)
+      end do
+
+      do concurrent(i = 1:nx1, j = 1:nx1)
+         varia1(i,j,nz1) = varia1(i,j,nz1-1)
+      end do
+      !**********************************************************
+      return
+   end subroutine filtro
 
    subroutine floor_condition_redefinition()
       use dimensions, only: nx1, nz1, dt1, dx1
