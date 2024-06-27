@@ -25,7 +25,8 @@ contains
       use model_aux, only: vapor_advection, dinamics, negative_correction, water_calculation,&
          microphisics_substring, floor_and_ceiling_contour, lateral_contour,&
          floor_condition_redefinition, floor_and_ceiling_contour_redefinition,&
-         lateral_contour_redefinition, vapour_negative_correction, save_backup
+         lateral_contour_redefinition, vapour_negative_correction, save_backup,&
+         speed_pressure, filtro
       use, intrinsic :: iso_fortran_env, only : I4P=>int32, R8P=>real64
       use, intrinsic :: iso_fortran_env
       use forbear, only: bar_object
