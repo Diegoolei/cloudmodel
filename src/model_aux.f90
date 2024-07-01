@@ -225,10 +225,6 @@ contains
          vapt1=vapt1+vapor_new(i,j,k)
          gott1=gott1+drop_new(i,j,k)
          aert1=aert1+aerosol_new(i,j,k)
-
-         if(vapor_new(i,j,k)+vapor_z_initial(k) < 0) then
-            stop
-         endif
       end do
    end subroutine water_calculation
 
@@ -382,17 +378,7 @@ contains
                   temperature(i,j,k)=T-temperature_z_initial(k)
 
                endif
-
-               if (theta_z_initial(k) < abs(theta_new(i,j,k))+200.or.temperature_z_initial(k) < abs(temperature(i,j,k))+200) then
-                  stop
-               endif
-
                if(aerosol_new(i,j,k)+aerosol_z_initial(k) <= 0) then
-
-                  if (aerosol_new(i,j,k)+aerosol_z_initial(k) < -aerosol_z_initial(k)*.05) then
-                     stop
-                  endif
-
                   aerosol_new(i,j,k)=-aerosol_z_initial(k)
                endif
 
@@ -723,11 +709,6 @@ contains
       REAL, DIMENSION(-3:NX1+3,-3:NX1+3,-2:NZ1+2), intent(inout) :: varia1
       real, intent(in) :: facx,facy,facz
       fact = 1.-(facx+facy+facz)
-
-      if (fact < 0.25) then
-         stop
-      endif
-
       !**********************************************************
       !     Redefiniciones y contornos
 

@@ -240,7 +240,7 @@ contains
       !**   Velocidad terminal para el granizo, cte que depende de z
       do concurrent(k = 0:nz1+1)
          aux = 2.754*rhogra**.605
-         Vtgra0(2*k) = aux/Tvis(temperature_z_initial(k))**.21/air_density_z_initial(k)**.395
+         Vtgra0(2*k) = aux/Tvis(int(temperature_z_initial(k)))**.21/air_density_z_initial(k)**.395
       end do
 
       do concurrent(k = 1:nz1+1)

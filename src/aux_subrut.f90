@@ -287,12 +287,6 @@ contains
 
       theta_new(i,j,k) = dt1*((advec+verti)/dx2+turbul+calor)+&
          theta_base(i,j,k)
-
-      !     control de locura
-      if (abs(theta_new(i,j,k)) > 30) then
-         stop
-      endif
-
       return
    end subroutine tempot
 
@@ -714,9 +708,6 @@ contains
          do concurrent(l = lgot(1):lgot(2), m = mgot(1):mgot(2), n = ngot(1):ngot(2))
             drop_new(l,m,n) = 0.
          end do
-         if (-neg1 > 1e-3) then
-            stop
-         endif
       else
          aux1 = neg1/pos1
          do concurrent(l = lgot(1):lgot(2), m = mgot(1):mgot(2), n = ngot(1):ngot(2))
@@ -753,9 +744,6 @@ contains
          do concurrent(l = lllu(1):lllu(2), m = mllu(1):mllu(2), n = nllu(1):nllu(2))
             rain_new(l,m,n) = 0.
          end do
-         if (-neg1 > 1e-3) then
-            stop
-         endif
       else
          aux1 = neg1/pos1
          do concurrent(l = lllu(1):lllu(2), m = mllu(1):mllu(2), n = nllu(1):nllu(2))
@@ -790,9 +778,6 @@ contains
          do concurrent(l = lcri(1):lcri(2), m = mcri(1):mcri(2), n = ncri(1):ncri(2))
             crystal_new(l,m,n) = 0.
          end do
-         if (-neg1 > 1e-3) then
-            stop
-         endif
       else
          aux1 = neg1/pos1
          do concurrent(l = lcri(1):lcri(2), m = mcri(1):mcri(2), n = ncri(1):ncri(2))
@@ -828,10 +813,6 @@ contains
          do concurrent(l = lnie(1):lnie(2), m = mnie(1):mnie(2), n = nnie(1):nnie(2))
             snow_new(l,m,n) = 0.
          end do
-
-         if (-neg1 > 1e-3) then
-            stop
-         endif
       else
          aux1 = neg1/pos1
          do concurrent(l = lnie(1):lnie(2), m = mnie(1):mnie(2), n = nnie(1):nnie(2))
@@ -866,10 +847,6 @@ contains
          do concurrent(l = lgra(1):lgra(2), m = mgra(1):mgra(2), n = ngra(1):ngra(2))
             hail_new(l,m,n) = 0.
          end do
-
-         if (-neg1 > 1e-3) then
-            stop
-         endif
       else
          aux1 = neg1/pos1
          do concurrent(l = lgra(1):lgra(2), m = mgra(1):mgra(2), n = ngra(1):ngra(2))
@@ -1018,9 +995,6 @@ contains
             TT2 = esl/(e1/TT1-auxl*Rv)
             e1 = (Qvap-auxl)*Rv*TT2
             hhh = 1
-            if (s == 1) then
-               stop
-            endif
          endif
 
          s = 1
@@ -1032,12 +1006,6 @@ contains
 
          Qvap = Qvap-auxl
          Qliq = Qliq+auxl
-
-         !*     control de mocos
-         if (auxl < 0 .or. auxs < 0) then
-            stop
-         endif
-
          !*
          !      variacion en los aerosoles
          !      considerando que las nuevas gotitas tienen un radio Rgotmin
