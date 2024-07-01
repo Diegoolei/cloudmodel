@@ -59,7 +59,7 @@ end subroutine graba120
 
 subroutine graba231(k, w_perturbed_new, theta_base, vapor_base, rain_base,&
    hail_base, aerosol_base, vapor_z_initial, aerosol_z_initial, file_number)
-   !### Grabacion 2D ###
+   !! Grabacion 2D
    use dimensions
    use config
    implicit none
@@ -122,7 +122,7 @@ end subroutine graba231
 subroutine graba320(u_perturbed_base, v_perturbed_base, w_perturbed_base, theta_base,&
    pressure_base, vapor_base, drop_base, rain_base, crystal_base, snow_base,&
    hail_base, aerosol_base, file_number)
-   !### Grabacion 3D ###
+   !! Grabacion 3D
    use dimensions
    use config
    implicit none
