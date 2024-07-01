@@ -333,11 +333,6 @@ contains
          cfln1=0.
          cfln2=0.
       endif
-
-      if (cfllunie < 0) then
-         stop
-      endif
-
       !**   colision entre lluvia y nieve o cristales que forman granizos (o nieve)
 
       !*    lluvia con cristales
@@ -597,24 +592,12 @@ contains
       !     prevencion de negativos
       if (qgotaux1 < 0 .or. qlluaux1 < 0 .or. qcriaux1 < 0 .or.&
          qnieaux1 < 0 .or. qgraaux1 < 0) then
-
-         if (qgotaux1 < -1e-10 .or. qlluaux1 < -1e-10 .or. &
-            qcriaux1 < -1e-10 .or.&
-            qnieaux1 < -1e-10 .or. qgraaux1 < -1e-10) then
-            stop
-         endif
          if (qgotaux1 < 0) qgotaux1=0.
          if (qlluaux1 < 0) qlluaux1=0.
          if (qcriaux1 < 0) qcriaux1=0.
          if (qnieaux1 < 0) qnieaux1=0.
          if (qgraaux1 < 0) qgraaux1=0.
       endif
-
-      aux=Intvap+Intgot+Intllu+Intcri+Intnie+Intgra
-      if (aux > 1e-9) then
-         stop
-      endif
-
       qvapaux=qvapaux1
       qgotaux=qgotaux1
       qlluaux=qlluaux1

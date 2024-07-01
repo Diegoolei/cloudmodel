@@ -28,7 +28,7 @@ xcode-select --install
 
 ## F2Py
 
-### Compile with F2Py
+### Compile for F2Py
 
 ```console
 cd interface
@@ -41,3 +41,15 @@ make
 cd ..
 python3 main.py
 ```
+
+## nvfortran
+
+### Installation
+
+First of all, Install the appropriate Nvidia drivers for your system.
+Install the [Nvidia CUDA toolkit.](https://developer.nvidia.com/cuda-toolkit)
+Install the [Nvidia HPC SDK](https://developer.nvidia.com/nvidia-hpc-sdk-downloads) (The installation path is usually /opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin, add it to your PATH).
+
+### Execution
+
+fpm run --compiler "/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin/nvfortran" --flag "-O3 -cuda"
