@@ -14,7 +14,6 @@ module cant01
    real :: ctur, cteturb, dx2, dx8, dx12, AA, ikapa, pro1,&
       pro2, pro3, pro4, cteqgot, cteqllu, cteqnie, cteqgra
 
-   integer :: ini  !! if first start ini = 0
    integer :: total_time, lt2, lt3
 end module cant01
 

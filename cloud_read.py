@@ -14,6 +14,8 @@ from constants import (
     plot_center,
 )
 
+import interface.interface as nb
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter, FuncAnimation
 
@@ -56,6 +58,22 @@ class FolderHandle(Enum):
     IGNORE = "Ignore"
     DELETE = "Delete"
     CANCEL = "Cancel"
+
+
+class CloudModel:
+    def __init__(
+        self,
+        simulation_time_minutes=0,
+        save_time_minutes=0,
+        statistic_time_minutes=0,
+        bacup_time_minutes=0,
+    ):
+        nb.c_interface.run_model_python(
+            simulation_time_minutes,
+            save_time_minutes,
+            statistic_time_minutes,
+            bacup_time_minutes,
+        )
 
 
 class FileStyle:
@@ -122,7 +140,7 @@ class FileStyle:
     def get_var_from_data(self, file_number, var_iterator):
         actual_file_data = self.data_file[file_number]
         return actual_file_data[
-            var_iterator: var_iterator + self.var_structure_size
+            var_iterator : var_iterator + self.var_structure_size
         ].reshape(self.var_structure, order="F")
 
     def list_var(self):
@@ -150,7 +168,7 @@ class FileStyle:
                 raise ValueError("Invalid Axis")
 
     def get_var_max_value_position(self, var_array):
-        return np.where(var_array==np.max(var_array))
+        return np.where(var_array == np.max(var_array))
 
     def check_path(self, path, selected_file_name=""):
         """Checks if the path exists, if not, creates it
@@ -204,12 +222,17 @@ class FileStyle:
             print(f"There is no {self.cmp_output_data_path} folder to compare with")
 
     def live_var_animation(self, variable):
-        ax = plt.axes(projection='3d')
+        ax = plt.axes(projection="3d")
         num_layers = 50
         num_pnt = 57
-        z, x, y = np.meshgrid(np.arange(1, num_layers + 1), np.arange(num_pnt), np.arange(num_pnt), indexing='ij')
+        z, x, y = np.meshgrid(
+            np.arange(1, num_layers + 1),
+            np.arange(num_pnt),
+            np.arange(num_pnt),
+            indexing="ij",
+        )
 
-        ax.scatter3D(x, y, z, c=variable, cmap='viridis')
+        ax.scatter3D(x, y, z, c=variable, cmap="viridis")
         plt.show()
 
     def plot_style(self, variable):
@@ -217,9 +240,11 @@ class FileStyle:
             case ImageStyle.IMAGE.value:
                 if self.data_dimension == 3:
                     plt.imshow(
-                        self.center_var(variable, self.get_var_max_value_position(variable), "z")
-                        #np.flipud(variable[:, :, plot_center])
+                        self.center_var(
+                            variable, self.get_var_max_value_position(variable), "z"
                         )
+                        # np.flipud(variable[:, :, plot_center])
+                    )
                 elif self.data_dimension == 2:
                     plt.imshow(variable[:, plot_center])
                 elif self.data_dimension == 1:
@@ -228,8 +253,10 @@ class FileStyle:
                 fig, ax = plt.subplots()
                 if self.data_dimension == 3:
                     cs = ax.contour(
-                        #np.flipud(variable[:, :, plot_center]),
-                        self.center_var(variable, self.get_var_max_value_position(variable), "z"),
+                        # np.flipud(variable[:, :, plot_center]),
+                        self.center_var(
+                            variable, self.get_var_max_value_position(variable), "z"
+                        ),
                         linewidths=0.3,
                         colors="k",
                     )
