@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="cloud simulation.">
+    <meta name="author" content="Diego E. Oleiarz" >
+    <link rel="icon" href="./favicon.png">
+
+    <title> cloud_model </title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="./css/pygments.css" rel="stylesheet">
+    <link href="./css/font-awesome.min.css" rel="stylesheet">
+    <link href="./css/local.css" rel="stylesheet">
+      <link  href="./tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="./js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="./index.html">cloud_model </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="./lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="./lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="./lists/procedures.html">Procedures</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="./search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <!-- Main component for a primary marketing message or call to action -->
+    <div class="p-5 mb-4 bg-light border rounded-3" id="jumbotron">
+      <p>cloud simulation.</p>
+        <p> Find us on&hellip;</p>
+      <p>
+        <a class="btn btn-lg btn-primary" href="https://github.com/Diegoolei/Fortran77-Cloud-Model" role="button">GitHub</a>
+        
+        
+        
+        
+      </p>
+    </div>
+
+      <div class="row" id='text'>
+        <div class=col-md-8>
+          <h1>cloud_model</h1>
+          <div class="toc">
+<ul>
+<li><a href="#fortran77-cloud-model">Fortran77-Cloud-Model</a><ul>
+<li><a href="#animation-functionality-requirements">Animation Functionality Requirements</a></li>
+<li><a href="#compilation-and-execution-requirements-for-fortran-code">Compilation and Execution Requirements for Fortran Code</a><ul>
+<li><a href="#gfortran">gfortran</a><ul>
+<li><a href="#linux">Linux</a></li>
+<li><a href="#macos">MacOS</a></li>
+</ul>
+</li>
+<li><a href="#nvfortran">nvfortran</a><ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#execution">Execution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#f2py-integration">F2Py Integration</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="fortran77-cloud-model">Fortran77-Cloud-Model</h1>
+<p>This repository hosts the re-engineered cloud simulation model, now implemented in Fortran 90 and wrapped for Python integration. Below are the instructions for setting up and running the model, as well as additional requirements for animation functionality and compilation with different Fortran compilers.</p>
+<h2 id="animation-functionality-requirements">Animation Functionality Requirements</h2>
+<p>To display animations, follow these steps:</p>
+<ol>
+<li>
+<p>Install <code>ffmpeg</code>:</p>
+<p><code>console
+sudo apt install ffmpeg</code></p>
+</li>
+<li>
+<p>If you&rsquo;re using Windows Subsystem for Linux (WSL), you can show Matplotlib plots and other GUI elements by following these <a href="https://stackoverflow.com/questions/43397162/show-matplotlib-plots-and-other-gui-in-ubuntu-wsl1-wsl2">steps</a>:</p>
+<ul>
+<li>Install <a href="https://sourceforge.net/projects/xming/">Xming X Server for Windows</a>.</li>
+<li>Run the following command in your WSL2 terminal:</li>
+</ul>
+<p><code>console
+  sudo apt-get install python-tk</code></p>
+</li>
+</ol>
+<h2 id="compilation-and-execution-requirements-for-fortran-code">Compilation and Execution Requirements for Fortran Code</h2>
+<h3 id="gfortran">gfortran</h3>
+<h4 id="linux">Linux</h4>
+<p>Install <code>gfortran</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">sudo apt install gfortran</span>
+</code></pre></div>
+
+<h4 id="macos">MacOS</h4>
+<p>Install <code>gfortran</code> using Homebrew:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">brew install gfortran</span>
+<span class="go">xcode-select --install</span>
+</code></pre></div>
+
+<h3 id="nvfortran">nvfortran</h3>
+<h4 id="installation">Installation</h4>
+<ol>
+<li>Install the appropriate Nvidia drivers for your system.</li>
+<li>Install the <a href="https://developer.nvidia.com/cuda-toolkit">Nvidia CUDA toolkit</a>.</li>
+<li>Install the <a href="https://developer.nvidia.com/nvidia-hpc-sdk-downloads">Nvidia HPC SDK</a>. The installation path is usually <code>/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin</code>. Add it to your PATH.</li>
+</ol>
+<h4 id="execution">Execution</h4>
+<p>Run the following command with <code>fpm</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">fpm run --compiler &quot;/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin/nvfortran&quot; --flag &quot;-O3 -cuda&quot;</span>
+</code></pre></div>
+
+<h2 id="f2py-integration">F2Py Integration</h2>
+<p>To compile for F2Py, follow these steps:</p>
+<ol>
+<li>
+<p>Navigate to the <code>interface</code> directory:</p>
+<p><code>console
+cd interface</code></p>
+</li>
+<li>
+<p>Compile using <code>make</code>:</p>
+<p><code>console
+make</code></p>
+</li>
+<li>
+<p>Execute the Python code:</p>
+<p><code>console
+cd ..
+python3 main.py</code></p>
+</li>
+</ol>
+        </div>
+          <div class="col-md-4">
+            <div class="card card-body bg-light">
+              <h2 class="card-title">Developer Info</h2>
+              <h4 class="card-text">Diego E. Oleiarz</h4>
+              <p class="card-text"><p>Computer science student.</p></p>
+                <div class="text-center"><div class="btn-group" role="group">
+                      <a class="btn btn-lg btn-primary" href="mailto:diego.oleiarz@mi.unc.edu.ar"><i class="fa fa-envelope fa-lg"></i></a>
+                    
+                    <a class="btn btn-lg btn-primary" href="https://github.com/Diegoolei"><i class="fa fa-github fa-lg"></i></a>
+                    
+                    
+                    
+                    
+                    
+                    
+                </div></div>
+            </div>
+          </div>
+      </div>
+        <div class="row">
+          <hr>
+          <div class="col-xs-6 col-sm-4">
+            <div>
+              <h3>Source Files</h3>
+              <ul><li><a href='sourcefile/aux_subrut.f90.html'>aux_subrut.f90</a></li><li><a href='sourcefile/config.f90.html'>config.f90</a></li><li><a href='sourcefile/constants.f90.html'>constants.f90</a></li><li><a href='sourcefile/graba.f90.html'>graba.f90</a></li><li><a href='sourcefile/initials.f90.html'>initials.f90</a></li><li><a href='sourcefile/microf05.f90.html'>MICROF05.f90</a></li><li><a href='sourcefile/model.f90.html'>model.f90</a></li><li><a href='sourcefile/model_aux.f90.html'>model_aux.f90</a></li><li><a href='sourcefile/text_handling.f90.html'>text_handling.f90</a></li><li><a href='sourcefile/var_dec.f90.html'>var_dec.f90</a></li></ul>
+            </div>
+            <div>
+              <ul>
+                <li><a href="./lists/files.html"><em>All source files&hellip;</em></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <div>
+              <h3>Modules</h3>
+              <ul><li><a href='module/advecs.html'>advecs</a></li><li><a href='module/cant01.html'>cant01</a></li><li><a href='module/cloud_model.html'>cloud_model</a></li><li><a href='module/config.html'>config</a></li><li><a href='module/constants.html'>constants</a></li><li><a href='module/coraer_vars.html'>coraer_vars</a></li><li><a href='module/corgot_vars.html'>corgot_vars</a></li><li><a href='module/corvap_vars.html'>corvap_vars</a></li><li><a href='module/daeros_vars.html'>daeros_vars</a></li><li><a href='module/dcrist_vars.html'>dcrist_vars</a></li></ul>
+            </div>
+            <div>
+              <ul>
+                <li><a href="./lists/modules.html"><em>All modules&hellip;</em></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <div>
+              <h3>Procedures</h3>
+              <ul><li><a href='proc/cloud_movement.html'>cloud_movement</a></li><li><a href='proc/cloud_position.html'>cloud_position</a></li><li><a href='proc/coraer.html'>coraer</a></li><li><a href='proc/corcri.html'>corcri</a></li><li><a href='proc/corgot.html'>corgot</a></li><li><a href='proc/corgra.html'>corgra</a></li><li><a href='proc/corllu.html'>corllu</a></li><li><a href='proc/cornie.html'>cornie</a></li><li><a href='proc/corvap.html'>corvap</a></li><li><a href='proc/daeros.html'>daeros</a></li></ul>
+            </div>
+            <div>
+              <ul>
+                <li><a href="./lists/procedures.html"><em>All procedures&hellip;</em></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              cloud_model
+ was developed by Diego E. Oleiarz<br>              &copy; 2024 <a rel="license" href="http://www.gnu.org/licenses/old-licenses/fdl-1.2.en.html">GNU Free Documentation License</a>
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2024-07-05 20:32              </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+
+    <!-- MathJax JavaScript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+          TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+          jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+          extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+          });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+          <script src="./tipuesearch/tipuesearch_content.js"></script>
+          <script src="./tipuesearch/tipuesearch_set.js"></script>
+          <script src="./tipuesearch/tipuesearch.js"></script>
+
+  </body>
+</html>
