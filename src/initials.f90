@@ -408,7 +408,7 @@ module model_var
    character(len = 3) :: file_number
 
    integer :: current_time
-   integer :: t1  !! paso a inicio (si ini = 0->t1 = 0)
+   integer :: actual_file  !! actual file number
    integer :: t2, n, m, l, i, j, k, lll, s, iT, tte, lvapneg,&
       llluneg, lcrineg, laerneg, lnieneg, lgraneg, yy
 
@@ -435,11 +435,12 @@ contains
    subroutine initialize_model()
       use model_var
       use cant01, only: total_time, lt2, lt3, cteturb, dx2, dx8, dx12,&
-         AA, ikapa, cteqgot, cteqllu, cteqnie, cteqgra, ini, ltt, ltg, lte,&
+         AA, ikapa, cteqgot, cteqllu, cteqnie, cteqgra, ltt, ltg, lte,&
          ltb, ctur, pro1, pro2, pro3, pro4, cteqnie
       use dimensions
       use constants
-      use config
+      use config, only: sim_time_minutes, save_lapse_minutes, statistic_time_minutes,&
+         output_directory, backup_time_minutes, restore_backup
       use initial_z_state, only: air_density_z_initial, temperature_z_initial,&
          theta_z_initial, Pres00, vapor_z_initial, cc2,&
          aerosol_z_initial, u_z_initial, v_z_initial,&
@@ -456,14 +457,12 @@ contains
       implicit none
       integer :: unit_number
 
-      ini = 0
-      t1 = 0
       ltt = sim_time_minutes * 60. * 2.
       ltg = save_lapse_minutes * 60. * 2.
-      lte = 3. * 60. * 2.
-      ltb = 3. * 60. * 2.
-      ctur = 0.5
+      lte = statistic_time_minutes * 60. * 2.
+      ltb = backup_time_minutes * 60. * 2.
 
+      ctur = 0.5
       pro1 = 1. - 2e-2 * (dt1 / 5.)
       pro2 = (1. - pro1) / 6.
       pro3 = 1. - 2e-2 * (dt1 / 5.)
@@ -494,7 +493,8 @@ contains
       posy(0) = 0
       tte = 0
 
-      if (ini == 0) then
+      if (.not. restore_backup) then
+         actual_file = 1
          call initial_conditions()
       else
          open(newunit = unit_number, file = output_directory//"inis.da", status =&
@@ -521,7 +521,6 @@ contains
          read(unit_number)  Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, Av, Vtnie,&
             Vtgra0, vapor_z_relative, aerosol_z_relative, Eautcn, Eacrcn
          close(unit_number)
-
       endif
 
       !definicion de calores y presiones de vapor a 0 K

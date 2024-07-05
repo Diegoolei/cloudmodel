@@ -1022,7 +1022,7 @@ contains
 
    subroutine save_backup()
       use model_var, only: current_time, tte, posx, posy, Xnub, Ynub, posxx, posyy,&
-         file_number, t1
+         file_number, actual_file
       use cant01, only: lte, ltg, ltb
       use dimensions, only: dt1
       use config, only: output_directory
@@ -1057,11 +1057,11 @@ contains
       endif
 
       if (current_time/nint(ltg/dt1)*nint(ltg/dt1) == current_time) then
-         file_number=str_gen(t1)
+         file_number=str_gen(actual_file)
          call graba320(u_perturbed_base, v_perturbed_base, w_perturbed_base,&
             theta_base, pressure_base, vapor_base, drop_base,&
             rain_base, crystal_base, snow_base, hail_base, aerosol_base, file_number)
-         t1=t1+1
+         actual_file = actual_file+1
       endif
 
       if (current_time/nint(ltb/dt1)*nint(ltb/dt1) == current_time) then

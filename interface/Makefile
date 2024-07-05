@@ -13,7 +13,7 @@ gfortran:
 
 nvfortran:
 	#fpm clean --all
-	fpm run --compiler "/opt/nvidia/hpc_sdk/Linux_x86_64/2024/compilers/bin/nvfortran" --flag "-O3 -cuda"
+	fpm build --compiler "/opt/nvidia/hpc_sdk/Linux_x86_64/2024/compilers/bin/nvfortran" --flag "-O3 -cuda"
 	f2py -m interface \
 		-L$(PWD)/../build/nvfortran_C1B52A2EA9B3E302/cloudsim/ \
 		-I$(PWD)/../build/nvfortran_72B09486B8F05AD4/ \
