@@ -2,7 +2,7 @@ name: FORD Documentation
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "var_documentation" ]
 
 jobs:
   documentation:
