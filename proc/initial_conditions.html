@@ -1,0 +1,1010 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="cloud simulation.">
+    <meta name="author" content="Diego E. Oleiarz" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initial_conditions &ndash; cloud_model</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+      <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">cloud_model </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initial_conditions
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-license"><i class="fa fa-legal"></i> <a rel="license" href="http://www.gnu.org/licenses/old-licenses/fdl-1.2.en.html">GNU Free Documentation License</a></li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 6.2% of total for procedures.">182 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/initials.f90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/initials.f90.html'>initials.f90</a></li>
+                <li class="breadcrumb-item"><a href='../module/model_initial_conditions.html'>model_initial_conditions</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initial_conditions</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip()
+    })
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-aerosol_max_perturbation">aerosol_max_perturbation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-aerosol_total">aerosol_total</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-aux~4">aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-base_horizontal_velocity">base_horizontal_velocity</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-celcius_temperature_aux">celcius_temperature_aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-cubic_lv_saturation">cubic_lv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-cubic_sv_saturation">cubic_sv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-gaussian">gaussian</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-i~8">i</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-initial_x_perturbation">initial_x_perturbation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-initial_y_perturbation">initial_y_perturbation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-initial_z_perturbation">initial_z_perturbation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-intercept_lv_saturation">intercept_lv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-intercept_sv_saturation">intercept_sv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-j~7">j</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-k~7">k</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-latent_heat_exponent_aux">latent_heat_exponent_aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-n~5">n</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-perturbation_width">perturbation_width</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-quadratic_lv_saturation">quadratic_lv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-quadratic_sv_saturation">quadratic_sv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-quartic_lv_saturation">quartic_lv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-quartic_sv_saturation">quartic_sv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-quintic_lv_saturation">quintic_lv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-quintic_sv_saturation">quintic_sv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-relative_humidity_aux">relative_humidity_aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-sat_press_lv_aux">sat_press_lv_aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-sextic_lv_saturation">sextic_lv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-sextic_sv_saturation">sextic_sv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-sigma_a">sigma_a</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-sigma_t">sigma_t</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-slope_lv_saturation">slope_lv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-slope_sv_saturation">slope_sv_saturation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-temperature_aux">temperature_aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-temperature_max_perturbation">temperature_max_perturbation</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-unit">unit</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-vapor_total">vapor_total</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-x_aux">x_aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-y_aux">y_aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-z_aux">z_aux</a>
+            <a class="list-group-item" href="../proc/initial_conditions.html#variable-z_reference">z_reference</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public  subroutine initial_conditions()  
+</h2>
+        <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                  <li class="list-inline-item"><a href='../module/config.html'>config</a></li>
+                  <li class="list-inline-item"><a href='../module/dimensions.html'>dimensions</a></li>
+                  <li class="list-inline-item"><a href='../module/constants.html'>constants</a></li>
+                  <li class="list-inline-item"><a href='../module/dinamic_var_perturbation.html'>dinamic_var_perturbation</a></li>
+                  <li class="list-inline-item"><a href='../module/initial_z_state.html'>initial_z_state</a></li>
+                  <li class="list-inline-item"><a href='../module/microphysics_perturbation.html'>microphysics_perturbation</a></li>
+                  <li class="list-inline-item"><a href='../module/cant01.html'>cant01</a></li>
+              </ul>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div class="codehilite"><pre><span></span><code><span class="w"> </span><span class="n">Condiciones</span><span class="w"> </span><span class="n">iniciales</span><span class="w"> </span><span class="n">para</span><span class="w"> </span><span class="n">las</span><span class="w"> </span><span class="n">variables</span><span class="w"> </span><span class="n">dinamicas</span>
+<span class="w"> </span><span class="n">Corresponde</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">una</span><span class="w"> </span><span class="n">nube</span><span class="w"> </span><span class="n">con</span><span class="w"> </span><span class="n">hielo</span>
+<span class="w"> </span><span class="n">Calcula</span><span class="w"> </span><span class="n">la</span><span class="w"> </span><span class="n">presion</span><span class="w"> </span><span class="n">inicial</span><span class="w"> </span><span class="n">en</span><span class="w"> </span><span class="n">forma</span><span class="w"> </span><span class="n">iterativa</span><span class="p">,</span><span class="w"> </span><span class="n">primero</span><span class="w"> </span><span class="n">supone</span><span class="w"> </span><span class="n">aire</span>
+<span class="w">  </span><span class="n">seco</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="n">luego</span><span class="w"> </span><span class="n">integra</span><span class="w"> </span><span class="n">considerando</span><span class="w"> </span><span class="n">la</span><span class="w"> </span><span class="n">densidad</span><span class="w"> </span><span class="n">total</span><span class="p">,</span><span class="w"> </span><span class="n">incluyendo</span><span class="w"> </span><span class="n">el</span>
+<span class="w">  </span><span class="n">vapor</span><span class="o">.</span>
+<span class="w"> </span><span class="n">Solo</span><span class="w"> </span><span class="n">hay</span><span class="w"> </span><span class="n">una</span><span class="w"> </span><span class="n">perturbacion</span><span class="w"> </span><span class="n">en</span><span class="w"> </span><span class="n">temperatura</span><span class="w"> </span><span class="n">para</span><span class="w"> </span><span class="n">iniciar</span><span class="w"> </span><span class="n">la</span><span class="w"> </span><span class="n">conveccion</span>
+<span class="w"> </span><span class="n">Incluye</span><span class="w"> </span><span class="n">viento</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">corte</span><span class="p">,</span><span class="w"> </span><span class="n">tipo</span><span class="w"> </span><span class="n">frente</span>
+</code></pre></div>
+
+<ul>
+<li>calculo de &lsquo;constantes&rsquo; que dependen de T</li>
+<li>
+<p>condiciones de tiempo bueno
+ TT_f not pure function, do concurrent not allowed</p>
+</li>
+<li>
+<p>Velocidad terminal para gota de lluvia, cte que depende de P</p>
+</li>
+<li>Velocidad terminal para la nieve, cte que depende de P</li>
+<li>Velocidad terminal para el granizo, cte que depende de z</li>
+</ul>
+<hr>
+<div class="codehilite"><pre><span></span><code>Recalculo de la Presion y de Tita
+Recalculo de la Presion a partir de la densidad
+</code></pre></div>
+
+
+    <h3>Arguments</h3>
+    <em>None</em>
+    <br>
+    <br>
+
+
+    <section>    
+      <h2>Variables</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-aerosol_max_perturbation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>aerosol_max_perturbation</strong></td>
+<td> =</td>
+                <td>10000.</td>
+            <td>
+                <p>Maximum aerosol perturbation</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-aerosol_total"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>aerosol_total</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-aux~4"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-base_horizontal_velocity"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>base_horizontal_velocity</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-celcius_temperature_aux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>celcius_temperature_aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cubic_lv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cubic_lv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cubic_sv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cubic_sv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-gaussian"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>gaussian</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-i~8"></span>
+              integer,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>i</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-initial_x_perturbation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>initial_x_perturbation</strong></td>
+<td> =</td>
+                <td>(nx1+1.)*dx1/2.</td>
+            <td>
+                <p>Initial disturbance’s x-coordinate</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-initial_y_perturbation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>initial_y_perturbation</strong></td>
+<td> =</td>
+                <td>(nx1+1.)*dx1/2.</td>
+            <td>
+                <p>Initial disturbance’s y-coordinate</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-initial_z_perturbation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>initial_z_perturbation</strong></td>
+<td> =</td>
+                <td>0.</td>
+            <td>
+                <p>Initial disturbance’s z-coordinate</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-intercept_lv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>intercept_lv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-intercept_sv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>intercept_sv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-j~7"></span>
+              integer,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>j</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-k~7"></span>
+              integer,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>k</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-latent_heat_exponent_aux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>latent_heat_exponent_aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n~5"></span>
+              integer,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-perturbation_width"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>perturbation_width</strong></td>
+<td> =</td>
+                <td>2000.</td>
+            <td>
+                <p>perturbation_width</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-quadratic_lv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>quadratic_lv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-quadratic_sv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>quadratic_sv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-quartic_lv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>quartic_lv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-quartic_sv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>quartic_sv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-quintic_lv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>quintic_lv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-quintic_sv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>quintic_sv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-relative_humidity_aux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>relative_humidity_aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sat_press_lv_aux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>sat_press_lv_aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sextic_lv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>sextic_lv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sextic_sv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>sextic_sv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sigma_a"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>sigma_a</strong></td>
+<td> =</td>
+                <td>200.**2.</td>
+            <td>
+                <p>z decay of the perturbation in A</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sigma_t"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>sigma_t</strong></td>
+<td> =</td>
+                <td>2*1000.**2.</td>
+            <td>
+                <p>z decay of the perturbation in T</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-slope_lv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>slope_lv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-slope_sv_saturation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>slope_sv_saturation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-temperature_aux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature_aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-temperature_max_perturbation"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature_max_perturbation</strong></td>
+<td> =</td>
+                <td>.7</td>
+            <td>
+                <p>Maximum temperature perturbation</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-unit"></span>
+              integer,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unit</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vapor_total"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vapor_total</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x_aux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>x_aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-y_aux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>y_aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z_aux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z_aux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z_reference"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z_reference</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+    
+
+    
+    
+
+
+
+    
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              cloud_model
+ was developed by Diego E. Oleiarz<br>              &copy; 2024 <a rel="license" href="http://www.gnu.org/licenses/old-licenses/fdl-1.2.en.html">GNU Free Documentation License</a>
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2024-07-06 03:18              </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+
+    <!-- MathJax JavaScript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+          TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+          jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+          extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+          });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+          <script src="../tipuesearch/tipuesearch_content.js"></script>
+          <script src="../tipuesearch/tipuesearch_set.js"></script>
+          <script src="../tipuesearch/tipuesearch.js"></script>
+
+  </body>
+</html>
