@@ -17,17 +17,17 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
     - name: Install Python
-      uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Setup Graphviz
-      uses: ts-graphviz/setup-graphviz@v1
+      uses: ts-graphviz/setup-graphviz@v2
 
     - name: Install FORD
       if: contains( matrix.os, 'ubuntu')
@@ -39,8 +39,8 @@ jobs:
     - name: Build FORD Documentation
       run: ford ./ford.yml
 
-    - name: Deploy Documentation
-      uses: JamesIves/github-pages-deploy-action@v4.4.3
+    - name: Deploy Documentation🚀
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
         branch: gh-pages
         folder: doc
