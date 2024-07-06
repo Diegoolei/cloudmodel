@@ -2,7 +2,7 @@ name: Build and Deploy Documentation
 
 on: 
   push:
-    branches: [ "page_cfg" ]
+    branches: [ "dev" ]
   
 jobs:
   documentation:
