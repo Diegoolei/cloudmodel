@@ -6,8 +6,7 @@ author: Diego E. Oleiarz
 author_description: Computer science student.
 email: diego.oleiarz@mi.unc.edu.ar
 github: https://github.com/Diegoolei
-src_dir: ./src
-exclude_dir: **doc*
+src_dir: src
 output_dir: doc/ford_site
 preprocessor: gfortran -E
 display: public
