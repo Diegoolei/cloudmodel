@@ -1,8 +1,26 @@
-# Fortran77-Cloud-Model
+# CloudModel
 
 This repository hosts the re-engineered cloud simulation model, now implemented in Fortran 90 and wrapped for Python integration. Below are the instructions for setting up and running the model, as well as additional requirements for animation functionality and compilation with different Fortran compilers.
 
-## Instalation
+## Table of Contents
+
+- [Python](#python)
+
+-- [Installation](#instalation)
+-- [Usage](#usage)
+-- [Extra Functionality Requirements](#extra-functionality-requirements)
+
+- [Fortran](#fortran-for-devs)
+
+-- [Fortran Only](#fortran-only-compiling)
+-- [F2Py](#f2py-integration)
+
+- [Contributing](#contributing)
+- [License](#license)
+
+## Python
+
+### Instalation
 
 To install as a pip package:
 
@@ -10,7 +28,15 @@ To install as a pip package:
     pip install -i https://test.pypi.org/simple/ cloudmodel
 ```
 
-## Animation Functionality Requirements
+### Usage
+
+To run the project, use the following command:
+
+### Features
+
+<https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/>
+
+## Extra Functionality Requirements
 
 To display animations, follow these steps:
 
@@ -28,44 +54,11 @@ To display animations, follow these steps:
       sudo apt-get install python-tk
       ```
 
-## Compilation and Execution Requirements for Fortran Code
+## Fortran for devs
 
-### gfortran
+This section is focused on the steps needed to re-compile the model to mantain usability with the Python package.
 
-#### Linux
-
-Install `gfortran`:
-
-```console
-sudo apt install gfortran
-```
-
-#### MacOS
-
-Install `gfortran` using Homebrew:
-
-```console
-brew install gfortran
-xcode-select --install
-```
-
-### nvfortran
-
-#### Installation
-
-1. Install the appropriate Nvidia drivers for your system.
-2. Install the [Nvidia CUDA toolkit](https://developer.nvidia.com/cuda-toolkit).
-3. Install the [Nvidia HPC SDK](https://developer.nvidia.com/nvidia-hpc-sdk-downloads). The installation path is usually `/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin`. Add it to your PATH.
-
-#### Execution
-
-Run the following command with `fpm`:
-
-```console
-fpm run --compiler "/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin/nvfortran" --flag "-O3 -cuda"
-```
-
-## F2Py Integration
+### F2Py Integration
 
 To compile for F2Py, follow these steps:
 
@@ -81,9 +74,62 @@ To compile for F2Py, follow these steps:
     make
     ```
 
-3. Execute the Python code:
+---
 
-    ```console
-    cd ..
-    python3 main.py
-    ```
+### Fortran-only compiling
+
+#### gfortran
+
+Linux:
+
+Install `gfortran`:
+
+```console
+sudo apt install gfortran
+```
+
+MacOS:
+
+Install `gfortran` using Homebrew:
+
+```console
+brew install gfortran
+xcode-select --install
+```
+
+---
+Execution:
+
+Run the following command with `fpm`:
+
+```console
+fpm run --profile release
+```
+
+#### nvfortran
+
+##### Installation
+
+1. Install the appropriate Nvidia drivers for your system.
+2. Install the [Nvidia CUDA toolkit](https://developer.nvidia.com/cuda-toolkit).
+3. Install the [Nvidia HPC SDK](https://developer.nvidia.com/nvidia-hpc-sdk-downloads). The installation path is usually `/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin`. Add it to your PATH.
+
+Execution:
+
+Run the following command with `fpm`:
+
+```console
+fpm run --compiler "/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin/nvfortran" --flag "-O3 -cuda"
+```
+
+## Contributing
+
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature-name`.
+3. Make your changes.
+4. Push your branch: `git push origin feature-name`.
+5. Create a pull request.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
