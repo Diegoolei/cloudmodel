@@ -2,6 +2,14 @@
 
 This repository hosts the re-engineered cloud simulation model, now implemented in Fortran 90 and wrapped for Python integration. Below are the instructions for setting up and running the model, as well as additional requirements for animation functionality and compilation with different Fortran compilers.
 
+## Instalation
+
+To install as a pip package:
+
+```console
+    pip install -i https://test.pypi.org/simple/ cloudmodel
+```
+
 ## Animation Functionality Requirements
 
 To display animations, follow these steps:
