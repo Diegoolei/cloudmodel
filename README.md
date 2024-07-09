@@ -83,10 +83,44 @@ class FileStyle:
         generate_image(frame, var_number): Generate an image for a specific frame and variable.
         animate_variables(var_list, save_animation, show_animation): Animate multiple variables.
         animate_variable(var_to_animate, save_animation, show_animation, check_path): Animate a specific variable.
+        parse_status_img(): Parse the status images.
+        multi_var_img(var_1, var_2, file="inis.da"): Create an image with multiple variables.
+        show_file_diff(file): Show the differences between two text files.
+        cloud_text_comparison(): Compare text files in the specified paths and display the differences, if any.
+        get_unequal_files(): Get the unequal files between two folders.
+        parse_text_files(): Parse the text files.
     """
 ```
 
-A run + 
+A run + image generation for all variables to all the simulated times would look like this:
+
+```python
+    from cloudmodel import CloudModel
+    
+    CloudModel(
+        simulation_time_minutes=45,
+        save_time_minutes=3,
+        statistic_time_minutes=3,
+        bacup_time_minutes=3,
+    )
+
+    
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path="Data/new_code/",
+        cmp_output_data_path="outputdata1/",
+        img_path="img/new_code/",
+        txt_path="txt/",
+        cmp_txt_path="txt1/",
+        vid_path="vid/",
+        img_option="Contour",
+        folder_handle="Delete",
+    )
+    cloud.parse_status_img()
+    theta_base = cloud.get_var(cloud.var_list[3])
+    cloud.show_var_dataframe(theta_base, 3)
+```
+
 ## Extra Functionality Requirements
 
 To display animations, follow these steps:
