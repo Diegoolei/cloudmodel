@@ -1,9 +1,0 @@
-[build-system]
-build-backend = "setuptools.build_meta"
-requires = ["setuptools",
-             "wheel", 
-             "fpm", 
-             "numpy", 
-             "matplotlib",
-             "scipy", 
-             "pandas"]

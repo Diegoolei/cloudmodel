@@ -1,4 +1,4 @@
-from cloud_read import FileStyle, CloudModel
+from cloudmodel.cloud_read import FileStyle, CloudModel
 
 
 def main():

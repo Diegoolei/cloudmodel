@@ -5,7 +5,7 @@ from enum import Enum
 from filecmp import cmpfiles
 from subprocess import PIPE, Popen
 
-from constants import (
+from cloudmodel.constants import (
     biased_nx1,
     inis_biased_nz1,
     inis_var_list,
@@ -14,7 +14,7 @@ from constants import (
     plot_center,
 )
 
-import interface.interface as nb
+from .interface import interface as nb
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter, FuncAnimation
