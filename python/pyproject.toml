@@ -53,3 +53,5 @@ Documentation = "https://diegoolei.github.io/Fortran77-Cloud-Model/"
 [project.scripts]
 cloudmodel = "cloudmodel.__main__:main"
 
+[pydocstyle]
+convention = "numpy"
