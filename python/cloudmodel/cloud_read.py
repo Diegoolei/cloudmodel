@@ -1,3 +1,4 @@
+"""Module to read and compare cloud model data."""
 import os
 import re
 from datetime import datetime
@@ -27,7 +28,7 @@ from scipy.io import FortranFile
 
 
 def time_it(func):
-    """Log the date and time of a function"""
+    """Log the date and time of a function."""
 
     def wrapper(*args, **kwargs):
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -39,21 +40,21 @@ def time_it(func):
 
 
 class ImageStyle(Enum):
-    """Enum to select the style of the image"""
+    """Enum to select the style of the image."""
 
     IMAGE = "Image"
     CONTOUR = "Contour"
 
 
 class InputFileType(Enum):
-    """Enum to select the input file"""
+    """Enum to select the input file."""
 
     NUBE31 = "Nube"
     INIS = "Inis"
 
 
 class FolderHandle(Enum):
-    """Enum to select how to respond if destiny folder exists"""
+    """Enum to select how to respond if destiny folder exists."""
 
     IGNORE = "Ignore"
     DELETE = "Delete"
@@ -64,7 +65,8 @@ class CloudModel:
     """
     Represents a cloud model.
 
-    Args:
+    Args
+    ----
         simulation_time_minutes (int): The total simulation time in minutes.
         save_time_minutes (int): The time interval in minutes at which the model state is saved.
         statistic_time_minutes (int): The time interval in minutes at which statistics are calculated.
@@ -90,7 +92,8 @@ class FileStyle:
     """
     A class representing the file style for cloud data.
 
-    Attributes:
+    Attributes
+    ----------
         chosen_file (str): The chosen input file type.
         output_data_path (str): The path to the output data folder.
         cmp_output_data_path (str): The path to the comparison output data folder.
@@ -101,7 +104,8 @@ class FileStyle:
         img_option (str): The image style option.
         folder_handle (str): The folder handling option.
 
-    Methods:
+    Methods
+    -------
         get_data(): Get the data from the selected files.
         get_var_from_data(file_number, var_iterator): Get a variable from the data.
         list_var(): List all the variables.
@@ -178,9 +182,7 @@ class FileStyle:
                 raise ValueError("Invalid Input File Type")
         self.get_data()
     def get_data(self):
-        """
-        Get the data from the selected files.
-        """
+        """Get the data from the selected files."""
         selected_files = get_file_list(self.output_data_path, self.binary_regex)
         for file in selected_files:
             with FortranFile(f"{self.output_data_path}{file}", "r") as f:
@@ -190,11 +192,13 @@ class FileStyle:
         """
         Get a variable from the data.
 
-        Args:
+        Args
+        ----
             file_number (int): The index of the file in the data_file list.
             var_iterator (int): The iterator for the variable in the file.
 
-        Returns:
+        Returns
+        -------
             numpy.ndarray: The variable data as a numpy array.
         """
         actual_file_data = self.data_file[file_number]
@@ -203,9 +207,7 @@ class FileStyle:
         ].reshape(self.var_structure, order="F")
 
     def list_var(self):
-        """
-        List all the variables.
-        """
+        """List all the variables."""
         for var in self.var_list:
             print(var)
 
@@ -213,11 +215,13 @@ class FileStyle:
         """
         Get a specific variable at a given time.
 
-        Args:
+        Args
+        ----
             var (str): The name of the variable.
             time (int): The time index.
 
-        Returns:
+        Returns
+        -------
             numpy.ndarray: The variable data as a numpy array.
         """
         var_index = self.var_list.index(var)
@@ -228,7 +232,8 @@ class FileStyle:
         """
         Show a variable as a DataFrame.
 
-        Args:
+        Args
+        ----
             var_array (numpy.ndarray): The variable data as a numpy array.
             center (tuple): The center coordinates for the variable.
             axis (str): The axis along which to center the variable.
@@ -240,12 +245,14 @@ class FileStyle:
         """
         Center a variable along a given axis.
 
-        Args:
+        Args
+        ----
             var_array (numpy.ndarray): The variable data as a numpy array.
             center (tuple): The center coordinates for the variable.
             axis (str): The axis along which to center the variable.
 
-        Returns:
+        Returns
+        -------
             numpy.ndarray: The centered variable data as a numpy array.
         """
         match axis:
@@ -262,10 +269,12 @@ class FileStyle:
         """
         Get the position of the maximum value in a variable.
 
-        Args:
+        Args
+        ----
             var_array (numpy.ndarray): The variable data as a numpy array.
 
-        Returns:
+        Returns
+        -------
             tuple: The position of the maximum value in the variable.
         """
         return np.where(var_array == np.max(var_array))
@@ -274,7 +283,8 @@ class FileStyle:
         """
         Check if a path exists and create it if necessary.
 
-        Args:
+        Args
+        ----
             path (str): The path to check.
             selected_file_name (str, optional): The name of the selected file. Defaults to "".
         """
@@ -294,9 +304,7 @@ class FileStyle:
                     raise ValueError("Invalid Folder Handle")
 
     def cloud_binary_comparison(self):
-        """
-        Compare binary files in the output and comparison folders.
-        """
+        """Compare binary files in the output and comparison folders."""
         if os.path.exists(self.cmp_output_data_path):
             file_regex = self.binary_regex
             file1_list = get_file_list(self.output_data_path, file_regex)
@@ -327,13 +335,15 @@ class FileStyle:
 
     def live_var_animation(self, variable):
         """
-        Creates a 3D scatter plot animation of a given variable.
+        Create a 3D scatter plot animation of a given variable.
 
-        Parameters:
+        Parameters
+        ----------
         - variable: numpy array
             The variable to be plotted.
 
-        Returns:
+        Returns
+        -------
         None
         """
         ax = plt.axes(projection="3d")
@@ -351,15 +361,18 @@ class FileStyle:
 
     def plot_style(self, variable):
         """
-        Applies a specific plot style based on the image option and data dimension.
+        Apply a specific plot style based on the image option and data dimension.
 
-        Parameters:
+        Parameters
+        ----------
             variable (numpy.ndarray): The variable to be plotted.
 
-        Raises:
+        Raises
+        ------
             ValueError: If the image style is invalid.
 
-        Returns:
+        Returns
+        -------
             None
         """
         match self.img_option:
@@ -402,13 +415,15 @@ class FileStyle:
 
     def generate_image(self, frame, var_number):
         """
-        Generates an image for a given frame and variable number.
+        Generate an image for a given frame and variable number.
 
-        Args:
+        Args
+        ----
             frame (int): The frame number.
             var_number (int): The variable number.
 
-        Returns:
+        Returns
+        -------
             None
         """
         # directory = "img/" + str(file_counter) + file.split(".")[0] + "/"
@@ -422,7 +437,8 @@ class FileStyle:
         """
         Animates the variables in the given var_list.
 
-        Args:
+        Args
+        ----
             var_list (list, optional): List of variable indices to animate. If None, all variables will be animated. Defaults to None.
             save_animation (bool, optional): Whether to save the animation as a video file. Defaults to True.
             show_animation (bool, optional): Whether to display the animation. Defaults to False.
@@ -439,7 +455,8 @@ class FileStyle:
         """
         Animates a variable from the output data.
 
-        Args:
+        Args
+        ----
             var_to_animate (str): The variable to animate.
             save_animation (bool, optional): Whether to save the animation as an mp4 file. Defaults to True.
             show_animation (bool, optional): Whether to display the animation. Defaults to False.
@@ -473,12 +490,13 @@ class FileStyle:
 
     def parse_status_img(self):
         """
-        Parses the status image data and generates plots for each variable.
+        Parse the status image data and generates plots for each variable.
 
         This method iterates over the data files and generates plots for each variable
         in the status image. The plots are saved as PNG images in the specified image path.
 
-        Returns:
+        Returns
+        -------
             None
         """
         self.check_path(f"{self.img_path}{self.file_name}")
@@ -505,12 +523,14 @@ class FileStyle:
         """
         Generate a scatter plot of two variables from the data file.
 
-        Args:
+        Args
+        ----
             var_1 (int): Index of the first variable to plot.
             var_2 (int): Index of the second variable to plot.
             file (str, optional): Name of the data file. Defaults to "inis.da".
 
-        Returns:
+        Returns
+        -------
             None
         """
         self.check_path(f"{self.img_path}{self.file_name}/multivar/")
@@ -530,10 +550,12 @@ class FileStyle:
         """
         Compare two files and print the differences line by line.
 
-        Args:
+        Args
+        ----
             file_name (str): The name of the file to compare.
 
-        Returns:
+        Returns
+        -------
             None
         """
         print(f"\n\n------------------- File: {file_name} -------------------\n")
@@ -551,10 +573,12 @@ class FileStyle:
         """
         Compare text files in the specified paths and display the differences, if any.
 
-        Returns:
+        Returns
+        -------
             None
 
-        Raises:
+        Raises
+        ------
             None
         """
         original_path_extists = os.path.exists(f"{self.txt_path}{self.file_name}/")
@@ -576,11 +600,13 @@ class FileStyle:
     def get_unequal_files(self):
         """
         Compare the files in the specified directories and return a list of unequal files.
-
-        Returns:
+        
+        Returns
+        -------
             list: A list of unequal files found in the directories.
         
-        Raises:
+        Raises
+        ------
             Exception: If the text file names in the directories differ, an exception is raised.
         """
         txt_files = os.listdir(f"{self.txt_path}{self.file_name}/")
@@ -603,10 +629,12 @@ class FileStyle:
         The file name is constructed using the file counter and the provided file name.
         The data is saved using the `np.savetxt` function, with a header containing information about the file.
 
-        Args:
+        Args
+        ----
             None
 
-        Returns:
+        Returns
+        -------
             None
         """
         full_txt_path = f"{self.txt_path}{self.file_name}/"
@@ -623,11 +651,13 @@ def get_file_list(data_path, binary_regex):
     """
     Get a sorted list of files in the specified data path that match the given binary regex pattern.
 
-    Args:
+    Args
+    ----
         data_path (str): The path to the data directory.
         binary_regex (str): The regular expression pattern to match binary files.
 
-    Returns:
+    Returns
+    -------
         list: A sorted list of file names that match the binary regex pattern.
     """
     files = os.listdir(data_path)  # List all files in outputdata folder
@@ -639,11 +669,13 @@ def data_comparison(original_data: FileStyle, cmp_data: FileStyle):
     """
     Compare the data in two FileStyle objects and print any differences found.
 
-    Args:
+    Args
+    ----
         original_data (FileStyle): The original data to compare.
         cmp_data (FileStyle): The data to compare against.
 
-    Returns:
+    Returns
+    -------
         bool: True if all data is the same, False otherwise.
     """
     for iterator in range(len(original_data.data_file)):
