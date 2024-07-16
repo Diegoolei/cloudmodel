@@ -6,14 +6,14 @@ This repository hosts the re-engineered cloud simulation model, now implemented 
 
 - [Python](#python)
 
--- [Installation](#instalation)
--- [Usage](#usage)
--- [Extra Functionality Requirements](#extra-functionality-requirements)
+  - [Installation](#instalation)
+  - [Usage](#usage)
+  - [Extra Functionality Requirements](#extra-functionality-requirements)
 
 - [Fortran](#fortran-for-devs)
 
--- [Fortran Only](#fortran-only-compiling)
--- [F2Py](#f2py-integration)
+  - [Fortran Only](#fortran-only-compiling)
+  - [F2Py](#f2py-integration)
 
 - [Contributing](#contributing)
 - [License](#license)
