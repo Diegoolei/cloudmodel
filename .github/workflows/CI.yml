@@ -65,18 +65,27 @@ jobs:
     - name: Install cloudmodel
       run:
         cd python; pip install .
-      
+
+    - name: Check dir3
+      run: |
+        sudo ls -a
 
   build-manylinux:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check dir
+        run: |
+          sudo ls -a
       - uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
         with:
           python-versions: "cp37-cp37m cp38-cp38 cp39-cp39"
           build-requirements: "numpy"
           pip-wheel-args: "-w ./dist --no-deps"
+      - name: Check dir2
+        run: |
+          sudo ls -a
       - name: Remove non-compatible packages
         run: |
           sudo rm dist/*linux_x86_64.whl
