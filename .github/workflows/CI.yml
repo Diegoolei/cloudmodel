@@ -72,11 +72,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: RalfG/python-wheels-manylinux-build@v0.7.1-manylinux2010_x86_64
+    - uses: RalfG/python-wheels-manylinux-build@v0.7.1
       with:
-        python-versions: 'cp310-cp310 cp311-cp311 cp312-cp312'
-        build-requirements: 'numpy'
-        pip-wheel-args: '-w ./dist --no-deps'
+        python-versions: 'cp310-cp310 cp311-cp311'
     - name: Remove non-compatible packages
       run: |
         sudo rm dist/*linux_x86_64.whl
