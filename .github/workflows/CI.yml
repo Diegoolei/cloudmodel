@@ -1,9 +1,7 @@
 name: Continuous Integration
-
 on:
   push:
     branches: [ "to_pkg" ]
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -11,45 +9,38 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        gcc_v: [10] # Version of GFortran we want to use.
+        gcc_v: [13] # Version of GFortran we want to use.
         python-version: ['3.9', '3.10', '3.11', '3.12']
     env:
       FC: gfortran-${{ matrix.gcc_v }}
       GCC_V: ${{ matrix.gcc_v }}
-
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
         submodules: false
-
     - name: Setup Fortran Compiler
       uses: fortran-lang/setup-fortran@v1
       id: setup-fortran
       with:
         compiler: gcc
         version: ${{ matrix.gcc_v }}
-
     - name: Install Python
       uses: actions/setup-python@v5 # Use pip to install latest CMake, & FORD/Jin2For, etc.
       with:
         python-version: ${{ matrix.python-version }}
-
     - name: Setup Graphviz
       uses: ts-graphviz/setup-graphviz@v2
-
     - name: Setup Fortran Package Manager
       uses: fortran-lang/setup-fpm@v5
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Install Python dependencies
       if: contains( matrix.os, 'ubuntu')
       run: |
         python -m pip install --upgrade pip
         pip install setuptools wheel ford numpy matplotlib numpy scipy
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
     - name: Install GFortran Linux
       if: contains( matrix.os, 'ubuntu')
       run: |
@@ -58,7 +49,6 @@ jobs:
            --install /usr/bin/gcc gcc /usr/bin/gcc-${{ matrix.gcc_v }} 100 \
            --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${{ matrix.gcc_v }} \
            --slave /usr/bin/gcov gcov /usr/bin/gcov-${{ matrix.gcc_v }}
-
     - name: Compile
       run: fpm build --profile release
       
@@ -78,11 +68,11 @@ jobs:
       - name: Check dir
         run: |
           sudo ls -a
-      - uses: RalfG/python-wheels-manylinux-build@v0.7.1-manylinux2010_x86_64
+      - uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
         with:
-          python-versions: 'cp310-cp310 cp311-cp311 cp312-cp312'
-          build-requirements: 'cython numpy'
-          pip-wheel-args: '-w ./dist --no-deps'
+          python-versions: "cp37-cp37m cp38-cp38 cp39-cp39"
+          build-requirements: "numpy"
+          pip-wheel-args: "-w ./dist --no-deps"
       - name: Check dir2
         run: |
           sudo ls -a
@@ -93,8 +83,6 @@ jobs:
         with:
           name: dist
           path: dist
-
-
   deploy:
     needs: [build, build-manylinux]
     runs-on: ${{ matrix.os }}
