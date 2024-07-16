@@ -1,0 +1,54 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=40.8.0", 
+             "fpm", 
+             "numpy==1.26.4",
+             "wheel", 
+             "matplotlib",
+             "scipy", 
+             "pandas"]
+
+[project]
+name = "cloudmodel"
+version = "0.2.8"
+authors = [{name = "Diego E. Oleiarz", email = "diego.oleiarz@mi.unc.edu.ar"}]
+license = {text = "The MIT License"}
+readme = "README.md"
+description = "A simple, parameterized cloud model"
+keywords = ["simulator", "cloud", "fortran", "python", "modeling"]
+classifiers = [  
+    # How mature is this project? Common values are
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    "Development Status :: 4 - Beta",
+
+    # Indicate who your project is intended for
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+
+    # Pick your license as you wish (see also "license" above)
+    "License :: OSI Approved :: MIT License",
+
+    # Specify the Python versions you support here.
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = ["numpy", "pandas", "scipy", "fpm", "matplotlib"]
+requires-python = '>=3.9, <4'
+
+[project.urls]
+Homepage = "https://github.com/Diegoolei/Fortran77-Cloud-Model"
+Documentation = "https://diegoolei.github.io/Fortran77-Cloud-Model/"
+
+[project.scripts]
+cloudmodel = "cloudmodel.__main__:main"
+
+[pydocstyle]
+convention = "numpy"
