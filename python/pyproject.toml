@@ -2,7 +2,7 @@
 build-backend = "setuptools.build_meta"
 requires = ["setuptools>=40.8.0", 
              "fpm", 
-             "numpy==1.21.6",
+             "numpy==1.26.4",
              "wheel", 
              "matplotlib",
              "scipy", 
