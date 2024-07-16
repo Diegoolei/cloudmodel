@@ -73,7 +73,7 @@ jobs:
           pip-wheel-args: "-w ./dist --no-deps"
       - name: Remove non-compatible packages
         run: |
-          sudo rm ./dist/cloudmodel-0.2.8-py3-none-any.whl
+          sudo rm dist/cloudmodel-0.2.8-py3-none-any.whl
       - uses: actions/upload-artifact@v4
         with:
           name: dist
