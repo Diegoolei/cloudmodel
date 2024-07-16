@@ -56,30 +56,17 @@ jobs:
       run:
         cd python; pip install .
 
-    - name: Check dir3
-      run: |
-        sudo ls -a
-
   build-manylinux:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check dir
-        run: |
-          sudo ls -a
       - name: Build manylinux Python wheels
         uses: RalfG/python-wheels-manylinux-build@v0.7.1-manylinux2014_x86_64
         with:
           python-versions: 'cp310-cp310 cp311-cp311'
           build-requirements: 'cython numpy'
           pip-wheel-args: "-w ./dist --no-deps"
-      - name: Check dir2
-        run: |
-          sudo ls -a
-      - name: Remove non-compatible packages
-        run: |
-          sudo rm dist/*linux_x86_64.whl
       - uses: actions/upload-artifact@v4
         with:
           name: dist
