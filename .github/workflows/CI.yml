@@ -10,7 +10,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         gcc_v: [13] # Version of GFortran we want to use.
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11']
     env:
       FC: gfortran-${{ matrix.gcc_v }}
       GCC_V: ${{ matrix.gcc_v }}
@@ -68,10 +68,11 @@ jobs:
       - name: Check dir
         run: |
           sudo ls -a
-      - uses: RalfG/python-wheels-manylinux-build@v0.7.1-manylinux2010_x86_64
+      - name: Build manylinux Python wheels
+        uses: RalfG/python-wheels-manylinux-build@v0.7.1-manylinux2014_x86_64
         with:
-          python-versions: 'cp310-cp310 cp311-cp311 cp312-cp312'
-          build-requirements: "numpy"
+          python-versions: 'cp310-cp310 cp311-cp311'
+          build-requirements: 'cython numpy'
           pip-wheel-args: "-w ./dist --no-deps"
       - name: Check dir2
         run: |
