@@ -55,7 +55,8 @@ jobs:
     - name: Install cloudmodel
       run:
         cd python; pip install .
-
+        pip install . --upgrade
+        
     - name: Check dir3
       run: |
         sudo ls -a
