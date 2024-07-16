@@ -11,12 +11,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        toolchain:
-          - {compiler: gcc, version: 10}
+        gcc_v: [11] # Version of GFortran we want to use.
         python-version: ['3.9', '3.10', '3.11', '3.12']
     env:
-      FC: gfortran-${{ matrix.toolchain.gcc_v }}
-      GCC_V: ${{ matrix.toolchain.gcc_v }}
+      FC: gfortran-${{ matrix.gcc_v }}
+      GCC_V: ${{ matrix.gcc_v }}
 
     steps:
     - name: Checkout Code
@@ -28,8 +27,8 @@ jobs:
       uses: fortran-lang/setup-fortran@v1
       id: setup-fortran
       with:
-        compiler: ${{ matrix.toolchain.compiler }}
-        version: ${{ matrix.toolchain.version }}
+        compiler: gcc
+        version: ${{ matrix.gcc_v }}
 
     - name: Install Python
       uses: actions/setup-python@v5 # Use pip to install latest CMake, & FORD/Jin2For, etc.
@@ -56,9 +55,9 @@ jobs:
       run: |
         sudo apt-get install lcov
         sudo update-alternatives \
-           --install /usr/bin/gcc gcc /usr/bin/gcc-${{ matrix.toolchain.gcc_v }} 100 \
-           --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${{ matrix.toolchain.gcc_v }} \
-           --slave /usr/bin/gcov gcov /usr/bin/gcov-${{ matrix.toolchain.gcc_v }}
+           --install /usr/bin/gcc gcc /usr/bin/gcc-${{ matrix.gcc_v }} 100 \
+           --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${{ matrix.gcc_v }} \
+           --slave /usr/bin/gcov gcov /usr/bin/gcov-${{ matrix.gcc_v }}
 
     - name: Compile
       run: fpm build --profile release
