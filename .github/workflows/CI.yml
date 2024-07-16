@@ -71,9 +71,6 @@ jobs:
           python-versions: 'cp310-cp310 cp311-cp311'
           build-requirements: 'cython numpy'
           pip-wheel-args: "-w ./dist --no-deps"
-      - name: Remove non-compatible packages
-        run: |
-          sudo rm dist/cloudmodel-0.2.8-py3-none-any.whl
       - uses: actions/upload-artifact@v4
         with:
           name: dist
