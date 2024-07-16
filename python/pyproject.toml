@@ -3,7 +3,7 @@ build-backend = "setuptools.build_meta"
 requires = ["setuptools>=40.8.0",
              "wheel", 
              "fpm", 
-             "numpy", 
+             "numpy<2", 
              "matplotlib",
              "scipy", 
              "pandas"]
@@ -32,9 +32,6 @@ classifiers = [
 
     # Specify the Python versions you support here.
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -43,8 +40,8 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
 ]
-# dependencies = ["numpy", "pandas", "scipy", "fpm", "matplotlib"]
-requires-python = '>=3.6, <4'
+dependencies = ["numpy", "pandas", "scipy", "fpm", "matplotlib"]
+requires-python = '>=3.9, <4'
 
 [project.urls]
 Homepage = "https://github.com/Diegoolei/Fortran77-Cloud-Model"
