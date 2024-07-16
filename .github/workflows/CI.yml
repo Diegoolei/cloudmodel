@@ -72,7 +72,7 @@ jobs:
         with:
           python-versions: "cp37-cp37m cp38-cp38 cp39-cp39"
           build-requirements: "numpy"
-          pip-wheel-args: "-w ./dist --no-deps"
+          pip-wheel-args: "-w ./python/dist --no-deps"
       - name: Check dir2
         run: |
           sudo ls -a
