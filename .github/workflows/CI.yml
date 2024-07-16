@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         toolchain:
-          - {compiler: gcc, version: 13}
+          - {compiler: gcc, version: 11.4}
         gcc_v: [13] # Version of GFortran we want to use.
         python-version: ['3.9', '3.10', '3.11', '3.12']
     env:
