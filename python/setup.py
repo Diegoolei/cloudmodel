@@ -13,8 +13,8 @@ from setuptools.command.egg_info import egg_info
 # =============================================================================
 # Directories and constants
 # =============================================================================
-THIS_DIR = Path(__file__).parent
-BUILD_DIR = (THIS_DIR.parent / "build" / "python").absolute()
+THIS_DIR = Path(__file__)
+BUILD_DIR = (Path() / "build" / "python").absolute()
 LINK_DIR = BUILD_DIR / "lib"
 INCL_DIR = BUILD_DIR / "include"
 COMPILED_FLAG = THIS_DIR / "compiled_flag"
@@ -30,6 +30,9 @@ def pre_build():
     """Execute fpm and f2py compilations commands."""
     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     print(THIS_DIR)
+    print(THIS_DIR.parent)
+    print(BUILD_DIR)
+    print(BUILD_DIR.parent)
     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
     if COMPILED_FLAG.exists():
@@ -121,8 +124,6 @@ def save_editable_compiled():
 
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-    print(THIS_DIR)
-    print(THIS_DIR.parent)
     compiled_module_dir = THIS_DIR.parent / "build" / "compiled_module"
 
     if compiled_module_dir.exists():
