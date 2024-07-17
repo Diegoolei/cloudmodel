@@ -13,8 +13,8 @@ from setuptools.command.egg_info import egg_info
 # =============================================================================
 # Directories and constants
 # =============================================================================
-THIS_DIR = Path(__file__)
-BUILD_DIR = (Path() / "build" / "python").absolute()
+THIS_DIR = Path(__file__).parent
+BUILD_DIR = (THIS_DIR / "build" / "python").absolute()
 LINK_DIR = BUILD_DIR / "lib"
 INCL_DIR = BUILD_DIR / "include"
 COMPILED_FLAG = THIS_DIR / "compiled_flag"
