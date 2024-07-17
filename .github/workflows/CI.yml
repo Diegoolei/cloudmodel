@@ -54,6 +54,7 @@ jobs:
       
     - name: Install cloudmodel
       run:
+        python setup.py sdist
         pip install .
 
   build-manylinux:
