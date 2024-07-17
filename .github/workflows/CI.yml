@@ -54,7 +54,7 @@ jobs:
       
     - name: Install cloudmodel
       run:
-        cd python; pip install .
+        pip install .
 
   build-manylinux:
     needs: build
