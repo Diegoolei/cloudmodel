@@ -13,13 +13,13 @@ from setuptools.command.egg_info import egg_info
 # =============================================================================
 # Directories and constants
 # =============================================================================
-THIS_DIR = Path(__file__).parent
-BUILD_DIR = (THIS_DIR / "build" / "python").absolute()
+THIS_DIR = Path(__file__).parent # /home/runner/work/Fortran77-Cloud-Model/Fortran77-Cloud-Model/python
+BUILD_DIR = (THIS_DIR.parent / "build" / "python").absolute()
 LINK_DIR = BUILD_DIR / "lib"
 INCL_DIR = BUILD_DIR / "include"
 COMPILED_FLAG = THIS_DIR / "compiled_flag"
 
-FFLAGS = "-g -fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp"  # noqa
+FFLAGS = "-fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp"  # noqa
 CFLAGS = "-fPIC"
 
 
@@ -57,12 +57,12 @@ def pre_build():
         [
             "f2py",
             "-m",
-            "yaeos_compiled",
+            "interface",
             f"-L{LINK_DIR}",
             f"-I{INCL_DIR}",
             "-c",
-            "yaeos/fortran_wrap/yaeos_c.f90",
-            "-lyaeos", "-llapack",
+            "interface/cloud_c_interface.f90",
+            "-lcloudsim"
             "--backend",
             "meson",
         ]
@@ -78,26 +78,26 @@ def initial_compiled_clean():
         shutil.rmtree(BUILD_DIR)
 
     # Clear compiled files on compiled_files
-    compiled_module_dir = THIS_DIR / "yaeos" / "compiled_module"
+    compiled_module_dir = THIS_DIR / "cloudmodel" / "interface"
 
     if compiled_module_dir.exists():
         for so_file in compiled_module_dir.glob("*.so"):
             so_file.unlink()
 
     # Additionally, clear any .so files in the root directory if present
-    for so_file in THIS_DIR.glob("yaeos_compiled*.so"):
+    for so_file in THIS_DIR.glob("interface*.so"):
         so_file.unlink()
 
 
 def final_build_clean():
     """Clean the build of setuptools."""
 
-    if (THIS_DIR / "build").exists():
-        print((THIS_DIR / "build").absolute())
-        shutil.rmtree(THIS_DIR / "build")
+    if (THIS_DIR.parent / "build").exists():
+        print((THIS_DIR.print / "build").absolute())
+        shutil.rmtree(THIS_DIR.parent / "build")
 
     # Clear compiled files on compiled_files
-    compiled_module_dir = THIS_DIR / "yaeos" / "compiled_module"
+    compiled_module_dir = THIS_DIR / "cloudmodel" / "interface"
 
     if compiled_module_dir.exists():
         for so_file in compiled_module_dir.glob("*.so"):
@@ -111,8 +111,8 @@ def final_build_clean():
 def move_compiled_to_editable_loc():
     """Move compiled files to 'compiled_module' directory"""
 
-    for file in THIS_DIR.glob("yaeos_compiled.*"):
-        target_dir = THIS_DIR / "yaeos" / "compiled_module"
+    for file in THIS_DIR.glob("interface.*"):
+        target_dir = THIS_DIR / "cloudmodel" / "interface"
         target_dir.mkdir(parents=True, exist_ok=True)
 
         shutil.move(file.absolute(), (target_dir / file.name).absolute())
@@ -124,7 +124,7 @@ def save_editable_compiled():
 
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-    compiled_module_dir = THIS_DIR.parent / "build" / "compiled_module"
+    compiled_module_dir = THIS_DIR.parent / "build" / "interface"
 
     if compiled_module_dir.exists():
         for so_file in compiled_module_dir.glob("*.so"):
@@ -139,7 +139,7 @@ def save_editable_compiled():
 def restore_save_editable_compiled():
     tmp_dir = THIS_DIR / "tmp_editable"
 
-    compiled_module_dir = THIS_DIR / "yaeos" / "compiled_module"
+    compiled_module_dir = THIS_DIR / "cloudmodel" / "interface"
 
     if tmp_dir.exists():
         for so_file in tmp_dir.glob("*.so"):
@@ -165,9 +165,9 @@ class BuildFortran(Command):
         pass
 
     def run(self):
-        dir = str(THIS_DIR.absolute())
+        directory = str(THIS_DIR.absolute())
 
-        if ("build" in dir) or ("check-manifest" in dir):
+        if ("build" in directory) or ("check-manifest" in directory):
             # Do not compile, we are building, the compilation has been already
             # done at this point.
             ...
