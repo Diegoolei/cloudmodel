@@ -1,3 +1,0 @@
-include cloudmodel/interface/*.so
-include cloudmodel/*.py
-include requirements.txt
