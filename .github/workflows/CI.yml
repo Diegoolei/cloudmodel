@@ -10,7 +10,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         gcc_v: [13] # Version of GFortran we want to use.
-        python-version: ['3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     env:
       FC: gfortran-${{ matrix.gcc_v }}
       GCC_V: ${{ matrix.gcc_v }}
@@ -64,7 +64,7 @@ jobs:
       - name: Build manylinux Python wheels
         uses: RalfG/python-wheels-manylinux-build@v0.7.1-manylinux2014_x86_64
         with:
-          python-versions: 'cp310-cp310 cp311-cp311'
+          python-versions: 'cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312'
           build-requirements: 'cython numpy'
           pip-wheel-args: "-w ./dist --no-deps"
       - uses: actions/upload-artifact@v4
@@ -77,7 +77,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.10", "3.11"]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
     - uses: actions/checkout@v4
     - uses: actions/download-artifact@v4
@@ -95,4 +95,4 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install twine
-        twine upload --repository testpypi dist/* --skip-existing dist/*
+        twine upload --repository testpypi dist/*
