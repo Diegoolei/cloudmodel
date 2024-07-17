@@ -14,7 +14,7 @@ from setuptools.command.egg_info import egg_info
 # Directories and constants
 # =============================================================================
 THIS_DIR = Path(__file__).parent # /home/runner/work/Fortran77-Cloud-Model/Fortran77-Cloud-Model/python
-BUILD_DIR = (THIS_DIR.parent / "build").absolute()
+BUILD_DIR = (THIS_DIR.parent / "build" / "python").absolute()
 LINK_DIR = BUILD_DIR / "lib"
 INCL_DIR = BUILD_DIR / "include"
 COMPILED_FLAG = THIS_DIR / "compiled_flag"
@@ -40,20 +40,17 @@ def pre_build():
 
     subprocess.check_call(
         [
-            "ls",
-            "-la",
+            "fpm",
+            "build",
+            "--profile",
+            "release",
+            "--flag",
+            f"{FFLAGS}",
+            "--c-flag",
+            f"{CFLAGS}"
         ]
     )
-    
-    subprocess.check_call(
-        [
-            "cd",
-            "..",
-            "&&",
-            "ls",
-            "-la",
-        ]
-    )
+
     subprocess.check_call(
         [
             "fpm",
