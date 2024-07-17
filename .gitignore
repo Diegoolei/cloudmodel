@@ -51,6 +51,9 @@ Data/
 dist/
 *.egg-info/
 
+# Testing
+.tox/*
+.coverage
 
 # Ignore the following files
 .vscode/settings.json
