@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        gcc_v: [10] # Version of GFortran we want to use.
+        gcc_v: [13] # Version of GFortran we want to use.
         python-version: ['3.10', '3.11', '3.12']
     env:
       FC: gfortran-${{ matrix.gcc_v }}
@@ -50,7 +50,7 @@ jobs:
            --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${{ matrix.gcc_v }} \
            --slave /usr/bin/gcov gcov /usr/bin/gcov-${{ matrix.gcc_v }}
     - name: Compile
-      run: fpm install --profile release --prefix build/python
+      run: fpm install --profile release
       
     - name: Install cloudmodel
       run:
@@ -63,6 +63,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build manylinux Python wheels
         uses: RalfG/python-wheels-manylinux-build@v0.7.1-manylinux2014_x86_64
+        working-directory: ./python
         with:
           python-versions: 'cp310-cp310 cp311-cp311 cp312-cp312'
           build-requirements: 'cython numpy'
