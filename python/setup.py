@@ -39,8 +39,6 @@ def pre_build():
             "install",
             "--profile",
             "release",
-            "--flag",
-            f"{FFLAGS}",
             "--prefix",
             BUILD_DIR,
         ]
