@@ -1,5 +1,6 @@
 """Module to read and compare cloud model data."""
 
+
 import os
 import re
 from datetime import datetime
@@ -24,6 +25,8 @@ import numpy as np
 import pandas as pd
 
 from scipy.io import FortranFile
+
+from .interface import interface as nb
 
 from .interface import interface as nb
 
@@ -69,6 +72,12 @@ class CloudSimulation:
     Args
     ----
         simulation_time_minutes (int): The total simulation time in minutes.
+        save_time_minutes (int): The time interval in minutes at which the
+            model state is saved.
+        statistic_time_minutes (int): The time interval in minutes at which
+            statistics are calculated.
+        bacup_time_minutes (int): The time interval in minutes at which
+            backups are created.
         save_time_minutes (int): The time interval in minutes at which the
             model state is saved.
         statistic_time_minutes (int): The time interval in minutes at which
@@ -155,6 +164,8 @@ class FileStyle:
         output_data_path (str): The path to the output data folder.
         cmp_output_data_path (str): The path to the comparison output
             data folder.
+        cmp_output_data_path (str): The path to the comparison output
+            data folder.
         img_path (str): The path to the image folder.
         txt_path (str): The path to the text folder.
         cmp_txt_path (str): The path to the comparison text folder.
@@ -165,6 +176,8 @@ class FileStyle:
     Methods
     -------
         get_data(): Get the data from the selected files.
+        get_var_from_data(file_number, var_iterator): Get a variable from
+            the data.
         get_var_from_data(file_number, var_iterator): Get a variable from
             the data.
         list_var(): List all the variables.
@@ -183,7 +196,22 @@ class FileStyle:
         animate_variable(var_to_animate, save_animation=True,
             show_animation=False, check_path=True): Animates a variable from
             the output data.
+        generate_image(frame, var_number): Generates an image for a
+            given frame and variable number.
+        animate_variables(var_list=None, save_animation=True,
+            show_animation=False): Animate multiple variables.
+        animate_variable(var_to_animate, save_animation=True,
+            show_animation=False, check_path=True): Animates a variable from
+            the output data.
         parse_status_img(): Animates the variables in the given var_list.
+        multi_var_img(var_1, var_2): Generate a scatter plot of two variables
+            from the data file.
+        show_file_diff(file_name): Show the differences between two text files
+            with the same name in different directories.
+        cloud_text_comparison(): Compare text files in the specified paths and
+            display the differences, if any.
+        get_unequal_files(): Get files with identical names but unequal
+            content between two directories.
         multi_var_img(var_1, var_2): Generate a scatter plot of two variables
             from the data file.
         show_file_diff(file_name): Show the differences between two text files
@@ -249,6 +277,7 @@ class FileStyle:
                 self.file_name = "inis"
             case _:
                 raise ValueError("Invalid Input File Type")
+
 
         self.get_data()
 
@@ -421,6 +450,8 @@ class FileStyle:
         """
         Apply a specific plot style based on the image option and
             data dimension.
+        Apply a specific plot style based on the image option and
+            data dimension.
 
         Parameters
         ----------
@@ -515,6 +546,13 @@ class FileStyle:
                   a video file. Defaults to True.
             show_animation (bool, optional): Whether to display the animation.
                   Defaults to False.
+            var_list (list, optional):
+                List of variable indices to animate. If None, all variables
+                  will be animated. Defaults to None.
+            save_animation (bool, optional): Whether to save the animation as
+                  a video file. Defaults to True.
+            show_animation (bool, optional): Whether to display the animation.
+                  Defaults to False.
         """
         if var_list is None:
             var_list = range(self.var_amount)
@@ -551,6 +589,12 @@ class FileStyle:
                 Defaults to False.
             check_path (bool, optional): Whether to check the path before
                 saving the animation. Defaults to True.
+            save_animation (bool, optional): Whether to save the animation
+                as an mp4 file. Defaults to True.
+            show_animation (bool, optional): Whether to display the animation.
+                Defaults to False.
+            check_path (bool, optional): Whether to check the path before
+                saving the animation. Defaults to True.
         """
         fargs = [var_to_animate]
         file_ammount = len(
@@ -571,6 +615,7 @@ class FileStyle:
         plt.tight_layout()
         # If the user wants to save the animation as mp4 before showing it
         # gets segfault because of plt.show() implementation closing the figure
+        # gets segfault because of plt.show() implementation closing the figure
         if save_animation:
             writervideo = FFMpegWriter(fps=2)
             if check_path:
@@ -587,6 +632,9 @@ class FileStyle:
         """
         Parse the status image data and generates plots for each variable.
 
+        This method iterates over the data files and generates plots for
+        each variable in the status image. The plots are saved as PNG
+        images in the specified image path.
         This method iterates over the data files and generates plots for
         each variable in the status image. The plots are saved as PNG
         images in the specified image path.
@@ -620,7 +668,10 @@ class FileStyle:
                 self.plot_style(variable)
                 fullpath = (
                     f"{self.img_path}{self.file_name}/{str(file_iterator)}/"
+                fullpath = (
+                    f"{self.img_path}{self.file_name}/{str(file_iterator)}/"
                 )
+                plt.savefig(f"{fullpath}{self.var_list[var_iterator]}.png")
                 plt.savefig(f"{fullpath}{self.var_list[var_iterator]}.png")
                 plt.close()  # If not closed, images will be superimposed
                 if var_iterator < self.var_amount:
@@ -653,7 +704,9 @@ class FileStyle:
         plt.plot(var_1_data[10:-10], var_2_data[10:-10], ".b")
         # plt.plot(var_1_data[::6], var_2_data[::6], "*")
         fullpath = f"{self.img_path}{self.file_name}/multivar/"
+        fullpath = f"{self.img_path}{self.file_name}/multivar/"
         plt.savefig(
+            f"{fullpath}{self.var_list[var_1]}_{self.var_list[var_2]}.png"
             f"{fullpath}{self.var_list[var_1]}_{self.var_list[var_2]}.png"
         )
         plt.close()  # If not closed, images will be superimposed
@@ -700,6 +753,8 @@ class FileStyle:
         """
         Compare text files in the specified paths and display the differences,
             if any.
+        Compare text files in the specified paths and display the differences,
+            if any.
 
         Returns
         -------
@@ -737,6 +792,9 @@ class FileStyle:
             text1 = "error: -txt is created:{original_path_extists}\n"
             text2 = "-txt1 is created:{compate_path_extists}"
             print(text1 + text2)
+            text1 = "error: -txt is created:{original_path_extists}\n"
+            text2 = "-txt1 is created:{compate_path_extists}"
+            print(text1 + text2)
 
     def get_unequal_files(self):
         """
@@ -749,6 +807,8 @@ class FileStyle:
 
         Raises
         ------
+            Exception: If the text file names in the directories differ, an
+                exception is raised.
             Exception: If the text file names in the directories differ, an
                 exception is raised.
         """
@@ -774,6 +834,12 @@ class FileStyle:
             file name.
         The data is saved using the `np.savetxt` function, with a header
             containing information about the file.
+        This method iterates over the data files and saves each file as a
+            .txt file.
+        The file name is constructed using the file counter and the provided
+            file name.
+        The data is saved using the `np.savetxt` function, with a header
+            containing information about the file.
 
         Args
         ----
@@ -786,6 +852,10 @@ class FileStyle:
         full_txt_path = f"{self.txt_path}{self.file_name}/"
         check_path(self.folder_handle, full_txt_path)
         for file_counter in range(len(self.data_file)):
+            file_header = f"File: {file_counter}\n"
+            var_header = f"Variable: {self.file_name}/\n"
+            file_number = f"File number: {str(file_counter)}\n"
+            header = file_header + var_header + file_number
             file_header = f"File: {file_counter}\n"
             var_header = f"Variable: {self.file_name}/\n"
             file_number = f"File number: {str(file_counter)}\n"
@@ -807,10 +877,14 @@ def get_file_list(data_path, binary_regex):
     """
     Get a sorted list of files in the specified data path that match the given
         binary regex pattern.
+    Get a sorted list of files in the specified data path that match the given
+        binary regex pattern.
 
     Args
     ----
         data_path (str): The path to the data directory.
+        binary_regex (str): The regular expression pattern to match binary
+            files.
         binary_regex (str): The regular expression pattern to match binary
             files.
 
