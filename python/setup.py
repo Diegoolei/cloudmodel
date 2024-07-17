@@ -41,8 +41,6 @@ def pre_build():
             "release",
             "--flag",
             f"{FFLAGS}",
-            "--c-flag",
-            f"{CFLAGS}",
             "--prefix",
             BUILD_DIR,
         ]
@@ -106,7 +104,7 @@ def final_build_clean():
 def move_compiled_to_editable_loc():
     """Move compiled files to 'compiled_module' directory"""
 
-    for file in THIS_DIR.glob("yaeos_compiled.*"):
+    for file in THIS_DIR.glob("interface.*"):
         target_dir = THIS_DIR / "cloudmodel" / "interface"
         target_dir.mkdir(parents=True, exist_ok=True)
 
