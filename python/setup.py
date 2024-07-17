@@ -14,12 +14,12 @@ from setuptools.command.egg_info import egg_info
 # Directories and constants
 # =============================================================================
 THIS_DIR = Path(__file__).parent
-BUILD_DIR = ("build" / "python").absolute()
+BUILD_DIR = (THIS_DIR.parent / "build" / "python").absolute()
 LINK_DIR = BUILD_DIR / "lib"
 INCL_DIR = BUILD_DIR / "include"
 COMPILED_FLAG = THIS_DIR / "compiled_flag"
 
-FFLAGS = "-fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp"  # noqa
+FFLAGS = "-g -fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp"  # noqa
 CFLAGS = "-fPIC"
 
 
@@ -28,7 +28,9 @@ CFLAGS = "-fPIC"
 # =============================================================================
 def pre_build():
     """Execute fpm and f2py compilations commands."""
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     print(THIS_DIR)
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
     if COMPILED_FLAG.exists():
         return
@@ -39,6 +41,10 @@ def pre_build():
             "install",
             "--profile",
             "release",
+            "--flag",
+            f"{FFLAGS}",
+            "--c-flag",
+            f"{CFLAGS}",
             "--prefix",
             BUILD_DIR,
         ]
@@ -48,12 +54,12 @@ def pre_build():
         [
             "f2py",
             "-m",
-            "interface",
+            "yaeos_compiled",
             f"-L{LINK_DIR}",
             f"-I{INCL_DIR}",
             "-c",
-            "cloudmodel/interface/cloud_c_interface.f90",
-            "-lcloudsim",
+            "yaeos/fortran_wrap/yaeos_c.f90",
+            "-lyaeos", "-llapack",
             "--backend",
             "meson",
         ]
@@ -69,14 +75,14 @@ def initial_compiled_clean():
         shutil.rmtree(BUILD_DIR)
 
     # Clear compiled files on compiled_files
-    compiled_module_dir = THIS_DIR / "cloudmodel" / "interface"
+    compiled_module_dir = THIS_DIR / "yaeos" / "compiled_module"
 
     if compiled_module_dir.exists():
         for so_file in compiled_module_dir.glob("*.so"):
             so_file.unlink()
 
     # Additionally, clear any .so files in the root directory if present
-    for so_file in THIS_DIR.glob("interface*.so"):
+    for so_file in THIS_DIR.glob("yaeos_compiled*.so"):
         so_file.unlink()
 
 
@@ -88,7 +94,7 @@ def final_build_clean():
         shutil.rmtree(THIS_DIR / "build")
 
     # Clear compiled files on compiled_files
-    compiled_module_dir = THIS_DIR / "cloudmodel" / "interface"
+    compiled_module_dir = THIS_DIR / "yaeos" / "compiled_module"
 
     if compiled_module_dir.exists():
         for so_file in compiled_module_dir.glob("*.so"):
@@ -102,8 +108,8 @@ def final_build_clean():
 def move_compiled_to_editable_loc():
     """Move compiled files to 'compiled_module' directory"""
 
-    for file in THIS_DIR.glob("interface.*"):
-        target_dir = THIS_DIR / "cloudmodel" / "interface"
+    for file in THIS_DIR.glob("yaeos_compiled.*"):
+        target_dir = THIS_DIR / "yaeos" / "compiled_module"
         target_dir.mkdir(parents=True, exist_ok=True)
 
         shutil.move(file.absolute(), (target_dir / file.name).absolute())
@@ -115,8 +121,9 @@ def save_editable_compiled():
 
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-
-    compiled_module_dir = THIS_DIR / "cloudmodel" / "interface"
+    print(THIS_DIR)
+    print(THIS_DIR.parent)
+    compiled_module_dir = THIS_DIR.parent / "build" / "compiled_module"
 
     if compiled_module_dir.exists():
         for so_file in compiled_module_dir.glob("*.so"):
@@ -131,7 +138,7 @@ def save_editable_compiled():
 def restore_save_editable_compiled():
     tmp_dir = THIS_DIR / "tmp_editable"
 
-    compiled_module_dir = THIS_DIR / "cloudmodel" / "interface"
+    compiled_module_dir = THIS_DIR / "yaeos" / "compiled_module"
 
     if tmp_dir.exists():
         for so_file in tmp_dir.glob("*.so"):
@@ -203,9 +210,11 @@ setup(
     cmdclass={
         "build_fortran": BuildFortran,
         "editable_wheel": CustomEditable,
-        "egg_info": CustomEgg,
+        "egg_info": CustomEgg
     },
     packages=find_packages(),
+    package_data={"cloudsim": ["build/*.so"]},
+    include_package_data=True,
 )
 
 final_build_clean()
