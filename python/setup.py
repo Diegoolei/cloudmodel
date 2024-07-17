@@ -56,7 +56,7 @@ def pre_build():
             "fpm",
             "install",
             "--profile",
-            "release",
+            "debug",
             "--flag",
             f"{FFLAGS}",
             "--c-flag",
