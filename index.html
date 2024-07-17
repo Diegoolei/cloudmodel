@@ -76,29 +76,150 @@
           <h1>cloud_model</h1>
           <div class="toc">
 <ul>
-<li><a href="#fortran77-cloud-model">Fortran77-Cloud-Model</a><ul>
-<li><a href="#animation-functionality-requirements">Animation Functionality Requirements</a></li>
-<li><a href="#compilation-and-execution-requirements-for-fortran-code">Compilation and Execution Requirements for Fortran Code</a><ul>
-<li><a href="#gfortran">gfortran</a><ul>
-<li><a href="#linux">Linux</a></li>
-<li><a href="#macos">MacOS</a></li>
+<li><a href="#cloudmodel">CloudModel</a><ul>
+<li><a href="#table-of-contents">Table of Contents</a></li>
+<li><a href="#python">Python</a><ul>
+<li><a href="#instalation">Instalation</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#features">Features</a></li>
 </ul>
 </li>
+<li><a href="#extra-functionality-requirements">Extra Functionality Requirements</a></li>
+<li><a href="#fortran-for-devs">Fortran for devs</a><ul>
+<li><a href="#f2py-integration">F2Py Integration</a></li>
+<li><a href="#fortran-only-compiling">Fortran-only compiling</a><ul>
+<li><a href="#gfortran">gfortran</a></li>
 <li><a href="#nvfortran">nvfortran</a><ul>
 <li><a href="#installation">Installation</a></li>
-<li><a href="#execution">Execution</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#f2py-integration">F2Py Integration</a></li>
+</ul>
+</li>
+<li><a href="#contributing">Contributing</a></li>
+<li><a href="#license">License</a></li>
 </ul>
 </li>
 </ul>
 </div>
-<h1 id="fortran77-cloud-model">Fortran77-Cloud-Model</h1>
+<h1 id="cloudmodel">CloudModel</h1>
 <p>This repository hosts the re-engineered cloud simulation model, now implemented in Fortran 90 and wrapped for Python integration. Below are the instructions for setting up and running the model, as well as additional requirements for animation functionality and compilation with different Fortran compilers.</p>
-<h2 id="animation-functionality-requirements">Animation Functionality Requirements</h2>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li>
+<p><a href="#python">Python</a></p>
+</li>
+<li>
+<p><a href="#instalation">Installation</a></p>
+</li>
+<li><a href="#usage">Usage</a></li>
+<li>
+<p><a href="#extra-functionality-requirements">Extra Functionality Requirements</a></p>
+</li>
+<li>
+<p><a href="#fortran-for-devs">Fortran</a></p>
+</li>
+<li>
+<p><a href="#fortran-only-compiling">Fortran Only</a></p>
+</li>
+<li>
+<p><a href="#f2py-integration">F2Py</a></p>
+</li>
+<li>
+<p><a href="#contributing">Contributing</a></p>
+</li>
+<li><a href="#license">License</a></li>
+</ul>
+<h2 id="python">Python</h2>
+<h3 id="instalation">Instalation</h3>
+<p>To install as a pip package:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">    pip install -i https://test.pypi.org/simple/ cloudmodel</span>
+</code></pre></div>
+
+<h3 id="usage">Usage</h3>
+<p>To run the model, first import it from the library</p>
+<div class="codehilite"><pre><span></span><code>    <span class="kn">from</span> <span class="nn">cloudmodel</span> <span class="kn">import</span> <span class="n">CloudModel</span>
+</code></pre></div>
+
+<p>and call it with the desired parameters</p>
+<div class="codehilite"><pre><span></span><code><span class="n">CloudModel</span><span class="p">(</span>
+    <span class="n">simulation_time_minutes</span><span class="p">,</span>  <span class="c1">#(int): The total simulation time in minutes.</span>
+    <span class="n">save_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which the model state is saved.</span>
+    <span class="n">statistic_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which statistics are calculated.</span>
+    <span class="n">bacup_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which backups are created.</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>When the model finishes running there will be a new directory, where all the output data from the simulation will be stored.</p>
+<p>The following section describes all the functions that can be applied to those simulation results.</p>
+<h3 id="features">Features</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">FileStyle</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing the file style for cloud data.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        chosen_file (str): The chosen input file type.</span>
+<span class="sd">        output_data_path (str): The path to the output data folder.</span>
+<span class="sd">        cmp_output_data_path (str): The path to the comparison output data folder.</span>
+<span class="sd">        img_path (str): The path to the image folder.</span>
+<span class="sd">        txt_path (str): The path to the text folder.</span>
+<span class="sd">        cmp_txt_path (str): The path to the comparison text folder.</span>
+<span class="sd">        vid_path (str): The path to the video folder.</span>
+<span class="sd">        img_option (str): The image style option.</span>
+<span class="sd">        folder_handle (str): The folder handling option.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        get_data(): Get the data from the selected files.</span>
+<span class="sd">        get_var_from_data(file_number, var_iterator): Get a specific variable from the data.</span>
+<span class="sd">        list_var(): List all the variables.</span>
+<span class="sd">        get_var(var, time): Get a specific variable at a given time.</span>
+<span class="sd">        show_var_dataframe(var_array, center, axis): Show the variable data as a DataFrame.</span>
+<span class="sd">        center_var(var_array, center, axis): Center the variable data along a specific axis.</span>
+<span class="sd">        get_var_max_value_position(var_array): Get the position of the maximum value in the variable data.</span>
+<span class="sd">        check_path(path, selected_file_name): Check if the path exists and create it if necessary.</span>
+<span class="sd">        cloud_binary_comparison(): Compare the binary files in the output data and comparison output data folders.</span>
+<span class="sd">        live_var_animation(variable): Create a live animation of a variable.</span>
+<span class="sd">        plot_style(variable): Plot the style of a variable.</span>
+<span class="sd">        generate_image(frame, var_number): Generate an image for a specific frame and variable.</span>
+<span class="sd">        animate_variables(var_list, save_animation, show_animation): Animate multiple variables.</span>
+<span class="sd">        animate_variable(var_to_animate, save_animation, show_animation, check_path): Animate a specific variable.</span>
+<span class="sd">        parse_status_img(): Parse the status images.</span>
+<span class="sd">        multi_var_img(var_1, var_2, file=&quot;inis.da&quot;): Create an image with multiple variables.</span>
+<span class="sd">        show_file_diff(file): Show the differences between two text files.</span>
+<span class="sd">        cloud_text_comparison(): Compare text files in the specified paths and display the differences, if any.</span>
+<span class="sd">        get_unequal_files(): Get the unequal files between two folders.</span>
+<span class="sd">        parse_text_files(): Parse the text files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</code></pre></div>
+
+<p>A run + image generation for all variables to all the simulated times would look like this:</p>
+<div class="codehilite"><pre><span></span><code>    <span class="kn">from</span> <span class="nn">cloudmodel</span> <span class="kn">import</span> <span class="n">CloudModel</span>
+
+    <span class="n">CloudModel</span><span class="p">(</span>
+        <span class="n">simulation_time_minutes</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+        <span class="n">save_time_minutes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">statistic_time_minutes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">bacup_time_minutes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+    <span class="n">cloud</span> <span class="o">=</span> <span class="n">FileStyle</span><span class="p">(</span>
+        <span class="n">chosen_file</span><span class="o">=</span><span class="s2">&quot;Nube&quot;</span><span class="p">,</span>
+        <span class="n">output_data_path</span><span class="o">=</span><span class="s2">&quot;Data/new_code/&quot;</span><span class="p">,</span>
+        <span class="n">cmp_output_data_path</span><span class="o">=</span><span class="s2">&quot;outputdata1/&quot;</span><span class="p">,</span>
+        <span class="n">img_path</span><span class="o">=</span><span class="s2">&quot;img/new_code/&quot;</span><span class="p">,</span>
+        <span class="n">txt_path</span><span class="o">=</span><span class="s2">&quot;txt/&quot;</span><span class="p">,</span>
+        <span class="n">cmp_txt_path</span><span class="o">=</span><span class="s2">&quot;txt1/&quot;</span><span class="p">,</span>
+        <span class="n">vid_path</span><span class="o">=</span><span class="s2">&quot;vid/&quot;</span><span class="p">,</span>
+        <span class="n">img_option</span><span class="o">=</span><span class="s2">&quot;Contour&quot;</span><span class="p">,</span>
+        <span class="n">folder_handle</span><span class="o">=</span><span class="s2">&quot;Delete&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cloud</span><span class="o">.</span><span class="n">parse_status_img</span><span class="p">()</span>
+    <span class="n">theta_base</span> <span class="o">=</span> <span class="n">cloud</span><span class="o">.</span><span class="n">get_var</span><span class="p">(</span><span class="n">cloud</span><span class="o">.</span><span class="n">var_list</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">cloud</span><span class="o">.</span><span class="n">show_var_dataframe</span><span class="p">(</span><span class="n">theta_base</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="extra-functionality-requirements">Extra Functionality Requirements</h2>
 <p>To display animations, follow these steps:</p>
 <ol>
 <li>
@@ -116,32 +237,9 @@ sudo apt install ffmpeg</code></p>
   sudo apt-get install python-tk</code></p>
 </li>
 </ol>
-<h2 id="compilation-and-execution-requirements-for-fortran-code">Compilation and Execution Requirements for Fortran Code</h2>
-<h3 id="gfortran">gfortran</h3>
-<h4 id="linux">Linux</h4>
-<p>Install <code>gfortran</code>:</p>
-<div class="codehilite"><pre><span></span><code><span class="go">sudo apt install gfortran</span>
-</code></pre></div>
-
-<h4 id="macos">MacOS</h4>
-<p>Install <code>gfortran</code> using Homebrew:</p>
-<div class="codehilite"><pre><span></span><code><span class="go">brew install gfortran</span>
-<span class="go">xcode-select --install</span>
-</code></pre></div>
-
-<h3 id="nvfortran">nvfortran</h3>
-<h4 id="installation">Installation</h4>
-<ol>
-<li>Install the appropriate Nvidia drivers for your system.</li>
-<li>Install the <a href="https://developer.nvidia.com/cuda-toolkit">Nvidia CUDA toolkit</a>.</li>
-<li>Install the <a href="https://developer.nvidia.com/nvidia-hpc-sdk-downloads">Nvidia HPC SDK</a>. The installation path is usually <code>/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin</code>. Add it to your PATH.</li>
-</ol>
-<h4 id="execution">Execution</h4>
-<p>Run the following command with <code>fpm</code>:</p>
-<div class="codehilite"><pre><span></span><code><span class="go">fpm run --compiler &quot;/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin/nvfortran&quot; --flag &quot;-O3 -cuda&quot;</span>
-</code></pre></div>
-
-<h2 id="f2py-integration">F2Py Integration</h2>
+<h2 id="fortran-for-devs">Fortran for devs</h2>
+<p>This section is focused on the steps needed to re-compile the model to mantain usability with the Python package.</p>
+<h3 id="f2py-integration">F2Py Integration</h3>
 <p>To compile for F2Py, follow these steps:</p>
 <ol>
 <li>
@@ -154,13 +252,49 @@ cd interface</code></p>
 <p><code>console
 make</code></p>
 </li>
-<li>
-<p>Execute the Python code:</p>
-<p><code>console
-cd ..
-python3 main.py</code></p>
-</li>
 </ol>
+<hr>
+<h3 id="fortran-only-compiling">Fortran-only compiling</h3>
+<h4 id="gfortran">gfortran</h4>
+<p>Linux:</p>
+<p>Install <code>gfortran</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">sudo apt install gfortran</span>
+</code></pre></div>
+
+<p>MacOS:</p>
+<p>Install <code>gfortran</code> using Homebrew:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">brew install gfortran</span>
+<span class="go">xcode-select --install</span>
+</code></pre></div>
+
+<hr>
+<p>Execution:</p>
+<p>Run the following command with <code>fpm</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">fpm run --profile release</span>
+</code></pre></div>
+
+<h4 id="nvfortran">nvfortran</h4>
+<h5 id="installation">Installation</h5>
+<ol>
+<li>Install the appropriate Nvidia drivers for your system.</li>
+<li>Install the <a href="https://developer.nvidia.com/cuda-toolkit">Nvidia CUDA toolkit</a>.</li>
+<li>Install the <a href="https://developer.nvidia.com/nvidia-hpc-sdk-downloads">Nvidia HPC SDK</a>. The installation path is usually <code>/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin</code>. Add it to your PATH.</li>
+</ol>
+<p>Execution:</p>
+<p>Run the following command with <code>fpm</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">fpm run --compiler &quot;/opt/nvidia/hpc_sdk/Linux_x86_64/(version)/compilers/bin/nvfortran&quot; --flag &quot;-O3 -cuda&quot;</span>
+</code></pre></div>
+
+<h2 id="contributing">Contributing</h2>
+<ol>
+<li>Fork the repository.</li>
+<li>Create a new branch: <code>git checkout -b feature-name</code>.</li>
+<li>Make your changes.</li>
+<li>Push your branch: <code>git push origin feature-name</code>.</li>
+<li>Create a pull request.</li>
+</ol>
+<h2 id="license">License</h2>
+<p>This project is licensed under the <a href="LICENSE">MIT License</a>.</p>
         </div>
           <div class="col-md-4">
             <div class="card card-body bg-light">
@@ -232,7 +366,7 @@ python3 main.py</code></p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-07-06 03:18              </p>
+ on 2024-07-17 02:19              </p>
           </div>
         </div>
         <br>
