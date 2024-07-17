@@ -1,3 +1,4 @@
+"""Module to read and compare cloud model data."""
 import os
 import re
 from datetime import datetime
@@ -5,7 +6,7 @@ from enum import Enum
 from filecmp import cmpfiles
 from subprocess import PIPE, Popen
 
-from constants import (
+from cloudmodel.constants import (
     biased_nx1,
     inis_biased_nz1,
     inis_var_list,
@@ -14,7 +15,7 @@ from constants import (
     plot_center,
 )
 
-import interface.interface as nb
+from .interface import interface as nb
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter, FuncAnimation
@@ -27,7 +28,7 @@ from scipy.io import FortranFile
 
 
 def time_it(func):
-    """Log the date and time of a function"""
+    """Log the date and time of a function."""
 
     def wrapper(*args, **kwargs):
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -39,21 +40,21 @@ def time_it(func):
 
 
 class ImageStyle(Enum):
-    """Enum to select the style of the image"""
+    """Enum to select the style of the image."""
 
     IMAGE = "Image"
     CONTOUR = "Contour"
 
 
 class InputFileType(Enum):
-    """Enum to select the input file"""
+    """Enum to select the input file."""
 
     NUBE31 = "Nube"
     INIS = "Inis"
 
 
 class FolderHandle(Enum):
-    """Enum to select how to respond if destiny folder exists"""
+    """Enum to select how to respond if destiny folder exists."""
 
     IGNORE = "Ignore"
     DELETE = "Delete"
@@ -61,6 +62,17 @@ class FolderHandle(Enum):
 
 
 class CloudModel:
+    """
+    Represents a cloud model.
+
+    Args
+    ----
+        simulation_time_minutes (int): The total simulation time in minutes.
+        save_time_minutes (int): The time interval in minutes at which the model state is saved.
+        statistic_time_minutes (int): The time interval in minutes at which statistics are calculated.
+        bacup_time_minutes (int): The time interval in minutes at which backups are created.
+    """
+
     def __init__(
         self,
         simulation_time_minutes=0,
@@ -77,6 +89,45 @@ class CloudModel:
 
 
 class FileStyle:
+    """
+    A class representing the file style for cloud data.
+
+    Attributes
+    ----------
+        chosen_file (str): The chosen input file type.
+        output_data_path (str): The path to the output data folder.
+        cmp_output_data_path (str): The path to the comparison output data folder.
+        img_path (str): The path to the image folder.
+        txt_path (str): The path to the text folder.
+        cmp_txt_path (str): The path to the comparison text folder.
+        vid_path (str): The path to the video folder.
+        img_option (str): The image style option.
+        folder_handle (str): The folder handling option.
+
+    Methods
+    -------
+        get_data(): Get the data from the selected files.
+        get_var_from_data(file_number, var_iterator): Get a variable from the data.
+        list_var(): List all the variables.
+        get_var(var, time): Get a specific variable at a given time.
+        show_var_dataframe(var_array, center, axis): Show a variable as a DataFrame.
+        center_var(var_array, center, axis): Center a variable along a given axis.
+        get_var_max_value_position(var_array): Get the position of the maximum value in a variable.
+        check_path(path, selected_file_name=""): Check if a path exists and create it if necessary.
+        cloud_binary_comparison(): Compare binary files in the output and comparison folders.
+        live_var_animation(variable): Create a live variable animation.
+        plot_style(variable): Plot the style of a variable.
+        generate_image(frame, var_number): Generates an image for a given frame and variable number.
+        animate_variables(var_list=None, save_animation=True, show_animation=False): Animate multiple variables.
+        animate_variable(var_to_animate, save_animation=True, show_animation=False, check_path=True): Animates a variable from the output data.
+        parse_status_img(): Animates the variables in the given var_list.
+        multi_var_img(var_1, var_2): Generate a scatter plot of two variables from the data file.
+        show_file_diff(file_name): Show the differences between two text files with the same name in different directories.
+        cloud_text_comparison(): Compare text files in the specified paths and display the differences, if any.
+        get_unequal_files(): Get files with identical names but unequal content between two directories.
+        parse_text_files(): Parse the text files.
+    """
+
     def __init__(
         self,
         chosen_file=InputFileType.NUBE31.value,
@@ -130,33 +181,80 @@ class FileStyle:
             case _:
                 raise ValueError("Invalid Input File Type")
         self.get_data()
-
     def get_data(self):
+        """Get the data from the selected files."""
         selected_files = get_file_list(self.output_data_path, self.binary_regex)
         for file in selected_files:
             with FortranFile(f"{self.output_data_path}{file}", "r") as f:
                 self.data_file.append(f.read_reals(self.var_datatype))
 
     def get_var_from_data(self, file_number, var_iterator):
+        """
+        Get a variable from the data.
+
+        Args
+        ----
+            file_number (int): The index of the file in the data_file list.
+            var_iterator (int): The iterator for the variable in the file.
+
+        Returns
+        -------
+            numpy.ndarray: The variable data as a numpy array.
+        """
         actual_file_data = self.data_file[file_number]
         return actual_file_data[
             var_iterator : var_iterator + self.var_structure_size
         ].reshape(self.var_structure, order="F")
 
     def list_var(self):
+        """List all the variables."""
         for var in self.var_list:
             print(var)
 
     def get_var(self, var: str, time: int):
+        """
+        Get a specific variable at a given time.
+
+        Args
+        ----
+            var (str): The name of the variable.
+            time (int): The time index.
+
+        Returns
+        -------
+            numpy.ndarray: The variable data as a numpy array.
+        """
         var_index = self.var_list.index(var)
         var_iterator = var_index * self.var_structure_size
         return self.get_var_from_data(time, var_iterator)
 
     def show_var_dataframe(self, var_array, center: tuple, axis: str):
+        """
+        Show a variable as a DataFrame.
+
+        Args
+        ----
+            var_array (numpy.ndarray): The variable data as a numpy array.
+            center (tuple): The center coordinates for the variable.
+            axis (str): The axis along which to center the variable.
+        """
         df = pd.DataFrame(self.center_var(var_array, center, axis))
         print(df)
 
     def center_var(self, var_array, center: tuple, axis: str):
+        """
+        Center a variable along a given axis.
+
+        Args
+        ----
+            var_array (numpy.ndarray): The variable data as a numpy array.
+            center (tuple): The center coordinates for the variable.
+            axis (str): The axis along which to center the variable.
+
+        Returns
+        -------
+            numpy.ndarray: The centered variable data as a numpy array.
+        """
         match axis:
             case "x":
                 return var_array[center[0][0], :, :]
@@ -168,15 +266,28 @@ class FileStyle:
                 raise ValueError("Invalid Axis")
 
     def get_var_max_value_position(self, var_array):
+        """
+        Get the position of the maximum value in a variable.
+
+        Args
+        ----
+            var_array (numpy.ndarray): The variable data as a numpy array.
+
+        Returns
+        -------
+            tuple: The position of the maximum value in the variable.
+        """
         return np.where(var_array == np.max(var_array))
 
     def check_path(self, path, selected_file_name=""):
-        """Checks if the path exists, if not, creates it
-        If the path exists, checks if the selected_file_name folder exists,
-        if not, creates it
-        If no selected_file_name is given, it will only check if the path
-        exists"""
+        """
+        Check if a path exists and create it if necessary.
 
+        Args
+        ----
+            path (str): The path to check.
+            selected_file_name (str, optional): The name of the selected file. Defaults to "".
+        """
         if not os.path.exists(path):
             os.makedirs(path)
         elif not os.path.exists(path + selected_file_name + "/"):
@@ -193,6 +304,7 @@ class FileStyle:
                     raise ValueError("Invalid Folder Handle")
 
     def cloud_binary_comparison(self):
+        """Compare binary files in the output and comparison folders."""
         if os.path.exists(self.cmp_output_data_path):
             file_regex = self.binary_regex
             file1_list = get_file_list(self.output_data_path, file_regex)
@@ -222,6 +334,18 @@ class FileStyle:
             print(f"There is no {self.cmp_output_data_path} folder to compare with")
 
     def live_var_animation(self, variable):
+        """
+        Create a 3D scatter plot animation of a given variable.
+
+        Parameters
+        ----------
+        - variable: numpy array
+            The variable to be plotted.
+
+        Returns
+        -------
+        None
+        """
         ax = plt.axes(projection="3d")
         num_layers = 50
         num_pnt = 57
@@ -236,6 +360,21 @@ class FileStyle:
         plt.show()
 
     def plot_style(self, variable):
+        """
+        Apply a specific plot style based on the image option and data dimension.
+
+        Parameters
+        ----------
+            variable (numpy.ndarray): The variable to be plotted.
+
+        Raises
+        ------
+            ValueError: If the image style is invalid.
+
+        Returns
+        -------
+            None
+        """
         match self.img_option:
             case ImageStyle.IMAGE.value:
                 if self.data_dimension == 3:
@@ -275,6 +414,18 @@ class FileStyle:
         plt.ylabel("Y")
 
     def generate_image(self, frame, var_number):
+        """
+        Generate an image for a given frame and variable number.
+
+        Args
+        ----
+            frame (int): The frame number.
+            var_number (int): The variable number.
+
+        Returns
+        -------
+            None
+        """
         # directory = "img/" + str(file_counter) + file.split(".")[0] + "/"
         variable = self.get_var_from_data(frame, var_number)
         plt.title(f"{nube31_var_list[var_number]} {str(2 * frame)}s")
@@ -283,6 +434,15 @@ class FileStyle:
     def animate_variables(
         self, var_list=None, save_animation=True, show_animation=False
     ):
+        """
+        Animates the variables in the given var_list.
+
+        Args
+        ----
+            var_list (list, optional): List of variable indices to animate. If None, all variables will be animated. Defaults to None.
+            save_animation (bool, optional): Whether to save the animation as a video file. Defaults to True.
+            show_animation (bool, optional): Whether to display the animation. Defaults to False.
+        """
         if var_list is None:
             var_list = range(self.var_amount)
         self.check_path(self.vid_path)
@@ -292,6 +452,16 @@ class FileStyle:
     def animate_variable(
         self, var_to_animate, save_animation=True, show_animation=False, check_path=True
     ):
+        """
+        Animates a variable from the output data.
+
+        Args
+        ----
+            var_to_animate (str): The variable to animate.
+            save_animation (bool, optional): Whether to save the animation as an mp4 file. Defaults to True.
+            show_animation (bool, optional): Whether to display the animation. Defaults to False.
+            check_path (bool, optional): Whether to check the path before saving the animation. Defaults to True.
+        """
         fargs = [var_to_animate]
         file_ammount = len(get_file_list(self.output_data_path, self.binary_regex))
         # FuncAnimation will call generate_image with the arguments in fargs
@@ -319,6 +489,16 @@ class FileStyle:
             plt.show()
 
     def parse_status_img(self):
+        """
+        Parse the status image data and generates plots for each variable.
+
+        This method iterates over the data files and generates plots for each variable
+        in the status image. The plots are saved as PNG images in the specified image path.
+
+        Returns
+        -------
+            None
+        """
         self.check_path(f"{self.img_path}{self.file_name}")
         for file_iterator in range(len(self.data_file)):
             full_img_path = f"{self.img_path}{self.file_name}/{str(file_iterator)}/"
@@ -339,7 +519,20 @@ class FileStyle:
                 else:
                     var_iterator = 0
 
-    def multi_var_img(self, var_1, var_2, file="inis.da"):
+    def multi_var_img(self, var_1, var_2):
+        """
+        Generate a scatter plot of two variables from the data file.
+
+        Args
+        ----
+            var_1 (int): Index of the first variable to plot.
+            var_2 (int): Index of the second variable to plot.
+            file (str, optional): Name of the data file. Defaults to "inis.da".
+
+        Returns
+        -------
+            None
+        """
         self.check_path(f"{self.img_path}{self.file_name}/multivar/")
         print(len(self.data_file))
         var_1_data = self.get_var_from_data(0, var_1)
@@ -353,10 +546,21 @@ class FileStyle:
         )
         plt.close()  # If not closed, images will be superimposed
 
-    def show_file_diff(self, file):
-        print(f"\n\n------------------- File: {file} -------------------\n")
-        with open(f"{self.txt_path}{self.file_name}/{file}", "r") as file1:
-            with open(f"{self.cmp_txt_path}{self.file_name}/{file}", "r") as file2:
+    def show_file_diff(self, file_name):
+        """
+        Compare two files and print the differences line by line.
+
+        Args
+        ----
+            file_name (str): The name of the file to compare.
+
+        Returns
+        -------
+            None
+        """
+        print(f"\n\n------------------- File: {file_name} -------------------\n")
+        with open(f"{self.txt_path}{self.file_name}/{file_name}", "r") as file1:
+            with open(f"{self.cmp_txt_path}{self.file_name}/{file_name}", "r") as file2:
                 for i, l1 in enumerate(file1, start=1):
                     for l2 in file2:
                         if l1 != l2:
@@ -366,6 +570,17 @@ class FileStyle:
                         break
 
     def cloud_text_comparison(self):
+        """
+        Compare text files in the specified paths and display the differences, if any.
+
+        Returns
+        -------
+            None
+
+        Raises
+        ------
+            None
+        """
         original_path_extists = os.path.exists(f"{self.txt_path}{self.file_name}/")
         compate_path_extists = os.path.exists(f"{self.cmp_txt_path}{self.file_name}/")
         if original_path_extists and compate_path_extists:
@@ -383,10 +598,21 @@ class FileStyle:
             )
 
     def get_unequal_files(self):
+        """
+        Compare the files in the specified directories and return a list of unequal files.
+        
+        Returns
+        -------
+            list: A list of unequal files found in the directories.
+        
+        Raises
+        ------
+            Exception: If the text file names in the directories differ, an exception is raised.
+        """
         txt_files = os.listdir(f"{self.txt_path}{self.file_name}/")
         txt1_files = os.listdir(f"{self.cmp_txt_path}{self.file_name}/")
         if txt_files != txt1_files:
-            raise ("Text file names differ, cannot compare")
+            raise Exception("Text file names differ, cannot compare")
         status = cmpfiles(
             f"{self.txt_path}{self.file_name}/",
             f"{self.cmp_txt_path}{self.file_name}/",
@@ -396,6 +622,21 @@ class FileStyle:
         return status[1]  # return unequal files
 
     def parse_text_files(self):
+        """
+        Parse the text files and save them as .txt files.
+
+        This method iterates over the data files and saves each file as a .txt file.
+        The file name is constructed using the file counter and the provided file name.
+        The data is saved using the `np.savetxt` function, with a header containing information about the file.
+
+        Args
+        ----
+            None
+
+        Returns
+        -------
+            None
+        """
         full_txt_path = f"{self.txt_path}{self.file_name}/"
         self.check_path(full_txt_path)
         for file_counter in range(len(self.data_file)):
@@ -407,12 +648,36 @@ class FileStyle:
 
 
 def get_file_list(data_path, binary_regex):
+    """
+    Get a sorted list of files in the specified data path that match the given binary regex pattern.
+
+    Args
+    ----
+        data_path (str): The path to the data directory.
+        binary_regex (str): The regular expression pattern to match binary files.
+
+    Returns
+    -------
+        list: A sorted list of file names that match the binary regex pattern.
+    """
     files = os.listdir(data_path)  # List all files in outputdata folder
     reg = re.compile(binary_regex)  # Compile regex to match binary files
     return sorted(filter(reg.search, files))
 
 
 def data_comparison(original_data: FileStyle, cmp_data: FileStyle):
+    """
+    Compare the data in two FileStyle objects and print any differences found.
+
+    Args
+    ----
+        original_data (FileStyle): The original data to compare.
+        cmp_data (FileStyle): The data to compare against.
+
+    Returns
+    -------
+        bool: True if all data is the same, False otherwise.
+    """
     for iterator in range(len(original_data.data_file)):
         if not np.allclose(
             original_data.data_file[iterator],

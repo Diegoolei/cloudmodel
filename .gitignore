@@ -47,7 +47,14 @@ txt/
 txt1/
 Data/
 
+# PyPI
+dist/
+*.egg-info/
+
+
+# Ignore the following files
 .vscode/settings.json
 __pycache__/*
+*.pyc
 callgrind.out.30406
 Fortran77-Cloud-Model.code-workspace

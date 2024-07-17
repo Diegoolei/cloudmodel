@@ -1,7 +1,9 @@
-from cloud_read import FileStyle, CloudModel
+"""main file to run the cloud model."""
+from cloudmodel.cloud_read import FileStyle, CloudModel
 
 
 def main():
+    """Execute function to run the cloud model."""
     CloudModel(
         simulation_time_minutes=45,
         save_time_minutes=3,
