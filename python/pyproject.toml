@@ -10,7 +10,8 @@ requires = ["setuptools>=40.8.0",
 
 [project]
 name = "cloudmodel"
-version = "0.2.9"
+dynamic = ["version"]
+version = "0.2.10"
 authors = [{name = "Diego E. Oleiarz", email = "diego.oleiarz@mi.unc.edu.ar"}]
 license = {text = "The MIT License"}
 readme = "README.md"
