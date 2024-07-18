@@ -56,6 +56,8 @@ def pre_build():
 
     chdir("cloudmodel/interface")
 
+    subprocess.check_call(["pip", "list"])
+
     subprocess.check_call(
         [
             "f2py",
@@ -70,7 +72,6 @@ def pre_build():
             "meson",
         ]
     )
-
     chdir("../..")
 
     COMPILED_FLAG.touch()
