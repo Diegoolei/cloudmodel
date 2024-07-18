@@ -63,7 +63,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install cibuildwheel
-        working-directory: ../
+        working-directory: python
         run: pip wheel -w dist .
 
       - uses: actions/upload-artifact@v4
