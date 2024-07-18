@@ -10,7 +10,7 @@ requires = ["setuptools>=40.8.0",
 
 [project]
 name = "cloudmodel"
-version = "0.2.10"
+version = "0.2.16"
 authors = [{name = "Diego E. Oleiarz", email = "diego.oleiarz@mi.unc.edu.ar"}]
 license = {text = "The MIT License"}
 readme = "README.md"
@@ -39,7 +39,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
 ]
-# dependencies = ["numpy", "pandas", "scipy", "fpm", "matplotlib"]
+dependencies = ["numpy", "pandas", "scipy", "fpm", "matplotlib"]
 requires-python = '>=3.9, <4'
 
 [project.urls]
@@ -51,3 +51,4 @@ cloudmodel = "cloudmodel.__main__:main"
 
 [pydocstyle]
 convention = "numpy"
+
