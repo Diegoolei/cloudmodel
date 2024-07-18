@@ -307,6 +307,7 @@ contains
    end subroutine initial_conditions
 
    function TT_f (z_aux)
+      real(4), intent(in) :: z_aux
       real :: a, xx, TT_f
       a = 298.15
       if (z_aux <= 2000) then
@@ -336,6 +337,7 @@ contains
       real Pres0
       real G,Rd,dx,dx4
       real zetaa,zetam,zetad
+      real ya,ym,yd
       dx4 = dx/4.
 
       integ(0) = 0
@@ -368,7 +370,8 @@ contains
       real integ(-3:3*nz1+3)
       real Pres0
       real G,dx
-
+      real ya,ym,yd
+      
       do concurrent(k = 0:nz1-1)
          Den00(2*k) = air_density_z_initial(k)
          Den00(2*k+1) = (air_density_z_initial(k)+air_density_z_initial(k+1))/2.
