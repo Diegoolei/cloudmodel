@@ -53,10 +53,12 @@ jobs:
       run: fpm build --profile release
       
     - name: Install cloudmodel
+      working-directory: python
       run:
-        python setup.py sdist
+        pip install .
     
     - name: Verify cloudmodel
+      working-directory: python
       run:
         ls dist
 
@@ -93,6 +95,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Publish
+      working-directory: python
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USER }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASS }}
