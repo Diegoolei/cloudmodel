@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         gcc_v: [13] # Version of GFortran we want to use.
         python-version: ['3.10', '3.11']
     env:
@@ -73,7 +73,7 @@ jobs:
     
   build-manylinux:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: update wheel
         run: pip install --upgrade setuptools wheel
@@ -90,7 +90,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         python-version: ['3.10', '3.11']
     steps:
     - uses: actions/checkout@v4
