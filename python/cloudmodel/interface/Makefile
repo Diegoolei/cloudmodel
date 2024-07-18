@@ -3,11 +3,11 @@
 # -lcloudsim linkea la lib
 gfortran:
 	fpm clean --all
-	fpm install --profile release --prefix build/python
+	fpm build --profile release
 	f2py -m interface \
-		-L$(PWD)/../../../build/python/lib/ \
-		-I$(PWD)/../../../build/python/include/ \
-		-c cloud_c_interface.f90 -lcloudsim
+		-L$(PWD)/../../../build/gfortran_63E63B2712D76620/cloudsim/ \
+		-I$(PWD)/../../../build/gfortran_63E63B2712D76620 \
+		-c cloud_c_interface.f90 -lcloudsim --backend meson
 
 
 nvfortran:
