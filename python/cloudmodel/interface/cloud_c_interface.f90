@@ -13,6 +13,8 @@ contains
       real(c_float), intent(in) :: save_lapse
       real(c_float), intent(in) :: statistic_time
       real(c_float), intent(in) :: backup_time
+      ! logical, intent(in) :: save_data
+      ! character(len=254), intent(in) :: directory
       call init_config(sim_time = sim_time, save_lapse = save_lapse,&
          statistic_time = statistic_time, backup_time=backup_time, &
          directory = "Data/new_code/")

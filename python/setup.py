@@ -1,5 +1,6 @@
 """Setup file for the python package."""
 
+
 from setuptools import setup, find_packages
 import shutil
 import subprocess
@@ -227,7 +228,8 @@ setup(
         "egg_info": CustomEgg
     },
     packages=find_packages(),
-    package_data={"cloudsim": ["build/*.so"]},
+    package_data={
+        "": ["*"],
     include_package_data=True,
 )
 
