@@ -18,7 +18,7 @@ THIS_DIR = Path(
 ).parent  # /home/runner/work/Fortran77-Cloud-Model/Fortran77-Cloud-Model/python
 BUILD_DIR = (THIS_DIR.parent / "build").absolute()
 LINK_DIR = BUILD_DIR / "gfortran_63E63B2712D76620" / "cloudsim"
-INCL_DIR = BUILD_DIR / "gfortran_2654F75F5833692A"
+INCL_DIR = BUILD_DIR / "gfortran_63E63B2712D76620"
 COMPILED_FLAG = THIS_DIR / "compiled_flag"
 
 FFLAGS = "-fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp"  # noqa
