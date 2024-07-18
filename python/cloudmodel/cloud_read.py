@@ -79,12 +79,17 @@ class CloudModel:
         save_time_minutes=0,
         statistic_time_minutes=0,
         bacup_time_minutes=0,
+        restore_backup=False,
+        directory="Data/new_code"
     ):
+        check_path(FolderHandle.IGNORE.value, directory)
         nb.c_interface.run_model_python(
             simulation_time_minutes,
             save_time_minutes,
             statistic_time_minutes,
             bacup_time_minutes,
+            restore_backup,
+            directory
         )
 
 
@@ -113,7 +118,6 @@ class FileStyle:
         show_var_dataframe(var_array, center, axis): Show a variable as a DataFrame.
         center_var(var_array, center, axis): Center a variable along a given axis.
         get_var_max_value_position(var_array): Get the position of the maximum value in a variable.
-        check_path(path, selected_file_name=""): Check if a path exists and create it if necessary.
         cloud_binary_comparison(): Compare binary files in the output and comparison folders.
         live_var_animation(variable): Create a live variable animation.
         plot_style(variable): Plot the style of a variable.
@@ -279,30 +283,6 @@ class FileStyle:
         """
         return np.where(var_array == np.max(var_array))
 
-    def check_path(self, path, selected_file_name=""):
-        """
-        Check if a path exists and create it if necessary.
-
-        Args
-        ----
-            path (str): The path to check.
-            selected_file_name (str, optional): The name of the selected file. Defaults to "".
-        """
-        if not os.path.exists(path):
-            os.makedirs(path)
-        elif not os.path.exists(path + selected_file_name + "/"):
-            os.makedirs(path + selected_file_name + "/")
-        else:
-            match self.folder_handle:
-                case FolderHandle.IGNORE.value:
-                    return
-                case FolderHandle.DELETE.value:
-                    os.system(f"rm -rf {path}{selected_file_name}/*")
-                case FolderHandle.CANCEL.value:
-                    raise ValueError("Folder already exists")
-                case _:
-                    raise ValueError("Invalid Folder Handle")
-
     def cloud_binary_comparison(self):
         """Compare binary files in the output and comparison folders."""
         if os.path.exists(self.cmp_output_data_path):
@@ -445,7 +425,7 @@ class FileStyle:
         """
         if var_list is None:
             var_list = range(self.var_amount)
-        self.check_path(self.vid_path)
+        check_path(self.folder_handle, self.vid_path)
         for var in var_list:
             self.animate_variable(var, save_animation, show_animation, check_path=False)
 
@@ -479,7 +459,7 @@ class FileStyle:
         if save_animation:
             writervideo = FFMpegWriter(fps=2)
             if check_path:
-                self.check_path(self.vid_path)
+                check_path(self.folder_handle, self.vid_path)
             anim.save(
                 f"{self.vid_path}{nube31_var_list[var_to_animate]}.mp4",
                 writer=writervideo,
@@ -499,10 +479,10 @@ class FileStyle:
         -------
             None
         """
-        self.check_path(f"{self.img_path}{self.file_name}")
+        check_path(self.folder_handle, f"{self.img_path}{self.file_name}")
         for file_iterator in range(len(self.data_file)):
             full_img_path = f"{self.img_path}{self.file_name}/{str(file_iterator)}/"
-            self.check_path(full_img_path)
+            check_path(self.folder_handle, full_img_path)
             var_iterator = 0
             for structure_iterator in range(
                 0, len(self.data_file[file_iterator]), self.var_structure_size
@@ -533,7 +513,7 @@ class FileStyle:
         -------
             None
         """
-        self.check_path(f"{self.img_path}{self.file_name}/multivar/")
+        check_path(self.folder_handle, f"{self.img_path}{self.file_name}/multivar/")
         print(len(self.data_file))
         var_1_data = self.get_var_from_data(0, var_1)
         var_2_data = self.get_var_from_data(0, var_2)
@@ -638,7 +618,7 @@ class FileStyle:
             None
         """
         full_txt_path = f"{self.txt_path}{self.file_name}/"
-        self.check_path(full_txt_path)
+        check_path(self.folder_handle,full_txt_path)
         for file_counter in range(len(self.data_file)):
             header = f"File: {file_counter}\n Variable: {self.file_name}/\n File number: {str(file_counter)}\n "
             file_name = f"{full_txt_path}{str(file_counter)}.txt"
@@ -702,3 +682,29 @@ def data_comparison(original_data: FileStyle, cmp_data: FileStyle):
                     print(f"Max difference: {np.argmax(np.abs(var - cmp_var))}\n")
 
     return True
+
+
+
+def check_path(folder_handle, path, selected_file_name=""):
+    """
+    Check if a path exists and create it if necessary.
+
+    Args
+    ----
+        path (str): The path to check.
+        selected_file_name (str, optional): The name of the selected file. Defaults to "".
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
+    elif not os.path.exists(path + selected_file_name + "/"):
+        os.makedirs(path + selected_file_name + "/")
+    else:
+        match folder_handle:
+            case FolderHandle.IGNORE.value:
+                return
+            case FolderHandle.DELETE.value:
+                os.system(f"rm -rf {path}{selected_file_name}/*")
+            case FolderHandle.CANCEL.value:
+                raise ValueError("Folder already exists")
+            case _:
+                raise ValueError("Invalid Folder Handle")

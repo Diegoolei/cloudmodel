@@ -4,16 +4,19 @@ from cloudmodel.cloud_read import FileStyle, CloudModel
 
 def main():
     """Execute function to run the cloud model."""
+    directory = "Data/new_code_1/"
     CloudModel(
         simulation_time_minutes=45,
         save_time_minutes=3,
         statistic_time_minutes=3,
         bacup_time_minutes=3,
+        restore_backup=False,
+        directory=directory
     )
     
     iniciales = FileStyle(
         chosen_file="Inis",
-        output_data_path="Data/new_code/",
+        output_data_path=directory,
         cmp_output_data_path="outputdata1/",
         img_path="img/new_code/",
         txt_path="txt/",
