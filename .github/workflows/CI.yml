@@ -55,6 +55,10 @@ jobs:
     - name: Install cloudmodel
       run:
         python setup.py sdist
+    
+    - name: Verify cloudmodel
+      run:
+        ls dist
 
   build-manylinux:
     needs: build
@@ -95,4 +99,5 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install twine
+        ls dist
         twine upload --repository testpypi dist/*
