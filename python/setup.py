@@ -55,19 +55,31 @@ def pre_build():
 
     subprocess.check_call(
         [
+            "cd",
+            "cloudmodel/interface",
+        ]
+    )
+
+    subprocess.check_call(
+        [
             "f2py",
             "-m",
             "interface",
             f"-L{LINK_DIR}",
             f"-I{INCL_DIR}",
             "-c",
-            "cloudmodel/interface/cloud_c_interface.f90",
+            "cloud_c_interface.f90",
             "-lcloudsim",
             "--backend",
             "meson",
         ]
     )
-
+    subprocess.check_call(
+        [
+            "cd",
+            "../..",
+        ]
+    )
     COMPILED_FLAG.touch()
 
 
