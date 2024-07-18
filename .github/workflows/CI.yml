@@ -53,6 +53,7 @@ jobs:
       run: fpm build --profile release
       
     - name: Install cloudmodel
+      working-directory: python
       run:
         pip install .
     
