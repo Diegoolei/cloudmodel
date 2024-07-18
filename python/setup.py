@@ -86,7 +86,7 @@ def final_build_clean():
     """Clean the build of setuptools."""
 
     if (THIS_DIR.parent / "build").exists():
-        print((THIS_DIR.print / "build").absolute())
+        print((THIS_DIR.parent / "build").absolute())
         shutil.rmtree(THIS_DIR.parent / "build")
 
     # Clear compiled files on compiled_files
