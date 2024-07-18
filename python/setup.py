@@ -6,6 +6,7 @@ import subprocess
 
 from pathlib import Path
 from setuptools import Command, setup, find_packages
+from setuptools.command.editable_wheel import editable_wheel
 from setuptools.command.egg_info import egg_info
 
 
@@ -160,6 +161,19 @@ class BuildFortran(Command):
             pre_build()
 
 
+# =============================================================================
+# - Building for developers (editable installation)
+#      pip install -e .
+# =============================================================================
+class CustomEditable(editable_wheel):
+    def run(self):
+        self.run_command("build_fortran")
+        move_compiled_to_editable_loc()
+        save_editable_compiled()
+
+        # Run base editable_wheel run method
+        super().run()
+
 
 # =============================================================================
 # - Custom egg_info command
@@ -182,6 +196,7 @@ initial_compiled_clean()
 setup(
     cmdclass={
         "build_fortran": BuildFortran,
+        "editable_wheel": CustomEditable,
         "egg_info": CustomEgg,
     },
     packages=find_packages(),
