@@ -1,12 +1,11 @@
 """Setup file for the python package."""
 
 from os import chdir
-from setuptools import setup, find_packages
 import shutil
 import subprocess
 
 from pathlib import Path
-from setuptools import Command, setup
+from setuptools import Command, setup, find_packages
 from setuptools.command.editable_wheel import editable_wheel
 from setuptools.command.egg_info import egg_info
 
