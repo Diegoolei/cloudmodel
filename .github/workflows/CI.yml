@@ -94,4 +94,4 @@ jobs:
         python -m pip install --upgrade pip
         pip install twine
         ls dist
-        twine upload --repository testpypi dist/* --skip-existing dist/*
+        twine upload --repository testpypi dist/*
