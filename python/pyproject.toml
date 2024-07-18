@@ -8,6 +8,9 @@ requires = ["setuptools>=40.8.0",
              "scipy", 
              "pandas"]
 
+[project.versions]
+cloudmodel = "0.2.16"
+
 [project]
 name = "cloudmodel"
 authors = [{name = "Diego E. Oleiarz", email = "diego.oleiarz@mi.unc.edu.ar"}]
@@ -47,6 +50,7 @@ Documentation = "https://diegoolei.github.io/Fortran77-Cloud-Model/"
 
 [project.scripts]
 cloudmodel = "cloudmodel.__main__:main"
+
 
 [pydocstyle]
 convention = "numpy"
