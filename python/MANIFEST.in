@@ -1,3 +1,8 @@
-include cloudmodel/interface/*.so
-include cloudmodel/*.py
+recursive-include cloudmodel/interface *
+recursive-include cloudmodel *.py
+include LICENSE
+include README.md
+include pyproject.toml
+include setup.py
+include MANIFEST.in
 include requirements.txt
