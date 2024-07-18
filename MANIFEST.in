@@ -1,3 +1,0 @@
-recursive-include python/cloudmodel/interface/*
-recursive-include python/cloudmodel/*.py
-recursive-include python/requirements.txt
