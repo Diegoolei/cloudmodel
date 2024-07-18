@@ -189,15 +189,15 @@ class CustomEgg(egg_info):
 # Call setup
 # =============================================================================
 
-#save_editable_compiled()
+save_editable_compiled()
 
-#initial_compiled_clean()
+initial_compiled_clean()
 
 setup(
     cmdclass={
         "build_fortran": BuildFortran,
-        "editable_wheel": CustomEditable,
-        "egg_info": CustomEgg,
+        # "editable_wheel": CustomEditable,
+        # "egg_info": CustomEgg,
     },
     packages=find_packages(),
     package_data={
@@ -206,6 +206,6 @@ setup(
     include_package_data=True,
 )
 
-#final_build_clean()
+final_build_clean()
 
-#restore_save_editable_compiled()
+restore_save_editable_compiled()
