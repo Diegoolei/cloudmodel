@@ -1,10 +1,11 @@
 """Setup file for the python package."""
 
+from os import chdir
 from setuptools import setup, find_packages
 import shutil
 import subprocess
-from pathlib import Path
 
+from pathlib import Path
 from setuptools import Command, setup
 from setuptools.command.editable_wheel import editable_wheel
 from setuptools.command.egg_info import egg_info
@@ -53,12 +54,7 @@ def pre_build():
         ]
     )
 
-    subprocess.check_call(
-        [
-            "cd",
-            "cloudmodel/interface",
-        ]
-    )
+    chdir("cloudmodel/interface")
 
     subprocess.check_call(
         [
@@ -74,12 +70,9 @@ def pre_build():
             "meson",
         ]
     )
-    subprocess.check_call(
-        [
-            "cd",
-            "../..",
-        ]
-    )
+
+    chdir("../..")
+
     COMPILED_FLAG.touch()
 
 
