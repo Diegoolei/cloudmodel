@@ -48,6 +48,8 @@ Documentation = "https://diegoolei.github.io/Fortran77-Cloud-Model/"
 
 [project.scripts]
 cloudmodel = "cloudmodel.__main__:main"
+interface = "cloudmodel.interface:main"
 
 [pydocstyle]
 convention = "numpy"
+
