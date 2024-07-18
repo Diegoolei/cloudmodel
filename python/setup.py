@@ -61,8 +61,9 @@ def pre_build():
             f"-L{LINK_DIR}",
             f"-I{INCL_DIR}",
             "-c",
-            "interface/cloud_c_interface.f90",
-            "-lcloudsim", "--backend",
+            "cloudmodel/interface/cloud_c_interface.f90",
+            "-lcloudsim",
+            "--backend",
             "meson",
         ]
     )
