@@ -1,6 +1,5 @@
 """Setup file for the python package."""
 
-
 from setuptools import setup, find_packages
 import shutil
 import subprocess
@@ -14,10 +13,12 @@ from setuptools.command.egg_info import egg_info
 # =============================================================================
 # Directories and constants
 # =============================================================================
-THIS_DIR = Path(__file__).parent # /home/runner/work/Fortran77-Cloud-Model/Fortran77-Cloud-Model/python
+THIS_DIR = Path(
+    __file__
+).parent  # /home/runner/work/Fortran77-Cloud-Model/Fortran77-Cloud-Model/python
 BUILD_DIR = (THIS_DIR.parent / "build" / "python").absolute()
 LINK_DIR = BUILD_DIR / "gfortran_63E63B2712D76620" / "cloudsim"
-INCL_DIR = BUILD_DIR / "gfortran_E62477DA9516D2A9"
+INCL_DIR = BUILD_DIR / "gfortran_2654F75F5833692A"
 COMPILED_FLAG = THIS_DIR / "compiled_flag"
 
 FFLAGS = "-fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp"  # noqa
@@ -48,7 +49,7 @@ def pre_build():
             "--flag",
             f"{FFLAGS}",
             "--c-flag",
-            f"{CFLAGS}"
+            f"{CFLAGS}",
         ]
     )
 
@@ -61,8 +62,7 @@ def pre_build():
             f"-I{INCL_DIR}",
             "-c",
             "interface/cloud_c_interface.f90",
-            "-lcloudsim"
-            "--backend",
+            "-lcloudsim" "--backend",
             "meson",
         ]
     )
@@ -210,11 +210,12 @@ setup(
     cmdclass={
         "build_fortran": BuildFortran,
         "editable_wheel": CustomEditable,
-        "egg_info": CustomEgg
+        "egg_info": CustomEgg,
     },
     packages=find_packages(),
     package_data={
         "": ["*"],
+    },
     include_package_data=True,
 )
 
