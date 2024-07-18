@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: update wheel
-        run: pip install --upgrade setuptools wheel 
+        run: pip install --upgrade setuptools wheel
       - uses: actions/checkout@v4
       - name: Install cibuildwheel
         run: pip wheel -w dist ./python/ --verbose
