@@ -40,26 +40,10 @@ def pre_build():
 
     if COMPILED_FLAG.exists():
         return
-    
 
     chdir("cloudmodel/interface")
 
-    subprocess.check_call(
-        [
-            "fpm",
-            "clean",
-            "--all"
-        ]
-    )
-
-    subprocess.check_call(
-        [
-            "fpm",
-            "build",
-            "--profile",
-            "release"
-        ]
-    )
+    subprocess.check_call(["fpm", "build", "--profile", "release"])
 
     subprocess.check_call(
         [
