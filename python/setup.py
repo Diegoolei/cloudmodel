@@ -196,8 +196,8 @@ initial_compiled_clean()
 setup(
     cmdclass={
         "build_fortran": BuildFortran,
-        # "editable_wheel": CustomEditable,
-        # "egg_info": CustomEgg,
+        "editable_wheel": CustomEditable,
+        "egg_info": CustomEgg,
     },
     packages=find_packages(),
     package_data={
