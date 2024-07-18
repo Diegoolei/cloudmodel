@@ -50,7 +50,7 @@ jobs:
            --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${{ matrix.gcc_v }} \
            --slave /usr/bin/gcov gcov /usr/bin/gcov-${{ matrix.gcc_v }}
     - name: Compile
-      run: fpm build --profile release
+      run: fpm install --profile release --prefix python
       
     - name: Install cloudmodel
       working-directory: python
