@@ -16,8 +16,8 @@ from setuptools.command.egg_info import egg_info
 # =============================================================================
 THIS_DIR = Path(__file__).parent # /home/runner/work/Fortran77-Cloud-Model/Fortran77-Cloud-Model/python
 BUILD_DIR = (THIS_DIR.parent / "build" / "python").absolute()
-LINK_DIR = BUILD_DIR / "lib"
-INCL_DIR = BUILD_DIR / "include"
+LINK_DIR = BUILD_DIR / "gfortran_63E63B2712D76620" / "cloudsim"
+INCL_DIR = BUILD_DIR / "gfortran_E62477DA9516D2A9"
 COMPILED_FLAG = THIS_DIR / "compiled_flag"
 
 FFLAGS = "-fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp"  # noqa
@@ -49,21 +49,6 @@ def pre_build():
             f"{FFLAGS}",
             "--c-flag",
             f"{CFLAGS}"
-        ]
-    )
-
-    subprocess.check_call(
-        [
-            "fpm",
-            "install",
-            "--profile",
-            "debug",
-            "--flag",
-            f"{FFLAGS}",
-            "--c-flag",
-            f"{CFLAGS}",
-            "--prefix",
-            BUILD_DIR,
         ]
     )
 
