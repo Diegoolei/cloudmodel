@@ -32,9 +32,6 @@
 *.app
 
 # Generated files
-*.sal
-*.sa
-*.da
 *.mp4
 *.png
 
@@ -51,6 +48,9 @@ Data/
 dist/
 *.egg-info/
 
+# Testing
+*/*.tox*/*
+.coverage
 
 # Ignore the following files
 .vscode/settings.json

@@ -1,4 +1,5 @@
 """Module to read and compare cloud model data."""
+
 import os
 import re
 from datetime import datetime
@@ -6,7 +7,7 @@ from enum import Enum
 from filecmp import cmpfiles
 from subprocess import PIPE, Popen
 
-from cloudmodel.constants import (
+from .constants import (
     biased_nx1,
     inis_biased_nz1,
     inis_var_list,
@@ -15,7 +16,6 @@ from cloudmodel.constants import (
     plot_center,
 )
 
-from .interface import interface as nb
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter, FuncAnimation
@@ -25,6 +25,8 @@ import numpy as np
 import pandas as pd
 
 from scipy.io import FortranFile
+
+from .interface import interface as nb
 
 
 def time_it(func):
@@ -106,6 +108,13 @@ class CloudSimulation:
         )
 
     def run_initial_analysis(self):
+        """
+        Run the initial analysis on the data.
+
+        Returns
+        -------
+            FileStyle: An instance of the FileStyle class representing the analysis results.
+        """
         if self.get_initials_data:
             analytics = FileStyle(
                 chosen_file="Inis",
@@ -121,6 +130,13 @@ class CloudSimulation:
         return analytics
 
     def run_cloud_analysis(self):
+        """
+        Run the cloud analysis.
+
+        Returns
+        -------
+            FileStyle: The cloud analysis object.
+        """
         if self.get_cloud_data:
             cloud = FileStyle(
                 chosen_file="Nube",
@@ -137,6 +153,18 @@ class CloudSimulation:
         return cloud
 
     def clean_model(self):
+        """
+        Clean the model by deleting the files in the specified directory.
+
+        If the directory is set to ".temp/", this method will delete all the files
+        in that directory using the `check_path` function with the `FolderHandle.DELETE` option.
+
+        Note: This method assumes that the `check_path` function is defined elsewhere.
+
+        Returns
+        -------
+            None
+        """
         if self.directory == ".temp/":
             check_path(FolderHandle.DELETE.value, self.directory)
 
@@ -559,9 +587,7 @@ class FileStyle:
                 variable = self.get_var_from_data(
                     file_iterator, structure_iterator
                 )
-                plt.title(
-                    f"{str(file_iterator)} {self.var_list[var_iterator]}"
-                )
+                plt.title(f"{str(file_iterator)} {self.var_list[var_iterator]}")
                 self.plot_style(variable)
                 plt.savefig(
                     f"{self.img_path}{self.file_name}/{str(file_iterator)}/{self.var_list[var_iterator]}.png"
@@ -616,9 +642,7 @@ class FileStyle:
         print(
             f"\n\n------------------- File: {file_name} -------------------\n"
         )
-        with open(
-            f"{self.txt_path}{self.file_name}/{file_name}", "r"
-        ) as file1:
+        with open(f"{self.txt_path}{self.file_name}/{file_name}", "r") as file1:
             with open(
                 f"{self.cmp_txt_path}{self.file_name}/{file_name}", "r"
             ) as file2:

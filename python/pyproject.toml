@@ -10,7 +10,7 @@ requires = ["setuptools>=40.8.0",
 
 [project]
 name = "cloudmodel"
-version = "0.2.16"
+version = "0.2.10"
 authors = [{name = "Diego E. Oleiarz", email = "diego.oleiarz@mi.unc.edu.ar"}]
 license = {text = "The MIT License"}
 readme = "README.md"
@@ -52,3 +52,16 @@ cloudmodel = "cloudmodel.__main__:main"
 [pydocstyle]
 convention = "numpy"
 
+[tool.black]
+line-length = 79
+target-version = ['py310', 'py311', 'py312']
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "plot: marks tests as part of the integration with matplotlib slow (deselect with '-m \"not plots\"')",
+    "model: marks tests as part model decomposition API (deselect with '-m \"not model\"')",
+]
+testpaths = [
+    "tests",
+]
