@@ -1,12 +1,9 @@
-include *.toml
-include *.yml
-recursive-include app *.f90
-recursive-include python *.f90
-recursive-include python *.in
-recursive-include python *.md
-recursive-include python *.py
-recursive-include python *.toml
-recursive-include python *.txt
-recursive-include python Makefile
-recursive-include python LICENSE
-recursive-include src *.f90
+recursive-include cloudmodel/interface *
+recursive-include cloudmodel *.py
+include LICENSE
+include README.md
+include pyproject.toml
+include setup.py
+include MANIFEST.in
+include requirements.txt
+include tox.ini

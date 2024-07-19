@@ -32,9 +32,6 @@
 *.app
 
 # Generated files
-*.sal
-*.sa
-*.da
 *.mp4
 *.png
 
@@ -52,7 +49,7 @@ dist/
 *.egg-info/
 
 # Testing
-.tox/*
+*/*.tox*/*
 .coverage
 
 # Ignore the following files

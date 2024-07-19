@@ -1,6 +1,7 @@
 """init file for the cloudmodel module."""
 
-from .cloud_read import CloudSimulation
-from .interface import interface
+from cloudmodel.cloud_read import CloudSimulation, FileStyle
 
-__all__ = ["interface", "CloudSimulation"]
+from cloudmodel.interface import interface
+
+__all__ = ["CloudSimulation", "FileStyle", "interface"]

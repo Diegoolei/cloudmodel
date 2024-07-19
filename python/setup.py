@@ -1,6 +1,6 @@
 """Setup file for the python package."""
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 packages = find_packages()
 print(packages)

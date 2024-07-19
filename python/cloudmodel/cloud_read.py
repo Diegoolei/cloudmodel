@@ -7,7 +7,7 @@ from enum import Enum
 from filecmp import cmpfiles
 from subprocess import PIPE, Popen
 
-from cloudmodel.constants import (
+from .constants import (
     biased_nx1,
     inis_biased_nz1,
     inis_var_list,
@@ -240,9 +240,7 @@ class FileStyle:
 
     def get_data(self):
         """Get the data from the selected files."""
-        selected_files = get_file_list(
-            self.output_data_path, self.binary_regex
-        )
+        selected_files = get_file_list(self.output_data_path, self.binary_regex)
         for file in selected_files:
             with FortranFile(f"{self.output_data_path}{file}", "r") as f:
                 self.data_file.append(f.read_reals(self.var_datatype))
@@ -561,9 +559,7 @@ class FileStyle:
                 variable = self.get_var_from_data(
                     file_iterator, structure_iterator
                 )
-                plt.title(
-                    f"{str(file_iterator)} {self.var_list[var_iterator]}"
-                )
+                plt.title(f"{str(file_iterator)} {self.var_list[var_iterator]}")
                 self.plot_style(variable)
                 plt.savefig(
                     f"{self.img_path}{self.file_name}/{str(file_iterator)}/{self.var_list[var_iterator]}.png"
@@ -618,9 +614,7 @@ class FileStyle:
         print(
             f"\n\n------------------- File: {file_name} -------------------\n"
         )
-        with open(
-            f"{self.txt_path}{self.file_name}/{file_name}", "r"
-        ) as file1:
+        with open(f"{self.txt_path}{self.file_name}/{file_name}", "r") as file1:
             with open(
                 f"{self.cmp_txt_path}{self.file_name}/{file_name}", "r"
             ) as file2:
@@ -806,3 +800,4 @@ def check_path(folder_handle, path, selected_file_name=""):
                 raise ValueError("Folder already exists")
             case _:
                 raise ValueError("Invalid Folder Handle")
+
