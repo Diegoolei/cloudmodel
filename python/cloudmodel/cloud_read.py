@@ -61,7 +61,7 @@ class FolderHandle(Enum):
     CANCEL = "Cancel"
 
 
-class CloudModel:
+class CloudSimulation:
     """
     Represents a cloud model.
 
@@ -80,17 +80,65 @@ class CloudModel:
         statistic_time_minutes=0,
         bacup_time_minutes=0,
         restore_backup=False,
-        directory="Data/new_code"
+        directory=".temp/",
+        get_cloud_data=True,
+        get_initials_data=True,
     ):
-        check_path(FolderHandle.IGNORE.value, directory)
+        self.simulation_time_minutes = simulation_time_minutes
+        self.save_time_minutes = save_time_minutes
+        self.statistic_time_minutes = statistic_time_minutes
+        self.bacup_time_minutes = bacup_time_minutes
+        self.restore_backup = restore_backup
+        self.directory = directory
+        self.get_cloud_data = get_cloud_data
+        self.get_initials_data = get_initials_data
+
+    def run_model(self):
+        """Run the cloud model."""
+        check_path(FolderHandle.IGNORE.value, self.directory)
         nb.c_interface.run_model_python(
-            simulation_time_minutes,
-            save_time_minutes,
-            statistic_time_minutes,
-            bacup_time_minutes,
-            restore_backup,
-            directory
+            self.simulation_time_minutes,
+            self.save_time_minutes,
+            self.statistic_time_minutes,
+            self.bacup_time_minutes,
+            self.restore_backup,
+            self.directory,
         )
+
+    def run_initial_analysis(self):
+        if self.get_initials_data:
+            analytics = FileStyle(
+                chosen_file="Inis",
+                output_data_path=self.directory,
+                cmp_output_data_path="outputdata1/",
+                img_path="img/" + self.directory,
+                txt_path="txt/" + self.directory,
+                cmp_txt_path="txt1/" + self.directory,
+                vid_path="vid/" + self.directory,
+                img_option="Contour",
+                folder_handle="Delete",
+            )
+        return analytics
+
+    def run_cloud_analysis(self):
+        if self.get_cloud_data:
+            cloud = FileStyle(
+                chosen_file="Nube",
+                output_data_path=self.directory,
+                cmp_output_data_path="outputdata1/",
+                img_path="img/" + self.directory,
+                txt_path="txt/" + self.directory,
+                cmp_txt_path="txt1/" + self.directory,
+                vid_path="vid/" + self.directory,
+                img_option="Contour",
+                folder_handle="Delete",
+            )
+
+        return cloud
+
+    def clean_model(self):
+        if self.directory == ".temp/":
+            check_path(FolderHandle.DELETE.value, self.directory)
 
 
 class FileStyle:
@@ -144,7 +192,9 @@ class FileStyle:
         img_option=ImageStyle.IMAGE.value,
         folder_handle=FolderHandle.IGNORE.value,
     ):
-        assert os.path.exists(output_data_path), "output_data_path does not exist"
+        assert os.path.exists(
+            output_data_path
+        ), "output_data_path does not exist"
         self.output_data_path = output_data_path
         self.cmp_output_data_path = cmp_output_data_path
         self.img_path = img_path
@@ -185,9 +235,12 @@ class FileStyle:
             case _:
                 raise ValueError("Invalid Input File Type")
         self.get_data()
+
     def get_data(self):
         """Get the data from the selected files."""
-        selected_files = get_file_list(self.output_data_path, self.binary_regex)
+        selected_files = get_file_list(
+            self.output_data_path, self.binary_regex
+        )
         for file in selected_files:
             with FortranFile(f"{self.output_data_path}{file}", "r") as f:
                 self.data_file.append(f.read_reals(self.var_datatype))
@@ -311,7 +364,9 @@ class FileStyle:
             if diff:
                 print("All the binaries are the same")
         else:
-            print(f"There is no {self.cmp_output_data_path} folder to compare with")
+            print(
+                f"There is no {self.cmp_output_data_path} folder to compare with"
+            )
 
     def live_var_animation(self, variable):
         """
@@ -360,7 +415,9 @@ class FileStyle:
                 if self.data_dimension == 3:
                     plt.imshow(
                         self.center_var(
-                            variable, self.get_var_max_value_position(variable), "z"
+                            variable,
+                            self.get_var_max_value_position(variable),
+                            "z",
                         )
                         # np.flipud(variable[:, :, plot_center])
                     )
@@ -374,7 +431,9 @@ class FileStyle:
                     cs = ax.contour(
                         # np.flipud(variable[:, :, plot_center]),
                         self.center_var(
-                            variable, self.get_var_max_value_position(variable), "z"
+                            variable,
+                            self.get_var_max_value_position(variable),
+                            "z",
                         ),
                         linewidths=0.3,
                         colors="k",
@@ -427,10 +486,16 @@ class FileStyle:
             var_list = range(self.var_amount)
         check_path(self.folder_handle, self.vid_path)
         for var in var_list:
-            self.animate_variable(var, save_animation, show_animation, check_path=False)
+            self.animate_variable(
+                var, save_animation, show_animation, check_path=False
+            )
 
     def animate_variable(
-        self, var_to_animate, save_animation=True, show_animation=False, check_path=True
+        self,
+        var_to_animate,
+        save_animation=True,
+        show_animation=False,
+        check_path=True,
     ):
         """
         Animates a variable from the output data.
@@ -443,7 +508,9 @@ class FileStyle:
             check_path (bool, optional): Whether to check the path before saving the animation. Defaults to True.
         """
         fargs = [var_to_animate]
-        file_ammount = len(get_file_list(self.output_data_path, self.binary_regex))
+        file_ammount = len(
+            get_file_list(self.output_data_path, self.binary_regex)
+        )
         # FuncAnimation will call generate_image with the arguments in fargs
         anim = FuncAnimation(
             plt.gcf(),
@@ -481,14 +548,20 @@ class FileStyle:
         """
         check_path(self.folder_handle, f"{self.img_path}{self.file_name}")
         for file_iterator in range(len(self.data_file)):
-            full_img_path = f"{self.img_path}{self.file_name}/{str(file_iterator)}/"
+            full_img_path = (
+                f"{self.img_path}{self.file_name}/{str(file_iterator)}/"
+            )
             check_path(self.folder_handle, full_img_path)
             var_iterator = 0
             for structure_iterator in range(
                 0, len(self.data_file[file_iterator]), self.var_structure_size
             ):
-                variable = self.get_var_from_data(file_iterator, structure_iterator)
-                plt.title(f"{str(file_iterator)} {self.var_list[var_iterator]}")
+                variable = self.get_var_from_data(
+                    file_iterator, structure_iterator
+                )
+                plt.title(
+                    f"{str(file_iterator)} {self.var_list[var_iterator]}"
+                )
                 self.plot_style(variable)
                 plt.savefig(
                     f"{self.img_path}{self.file_name}/{str(file_iterator)}/{self.var_list[var_iterator]}.png"
@@ -513,7 +586,9 @@ class FileStyle:
         -------
             None
         """
-        check_path(self.folder_handle, f"{self.img_path}{self.file_name}/multivar/")
+        check_path(
+            self.folder_handle, f"{self.img_path}{self.file_name}/multivar/"
+        )
         print(len(self.data_file))
         var_1_data = self.get_var_from_data(0, var_1)
         var_2_data = self.get_var_from_data(0, var_2)
@@ -538,9 +613,15 @@ class FileStyle:
         -------
             None
         """
-        print(f"\n\n------------------- File: {file_name} -------------------\n")
-        with open(f"{self.txt_path}{self.file_name}/{file_name}", "r") as file1:
-            with open(f"{self.cmp_txt_path}{self.file_name}/{file_name}", "r") as file2:
+        print(
+            f"\n\n------------------- File: {file_name} -------------------\n"
+        )
+        with open(
+            f"{self.txt_path}{self.file_name}/{file_name}", "r"
+        ) as file1:
+            with open(
+                f"{self.cmp_txt_path}{self.file_name}/{file_name}", "r"
+            ) as file2:
                 for i, l1 in enumerate(file1, start=1):
                     for l2 in file2:
                         if l1 != l2:
@@ -561,15 +642,22 @@ class FileStyle:
         ------
             None
         """
-        original_path_extists = os.path.exists(f"{self.txt_path}{self.file_name}/")
-        compate_path_extists = os.path.exists(f"{self.cmp_txt_path}{self.file_name}/")
+        original_path_extists = os.path.exists(
+            f"{self.txt_path}{self.file_name}/"
+        )
+        compate_path_extists = os.path.exists(
+            f"{self.cmp_txt_path}{self.file_name}/"
+        )
         if original_path_extists and compate_path_extists:
             diff = self.get_unequal_files()
             if diff == []:
                 print("All the text files are the same")
             else:
                 print(f"The text files are different in: {diff}")
-                if input("Show differences between files? Y/N: ").upper() == "Y":
+                if (
+                    input("Show differences between files? Y/N: ").upper()
+                    == "Y"
+                ):
                     for file in diff:
                         self.show_file_diff(file)
         else:
@@ -580,11 +668,11 @@ class FileStyle:
     def get_unequal_files(self):
         """
         Compare the files in the specified directories and return a list of unequal files.
-        
+
         Returns
         -------
             list: A list of unequal files found in the directories.
-        
+
         Raises
         ------
             Exception: If the text file names in the directories differ, an exception is raised.
@@ -618,12 +706,15 @@ class FileStyle:
             None
         """
         full_txt_path = f"{self.txt_path}{self.file_name}/"
-        check_path(self.folder_handle,full_txt_path)
+        check_path(self.folder_handle, full_txt_path)
         for file_counter in range(len(self.data_file)):
             header = f"File: {file_counter}\n Variable: {self.file_name}/\n File number: {str(file_counter)}\n "
             file_name = f"{full_txt_path}{str(file_counter)}.txt"
             np.savetxt(
-                file_name, self.data_file[file_counter], newline=", \n", header=header
+                file_name,
+                self.data_file[file_counter],
+                newline=", \n",
+                header=header,
             )
 
 
@@ -677,12 +768,17 @@ def data_comparison(original_data: FileStyle, cmp_data: FileStyle):
                 else:
                     norm_var = var
                     norm_cmp_var = cmp_var
-                if not np.allclose(norm_var, norm_cmp_var, rtol=1e-05, atol=3e-06):
-                    print(f"Variable {original_data.var_list[it_var]} is different ")
-                    print(f"Max difference: {np.argmax(np.abs(var - cmp_var))}\n")
+                if not np.allclose(
+                    norm_var, norm_cmp_var, rtol=1e-05, atol=3e-06
+                ):
+                    print(
+                        f"Variable {original_data.var_list[it_var]} is different "
+                    )
+                    print(
+                        f"Max difference: {np.argmax(np.abs(var - cmp_var))}\n"
+                    )
 
     return True
-
 
 
 def check_path(folder_handle, path, selected_file_name=""):
