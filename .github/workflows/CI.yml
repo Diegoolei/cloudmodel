@@ -1,14 +1,14 @@
 name: Continuous Integration
 on:
   push:
-    branches: [ "to_pkg" ]
+    branches: [ "fortran_comp" ]
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         gcc_v: [13] # Version of GFortran we want to use.
         python-version: ['3.10', '3.11']
     env:
@@ -35,12 +35,14 @@ jobs:
       uses: fortran-lang/setup-fpm@v5
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        
     - name: Install Python dependencies
       if: contains( matrix.os, 'ubuntu')
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel ford numpy matplotlib numpy scipy
+        pip install wheel ford numpy matplotlib numpy scipy meson ninja
         if [ -f python/requirements.txt ]; then pip install -r python/requirements.txt; fi
+
     - name: Install GFortran Linux
       if: contains( matrix.os, 'ubuntu')
       run: |
@@ -49,9 +51,21 @@ jobs:
            --install /usr/bin/gcc gcc /usr/bin/gcc-${{ matrix.gcc_v }} 100 \
            --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${{ matrix.gcc_v }} \
            --slave /usr/bin/gcov gcov /usr/bin/gcov-${{ matrix.gcc_v }}
+
+    - name: Install meson
+      working-directory: ./python
+      run: |
+        sudo apt-get install libnlopt-dev meson
+        pip install meson tox
+
     - name: Compile
+      working-directory: python
       run: fpm build --profile release
       
+    - name: Compile
+      working-directory: .
+      run: ls build -a
+
     - name: Install cloudmodel
       working-directory: python
       run:
@@ -59,8 +73,10 @@ jobs:
     
   build-manylinux:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
+      - name: update wheel
+        run: pip install --upgrade setuptools wheel
       - uses: actions/checkout@v4
       - name: Install cibuildwheel
         run: pip wheel -w dist ./python/ --verbose
@@ -74,7 +90,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         python-version: ['3.10', '3.11']
     steps:
     - uses: actions/checkout@v4
