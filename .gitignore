@@ -56,5 +56,6 @@ dist/
 .vscode/settings.json
 __pycache__/*
 *.pyc
+*.pyc
 callgrind.out.30406
 Fortran77-Cloud-Model.code-workspace
