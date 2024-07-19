@@ -4,8 +4,8 @@ module config
    real :: statistic_time_minutes, backup_time_minutes
    logical(4) :: restore_backup
 contains
-   subroutine init_config(sim_time, save_lapse, statistic_time, backup_time,&
-      restore_from_backup, directory)
+   subroutine init_config(sim_time, save_lapse, statistic_time, backup_time, &
+                          restore_from_backup, directory)
       !! Initializes the configuration for the simulation.
       character(len=*), intent(in) :: directory
       real, intent(in) :: sim_time !! simulation time in minutes

@@ -12,7 +12,7 @@ contains
       character(len=3) :: str_out_mid
       character(len=4) :: str_out
       str_out_mid = str_gen_aux(int_in)
-      if (int_in  < 10) then
+      if (int_in < 10) then
          str_out = '0'//str_out_mid
       else
          str_out = str_out_mid
@@ -24,10 +24,10 @@ contains
       character(len=99) :: str_mid
       character(len=3) :: str_out
 
-      select type(int_in)
-       type is (real)
+      select type (int_in)
+      type is (real)
          write (str_mid, *) int_in
-       type is (integer)
+      type is (integer)
          write (str_mid, *) int_in
       end select
       str_out = trim(adjustl(str_mid))
