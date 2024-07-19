@@ -15,9 +15,9 @@ contains
       real(c_float), intent(in) :: backup_time
       logical, intent(in) :: restore_backup
       character(256), intent(in) :: directory
-      call init_config(sim_time = sim_time, save_lapse = save_lapse,&
-         statistic_time = statistic_time, backup_time=backup_time, &
-         restore_from_backup = restore_backup, directory = trim(adjustl(directory)))
+      call init_config(sim_time=sim_time, save_lapse=save_lapse, &
+                       statistic_time=statistic_time, backup_time=backup_time, &
+                       restore_from_backup=restore_backup, directory=trim(adjustl(directory)))
       call model()
    end subroutine
 end module
