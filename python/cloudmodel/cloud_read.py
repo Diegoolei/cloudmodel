@@ -108,6 +108,13 @@ class CloudSimulation:
         )
 
     def run_initial_analysis(self):
+        """
+        Run the initial analysis on the data.
+
+        Returns
+        -------
+            FileStyle: An instance of the FileStyle class representing the analysis results.
+        """
         if self.get_initials_data:
             analytics = FileStyle(
                 chosen_file="Inis",
@@ -123,6 +130,13 @@ class CloudSimulation:
         return analytics
 
     def run_cloud_analysis(self):
+        """
+        Run the cloud analysis.
+
+        Returns
+        -------
+            FileStyle: The cloud analysis object.
+        """
         if self.get_cloud_data:
             cloud = FileStyle(
                 chosen_file="Nube",
@@ -139,6 +153,18 @@ class CloudSimulation:
         return cloud
 
     def clean_model(self):
+        """
+        Clean the model by deleting the files in the specified directory.
+
+        If the directory is set to ".temp/", this method will delete all the files
+        in that directory using the `check_path` function with the `FolderHandle.DELETE` option.
+
+        Note: This method assumes that the `check_path` function is defined elsewhere.
+
+        Returns
+        -------
+            None
+        """
         if self.directory == ".temp/":
             check_path(FolderHandle.DELETE.value, self.directory)
 
@@ -800,4 +826,3 @@ def check_path(folder_handle, path, selected_file_name=""):
                 raise ValueError("Folder already exists")
             case _:
                 raise ValueError("Invalid Folder Handle")
-
