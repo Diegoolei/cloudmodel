@@ -19,16 +19,19 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: false
+
     - name: Setup Fortran Compiler
       uses: fortran-lang/setup-fortran@v1
       id: setup-fortran
       with:
         compiler: gcc
         version: ${{ matrix.gcc_v }}
+
     - name: Install Python
       uses: actions/setup-python@v5 # Use pip to install latest CMake, & FORD/Jin2For, etc.
       with:
         python-version: ${{ matrix.python-version }}
+        
     - name: Setup Graphviz
       uses: ts-graphviz/setup-graphviz@v2
     - name: Setup Fortran Package Manager
@@ -42,15 +45,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install wheel ford numpy matplotlib numpy scipy meson ninja
         if [ -f python/requirements.txt ]; then pip install -r python/requirements.txt; fi
-
-    - name: Install GFortran Linux
-      if: contains( matrix.os, 'ubuntu')
-      run: |
-        sudo apt-get install lcov
-        sudo update-alternatives \
-           --install /usr/bin/gcc gcc /usr/bin/gcc-${{ matrix.gcc_v }} 100 \
-           --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${{ matrix.gcc_v }} \
-           --slave /usr/bin/gcov gcov /usr/bin/gcov-${{ matrix.gcc_v }}
 
     - name: Install meson
       working-directory: ./python
@@ -70,18 +64,33 @@ jobs:
   build-manylinux:
     needs: build
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        gcc_v: [13] # Version of GFortran we want to use.
+        python-version: ['3.10', '3.11']
     steps:
       - name: update wheel
         run: pip install --upgrade setuptools wheel
       - uses: actions/checkout@v4
       
+      - name: Setup Fortran Compiler
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: gcc
+          version: ${{ matrix.gcc_v }}
+
       - name: Setup Fortran Package Manager
         uses: fortran-lang/setup-fpm@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install cibuildwheel
         working-directory: python
-        run: python setup.py bdist_wheel
+        run: |
+          if [ -f python/requirements.txt ]; then pip install -r python/requirements.txt; fi
+          python setup.py bdist_wheel
 
       - uses: actions/upload-artifact@v4
         with:
