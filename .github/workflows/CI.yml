@@ -95,9 +95,8 @@ jobs:
           python -m pip install cibuildwheel
         
       - name: Build wheels
-        working-directory: python
         run: |
-          python -m cibuildwheel --output-dir dist
+          python -m cibuildwheel python --output-dir python/dist
 
       - uses: actions/upload-artifact@v4
         with:
