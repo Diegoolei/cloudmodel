@@ -101,7 +101,7 @@ jobs:
         
       - name: Build wheels
         run: |
-          python -m cibuildwheel python --output-dir python/dist --platform manylinux_x86_64
+          python -m cibuildwheel python --output-dir python/dist
 
       - name: Install cloudmodel
         run: |
