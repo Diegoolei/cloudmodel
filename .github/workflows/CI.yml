@@ -61,10 +61,6 @@ jobs:
     - name: Compile
       working-directory: python
       run: fpm build --profile release
-      
-    - name: Compile
-      working-directory: .
-      run: ls build -a
 
     - name: Install cloudmodel
       working-directory: python
@@ -79,12 +75,13 @@ jobs:
         run: pip install --upgrade setuptools wheel
       - uses: actions/checkout@v4
       - name: Install cibuildwheel
-        run: pip wheel -w dist ./python/ --verbose
+        working-directory: python
+        run: python setup.py bdist_wheel
 
       - uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist
+          path: python/dist
   deploy:
     needs: [build, build-manylinux]
     runs-on: ${{ matrix.os }}
@@ -97,7 +94,7 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         name: dist
-        path: dist
+        path: python/dist
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
