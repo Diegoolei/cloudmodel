@@ -74,6 +74,11 @@ jobs:
       - name: update wheel
         run: pip install --upgrade setuptools wheel
       - uses: actions/checkout@v4
+      
+      - name: Setup Fortran Package Manager
+        uses: fortran-lang/setup-fpm@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install cibuildwheel
         working-directory: python
         run: python setup.py bdist_wheel
