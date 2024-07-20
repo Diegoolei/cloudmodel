@@ -72,6 +72,11 @@ jobs:
         gcc_v: [13] # Version of GFortran we want to use.
         python-version: ['3.10', '3.11']
     steps:
+      - name: Install Python
+        uses: actions/setup-python@v5 # Use pip to install latest CMake, & FORD/Jin2For, etc.
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - name: update wheel
         run: pip install --upgrade setuptools wheel
       - uses: actions/checkout@v4
@@ -96,7 +101,7 @@ jobs:
         
       - name: Build wheels
         run: |
-          python -m cibuildwheel python --output-dir python/dist --verbose
+          python -m cibuildwheel python --output-dir python/dist --print-build-identifiers --debug-traceback
 
       - uses: actions/upload-artifact@v4
         with:
