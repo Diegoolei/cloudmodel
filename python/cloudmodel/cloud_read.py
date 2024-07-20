@@ -83,8 +83,6 @@ class CloudSimulation:
         bacup_time_minutes=0,
         restore_backup=False,
         directory=".temp/",
-        get_cloud_data=True,
-        get_initials_data=True,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
@@ -92,8 +90,8 @@ class CloudSimulation:
         self.bacup_time_minutes = bacup_time_minutes
         self.restore_backup = restore_backup
         self.directory = directory
-        self.get_cloud_data = get_cloud_data
-        self.get_initials_data = get_initials_data
+        self.initial_analytics = None
+        self.cloud_alalytics = None
 
     def run_model(self):
         """Run the cloud model."""
@@ -106,6 +104,8 @@ class CloudSimulation:
             self.restore_backup,
             self.directory,
         )
+        self.run_initial_analysis()
+        self.run_cloud_analysis()
 
     def run_initial_analysis(self):
         """
@@ -115,19 +115,18 @@ class CloudSimulation:
         -------
             FileStyle: An instance of the FileStyle class representing the analysis results.
         """
-        if self.get_initials_data:
-            analytics = FileStyle(
-                chosen_file="Inis",
-                output_data_path=self.directory,
-                cmp_output_data_path="outputdata1/",
-                img_path="img/" + self.directory,
-                txt_path="txt/" + self.directory,
-                cmp_txt_path="txt1/" + self.directory,
-                vid_path="vid/" + self.directory,
-                img_option="Contour",
-                folder_handle="Delete",
-            )
-        return analytics
+        data = FileStyle(
+            chosen_file="Inis",
+            output_data_path=self.directory,
+            cmp_output_data_path="outputdata1/",
+            img_path="img/" + self.directory,
+            txt_path="txt/" + self.directory,
+            cmp_txt_path="txt1/" + self.directory,
+            vid_path="vid/" + self.directory,
+            img_option="Contour",
+            folder_handle="Delete",
+        )
+        self.initial_analytics = data
 
     def run_cloud_analysis(self):
         """
@@ -137,20 +136,18 @@ class CloudSimulation:
         -------
             FileStyle: The cloud analysis object.
         """
-        if self.get_cloud_data:
-            cloud = FileStyle(
-                chosen_file="Nube",
-                output_data_path=self.directory,
-                cmp_output_data_path="outputdata1/",
-                img_path="img/" + self.directory,
-                txt_path="txt/" + self.directory,
-                cmp_txt_path="txt1/" + self.directory,
-                vid_path="vid/" + self.directory,
-                img_option="Contour",
-                folder_handle="Delete",
-            )
-
-        return cloud
+        data = FileStyle(
+            chosen_file="Nube",
+            output_data_path=self.directory,
+            cmp_output_data_path="outputdata1/",
+            img_path="img/" + self.directory,
+            txt_path="txt/" + self.directory,
+            cmp_txt_path="txt1/" + self.directory,
+            vid_path="vid/" + self.directory,
+            img_option="Contour",
+            folder_handle="Delete",
+        )
+        self.initial_analytics = data
 
     def clean_model(self):
         """

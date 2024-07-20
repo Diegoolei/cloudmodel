@@ -60,6 +60,7 @@ def test_simulation_equal():
         bacup_time_minutes=1,
         restore_backup=False,
     )
+
     model.clean_model()
 
     # model.run_model()
