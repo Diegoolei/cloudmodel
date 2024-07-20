@@ -61,7 +61,8 @@ jobs:
       working-directory: python
       run:
         pip install .
-    
+
+
   build-manylinux:
     needs: build
     runs-on: ubuntu-22.04
@@ -95,8 +96,10 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist_${{ matrix.python-version }}
           path: python/dist
+
+
   deploy:
     needs: [build, build-manylinux]
     runs-on: ${{ matrix.os }}
@@ -106,14 +109,17 @@ jobs:
         python-version: ['3.10', '3.11']
     steps:
     - uses: actions/checkout@v4
+
     - uses: actions/download-artifact@v4
       with:
-        name: dist
+        name: dist_${{ matrix.python-version }}
         path: python/dist
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USER }}
