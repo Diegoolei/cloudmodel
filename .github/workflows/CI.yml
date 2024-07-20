@@ -96,7 +96,7 @@ jobs:
         
       - name: Build wheels
         run: |
-          python -m cibuildwheel python --output-dir python/dist
+          python -m cibuildwheel python --output-dir python/dist --verbose
 
       - uses: actions/upload-artifact@v4
         with:
