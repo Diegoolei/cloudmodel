@@ -7,7 +7,7 @@ include setup.py
 include MANIFEST.in
 include requirements.txt
 include tox.ini
-include test.py
 recursive-include tests *.da
+recursive-include tests *.py
 recursive-include tests *.sa
 recursive-include tests *.sal

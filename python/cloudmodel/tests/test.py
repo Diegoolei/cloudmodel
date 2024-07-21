@@ -7,6 +7,19 @@ import numpy as np
 
 
 def verify_vars(model: CloudSimulation, equal: bool):
+    """
+    Verify the variables in the CloudSimulation model.
+
+    Args:
+        model (CloudSimulation): The CloudSimulation model to verify.
+        equal (bool): Flag indicating whether to check for equality or inequality.
+
+    Raises:
+        AssertionError: If the variables do not meet the specified condition.
+
+    Returns:
+        None
+    """
     temp = FileStyle(
         chosen_file="Nube",
         output_data_path="tests/test_data/",
