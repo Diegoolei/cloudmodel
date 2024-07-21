@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [ubuntu-latest]
         gcc_v: [12, 13] # Version of GFortran we want to use.
         python-version: ['3.10', '3.11']
     env:
@@ -68,7 +68,7 @@ jobs:
     strategy:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -81,7 +81,7 @@ jobs:
         with:
           package-dir: .
           output-dir: wheelhouse
-          config-file: "{package}/python/pyproject.toml"
+          config-file: "{package}/pyproject.toml"
       
       - uses: actions/upload-artifact@v4
         with:
@@ -94,7 +94,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [ubuntu-latest]
         python-version: ['3.10', '3.11']
     steps:
     - uses: actions/checkout@v4

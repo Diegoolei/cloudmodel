@@ -11,3 +11,10 @@ recursive-include tests *.da
 recursive-include tests *.py
 recursive-include tests *.sa
 recursive-include tests *.sal
+include *.py
+recursive-include cloudmodel *.da
+recursive-include cloudmodel *.sa
+recursive-include cloudmodel *.sal
+recursive-include cloudmodel ccc
+recursive-include cloudmodel est
+recursive-include cloudmodel esta
