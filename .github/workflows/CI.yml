@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
         gcc_v: [12, 13] # Version of GFortran we want to use.
         python-version: ['3.10', '3.11']
     env:
@@ -62,73 +62,47 @@ jobs:
       run:
         pip install .
 
-
-  build-manylinux:
-    needs: build
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-        gcc_v: [12, 13] # Version of GFortran we want to use.
-        python-version: ['3.10', '3.11']
-    steps:
-      - name: Install Python
-        uses: actions/setup-python@v5 # Use pip to install latest CMake, & FORD/Jin2For, etc.
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: update wheel
-        run: pip install --upgrade setuptools wheel
-      - uses: actions/checkout@v4
-      
-      - name: Setup Fortran Compiler
-        uses: fortran-lang/setup-fortran@v1
-        id: setup-fortran
-        with:
-          compiler: gcc
-          version: ${{ matrix.gcc_v }}
-
-      - name: Setup Fortran Package Manager
-        uses: fortran-lang/setup-fpm@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install cibuildwheel
-        working-directory: python
-        run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          python -m pip install cibuildwheel
-        
-      - name: Build wheels
-        run: |
-          python -m cibuildwheel python --output-dir python/dist
-
-      - name: Install cloudmodel
-        run: |
-          ls -l 
-          ls -l python
-          ls -l python/dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist_${{ matrix.python-version }}
-          path: python/dist
-
-
-  deploy:
-    needs: [build, build-manylinux]
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.19.2
+        # env:
+        #   CIBW_SOME_OPTION: value
+        #    ...
+        with:
+          package-dir: .
+          output-dir: wheelhouse
+          config-file: "{package}/python/pyproject.toml"
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
+
+
+  deploy:
+    needs: [build, build_wheels]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
         python-version: ['3.10', '3.11']
     steps:
     - uses: actions/checkout@v4
 
     - uses: actions/download-artifact@v4
       with:
-        name: dist_${{ matrix.python-version }}
-        path: python/dist
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
 
     - name: Set up Python
       uses: actions/setup-python@v5

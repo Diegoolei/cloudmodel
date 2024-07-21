@@ -6,6 +6,9 @@ biased_nx1 = nx1 + 7
 nube31_biased_nz1 = nz1 + 5
 inis_biased_nz1 = nz1 + 7
 
+# Var list for the cloud model
+# All var lists must be in the same order as the data in the binary files
+
 nube31_var_list = [
     "original_x_velocity",
     "original_y_velocity",

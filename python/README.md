@@ -58,8 +58,8 @@ class FileStyle:
         folder_handle (str): The folder handling option.
 
     Methods:
-        get_data(): Get the data from the selected files.
-        get_var_from_data(file_number, var_iterator): Get a specific variable from the data.
+        _get_data(): Get the data from the selected files.
+        _get_var_from_data(file_number, var_iterator): Get a specific variable from the data.
         list_var(): List all the variables.
         get_var(var, time): Get a specific variable at a given time.
         show_var_dataframe(var_array, center, axis): Show the variable data as a DataFrame.

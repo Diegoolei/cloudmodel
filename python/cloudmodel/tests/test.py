@@ -1,5 +1,8 @@
 """main file to run the cloud model."""
 
+import os
+import re
+
 from cloudmodel import CloudSimulation, FileStyle
 from cloudmodel.constants import nube31_var_list
 
@@ -10,14 +13,18 @@ def verify_vars(model: CloudSimulation, equal: bool):
     """
     Verify the variables in the CloudSimulation model.
 
-    Args:
+    Args
+    ----
         model (CloudSimulation): The CloudSimulation model to verify.
-        equal (bool): Flag indicating whether to check for equality or inequality.
+        equal (bool): Flag indicating whether to check for equality or
+            inequality.
 
-    Raises:
+    Raises
+    ------
         AssertionError: If the variables do not meet the specified condition.
 
-    Returns:
+    Returns
+    -------
         None
     """
     temp = FileStyle(
@@ -33,27 +40,39 @@ def verify_vars(model: CloudSimulation, equal: bool):
     )
     f = True
     for var in nube31_var_list:
-        for time in range(len(get_file_list(model.directory, model.cloud_analytics.binary_regex))):
+        for time in range(
+            len(
+                _get_file_list(
+                    model.directory, model.cloud_analytics.binary_regex
+                )
+            )
+        ):
             variable = model.cloud_analytics.get_var(var, time)
             temp_var = temp.get_var(var, time)
-            
+
             if equal:
-                assert np.allclose(variable,temp_var), f"Max value position of {var} is different"
+                assert np.allclose(
+                    variable, temp_var
+                ), f"Max value position of {var} is different"
             else:
-                f = f and not np.allclose(variable,temp_var), f"Max value position of {var} is equal"
+                f = (
+                    f and not np.allclose(variable, temp_var),
+                    f"Max value position of {var} is equal",
+                )
     assert f
-            
-    
-import os
-import re
-def get_file_list(data_path, binary_regex):
+
+
+def _get_file_list(data_path, binary_regex):
     """
-    Get a sorted list of files in the specified data path that match the given binary regex pattern.
+    Get a sorted list of files in the specified data path that match the given.
+
+        binary regex pattern.
 
     Args
     ----
         data_path (str): The path to the data directory.
-        binary_regex (str): The regular expression pattern to match binary files.
+        binary_regex (str): The regular expression pattern to match binary
+            files.
 
     Returns
     -------
@@ -62,6 +81,7 @@ def get_file_list(data_path, binary_regex):
     files = os.listdir(data_path)  # List all files in outputdata folder
     reg = re.compile(binary_regex)  # Compile regex to match binary files
     return sorted(filter(reg.search, files))
+
 
 def test_simulation_equal():
     """Execute function to run the cloud model."""
@@ -81,6 +101,7 @@ def test_simulation_equal():
 
     model.clean_model()
 
+
 def test_simulation_different():
     """Execute function to run the cloud model."""
     model = CloudSimulation(
@@ -97,6 +118,7 @@ def test_simulation_different():
     verify_vars(model, False)
 
     model.clean_model()
+
 
 test_simulation_equal()
 test_simulation_different()
