@@ -7,7 +7,6 @@ import numpy as np
 
 
 def verify_vars(model: CloudSimulation, equal: bool):
-    nube = model.run_cloud_analysis()
     temp = FileStyle(
         chosen_file="Nube",
         output_data_path="tests/test_data/",
@@ -21,8 +20,8 @@ def verify_vars(model: CloudSimulation, equal: bool):
     )
     f = True
     for var in nube31_var_list:
-        for time in range(len(get_file_list(model.directory, nube.binary_regex))):
-            variable = nube.get_var(var, time)
+        for time in range(len(get_file_list(model.directory, model.cloud_analytics.binary_regex))):
+            variable = model.cloud_analytics.get_var(var, time)
             temp_var = temp.get_var(var, time)
             
             if equal:
@@ -54,7 +53,7 @@ def get_file_list(data_path, binary_regex):
 def test_simulation_equal():
     """Execute function to run the cloud model."""
     model = CloudSimulation(
-        simulation_time_minutes=5,
+        simulation_time_minutes=1,
         save_time_minutes=1,
         statistic_time_minutes=1,
         bacup_time_minutes=1,
@@ -63,7 +62,7 @@ def test_simulation_equal():
 
     model.clean_model()
 
-    # model.run_model()
+    model.run_model()
 
     verify_vars(model, True)
 
@@ -80,7 +79,7 @@ def test_simulation_different():
     )
     model.clean_model()
 
-    # model.run_model()
+    model.run_model()
 
     verify_vars(model, False)
 

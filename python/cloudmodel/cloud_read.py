@@ -90,8 +90,8 @@ class CloudSimulation:
         self.bacup_time_minutes = bacup_time_minutes
         self.restore_backup = restore_backup
         self.directory = directory
-        self.initial_analytics = None
-        self.cloud_alalytics = None
+        self.initial_analytics : FileStyle = None
+        self.cloud_analytics : FileStyle = None
 
     def run_model(self):
         """Run the cloud model."""
@@ -147,7 +147,7 @@ class CloudSimulation:
             img_option="Contour",
             folder_handle="Delete",
         )
-        self.initial_analytics = data
+        self.cloud_analytics = data
 
     def clean_model(self):
         """
