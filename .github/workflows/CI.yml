@@ -96,6 +96,7 @@ jobs:
         with:
          package-dir: ./python/
          output-dir: ./python/wheelhouse
+         config-file: "{package}/setup.py"
 
       - uses: actions/upload-artifact@v4
         with:
