@@ -132,9 +132,6 @@ jobs:
           pattern: cibw-*
           path: dist
           merge-multiple: true
-      with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./python/wheelhouse/
 
     - name: Set up Python
       uses: actions/setup-python@v5
