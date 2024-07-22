@@ -80,7 +80,7 @@ jobs:
         #   CIBW_SOME_OPTION: value
         #    ...
         with:
-          package-dir: .python/
+          package-dir: python/
           output-dir: wheelhouse
           config-file: "{package}/pyproject.toml"
       
