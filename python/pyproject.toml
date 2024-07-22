@@ -13,7 +13,7 @@ requires = [
 
 [project]
 name = "cloudmodel"
-version = "0.2.19"
+version = "0.2.20"
 authors = [{name = "Diego E. Oleiarz", email = "diego.oleiarz@mi.unc.edu.ar"}]
 license = {text = "The MIT License"}
 readme = "README.md"
@@ -43,7 +43,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = ["numpy", "pandas", "scipy", "fpm", "matplotlib", "meson", "ninja"]
-requires-python = '>=3.9, <4'
+requires-python = '>=3.10, <=3.12'
 
 [project.urls]
 Homepage = "https://github.com/Diegoolei/Fortran77-Cloud-Model"

@@ -85,10 +85,15 @@ jobs:
             
       - uses: actions/checkout@v4
 
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.19.2
+
       - name: Build wheels
-        working-directory: python
-        run: pip wheel -w wheelhouse . --no-deps
-      
+        run: python -m cibuildwheel --output-dir wheelhouse
+        # to supply options, put them in 'env', like:
+        env:
+          CIBW_BUILD: "cp310-* cp311-* cp312-*"
+
       - uses: actions/upload-artifact@v4
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
@@ -101,7 +106,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.10', '3.11', '3.12']
+        python-version: ['3.12']
     steps:
     - uses: actions/checkout@v4
 
