@@ -7,11 +7,6 @@ import numpy as np
 
 from ..cloud_read import CloudSimulation, FileStyle, nube31_var_list
 
-import pytest
-
-from unittest.mock import patch
-
-
 
 def verify_vars(model: CloudSimulation, equal: bool):
     """
