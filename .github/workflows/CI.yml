@@ -108,7 +108,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: cibw-sdist
-          path: dist/*.tar.gz
+          path: python/dist/*.tar.gz
 
   deploy:
     needs: [build_wheels, build_sdist]
@@ -122,7 +122,6 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./python/wheelhouse/
           pattern: cibw-*
           merge-multiple: true
