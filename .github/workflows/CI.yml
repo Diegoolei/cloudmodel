@@ -77,7 +77,7 @@ jobs:
         uses: actions/setup-python@v5 # Use pip to install latest CMake, & FORD/Jin2For, etc.
         with:
           python-version: ${{ matrix.python-version }}
-        
+
       - name: Install dependencies
         run: |
             python -m pip install --upgrade pip
@@ -92,7 +92,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./wheelhouse/*.whl
+          path: ./python/wheelhouse/*.whl
 
 
   deploy:
@@ -108,7 +108,7 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./wheelhouse/*.whl
+          path: ./python/wheelhouse/*.whl
 
     - name: Set up Python
       uses: actions/setup-python@v5
