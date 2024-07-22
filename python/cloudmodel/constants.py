@@ -35,5 +35,3 @@ inis_var_list = [
     "u_z_initial",
     "v_z_initial",
 ]
-
-plot_center = 10  # center of the plot

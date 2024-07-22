@@ -10,7 +10,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         gcc_v: [12, 13] # Version of GFortran we want to use.
-        python-version: ['3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.12']
     env:
       FC: gfortran-${{ matrix.gcc_v }}
       GCC_V: ${{ matrix.gcc_v }}
@@ -70,7 +70,7 @@ jobs:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
         os: [ubuntu-latest]
-        python-version: ['3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
       - name: Install Python
@@ -87,7 +87,7 @@ jobs:
 
       - name: Build wheels
         working-directory: python
-        run: pip wheel -w wheelhouse .
+        run: pip wheel -w wheelhouse . --no-deps
       
       - uses: actions/upload-artifact@v4
         with:
@@ -101,7 +101,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.12']
     steps:
     - uses: actions/checkout@v4
 

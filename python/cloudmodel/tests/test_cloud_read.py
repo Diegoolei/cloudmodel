@@ -5,7 +5,15 @@ import re
 
 import numpy as np
 
-from ..cloud_read import CloudSimulation, FileStyle, nube31_var_list
+import pytest
+
+from ..cloud_read import (
+    CloudSimulation,
+    FileStyle,
+    check_path,
+    inis_var_list,
+    nube31_var_list,
+)
 
 
 def verify_vars(model: CloudSimulation, equal: bool):
@@ -28,7 +36,7 @@ def verify_vars(model: CloudSimulation, equal: bool):
     """
     temp = FileStyle(
         chosen_file="Nube",
-        output_data_path="test_data",
+        output_data_path="cloudmodel/tests/test_data",
         img_path=f"img/{model.directory}",
         img_option="Contour",
         folder_handle="Delete",
@@ -95,7 +103,6 @@ def test_simulation_equal():
     verify_vars(model, True)
 
     model.clean_model()
-    assert True
 
 
 def test_simulation_different():
@@ -115,8 +122,6 @@ def test_simulation_different():
 
     model.clean_model()
 
-    assert True
-
 
 def test_get_data():
     """Test the get_data method."""
@@ -134,8 +139,220 @@ def test_get_data():
 
     model.cloud_analytics._get_data()
 
-    assert isinstance(model.cloud_analytics.data_file, list)
-
     model.clean_model()
 
-    assert True
+    assert isinstance(model.cloud_analytics.data_file, list)
+    assert len(model.cloud_analytics.data_file) > 0
+
+
+def test_get_data_with_invalid_file():
+    with pytest.raises(ValueError):
+        FileStyle(
+            chosen_file="asd",
+            output_data_path="./temp",
+            img_path="img",
+            img_option="Contour",
+            folder_handle="Delete",
+        )
+
+
+def test_get_var_list():
+    model = CloudSimulation(
+        simulation_time_minutes=1,
+        save_time_minutes=1,
+        statistic_time_minutes=1,
+        bacup_time_minutes=1,
+        restore_backup=False,
+    )
+
+    model.run_model()
+    model.cloud_analytics.list_var()
+    model.initial_analytics.list_var()
+    model.clean_model()
+
+
+def test_get_var_with_invalid_file():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path=".temp",
+        img_path="img",
+        img_option="Contour",
+        folder_handle="Delete",
+    )
+
+    with pytest.raises(ValueError):
+        cloud.get_var("Temperature", 0)
+
+
+def test_get_var_with_valid_file():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path=".temp",
+        img_path="img",
+        img_option="Contour",
+        folder_handle="Delete",
+    )
+    check_cloud_var_list(cloud)
+
+
+def check_cloud_var_list(cloud: FileStyle):
+    for var in nube31_var_list:
+        for time in range(
+            len(_get_file_list(cloud.output_data_path, cloud.binary_regex))
+        ):
+            variable = cloud.get_var(var, time)
+            assert variable is not None
+            assert isinstance(variable, np.ndarray)
+
+
+def test_show_var_dataframe_with_invalid_file():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path="img",
+        img_option="Contour",
+        folder_handle="Delete",
+    )
+    var = cloud.get_var(nube31_var_list[0], 1)
+    var_max_value = cloud._get_var_max_value_position(var)
+    with pytest.raises(ValueError):
+        cloud.show_var_dataframe(var, var_max_value, "a")
+
+
+def test_show_var_dataframe_with_valid_file():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path="img",
+        img_option="Contour",
+        folder_handle="Delete",
+    )
+    var = cloud.get_var(nube31_var_list[0], 1)
+    var_max_value = cloud._get_var_max_value_position(var)
+    cloud.show_var_dataframe(var, var_max_value, "x")
+    cloud.show_var_dataframe(var, var_max_value, "y")
+    cloud.show_var_dataframe(var, var_max_value, "z")
+
+
+def test_plot_style_invalid_type():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path="img",
+        img_option="InvalidType",
+        folder_handle="Delete",
+    )
+    var = cloud.get_var(nube31_var_list[0], 1)
+    with pytest.raises(ValueError):
+        cloud._plot_style(var)
+
+
+def test_plot_style_initial_contour():
+    initial = FileStyle(
+        chosen_file="Inis",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path="img",
+        img_option="Contour",
+        folder_handle="Delete",
+    )
+    var = initial.get_var(inis_var_list[0], 0)
+    initial._plot_style(var)
+
+
+def test_plot_style_contour():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path="img",
+        img_option="Contour",
+        folder_handle="Delete",
+    )
+    var = cloud.get_var(nube31_var_list[0], 1)
+    cloud._plot_style(var)
+
+
+def test_plot_style_initial_image():
+    initial = FileStyle(
+        chosen_file="Inis",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path="img",
+        img_option="Image",
+        folder_handle="Delete",
+    )
+    var = initial.get_var(inis_var_list[0], 0)
+    initial._plot_style(var)
+
+
+def test_plot_style_cloud_image():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path="img",
+        img_option="Image",
+        folder_handle="Delete",
+    )
+    var = cloud.get_var(nube31_var_list[0], 1)
+    cloud._plot_style(var)
+
+
+def test_parse_status_img():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path=".temp/img",
+        img_option="Image",
+        folder_handle="Delete",
+    )
+    cloud.parse_status_img()
+    file_list = _get_file_list(cloud.output_data_path, cloud.binary_regex)
+    assert len(file_list) != 0
+    check_path("Delete", ".temp/img/")
+
+
+def test_multi_var_img_valid_type():
+    initials = FileStyle(
+        chosen_file="Inis",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path=".temp/img",
+        img_option="Image",
+        folder_handle="Delete",
+    )
+    var1 = inis_var_list[0]
+    var2 = inis_var_list[1]
+    initials.multi_var_img(var1, var2)
+    check_path("Delete", ".temp/img/")
+
+
+def test_multi_var_invalid_type():
+    cloud = FileStyle(
+        chosen_file="Nube",
+        output_data_path="cloudmodel/tests/test_data",
+        img_path=".temp/img",
+        img_option="Contour",
+        folder_handle="Delete",
+    )
+    var1 = nube31_var_list[0]
+    var2 = nube31_var_list[1]
+    with pytest.raises(ValueError):
+        cloud.multi_var_img(var1, var2)
+    check_path("Delete", ".temp/img/")
+
+
+def test_check_path_delete():
+    check_path("Delete", ".temp/Delete/", "test.txt")
+    check_path("Delete", ".temp/Delete/", "test.txt")
+    check_path("Delete", ".temp/Delete/", "test.txt")
+
+
+def test_check_path_cancel():
+    check_path("Cancel", ".temp/Cancel/", "test.txt")
+    check_path("Cancel", ".temp/Cancel/", "test.txt")
+    with pytest.raises(ValueError):
+        check_path("Cancel", ".temp/Cancel/", "test.txt")
+
+
+def test_check_path_invalid():
+    with pytest.raises(ValueError):
+        check_path("Invalid", ".temp/img/", "test.txt")
+        check_path("Invalid", ".temp/img/", "test.txt")
+        check_path("Invalid", ".temp/img/", "test.txt")

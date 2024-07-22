@@ -62,8 +62,8 @@ class FileStyle:
         _get_var_from_data(file_number, var_iterator): Get a specific variable from the data.
         list_var(): List all the variables.
         get_var(var, time): Get a specific variable at a given time.
-        show_var_dataframe(var_array, center, axis): Show the variable data as a DataFrame.
-        center_var(var_array, center, axis): Center the variable data along a specific axis.
+        show_var_dataframe(var_array, center, axes): Show the variable data as a DataFrame.
+        center_var(var_array, center, axes): Center the variable data along a specific axes.
         get_var_max_value_position(var_array): Get the position of the maximum value in the variable data.
         check_path(path, selected_file_name): Check if the path exists and create it if necessary.
         cloud_binary_comparison(): Compare the binary files in the output data and comparison output data folders.

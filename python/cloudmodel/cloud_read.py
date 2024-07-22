@@ -18,7 +18,6 @@ from .constants import (
     inis_var_list,
     nube31_biased_nz1,
     nube31_var_list,
-    plot_center,
 )
 from .interface import c_interface as nb
 
@@ -165,13 +164,13 @@ class FileStyle:
             from the data.
         list_var(): List all the variables.
         get_var(var, time): Get a specific variable at a given time.
-        show_var_dataframe(var_array, center, axis): Show a variable as
+        show_var_dataframe(var_array, center, axes): Show a variable as
             a DataFrame.
-        center_var(var_array, center, axis): Center a variable along a
-            given axis.
+        center_var(var_array, center, axes): Center a variable along a
+            given axes.
         get_var_max_value_position(var_array): Get the position of the
             maximum value in a variable.
-        plot_style(variable): Plot the style of a variable.
+        _plot_style(variable): Plot the style of a variable.
         parse_status_img(): Animates the variables in the given var_list.
     """
 
@@ -231,7 +230,7 @@ class FileStyle:
             with FortranFile(f"{self.output_data_path}{file}", "r") as f:
                 self.data_file.append(f.read_reals(self.var_datatype))
 
-    def _get_var_from_data(self, file_number, var_iterator):
+    def _get_var_from_data(self, file_number, var_iterator) -> np.ndarray:
         """
         Get a variable from the data.
 
@@ -250,7 +249,7 @@ class FileStyle:
         ].reshape(self.var_structure, order="F")
 
     def list_var(self):
-        """List all the variables."""
+        """Print all the file variables in order."""
         for var in self.var_list:
             print(var)
 
@@ -261,7 +260,11 @@ class FileStyle:
         Args
         ----
             var (str): The name of the variable.
-            time (int): The time index.
+            time (int): The time index. (nube01.sal <= time <= nube**.sal)
+
+        Raise:
+        ------
+            ValueError: If the variable is not in the variable list.
 
         Returns
         -------
@@ -271,7 +274,7 @@ class FileStyle:
         var_iterator = var_index * self.var_structure_size
         return self._get_var_from_data(time, var_iterator)
 
-    def show_var_dataframe(self, var_array, center: tuple, axis: str):
+    def show_var_dataframe(self, var_array, center: tuple, axes: str):
         """
         Show a variable as a DataFrame.
 
@@ -279,26 +282,28 @@ class FileStyle:
         ----
             var_array (numpy.ndarray): The variable data as a numpy array.
             center (tuple): The center coordinates for the variable.
-            axis (str): The axis along which to center the variable.
+            axes (str): The axes along which to center the variable.
         """
-        df = pd.DataFrame(self.center_var(var_array, center, axis))
+        df = pd.DataFrame(self.center_var(var_array, center, axes))
         print(df)
 
-    def center_var(self, var_array, center: tuple, axis: str):
+    def center_var(self, var_array, center: tuple, axes: str):
         """
-        Center a variable along a given axis.
+        Center a variable along a given axes.
 
         Args
         ----
             var_array (numpy.ndarray): The variable data as a numpy array.
             center (tuple): The center coordinates for the variable.
-            axis (str): The axis along which to center the variable.
+                can be provided by _get_var_max_value_position.
+            axes (str): The axes along which to center the variable.
+                options: "x", "y", "z"
 
         Returns
         -------
             numpy.ndarray: The centered variable data as a numpy array.
         """
-        match axis:
+        match axes:
             case "x":
                 return var_array[center[0][0], :, :]
             case "y":
@@ -306,9 +311,9 @@ class FileStyle:
             case "z":
                 return var_array[:, :, center[2][0]]
             case _:
-                raise ValueError("Invalid Axis")
+                raise ValueError("Invalid Axes")
 
-    def get_var_max_value_position(self, var_array):
+    def _get_var_max_value_position(self, var_array):
         """
         Get the position of the maximum value in a variable.
 
@@ -322,7 +327,7 @@ class FileStyle:
         """
         return np.where(var_array == np.max(var_array))
 
-    def plot_style(self, variable):
+    def _plot_style(self, variable):
         """
         Apply a specific plot style based on the image option and data dimen.
 
@@ -344,34 +349,26 @@ class FileStyle:
                     plt.imshow(
                         self.center_var(
                             variable,
-                            self.get_var_max_value_position(variable),
+                            self._get_var_max_value_position(variable),
                             "z",
                         )
                         # np.flipud(variable[:, :, plot_center])
                     )
-                elif self.data_dimension == 2:
-                    plt.imshow(variable[:, plot_center])
                 elif self.data_dimension == 1:
                     plt.plot(variable[3:-3])  # Cleans trash data
             case ImageStyle.CONTOUR.value:
                 fig, ax = plt.subplots()
-                if self.data_dimension == 3:
-                    cs = ax.contour(
-                        # np.flipud(variable[:, :, plot_center]),
-                        self.center_var(
-                            variable,
-                            self.get_var_max_value_position(variable),
-                            "z",
-                        ),
-                        linewidths=0.3,
-                        colors="k",
-                    )
-                    ax.clabel(cs, fontsize=6, inline=True)
-                elif self.data_dimension == 2:
-                    cs = ax.contour(
-                        variable[:, plot_center], linewidths=0.3, colors="k"
-                    )
-                    ax.clabel(cs, fontsize=6, inline=True)
+                cs = ax.contour(
+                    # np.flipud(variable[:, :, plot_center]),
+                    self.center_var(
+                        variable,
+                        self._get_var_max_value_position(variable),
+                        "z",
+                    ),
+                    linewidths=0.3,
+                    colors="k",
+                )
+                ax.clabel(cs, fontsize=6, inline=True)
             case _:
                 raise ValueError("Invalid Image Style")
         plt.grid(False)
@@ -407,7 +404,7 @@ class FileStyle:
                 )
                 filenumber = str(file_iterator)
                 plt.title(f"{filenumber} {self.var_list[var_iterator]}")
-                self.plot_style(variable)
+                self._plot_style(variable)
                 dirname = f"{self.img_path}{self.file_name}"
                 filename = f"{self.var_list[var_iterator]}.png"
                 plt.savefig(f"{dirname}/{filenumber}/{filename}")
@@ -419,13 +416,12 @@ class FileStyle:
 
     def multi_var_img(self, var_1, var_2):
         """
-        Generate a scatter plot of two variables from the data file.
+        Plot two INITIAL variables against each other.
 
         Args
         ----
             var_1 (int): Index of the first variable to plot.
             var_2 (int): Index of the second variable to plot.
-            file (str, optional): Name of the data file. Defaults to "inis.da".
 
         Returns
         -------
@@ -434,15 +430,21 @@ class FileStyle:
         check_path(
             self.folder_handle, f"{self.img_path}{self.file_name}/multivar/"
         )
-        print(len(self.data_file))
-        var_1_data = self._get_var_from_data(0, var_1)
-        var_2_data = self._get_var_from_data(0, var_2)
-        plt.title(f"{self.var_list[var_1]} vs {self.var_list[var_2]}")
-        # self.plot_style(variable, self.data_dimension)
-        plt.plot(var_1_data[10:-10], var_2_data[10:-10], ".b")
-        # plt.plot(var_1_data[::6], var_2_data[::6], "*")
+        var_index = self.var_list.index(var_1)
+        var_index_2 = self.var_list.index(var_2)
+        var_iterator = var_index * self.var_structure_size
+        var_iterator_2 = var_index_2 * self.var_structure_size
+        var_1_data = self._get_var_from_data(0, var_iterator)
+        var_2_data = self._get_var_from_data(0, var_iterator_2)
+        var_1_name = self.var_list[var_index]
+        var_2_name = self.var_list[var_index_2]
+        plt.title(f"{var_1_name} vs {var_2_name}")
+        try:
+            plt.plot(var_1_data[10:-10], var_2_data[10:-10], ".b")
+        except ValueError as e:
+            raise ValueError("Only Inis type file") from e
         dirname = f"{self.img_path}{self.file_name}"
-        filename = f"{self.var_list[var_1]}_{self.var_list[var_2]}.png"
+        filename = f"{var_1_name}_{var_2_name}.png"
         plt.savefig(f"{dirname}/multivar/{filename}")
         plt.close()  # If not closed, images will be superimposed
 
@@ -474,10 +476,18 @@ def check_path(folder_handle, path, selected_file_name=""):
 
     Args
     ----
-        path (str): The path to check.
-        selected_file_name (str, optional): The name of the selected file.
-            Defaults to "".
+        folder_handle (str): The handling option for existing folders.
+        path (str): The path to check and create if necessary.
+        selected_file_name (str): The name of the selected file (default is
+            empty string).
+
+    Raises
+    ------
+        ValueError (str): If the folder handle is invalid or the folder already
+            exists (depending on the handling option).
     """
+    if path[-1] != "/":
+        path += "/"
     if not os.path.exists(path):
         os.makedirs(path)
     elif not os.path.exists(path + selected_file_name + "/"):
