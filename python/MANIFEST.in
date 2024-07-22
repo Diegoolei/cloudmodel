@@ -18,3 +18,5 @@ recursive-include cloudmodel *.sal
 recursive-include cloudmodel ccc
 recursive-include cloudmodel est
 recursive-include cloudmodel esta
+recursive-exclude cloudmodel/interface *.so
+recursive-exclude cloudmodel/interface *.pyc

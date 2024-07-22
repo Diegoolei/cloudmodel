@@ -104,11 +104,7 @@ class CloudSimulation:
         data = FileStyle(
             chosen_file="Inis",
             output_data_path=self.directory,
-            cmp_output_data_path="outputdata1/",
             img_path="img/" + self.directory,
-            txt_path="txt/" + self.directory,
-            cmp_txt_path="txt1/" + self.directory,
-            vid_path="vid/" + self.directory,
             img_option="Contour",
             folder_handle="Delete",
         )
@@ -125,11 +121,7 @@ class CloudSimulation:
         data = FileStyle(
             chosen_file="Nube",
             output_data_path=self.directory,
-            cmp_output_data_path="outputdata1/",
             img_path="img/" + self.directory,
-            txt_path="txt/" + self.directory,
-            cmp_txt_path="txt1/" + self.directory,
-            vid_path="vid/" + self.directory,
             img_option="Contour",
             folder_handle="Delete",
         )
@@ -162,12 +154,7 @@ class FileStyle:
     ----------
         chosen_file (str): The chosen input file type.
         output_data_path (str): The path to the output data folder.
-        cmp_output_data_path (str): The path to the comparison output
-            data folder.
         img_path (str): The path to the image folder.
-        txt_path (str): The path to the text folder.
-        cmp_txt_path (str): The path to the comparison text folder.
-        vid_path (str): The path to the video folder.
         img_option (str): The image style option.
         folder_handle (str): The folder handling option.
 
@@ -184,50 +171,22 @@ class FileStyle:
             given axis.
         get_var_max_value_position(var_array): Get the position of the
             maximum value in a variable.
-        cloud_binary_comparison(): Compare binary files in the output
-            and comparison folders.
-        live_var_animation(variable): Create a live variable animation.
         plot_style(variable): Plot the style of a variable.
-        generate_image(frame, var_number): Generates an image for a given
-            frame and variable number.
-        animate_variables(var_list=None, save_animation=True,
-            show_animation=False): Animate multiple variables.
-        animate_variable(var_to_animate, save_animation=True,
-            show_animation=False, check_path=True): Animates a variable
-            from the output data.
         parse_status_img(): Animates the variables in the given var_list.
-        multi_var_img(var_1, var_2): Generate a scatter plot of two variables
-            from the data file.
-        show_file_diff(file_name): Show the differences between two text files
-            with the same name in different directories.
-        cloud_text_comparison(): Compare text files in the specified paths and
-            display the differences, if any.
-        get_unequal_files(): Get files with identical names but unequal content
-            between two directories.
-        parse_text_files(): Parse the text files.
     """
 
     def __init__(
         self,
         chosen_file=InputFileType.NUBE31.value,
-        output_data_path="outputdata/",
-        cmp_output_data_path="outputdata1/",
+        output_data_path=".temp/",
         img_path="img/",
-        txt_path="txt/",
-        cmp_txt_path="txt1/",
-        vid_path="vid/",
         img_option=ImageStyle.IMAGE.value,
         folder_handle=FolderHandle.IGNORE.value,
     ):
-        assert os.path.exists(
-            output_data_path
-        ), "output_data_path does not exist"
+        if output_data_path[-1] != "/":
+            output_data_path += "/"
         self.output_data_path = output_data_path
-        self.cmp_output_data_path = cmp_output_data_path
         self.img_path = img_path
-        self.txt_path = txt_path
-        self.cmp_txt_path = cmp_txt_path
-        self.vid_path = vid_path
         self.data_file = []
         self.folder_handle = folder_handle
         match chosen_file:
