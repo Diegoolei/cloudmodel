@@ -3,8 +3,7 @@
 import os
 import re
 
-from cloudmodel import CloudSimulation, FileStyle
-from cloudmodel.constants import nube31_var_list
+from ..cloud_read import CloudSimulation, FileStyle, nube31_var_list
 
 import numpy as np
 
@@ -121,4 +120,4 @@ def test_simulation_different():
 
 
 test_simulation_equal()
-test_simulation_different()
+

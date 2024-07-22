@@ -110,7 +110,7 @@ def save_editable_compiled():
 
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-    compiled_module_dir = THIS_DIR.parent / "build" / "interface"
+    compiled_module_dir = THIS_DIR.parent / "cloudmodel" / "interface"
 
     if compiled_module_dir.exists():
         for so_file in compiled_module_dir.glob("*.so"):
@@ -125,7 +125,7 @@ def save_editable_compiled():
 def restore_save_editable_compiled():
     tmp_dir = THIS_DIR / "tmp_editable"
 
-    compiled_module_dir = THIS_DIR / "cloudmodel" / "interface"
+    compiled_module_dir = THIS_DIR.parent / "cloudmodel" / "interface"
 
     if tmp_dir.exists():
         for so_file in tmp_dir.glob("*.so"):
@@ -189,9 +189,10 @@ class CustomEgg(egg_info):
 # Call setup
 # =============================================================================
 
-save_editable_compiled()
+# save_editable_compiled()
 
-initial_compiled_clean()
+
+# initial_compiled_clean()
 
 setup(
     cmdclass={
@@ -206,6 +207,6 @@ setup(
     include_package_data=True,
 )
 
-final_build_clean()
+# final_build_clean()
 
-restore_save_editable_compiled()
+# restore_save_editable_compiled()

@@ -20,7 +20,7 @@ from .constants import (
     nube31_var_list,
     plot_center,
 )
-from .interface import interface as nb
+from .interface import c_interface as nb
 
 
 class ImageStyle(Enum):
@@ -81,7 +81,7 @@ class CloudSimulation:
     def run_model(self):
         """Run the cloud model."""
         check_path(FolderHandle.IGNORE.value, self.directory)
-        nb.c_interface.run_model_python(
+        nb.run_model_python(
             self.simulation_time_minutes,
             self.save_time_minutes,
             self.statistic_time_minutes,
