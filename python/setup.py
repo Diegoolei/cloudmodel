@@ -34,8 +34,6 @@ def pre_build():
     if COMPILED_FLAG.exists():
         return
 
-    chdir("cloudmodel/interface")
-
     subprocess.check_call(["fpm", "build", "--profile", "release"])
 
     subprocess.check_call(
@@ -52,7 +50,6 @@ def pre_build():
             "meson",
         ]
     )
-    chdir("../..")
 
     COMPILED_FLAG.touch()
 
