@@ -68,8 +68,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, ubuntu-20.04]
         python-version: ['3.10', '3.11', '3.12']
 
     steps:
@@ -87,7 +86,7 @@ jobs:
 
       - name: Build wheels
         working-directory: python
-        run: pip wheel -w wheelhouse . --no-deps
+        run: python -m cibuildwheel --output-dir wheelhouse
       
       - uses: actions/upload-artifact@v4
         with:
@@ -131,12 +130,16 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Install Twine dependencies
+      working-directory: python
+      run: |
+        python -m pip install --upgrade pip
+        pip install twine
+
     - name: Publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USER }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASS }}
       working-directory: python
-      run: |
-        python -m pip install --upgrade pip
-        pip install twine
+      run: 
         twine upload --repository testpypi wheelhouse/*
