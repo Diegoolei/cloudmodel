@@ -8,6 +8,7 @@ include MANIFEST.in
 include requirements.txt
 include tox.ini
 include *.py
+include fpm.toml
 recursive-include cloudmodel *.da
 recursive-include cloudmodel *.sa
 recursive-include cloudmodel *.sal
@@ -16,3 +17,5 @@ recursive-include cloudmodel est
 recursive-include cloudmodel esta
 recursive-exclude cloudmodel/interface *.so
 recursive-exclude cloudmodel/interface *.pyc
+recursive-include src *.f90
+recursive-include app *.f90

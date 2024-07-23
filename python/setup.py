@@ -30,10 +30,11 @@ CFLAGS = "-fPIC"
 # =============================================================================
 def pre_build():
     """Execute fpm and f2py compilations commands."""
-
+    print(THIS_DIR)
     if COMPILED_FLAG.exists():
         return
 
+    subprocess.call(["ls", "..", "-l"])
 
     subprocess.check_call(["fpm", "build", "--profile", "release"])
 
@@ -190,10 +191,10 @@ class CustomEgg(egg_info):
 # Call setup
 # =============================================================================
 
-# save_editable_compiled()
+#save_editable_compiled()
 
 
-# initial_compiled_clean()
+#initial_compiled_clean()
 
 setup(
     cmdclass={
@@ -208,6 +209,6 @@ setup(
     include_package_data=True,
 )
 
-# final_build_clean()
+#final_build_clean()
 
-# restore_save_editable_compiled()
+#restore_save_editable_compiled()
