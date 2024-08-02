@@ -1,7 +1,7 @@
 name: Continuous Integration
 on:
   push:
-    branches: [ "initials" ]
+    branches: [ "dev" ]
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
@@ -10,6 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
+        gcc-version: ['10', '11', '12']
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +24,7 @@ jobs:
         id: setup-fortran
         with:
             compiler: gcc
-            version: 13
+            version: ${{ matrix.gcc-version }}
 
       # Install fpm for Windows
       - name: Install fpm
@@ -39,7 +40,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-wheels-${{ matrix.os }}-gcc${{ matrix.gcc-version }}-${{ strategy.job-index }}
           path: ./python/wheelhouse/
 
 
