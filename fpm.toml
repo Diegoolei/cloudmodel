@@ -20,8 +20,8 @@ source-dir = "app"
 main = "main.f90"
 
 [fortran]
-implicit-typing = false
-implicit-external = false
+implicit-typing = true
+implicit-external = true
 source-form = "default"
 
 # implicit-typing = false
