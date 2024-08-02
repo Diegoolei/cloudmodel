@@ -3,67 +3,7 @@ on:
   push:
     branches: [ "initials" ]
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        gcc_v: [11, 12, 13] # Version of GFortran we want to use.
-        python-version: ['3.10', '3.11', '3.12']
-    env:
-      FC: gfortran-${{ matrix.gcc_v }}
-      GCC_V: ${{ matrix.gcc_v }}
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        submodules: false
-
-    - name: Setup Fortran Compiler
-      uses: fortran-lang/setup-fortran@v1
-      id: setup-fortran
-      with:
-        compiler: gcc
-        version: ${{ matrix.gcc_v }}
-
-    - name: Install Python
-      uses: actions/setup-python@v5 # Use pip to install latest CMake, & FORD/Jin2For, etc.
-      with:
-        python-version: ${{ matrix.python-version }}
-        
-    - name: Setup Graphviz
-      uses: ts-graphviz/setup-graphviz@v2
-    - name: Setup Fortran Package Manager
-      uses: fortran-lang/setup-fpm@v5
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Install Python dependencies
-      if: contains( matrix.os, 'ubuntu')
-      working-directory: python
-      run: |
-        python -m pip install --upgrade pip
-        pip install wheel ford numpy matplotlib numpy scipy meson ninja
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-    - name: Install meson
-      working-directory: ./python
-      run: |
-        sudo apt-get install libnlopt-dev meson
-        pip install meson tox
-
-    - name: Compile
-      working-directory: python
-      run: fpm build --profile release
-
-    - name: Install cloudmodel
-      working-directory: python
-      run:
-        pip install . --verbose
-
   build_wheels:
-    needs: [build]
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
