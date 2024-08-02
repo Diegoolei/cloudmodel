@@ -34,8 +34,8 @@ fpm_build_dir = meson_path / 'fpm_build'
 run_command(
     'fpm',
     'install',
-    '--prefix',
-    fpm_build_dir
+    '--profile',
+    'release',
 )
 
 # f2py?
