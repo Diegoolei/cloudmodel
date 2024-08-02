@@ -40,8 +40,7 @@ run_command(
     '--c-flag',
     cflags,
     '--prefix',
-    fpm_build_dir,
-    check: true
+    fpm_build_dir
 )
 
 com = run_command(
