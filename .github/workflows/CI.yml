@@ -60,7 +60,7 @@ jobs:
     - name: Install cloudmodel
       working-directory: python
       run:
-        pip install .
+        pip install . --verbose
 
   build_wheels:
     needs: [build]
