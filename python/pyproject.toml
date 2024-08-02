@@ -1,8 +1,8 @@
 [build-system]
-build-backend = "setuptools.build_meta"
+build-backend = "mesonpy"
 requires = [ 
              "fpm",
-             "meson",
+             "meson-python>=0.15.0",
              "ninja", 
              "numpy",
              "setuptools",
@@ -68,3 +68,6 @@ markers = [
 testpaths = [
     "tests",
 ]
+
+[tool.cibuildwheel]
+build = ["cp310-*", "cp311-*", "cp312-*"]

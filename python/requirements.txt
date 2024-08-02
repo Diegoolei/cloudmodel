@@ -30,3 +30,4 @@ tomli==2.0.1
 tox==4.16.0
 tzdata==2024.1
 virtualenv==20.26.3
+meson-python==0.16.0

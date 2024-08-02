@@ -33,7 +33,7 @@ fpm_build_dir = meson_path / 'fpm_build'
 
 run_command(
     'fpm',
-    'install',
+    'build',
     '--profile',
     'release',
     '--flag',
@@ -64,10 +64,10 @@ cloud_c_interface_source = custom_target('cloud_c_interface_compiled.c',
 )
 
 # Install Python sources
-f_sources = ['interface/__init__.py']
-py.install_sources(f_sources, subdir:'interface/compiled')
+f_sources = ['cloudmodel/interface/__init__.py']
+py.install_sources(f_sources, subdir:'interface/gfortran_63E63B2712D76620/cloudsim')
 
-main_sources = ['interface/__init__.py']
+main_sources = ['cloudmodel/__init__.py']
 py.install_sources(main_sources, subdir:'interface')
 
 # Extension fortran module
