@@ -42,7 +42,8 @@ run_command(
     cflags,
     '--prefix',
     fpm_build_dir,
-    check : true
+    check : true,
+    '--verbose'
 )
 
 # f2py?
