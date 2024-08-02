@@ -37,10 +37,6 @@ run_command(
     '--profile',
     'release',
     '--verbose',
-    '--flag',
-    fflags,
-    '--c-flag',
-    cflags,
     '--prefix',
     fpm_build_dir,
     check : true
