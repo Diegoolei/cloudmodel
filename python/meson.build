@@ -1,4 +1,4 @@
-project('fexample', 'c',
+project('cloudmodel', 'c',
   version : '0.1.0',
   license: 'MIT',
   meson_version: '>=0.64.0',
@@ -65,20 +65,20 @@ cloud_c_interface_source = custom_target('cloud_c_interface_compiled.c',
 
 # Install Python sources
 f_sources = ['cloudmodel/interface/__init__.py']
-py.install_sources(f_sources, subdir:'interface/gfortran_63E63B2712D76620/cloudsim')
+py.install_sources(f_sources, subdir:'cloudmodel/interface')
 
 main_sources = ['cloudmodel/__init__.py']
-py.install_sources(main_sources, subdir:'interface')
+py.install_sources(main_sources, subdir:'cloudmodel')
 
 # Extension fortran module
 inc_np = include_directories(incdir_numpy, incdir_f2py, 'fpm_build' / 'include')
 
-py.extension_module('fexample_compiled',
+py.extension_module('cloudmodel_compiled',
   [cloud_c_interface, cloud_c_interface_source],
   incdir_f2py / 'fortranobject.c',
   include_directories: [inc_np],
   dependencies : py_dep,
-  link_args: ['-L' + 'fpm_build' / 'lib', '-lfexample'],
-  subdir: 'fexample' / 'compiled',
+  link_args: ['-L' + 'fpm_build' / 'lib', '-lcloudsim'],
+  subdir: 'cloudmodel' / 'interface',
   install : true,
 )
