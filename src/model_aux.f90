@@ -1040,6 +1040,7 @@ contains
                                  vapor_z_relative, u_z_initial, v_z_initial
       use model_initialization, only: cloud_position, cloud_movement, &
                                       statistics
+      use graba, only: graba320, graba120
       implicit none
       integer :: unit_number
       if (current_time/nint(lte/dt1)*nint(lte/dt1) == current_time) then
