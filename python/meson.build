@@ -1,0 +1,84 @@
+project('fexample', 'c',
+  version : '0.1.0',
+  license: 'MIT',
+  meson_version: '>=0.64.0',
+  default_options : ['warning_level=2'],
+)
+
+add_languages('fortran', native: false)
+
+meson_path = meson.current_build_dir()
+
+py_mod = import('python')
+py = py_mod.find_installation(pure: false)
+py_dep = py.dependency()
+
+
+incdir_numpy = run_command(py,
+  ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'],
+  check : true
+).stdout().strip()
+
+
+incdir_f2py = run_command(py,
+    ['-c', 'import os; os.chdir(".."); import numpy.f2py; print(numpy.f2py.get_include())'],
+    check : true
+).stdout().strip()
+
+
+# fpm?
+fflags = '-g -fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp'
+cflags = '-fPIC'
+fpm_build_dir = meson_path / 'fpm_build'
+
+run_command(
+    'fpm',
+    'install',
+    '--profile',
+    'release',
+    '--flag',
+    fflags,
+    '--c-flag',
+    cflags,
+    '--prefix',
+    fpm_build_dir,
+    check : true
+)
+
+# f2py?
+source_path = meson.source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
+cloud_c_interface = files(source_path)
+
+cloud_c_interface_source = custom_target('cloud_c_interface_compiled.c',
+  input: cloud_c_interface,
+  output: ['cloud_c_interface_compiledmodule.c', 'cloud_c_interface_compiled-f2pywrappers2.f90'],
+  command: [
+    py,
+    '-m',
+    'numpy.f2py',
+    '@INPUT@',
+    '-m',
+    'cloud_c_interface_compiled',
+    '--lower'
+  ]
+)
+
+# Install Python sources
+f_sources = ['interface/__init__.py']
+py.install_sources(f_sources, subdir:'interface/compiled')
+
+main_sources = ['interface/__init__.py']
+py.install_sources(main_sources, subdir:'interface')
+
+# Extension fortran module
+inc_np = include_directories(incdir_numpy, incdir_f2py, 'fpm_build' / 'include')
+
+py.extension_module('fexample_compiled',
+  [cloud_c_interface, cloud_c_interface_source],
+  incdir_f2py / 'fortranobject.c',
+  include_directories: [inc_np],
+  dependencies : py_dep,
+  link_args: ['-L' + 'fpm_build' / 'lib', '-lfexample'],
+  subdir: 'fexample' / 'compiled',
+  install : true,
+)
