@@ -30,7 +30,7 @@ fflags = '-g -fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggres
 cflags = '-fPIC'
 fpm_build_dir = meson_path / 'fpm_build'
 
-run_command(
+d = run_command(
     'fpm',
     'install',
     '--profile',
@@ -41,7 +41,8 @@ run_command(
     cflags,
     '--prefix',
     fpm_build_dir
-)
+).stdout()
+include_directories(d)
 
 # f2py?
 source_path = meson.source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
