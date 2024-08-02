@@ -76,7 +76,7 @@ py.install_sources(main_sources, subdir:'cloudmodel')
 
 # Extension fortran module
 inc_np = include_directories(incdir_numpy, incdir_f2py)
-inc_ftn = include_directories('fpm_build' / 'Include')
+inc_ftn = include_directories(com)
 
 py.extension_module('cloudmodel_compiled',
   [cloud_c_interface, cloud_c_interface_source],
