@@ -41,7 +41,7 @@ run_command(
     '--c-flag',
     cflags,
     '--prefix',
-    fpm_build_dir
+    'fpm_build'
 )
 
 # f2py?
