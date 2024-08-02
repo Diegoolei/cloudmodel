@@ -1,8 +1,8 @@
 [build-system]
-build-backend = "setuptools.build_meta"
+build-backend = "mesonpy"
 requires = [ 
              "fpm",
-             "meson",
+             "meson-python>=0.15.0",
              "ninja", 
              "numpy",
              "setuptools",
@@ -13,7 +13,7 @@ requires = [
 
 [project]
 name = "cloudmodel"
-version = "0.2.20"
+version = "0.3.0"
 authors = [{name = "Diego E. Oleiarz", email = "diego.oleiarz@mi.unc.edu.ar"}]
 license = {text = "The MIT License"}
 readme = "README.md"
@@ -68,3 +68,7 @@ markers = [
 testpaths = [
     "tests",
 ]
+
+[tool.cibuildwheel]
+build = ["cp310-*", "cp311-*", "cp312-*"]
+skip = ["*-win32 *_i686"]
