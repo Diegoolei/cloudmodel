@@ -40,7 +40,8 @@ run_command(
     '--c-flag',
     cflags,
     '--prefix',
-    fpm_build_dir
+    fpm_build_dir,
+    check: true
 )
 
 com = run_command(
@@ -48,8 +49,6 @@ com = run_command(
     fpm_build_dir,
     check: true
 ).stdout().strip()
-
-inc_ftn = include_directories(com)
 
 # f2py?
 source_path = meson.project_source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
@@ -78,7 +77,7 @@ py.install_sources(main_sources, subdir:'cloudmodel')
 
 # Extension fortran module
 inc_np = include_directories(incdir_numpy, incdir_f2py)
-inc_ftn = include_directories(com)
+inc_ftn = include_directories('fpm_build' / 'Include')
 
 py.extension_module('cloudmodel_compiled',
   [cloud_c_interface, cloud_c_interface_source],
