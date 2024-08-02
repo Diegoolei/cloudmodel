@@ -33,7 +33,7 @@ fpm_build_dir = meson_path / 'fpm_build'
 
 run_command(
     'fpm',
-    'build',
+    'install',
     '--profile',
     'release',
     '--flag',
