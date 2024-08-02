@@ -27,8 +27,8 @@ incdir_f2py = run_command(py,
 
 
 # fpm?
-fflags = '-g -fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp'
-cflags = '-fPIC'
+fflags = ''
+cflags = ''
 fpm_build_dir = meson_path / 'fpm_build'
 
 run_command(
