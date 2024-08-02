@@ -47,7 +47,7 @@ com = run_command(
     'ls',
     fpm_build_dir,
     check: true
-).stdout().strip()
+).stdout()
 
 # f2py?
 source_path = meson.project_source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
