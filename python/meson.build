@@ -36,6 +36,8 @@ run_command(
     'install',
     '--profile',
     'release',
+    '--prefix',
+    fpm_build_dir
 )
 
 # f2py?
