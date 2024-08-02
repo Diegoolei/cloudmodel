@@ -25,7 +25,6 @@ incdir_f2py = run_command(py,
     check : true
 ).stdout().strip()
 
-
 # fpm?
 fflags = '-g -fPIC -funroll-loops -fstack-arrays -Ofast -frepack-arrays -faggressive-function-elimination -fopenmp'
 cflags = '-fPIC'
@@ -41,8 +40,17 @@ run_command(
     '--c-flag',
     cflags,
     '--prefix',
-    'fpm_build'
+    fpm_build_dir,
+    check: true
 )
+
+com = run_command(
+    'ls',
+    fpm_build_dir,
+    check: true
+).stdout().strip()
+
+inc_ftn = include_directories(com)
 
 # f2py?
 source_path = meson.project_source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
@@ -70,12 +78,13 @@ main_sources = ['cloudmodel/__init__.py']
 py.install_sources(main_sources, subdir:'cloudmodel')
 
 # Extension fortran module
-inc_np = include_directories(incdir_numpy, incdir_f2py, 'fpm_build' / 'include')
+inc_np = include_directories(incdir_numpy, incdir_f2py)
+inc_ftn = include_directories(com)
 
 py.extension_module('cloudmodel_compiled',
   [cloud_c_interface, cloud_c_interface_source],
   incdir_f2py / 'fortranobject.c',
-  include_directories: [inc_np],
+  include_directories: [inc_np, inc_ftn],
   dependencies : py_dep,
   link_args: ['-L' + 'fpm_build' / 'lib', '-lcloudsim'],
   subdir: 'cloudmodel' / 'interface',
