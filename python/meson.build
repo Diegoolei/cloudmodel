@@ -36,12 +36,16 @@ run_command(
     'install',
     '--profile',
     'release',
+    '--flag',
+    fflags,
+    '--c-flag',
+    cflags,
     '--prefix',
     fpm_build_dir
 )
 
 # f2py?
-source_path = meson.source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
+source_path = meson.project_source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
 cloud_c_interface = files(source_path)
 
 cloud_c_interface_source = custom_target('cloud_c_interface_compiled.c',
