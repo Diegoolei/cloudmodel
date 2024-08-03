@@ -28,12 +28,14 @@ contains
                            floor_condition_redefinition, floor_and_ceiling_contour_redefinition, &
                            lateral_contour_redefinition, vapour_negative_correction, save_backup, &
                            speed_pressure, filtro
+      use memory_managment, only: allocate_model, deallocate_model
       use, intrinsic :: iso_fortran_env, only: I4P => int32, R8P => real64
       use, intrinsic :: iso_fortran_env
       use forbear, only: bar_object
       implicit none
       type(bar_object) :: progress_bar
       real(R8P)        :: progress_percent
+      call allocate_model()
       call initialize_model()
       call progress_bar%initialize(filled_char_string='㊂', empty_char_string='●', &
                                    suffix_string='| ', add_progress_percent=.true., prefix_string='Progress |', &
@@ -59,5 +61,6 @@ contains
       end do
 
       call progress_bar%destroy
+      call deallocate_model()
    end subroutine model
 end module cloud_model

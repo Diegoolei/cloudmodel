@@ -7,7 +7,8 @@ gfortran:
 	f2py -m cloud_compiled \
 		-L$(PWD)/../../../build/gfortran_63E63B2712D76620/cloudsim/ \
 		-I$(PWD)/../../../build/gfortran_63E63B2712D76620 \
-		-c cloud_c_interface.f90 -lcloudsim --backend meson
+		-c $(PWD)/../../../interface/cloud_c_interface.f90 \
+		-lcloudsim --backend meson
 
 
 nvfortran:
@@ -16,5 +17,6 @@ nvfortran:
 	f2py -m cloud_compiled \
 		-L$(PWD)/../build/nvfortran_C1B52A2EA9B3E302/cloudsim/ \
 		-I$(PWD)/../build/nvfortran_72B09486B8F05AD4/ \
-		-c cloud_c_interface.f90 -lcloudsim
+		-c $(PWD)/../../../interface/cloud_c_interface.f90 \
+		-lcloudsim
 	# fpm install --profile release --prefix build/python

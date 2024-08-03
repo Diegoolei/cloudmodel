@@ -80,6 +80,11 @@ class CloudSimulation:
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
+    def load_model(self):
+        """Load the cloud model."""
+        self.run_initial_analysis()
+        self.run_cloud_analysis()
+
     def run_model(self):
         """Run the cloud model."""
         check_path(FolderHandle.IGNORE.value, self.directory)
@@ -91,8 +96,7 @@ class CloudSimulation:
             self.restore_backup,
             self.directory,
         )
-        self.run_initial_analysis()
-        self.run_cloud_analysis()
+        self.load_model()
 
     def run_initial_analysis(self):
         """
@@ -123,7 +127,7 @@ class CloudSimulation:
         data = FileStyle(
             chosen_file="Nube",
             output_data_path=self.directory,
-            img_path="img/" + self.directory,
+            img_path="img/",
             img_option="Contour",
             folder_handle="Delete",
         )
@@ -188,7 +192,7 @@ class FileStyle:
         if output_data_path[-1] != "/":
             output_data_path += "/"
         self.output_data_path = output_data_path
-        self.img_path = img_path
+        self.img_path = f"{output_data_path}{img_path}"
         self.data_file = []
         self.folder_handle = folder_handle
         match chosen_file:

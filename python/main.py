@@ -11,7 +11,7 @@ def main():
         directory="Data/z_initials_param",
     )
     z_initials_param.run_model()
+    #z_initials_param.load_model()
     z_initials_param.cloud_analytics.parse_status_img()
-
 
 main()
