@@ -4,7 +4,7 @@ on:
     branches: [ "dev" ]
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels on ${{ matrix.os }}-gcc${{ matrix.gcc-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -40,7 +40,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-gcc${{ matrix.gcc-version }}-${{ strategy.job-index }}
+          name: cibw-wheels-${{ matrix.os }}-gcc${{ matrix.gcc-version }}
           path: ./python/wheelhouse/
 
 
@@ -56,8 +56,9 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./python/wheelhouse/
+          pattern: cibw-wheels-${{ matrix.os }}-gcc*
+          merge-multiple: true
 
     - name: Set up Python
       uses: actions/setup-python@v5
