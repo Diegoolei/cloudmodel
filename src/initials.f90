@@ -45,9 +45,8 @@ contains
 
       real vapor_total, aerosol_total, base_horizontal_velocity, z_reference, &
          gaussian
-
-      real :: initial_x_perturbation = (nx1 + 1.)*dx1/2.  !! Initial disturbance’s x-coordinate
-      real :: initial_y_perturbation = (nx1 + 1.)*dx1/2.  !! Initial disturbance’s y-coordinate
+      real :: initial_x_perturbation  !! Initial disturbance’s x-coordinate
+      real :: initial_y_perturbation  !! Initial disturbance’s y-coordinate
       real :: initial_z_perturbation = 0. !! Initial disturbance’s z-coordinate
       real :: sigma_t = 2*1000.**2.   !! z decay of the perturbation in T
       real :: sigma_a = 200.**2. !! z decay of the perturbation in A
@@ -64,7 +63,8 @@ contains
          sextic_sv_saturation
 
       integer i, j, k, n, unit
-
+      initial_x_perturbation = (nx1 + 1.)*dx1/2.  !! Initial disturbance’s x-coordinate
+      initial_y_perturbation = (nx1 + 1.)*dx1/2.
       intercept_lv_saturation = 6.10780
       slope_lv_saturation = 4.43652e-1
       quadratic_lv_saturation = 1.42895e-2

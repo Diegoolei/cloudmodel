@@ -89,12 +89,13 @@ module initial_z_state
    !real, allocatable :: u_z_initial(:) !! Non perturbed u z initial
    !real, allocatable :: v_z_initial(:) !! Non perturbed v z initial
    !!!
-   real :: temperature_z_initial(-3:nz1 + 3) !! Non perturbed temperature z initial
-   real :: theta_z_initial(-3:nz1 + 3) !! Non perturbed theta z initial
-   real :: Pres00(-3:nz1 + 3) !! Non perturbed pressure z initial
-   real :: Presi0(-3:nz1 + 3) !! Non perturbed pressure z initial
-   real :: u_z_initial(-3:nz1 + 3) !! Non perturbed u z initial
-   real :: v_z_initial(-3:nz1 + 3) !! Non perturbed v z initial
+   integer, parameter :: mod_nz1 = 45
+   real :: temperature_z_initial(-3:mod_nz1 + 3) !! Non perturbed temperature z initial
+   real :: theta_z_initial(-3:mod_nz1 + 3) !! Non perturbed theta z initial
+   real :: Pres00(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
+   real :: Presi0(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
+   real :: u_z_initial(-3:mod_nz1 + 3) !! Non perturbed u z initial
+   real :: v_z_initial(-3:mod_nz1 + 3) !! Non perturbed v z initial
 
    real, allocatable :: cc2(:) !! Non perturbed cc2 z initial
    real, allocatable :: air_density_z_initial(:) !! Non perturbed air density z initial

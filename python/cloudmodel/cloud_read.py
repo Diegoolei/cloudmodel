@@ -19,6 +19,21 @@ from .constants import (
     nube31_biased_nz1,
     nube31_var_list,
 )
+from .constants import nz1, dx1
+from .constants import (
+    G,
+    Rd,
+    Rv,
+    Kapa,
+    T0,
+    P00,
+    Lvl0,
+    Lsl0,
+    Vis0,
+    rhogra,
+    Av0,
+    Vtnie0,
+)
 from .interface import c_interface as nb
 
 
@@ -67,6 +82,20 @@ class CloudSimulation:
         bacup_time_minutes=0,
         restore_backup=False,
         directory=".temp/",
+        dx1=dx1,
+        nz1=nz1,
+        G=G,
+        Rd=Rd,
+        Rv=Rv,
+        Kapa=Kapa,
+        T0=T0,
+        P00=P00,
+        Lvl0=Lvl0,
+        Lsl0=Lsl0,
+        Vis0=Vis0,
+        rhogra=rhogra,
+        Av0=Av0,
+        Vtnie0=Vtnie0,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
@@ -77,6 +106,22 @@ class CloudSimulation:
             directory += "/"
         print(f"Destination directory: {directory}")
         self.directory = directory
+
+        self.dx1 = dx1
+        self.nz1 = nz1
+        self.G = G
+        self.Rd = Rd
+        self.Rv = Rv
+        self.Kapa = Kapa
+        self.T0 = T0
+        self.P00 = P00
+        self.Lvl0 = Lvl0
+        self.Lsl0 = Lsl0
+        self.Vis0 = Vis0
+        self.rhogra = rhogra
+        self.Av0 = Av0
+        self.Vtnie0 = Vtnie0
+
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -88,6 +133,21 @@ class CloudSimulation:
     def run_model(self):
         """Run the cloud model."""
         check_path(FolderHandle.IGNORE.value, self.directory)
+        nb.set_dimensions_python(self.dx1, self.nz1)
+        nb.set_constants_python(
+            self.G,
+            self.Rd,
+            self.Rv,
+            self.Kapa,
+            self.T0,
+            self.P00,
+            self.Lvl0,
+            self.Lsl0,
+            self.Vis0,
+            self.rhogra,
+            self.Av0,
+            self.Vtnie0,
+        )
         nb.run_model_python(
             self.simulation_time_minutes,
             self.save_time_minutes,
