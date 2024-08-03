@@ -19,7 +19,7 @@ from .constants import (
     nube31_biased_nz1,
     nube31_var_list,
 )
-from .interface import c_interface as nb
+from .interface import cloud_compiled as nb
 
 
 class ImageStyle(Enum):
