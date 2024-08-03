@@ -134,7 +134,7 @@ contains
                        v_perturbed_base, w_perturbed_base, theta_base, pressure_base, vapor_base, &
                        drop_base, rain_base, crystal_base, snow_base, hail_base, aerosol_base
       character(len=3), intent(in) :: file_number
-      character(len=30) :: file_name
+      character(len=300) :: file_name
       integer :: unit_number
 
       file_name = output_directory//"nube"//trim(file_number)//'.sal'

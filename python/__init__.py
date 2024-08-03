@@ -1,3 +1,3 @@
-from .cloudmodel import cloud_compiled, CloudSimulation
+from .cloudmodel import c_interface, CloudSimulation
 
-__all__ = ["CloudSimulation", "cloud_compiled"]
+__all__ = ["CloudSimulation", "c_interface"]

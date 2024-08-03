@@ -13,7 +13,7 @@ requires = [
 
 [project]
 name = "cloudmodel"
-version = "0.3.2"
+version = "0.3.3"
 authors = [{name = "Diego E. Oleiarz", email = "diego.oleiarz@mi.unc.edu.ar"}]
 license = {text = "The MIT License"}
 readme = "README.md"

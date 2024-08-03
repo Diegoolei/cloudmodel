@@ -1,5 +1,5 @@
-"""init file for the interface module."""
+"""init file for the cloud_compiled module."""
 
-from . import cloud_compiled
+from .cloud_compiled import c_interface
 
-__all__ = ["cloud_compiled"]
+__all__ = ["c_interface"]

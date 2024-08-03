@@ -19,7 +19,7 @@ from .constants import (
     nube31_biased_nz1,
     nube31_var_list,
 )
-from .interface import cloud_compiled as nb
+from .interface import c_interface as nb
 
 
 class ImageStyle(Enum):
@@ -73,6 +73,9 @@ class CloudSimulation:
         self.statistic_time_minutes = statistic_time_minutes
         self.bacup_time_minutes = bacup_time_minutes
         self.restore_backup = restore_backup
+        if directory[-1] != "/":
+            directory += "/"
+        print(f"Destination directory: {directory}")
         self.directory = directory
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
