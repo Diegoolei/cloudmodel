@@ -34,9 +34,12 @@ from .constants import (
     Av0,
     Vtnie0,
     Tmin,
-    Tmax
+    Tmax,
 )
-from .z_profile import (latent_heat,) 
+from .z_profile import (
+    latent_heat,
+    saturated_vapor_pressure2,
+)
 from .interface import c_interface as nb
 
 
@@ -102,7 +105,8 @@ class CloudSimulation:
         Tlvl=None,
         Tlsl=None,
         Tlvs=None,
-        
+        Telvs=None,
+        Tesvs=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
@@ -128,14 +132,22 @@ class CloudSimulation:
         self.rhogra = rhogra
         self.Av0 = Av0
         self.Vtnie0 = Vtnie0
-        if (Tlvl or Tlsl or Tlvs) is None:
-            l_heat = latent_heat(Tmin=Tmin, Tmax=Tmax)
+        if Tlvl is None or Tlsl is None or Tlvs is None:
+            l_heat = latent_heat(Tmin, Tmax)
             if Tlvl is None:
                 self.Tlvl = l_heat[0]
             if Tlsl is None:
                 self.Tlsl = l_heat[1]
             if Tlvs is None:
                 self.Tlvs = l_heat[2]
+        if Telvs is None or Tesvs is None:
+            s_vapor = saturated_vapor_pressure2(
+                Tmin, Tmax, self.Tlvl, self.Tlvs
+            )
+            if Telvs is None:
+                self.Telvs = s_vapor[0]
+            if Tesvs is None:
+                self.Tesvs = s_vapor[1]
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -161,10 +173,11 @@ class CloudSimulation:
             self.rhogra,
             self.Av0,
             self.Vtnie0,
-
-            self.Tlvl,
-            self.Tlsl,
-            self.Tlvs,
+            np.asfortranarray(self.Tlvl),
+            np.asfortranarray(self.Tlsl),
+            np.asfortranarray(self.Tlvs),
+            np.asfortranarray(self.Telvs),
+            np.asfortranarray(self.Tesvs),
         )
         nb.run_model_python(
             self.simulation_time_minutes,

@@ -1,6 +1,5 @@
 """Constants for the cloud model."""
 
-
 # Var list for the cloud model
 # All var lists must be in the same order as the data in the binary files
 
@@ -32,46 +31,46 @@ inis_var_list = [
 ]
 
 # ?
-n = 45 # 54
+n = 45  # 54
 
 # Dimensions for the cloud model
-dx1= 300
+dx1 = 300
 nz1 = n
 
 # Constants for the cloud model
 G = 9.8
-Rd=287.04
-Rv=461.05
-Kapa=0.2857
-T0=273.15
-P00=101300.
-Lvl0=2.500e6
-Lsl0=79.7 #calor latente fusion a 0C en kilocalorias
+Rd = 287.04
+Rv = 461.05
+Kapa = 0.2857
+T0 = 273.15
+P00 = 101300.0
+Lvl0 = 2.500e6
+Lsl0 = 79.7  # calor latente fusion a 0C en kilocalorias
 Vis0 = 1.718e-5
-rhogra = 500.
-Av0 = 1455.
-Vtnie0 = .5
-dx = dx1 # 300
+rhogra = 500.0
+Av0 = 1455.0
+Vtnie0 = 0.5
+dx = dx1  # 300
 
 import numpy as np
 
-zeta_offset = 3 #extension del dominio arriba y abajo para corregir problemas de memoria del Fortran
-zeta = np.arange(0, (n+1) * dx1, dx1)
-Tmin = -70 #en C
-Tmax = 30 #en C
+zeta_offset = 3  # extension del dominio arriba y abajo para corregir problemas de memoria del Fortran
+zeta = np.arange(0, (n + 1) * dx1, dx1)
+Tmin = 210  # Kelvin
+Tmax = 314  # Kelvin
 
-#Calulo de las velocidades horizontales
-zeta_p = np.array([0, 500, 2000, 9000, 13500.])
-U_p = np.array([0., 0., 4., -6., -5 ])
-V_p = np.array([0., 0., 0., 3., -.5])
+# Calulo de las velocidades horizontales
+zeta_p = np.array([0, 500, 2000, 9000, 13500.0])
+U_p = np.array([0.0, 0.0, 4.0, -6.0, -5])
+V_p = np.array([0.0, 0.0, 0.0, 3.0, -0.5])
 
-#Calculo de la Temperatura
-T_0= 298.15
-dT_p = np.array([-9e-3, -9e-3, -7e-3, -7e-3, 0, 0, (50./27)*1e-3 ])
-zeta_p = np.array([0, 2000, 5500., 9000., 11000, 12000., 13500.])
+# Calculo de la Temperatura
+T_0 = 298.15
+dT_p = np.array([-9e-3, -9e-3, -7e-3, -7e-3, 0, 0, (50.0 / 27) * 1e-3])
+zeta_p = np.array([0, 2000, 5500.0, 9000.0, 11000, 12000.0, 13500.0])
 
-rel1_p = np.array([.55, .6, .6, .35, .1, .05666667])
-zeta_p = np.array([0, 500, 1500., 4000., 7000., 13500.])
+rel1_p = np.array([0.55, 0.6, 0.6, 0.35, 0.1, 0.05666667])
+zeta_p = np.array([0, 500, 1500.0, 4000.0, 7000.0, 13500.0])
 
 nx1 = 50
 biased_nx1 = nx1 + 7

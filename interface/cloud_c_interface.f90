@@ -16,14 +16,15 @@ contains
 
    subroutine set_constants_python(G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
       Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in,&
-      Tlsl_in, Tlvs_in)
+      Tlsl_in, Tlvs_in, Telvs_in, Tesvs_in)
       implicit none
       real(c_float) :: G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in, Lvl0_in,&
          Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in
-      real(c_float), intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:)
+      real(c_float), intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:), Telvs_in(:), Tesvs_in(:)
 
       call set_constants(G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in, Lvl0_in,&
-         Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in, Tlsl_in, Tlvs_in)
+         Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in, Tlsl_in,&
+         Tlvs_in, Telvs_in, Tesvs_in)
    end subroutine set_constants_python
 
    subroutine run_model_python(sim_time, save_lapse, statistic_time, backup_time, restore_backup, directory)

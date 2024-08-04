@@ -67,8 +67,6 @@ module constants
    real, parameter :: Efcolgn = 0.7 !! Efficiency factor for collision (graupel)
 
    real :: Tvis(210:320) !! Temperature profile (viscous)
-   real :: Telvs(210:320) !! Temperature profile (equilibrium liquid-vapor-solid)
-   real :: Tesvs(210:320) !! Temperature profile (equilibrium solid-vapor-solid)
    real :: Eautcn(210:320) !! Equilibrium constants (liquid-vapor)
    real :: Eacrcn(210:320) !! Equilibrium constants (solid-liquid)
 
@@ -88,10 +86,12 @@ module constants
    real :: Tlvl(210:320) !! Temperature profile (liquid)
    real :: Tlsl(210:320) !! Temperature profile (solid-liquid)
    real :: Tlvs(210:320) !! Temperature profile (liquid-vapor-solid)
+   real :: Telvs(210:320) !! Temperature profile (equilibrium liquid-vapor-solid)
+   real :: Tesvs(210:320) !! Temperature profile (equilibrium solid-vapor-solid)
 contains
    subroutine set_constants(G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
       Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in,&
-      Tlsl_in, Tlvs_in)
+      Tlsl_in, Tlvs_in, Telvs_in, Tesvs_in)
       !! Sets the dimensions and intervals for the grid.
       !! Parameters:
       !! dx1: Spatial interval (grid spacing) in the x-direction
@@ -99,7 +99,7 @@ contains
       implicit none
       real, intent(in) :: G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
          Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in
-      real, intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:)
+      real, intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:), Telvs_in(:), Tesvs_in(:)
       G = G_in
       Rd = Rd_in
       Rv = Rv_in
@@ -116,6 +116,8 @@ contains
       Tlvl = Tlvl_in
       Tlsl = Tlsl_in
       Tlvs = Tlvs_in
+      Telvs = Telvs_in
+      Tesvs = Tesvs_in
    end subroutine set_constants
 end module constants
 

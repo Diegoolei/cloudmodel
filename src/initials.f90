@@ -121,36 +121,6 @@ contains
 
          if (k < 273.15) Tvis(k) = Tvis(k) - 1.2e-10*celcius_temperature_aux**2.
 
-         !calores latentes de evaporacion, fusion y sublimacion
-
-         !tension de vapor de saturacion liquido y solido
-         aux = cubic_lv_saturation + celcius_temperature_aux*( &
-               quartic_lv_saturation + celcius_temperature_aux*( &
-               quintic_lv_saturation + celcius_temperature_aux*sextic_lv_saturation))
-
-         aux = intercept_lv_saturation + celcius_temperature_aux*( &
-               slope_lv_saturation + celcius_temperature_aux*( &
-               quadratic_lv_saturation + celcius_temperature_aux*aux))
-
-         Telvs(k) = aux*100.
-
-         aux = cubic_sv_saturation + celcius_temperature_aux*( &
-               quartic_sv_saturation + celcius_temperature_aux*( &
-               quintic_sv_saturation + celcius_temperature_aux*sextic_sv_saturation))
-
-         aux = intercept_sv_saturation + celcius_temperature_aux*( &
-               slope_sv_saturation + celcius_temperature_aux*( &
-               quadratic_sv_saturation + celcius_temperature_aux*aux))
-
-         Tesvs(k) = aux*100.
-
-         if (k < 220) then
-            aux = Tlvl(220)/Rv*(1./220.-1./k)
-            Telvs(k) = Telvs(220)*exp(aux)
-            aux = Tlvs(220)/Rv*(1./220.-1./k)
-            Tesvs(k) = Tesvs(220)*exp(aux)
-         end if
-
          !cambio por las expresiones de Straka
          Eautcn(k) = 10.**(.035*(celcius_temperature_aux) - .7)
          Eacrcn(k) = exp(.09*celcius_temperature_aux)
@@ -158,7 +128,6 @@ contains
             Eautcn(k), Eacrcn(k)
       end do
       close (unit)
-
       !**   condiciones de tiempo bueno
       ! TT_f not pure function, do concurrent not allowed
       do k = -1, nz1 + 2

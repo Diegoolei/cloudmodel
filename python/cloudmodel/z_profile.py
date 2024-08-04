@@ -1,10 +1,9 @@
 from .constants import *
 import numpy as np
 from matplotlib import pyplot as plt
-from numpy import asfortranarray
 
 
-def latent_heat(Tmin, Tmax):
+def latent_heat(Tmin, Tmax) -> list[np.ndarray]:
     """
     Calculo de los calores latentes de evaporacion, fusion y sublimacion
     calor latente de sublimacion, Pruppacher and Klett, 2010, eq 4-74
@@ -13,8 +12,7 @@ def latent_heat(Tmin, Tmax):
     Tmin: temperatura minima, en C, int
     Tmax: temperatura maxima, en C, int
     """
-    k = np.arange(210, 314, dtype=np.float64)
-    print(k)
+    k = np.arange(Tmin, Tmax, dtype=np.float64)
     celcius_temperature_aux = k - T0
     Tlvl = Lvl0 * (T0 / k) ** (0.167 + 3.67e-4 * k)
 
@@ -22,11 +20,11 @@ def latent_heat(Tmin, Tmax):
         Lsl0
         + 0.485 * celcius_temperature_aux
         - 2.5e-3 * celcius_temperature_aux**2.0
-        ) * 4180.0
+    ) * 4180.0
 
     Tlvs = Tlvl + Tlsl
 
-    return [asfortranarray(Tlvl), asfortranarray(Tlsl), asfortranarray(Tlvs)]
+    return [Tlvl, Tlsl, Tlvs]
 
 
 def saturated_vapor_pressure(Tmin, Tmax):
@@ -56,7 +54,8 @@ def saturated_vapor_pressure(Tmin, Tmax):
 
 # @%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%
 # ORIGINAL A DESCARTAR
-def saturated_vapor_pressure2(Tmin, Tmax, Tlvl, Tlvs):
+def saturated_vapor_pressure2(Tmin, Tmax, Tlvl: np.array, Tlvs):
+    # sourcery skip: extract-duplicate-method, inline-immediately-returned-variable
     """
       MAL!!! DA NEGATIVO AUN CON LOS CALCULOS A MANO. MAL PRUPPACHER!!!
       Coeficientes para la tension de vapor de saturacion liquido y solido vs T
@@ -68,7 +67,7 @@ def saturated_vapor_pressure2(Tmin, Tmax, Tlvl, Tlvs):
       Tmax: temperatura maxima, en C, int
     """
     # coeficientes para liquido vapor, a[0] en mB
-    a = np.array(
+    lv_coefficients = np.array(
         [
             6.10780,
             4.43652e-1,
@@ -81,7 +80,7 @@ def saturated_vapor_pressure2(Tmin, Tmax, Tlvl, Tlvs):
     )
 
     # coeficientes para solido vapor, b[0] en mB
-    b = np.array(
+    sv_coefficients = np.array(
         [
             6.10918,
             5.03470e-1,
@@ -93,46 +92,37 @@ def saturated_vapor_pressure2(Tmin, Tmax, Tlvl, Tlvs):
         ]
     )
 
-    TC2K = T0
+    Telvs = auxiliar_fun(lv_coefficients, Tmin, Tmax)
+    Tesvs = auxiliar_fun(sv_coefficients, Tmin, Tmax)
 
-    Telvs = np.zeros(Tmax - Tmin)
-    Tesvs = np.zeros(Tmax - Tmin)
+    for k_temp, i in enumerate(range(10), start=210):
+        aux_Telvs = Tlvl[10] / Rv * (1.0 / 220.0 - 1.0 / k_temp)
+        Telvs[i] = Telvs[10] * np.exp(aux_Telvs)
+        aux_Tesvs = Tlvs[10] / Rv * (1.0 / 220.0 - 1.0 / k_temp)
+        Tesvs[i] = Tesvs[10] * np.exp(aux_Tesvs)
+    return [Telvs, Tesvs]
 
-    # tensiones de vapor de saturacion para -50C < T_C < 50C
-    for k in range(-50 - Tmin, Tmax - Tmin):
-        T_C = k + Tmin
-        aux = 0
-        for i in range(5, -1, -1):
-            aux = a[i] + T_C * aux
-        Telvs[k] = (
-            aux * 100.0
-        )  # x100 es para pasar a Pascales SM. Cambiar nombre de Telvs a elvs_T
 
-        aux = 0
-        for i in range(5, -1, -1):
-            aux = b[i] + T_C * aux
-        Tesvs[k] = (
-            aux * 100.0
-        )  # x100 es para pasar a Pascales SM. Cambiar nombre de Telvs a esvs_T
+def auxiliar_fun(coefficients, Tmin, Tmax):
+    k = np.arange(Tmin, Tmax, dtype=np.float64)
+    celcius_temperature_aux = k - T0
+    aux_pre = np.array([0.0] * len(k))
+    aux_pre = coefficients[3] + celcius_temperature_aux * (
+        coefficients[4]
+        + celcius_temperature_aux
+        * (coefficients[5] + celcius_temperature_aux * coefficients[6])
+    )
 
-    # tensiones de vapor de saturacion para T_C < -50C
-    if Tmin < -50:
-        ind = np.arange(-50 - Tmin)
-        # ind = np.arange(2)
-        aux = (
-            Tlvl[-50 - Tmin]
-            / Rv
-            * (1.0 / (-50 + TC2K) - 1.0 / (-ind - 50 + TC2K))
-        )
-        Telvs[ind] = Telvs[-50 - Tmin] * np.exp(aux)
-        aux = (
-            Tlvs[-50 - Tmin]
-            / Rv
-            * (1.0 / (-50 + TC2K) - 1.0 / (-ind - 50 + TC2K))
-        )
-        Tesvs[ind] = Tesvs[-50 - Tmin] * np.exp(aux)
+    aux = np.array([0.0] * len(k))
+    aux = coefficients[0] + celcius_temperature_aux * (
+        coefficients[1]
+        + celcius_temperature_aux
+        * (coefficients[2] + celcius_temperature_aux * aux_pre)
+    )
+    result = np.zeros(Tmax - Tmin)
+    result = aux * 100.0
 
-    return Telvs, Tesvs
+    return result
 
 
 # @%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%
@@ -349,7 +339,9 @@ def main():
     Tlvl = T_heat[0]
     Tlsl = T_heat[1]
     Tlvs = T_heat[2]
-    Telvs, Tesvs = saturated_vapor_pressure2(Tmin, Tmax, Tlvl, Tlvs)
+    sv_pressure = saturated_vapor_pressure2(Tmin, Tmax, Tlvl, Tlvs)
+    Telvs = sv_pressure[0]
+    Tesvs = sv_pressure[1]
     Tvis = viscosity(Tmin, Tmax)
     Eautcn, Eacrcn = crystal_efficiencies(Tmin, Tmax)
     UU, VV = velocidades(zeta, zeta_p, U_p, V_p)
