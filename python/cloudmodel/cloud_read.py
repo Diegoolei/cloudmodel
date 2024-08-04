@@ -41,6 +41,7 @@ from .z_profile import (
     saturated_vapor_pressure2,
     viscosity,
     crystal_efficiencies,
+    velocities,
 )
 from .interface import c_interface as nb
 
@@ -110,6 +111,8 @@ class CloudSimulation:
         Telvs=None,
         Tesvs=None,
         Tvis=None,
+        u_z_initial=None,
+        v_z_initial=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
@@ -157,6 +160,12 @@ class CloudSimulation:
                 self.Eautcn = cry_effic[0]
             if Tesvs is None:
                 self.Eacrcn = cry_effic[1]
+        if u_z_initial is None or v_z_initial is None:
+            z_profile = velocities()
+            if u_z_initial is None:
+                self.u_z_initial = z_profile[0]
+            if v_z_initial is None:
+                self.v_z_initial = z_profile[1]
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -190,6 +199,10 @@ class CloudSimulation:
             np.asfortranarray(self.Tvis),
             np.asfortranarray(self.Eautcn),
             np.asfortranarray(self.Eacrcn),
+        )
+        nb.set_initial_z_state_python(
+            np.asfortranarray(self.u_z_initial),
+            np.asfortranarray(self.v_z_initial),
         )
         nb.run_model_python(
             self.simulation_time_minutes,

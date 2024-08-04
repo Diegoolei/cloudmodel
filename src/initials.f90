@@ -59,42 +59,14 @@ contains
       initial_y_perturbation = (nx1 + 1.)*dx1/2.
 
       call PP(G, Rd, dx1, nz, Presi0, P00)
-
-      do concurrent(k=0:nz1)
-         z_aux = k*dx1
-         if (z_aux <= 500.) then
-            u_z_initial(k) = 0.
-            v_z_initial(k) = 0.
-
-         elseif (z_aux <= 2000.) then
-            z_reference = z_aux - 500.
-            aux = 4.*(z_reference/1500.)**2.
-            u_z_initial(k) = aux
-            v_z_initial(k) = 0.
-
-         elseif (z_aux <= 9000.) then
-            z_reference = z_aux - 2000.
-            base_horizontal_velocity = z_reference/7000.
-            u_z_initial(k) = 4.-10.*base_horizontal_velocity**2.
-            v_z_initial(k) = 3.*base_horizontal_velocity**.5
-            !
-         else
-            z_reference = z_aux - 9000.
-            u_z_initial(k) = 4.*(z_reference/9000.)**2.-6.
-            v_z_initial(k) = 3.-5.*(z_reference/9000.)**.5
-            !
-         end if
-
-         u_z_initial(k) = u_z_initial(k)*0.7
-         v_z_initial(k) = v_z_initial(k)*0.
-      end do
-
+      
       open (newunit=unit, file=output_directory//"initial_z_arrays", access='append')
       do concurrent(k=210:313)
          write (unit, *) k, Tvis(k), Tlvl(k), Tlsl(k), Tlvs(k), Telvs(k), Tesvs(k), &
             Eautcn(k), Eacrcn(k)
       end do
       close (unit)
+      
       !**   condiciones de tiempo bueno
       ! TT_f not pure function, do concurrent not allowed
       do k = -1, nz1 + 2

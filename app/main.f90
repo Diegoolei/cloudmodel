@@ -3,6 +3,7 @@ program main
    use config
    use dimensions, only: set_dimensions
    use constants, only: set_constants
+   use initial_z_state, only: set_initial_z_state
 
    implicit none
    call init_config(sim_time=45., save_lapse=3., statistic_time=3., &

@@ -105,6 +105,13 @@ module initial_z_state
    real, allocatable :: vapor_z_relative(:) !! Non perturbed Relative vapor z initial
    real, allocatable :: aerosol_z_relative(:) !! Non perturbed Relative aerosol z initial
 contains
+   subroutine set_initial_z_state(u_z_initial_in, v_z_initial_in)
+      real, intent(in), dimension(:) :: u_z_initial_in, v_z_initial_in
+
+      u_z_initial = u_z_initial_in
+      v_z_initial = v_z_initial_in
+   end subroutine set_initial_z_state
+
    subroutine allocate_initial_z_state
       !! Allocate the initial z state variables
       !!!!

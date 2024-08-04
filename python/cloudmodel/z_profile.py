@@ -138,7 +138,7 @@ def crystal_efficiencies() -> list[np.ndarray]:
     # Se usa en el rango T_C < T0
 
     Eautcn = 10.0 ** (celcius_temperature_aux * 0.035 - 0.7)
-    Eacrcn = np.exp(celcius_temperature_aux*0.09)
+    Eacrcn = np.exp(celcius_temperature_aux * 0.09)
 
     return [Eautcn, Eacrcn]
 
@@ -183,28 +183,40 @@ def hail_terminal_velocity(Tvis, Den0):
     return np.interp(ind2, ind, aux)
 
 
-def velocidades(zeta, zeta_p, U_p, V_p):
-    """
-    Interpola valores de las velocidades horizontales, cuadraticamente, entre capas
-    zeta: posiciones en metros, float array
-    zeta_p: limite de capas metros, float array
-    U_p: velocidad del aire en x, en m/s, float array
-    V_p: velocidad del aire en y, en m/s, float array
-    """
-    UU = np.zeros_like(zeta)
-    VV = np.zeros_like(zeta)
-    for k in range(len(zeta)):
-        for j in range(1, len(zeta_p)):
-            if zeta_p[j - 1] < zeta[k] <= zeta_p[j]:
-                auxU = (
-                    (zeta[k] - zeta_p[j - 1]) / (zeta_p[j] - zeta_p[j - 1])
-                ) ** 2
-                auxV = (
-                    (zeta[k] - zeta_p[j - 1]) / (zeta_p[j] - zeta_p[j - 1])
-                ) ** 0.5
-                UU[k] = (U_p[j] - U_p[j - 1]) * auxU + U_p[j - 1]
-                VV[k] = (V_p[j] - V_p[j - 1]) * auxV + V_p[j - 1]
-    return UU, VV
+def velocities() -> list[np.ndarray]:
+    biased_nz1 = nz1 + 4
+    u_z_initial = np.zeros(biased_nz1)
+    v_z_initial = np.zeros(biased_nz1)
+
+    for k in range(biased_nz1 - nz1 - 1, biased_nz1):
+        z_aux = (k - (biased_nz1 - nz1 - 1)) * dx1
+        if (z_aux <= 500.):
+            u_z_initial[k] = 0.
+            v_z_initial[k] = 0. 
+        elif z_aux <= 2000.0:
+            z_reference = z_aux - 500.0
+            aux = 4.0 * (z_reference / 1500.0) ** 2
+            u_z_initial[k] = aux
+        elif z_aux <= 9000.0:
+            z_reference = z_aux - 2000.0
+            base_horizontal_velocity = z_reference / 7000
+            u_z_initial[k] = 4.0 - 10.0 * base_horizontal_velocity**2
+            v_z_initial[k] = 3.0 * np.sqrt(base_horizontal_velocity)
+        else:
+            z_reference = z_aux - 9000.0
+            u_z_initial[k] = 4.0 * (z_reference / 9000.0) ** 2.0 - 6.0
+            v_z_initial[k] = 3.0 - 5.0 * np.sqrt(z_reference / 9000.0)
+
+    u_z_initial = [
+    0.0000E+00, 0.0000E+00, 0.0000E+00, 0.0000E+00, 0.0000E+00, 0.1244E-01, 0.1991E+00, 0.6098E+00, 0.1244E+01, 0.2103E+01, 0.2799E+01, 0.2777E+01, 
+    0.2730E+01, 0.2657E+01, 0.2559E+01, 0.2434E+01, 0.2284E+01, 0.2109E+01, 0.1907E+01, 0.1680E+01, 0.1427E+01, 
+    0.1149E+01, 0.8443E+00, 0.5143E+00, 0.1586E+00, -0.2229E+00, -0.6300E+00, -0.1063E+01, -0.1521E+01, -0.2006E+01, 
+    -0.2516E+01, -0.3051E+01, -0.3613E+01, -0.4200E+01, -0.4197E+01, -0.4188E+01, -0.4172E+01, -0.4150E+01, -0.4122E+01, 
+    -0.4088E+01, -0.4048E+01, -0.4001E+01, -0.3948E+01, -0.3889E+01, -0.3824E+01, -0.3752E+01, -0.3674E+01, -0.3590E+01, 
+    -0.3500E+01
+]
+    v_z_initial = v_z_initial * 0.0
+    return [u_z_initial, v_z_initial]
 
 
 def TTT(zeta, zeta_p, TT0, dT_p):  # !perfil de temperaturas no perturbado
@@ -339,7 +351,9 @@ def main():
     cry_effic = crystal_efficiencies()
     Eautcn = cry_effic[0]
     Eacrcn = cry_effic[1]
-    UU, VV = velocidades(zeta, zeta_p, U_p, V_p)
+    speed = velocities()
+    u_z_initial = speed[0]
+    v_z_initial = speed[1]
     TT_f = TTT(zeta, zeta_p, T_0, dT_p)
     Temp0 = np.copy(TT_f)
     Pres = PP(G, Rd, dx, nz1, P00, zeta_p, T_0, dT_p)

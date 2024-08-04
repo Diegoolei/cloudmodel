@@ -5,6 +5,7 @@ module c_interface
    use cloud_model, only: model
    use dimensions, only: set_dimensions
    use constants, only: set_constants
+   use initial_z_state, only: set_initial_z_state
 
 contains
    subroutine set_dimensions_python(dx1, nz1)
@@ -20,13 +21,18 @@ contains
       implicit none
       real(c_float) :: G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in, Lvl0_in,&
          Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in
-      real(c_float), intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:), &
-         Telvs_in(:), Tesvs_in(:), Tvis_in(:), Eautcn_in(:), Eacrcn_in(:)
+      real(c_float), intent(in), dimension(:) :: Tlvl_in, Tlsl_in, Tlvs_in, &
+         Telvs_in, Tesvs_in, Tvis_in, Eautcn_in, Eacrcn_in
 
       call set_constants(G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in, Lvl0_in,&
          Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in, Tlsl_in,&
          Tlvs_in, Telvs_in, Tesvs_in, Tvis_in, Eautcn_in, Eacrcn_in)
    end subroutine set_constants_python
+
+   subroutine set_initial_z_state_python(u_z_initial_in, v_z_initial_in)
+      real(c_float), intent(in), dimension(:) :: u_z_initial_in, v_z_initial_in
+      call set_initial_z_state(u_z_initial_in, v_z_initial_in)
+   end subroutine set_initial_z_state_python
 
    subroutine run_model_python(sim_time, save_lapse, statistic_time, backup_time, restore_backup, directory)
       ! bind(C, name="run_model")

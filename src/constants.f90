@@ -66,9 +66,6 @@ module constants
    real, parameter :: Efcol = 0.8 !! Efficiency factor for collision
    real, parameter :: Efcolgn = 0.7 !! Efficiency factor for collision (graupel)
 
-   real :: Tvis(210:320) !! Temperature profile (viscous)
-   real :: Eautcn(210:320) !! Equilibrium constants (liquid-vapor)
-   real :: Eacrcn(210:320) !! Equilibrium constants (solid-liquid)
 
    real :: G !! Acceleration due to gravity (m/s^2)
    real :: Rd !! Specific gas constants (dry air and water vapor)
@@ -88,6 +85,9 @@ module constants
    real :: Tlvs(210:320) !! Temperature profile (liquid-vapor-solid)
    real :: Telvs(210:320) !! Temperature profile (equilibrium liquid-vapor-solid)
    real :: Tesvs(210:320) !! Temperature profile (equilibrium solid-vapor-solid)
+   real :: Tvis(210:320) !! Temperature profile (viscous)
+   real :: Eautcn(210:320) !! Equilibrium constants (liquid-vapor)
+   real :: Eacrcn(210:320) !! Equilibrium constants (solid-liquid)
 contains
    subroutine set_constants(G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
       Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in,&
