@@ -91,7 +91,7 @@ module constants
 contains
    subroutine set_constants(G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
       Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in,&
-      Tlsl_in, Tlvs_in, Telvs_in, Tesvs_in)
+      Tlsl_in, Tlvs_in, Telvs_in, Tesvs_in, Tvis_in, Eautcn_in, Eacrcn_in)
       !! Sets the dimensions and intervals for the grid.
       !! Parameters:
       !! dx1: Spatial interval (grid spacing) in the x-direction
@@ -99,7 +99,8 @@ contains
       implicit none
       real, intent(in) :: G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
          Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in
-      real, intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:), Telvs_in(:), Tesvs_in(:)
+      real, intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:), Telvs_in(:),&
+         Tesvs_in(:), Tvis_in(:), Eautcn_in(:), Eacrcn_in(:)
       G = G_in
       Rd = Rd_in
       Rv = Rv_in
@@ -118,6 +119,9 @@ contains
       Tlvs = Tlvs_in
       Telvs = Telvs_in
       Tesvs = Tesvs_in
+      Tvis = Tvis_in
+      Eautcn = Eautcn_in
+      Eacrcn = Eacrcn_in
    end subroutine set_constants
 end module constants
 

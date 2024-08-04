@@ -39,6 +39,8 @@ from .constants import (
 from .z_profile import (
     latent_heat,
     saturated_vapor_pressure2,
+    viscosity,
+    crystal_efficiencies,
 )
 from .interface import c_interface as nb
 
@@ -107,6 +109,7 @@ class CloudSimulation:
         Tlvs=None,
         Telvs=None,
         Tesvs=None,
+        Tvis=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
@@ -133,7 +136,7 @@ class CloudSimulation:
         self.Av0 = Av0
         self.Vtnie0 = Vtnie0
         if Tlvl is None or Tlsl is None or Tlvs is None:
-            l_heat = latent_heat(Tmin, Tmax)
+            l_heat = latent_heat()
             if Tlvl is None:
                 self.Tlvl = l_heat[0]
             if Tlsl is None:
@@ -141,13 +144,19 @@ class CloudSimulation:
             if Tlvs is None:
                 self.Tlvs = l_heat[2]
         if Telvs is None or Tesvs is None:
-            s_vapor = saturated_vapor_pressure2(
-                Tmin, Tmax, self.Tlvl, self.Tlvs
-            )
+            s_vapor = saturated_vapor_pressure2(self.Tlvl, self.Tlvs)
             if Telvs is None:
                 self.Telvs = s_vapor[0]
             if Tesvs is None:
                 self.Tesvs = s_vapor[1]
+        if Tvis is None:
+            self.Tvis = viscosity()
+        if Telvs is None or Tesvs is None:
+            cry_effic = crystal_efficiencies()
+            if Telvs is None:
+                self.Eautcn = cry_effic[0]
+            if Tesvs is None:
+                self.Eacrcn = cry_effic[1]
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -178,6 +187,9 @@ class CloudSimulation:
             np.asfortranarray(self.Tlvs),
             np.asfortranarray(self.Telvs),
             np.asfortranarray(self.Tesvs),
+            np.asfortranarray(self.Tvis),
+            np.asfortranarray(self.Eautcn),
+            np.asfortranarray(self.Eacrcn),
         )
         nb.run_model_python(
             self.simulation_time_minutes,

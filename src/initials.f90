@@ -41,7 +41,7 @@ contains
       implicit none
 
       real aux, x_aux, y_aux, z_aux, sat_press_lv_aux, relative_humidity_aux, &
-         celcius_temperature_aux, temperature_aux
+         temperature_aux
 
       real vapor_total, aerosol_total, base_horizontal_velocity, z_reference, &
          gaussian
@@ -54,32 +54,9 @@ contains
       real :: temperature_max_perturbation = .7  !! Maximum temperature perturbation
       real :: aerosol_max_perturbation = 10000. !! Maximum aerosol perturbation
 
-      real intercept_lv_saturation, slope_lv_saturation, quadratic_lv_saturation, &
-         cubic_lv_saturation, quartic_lv_saturation, quintic_lv_saturation, &
-         sextic_lv_saturation
-
-      real intercept_sv_saturation, slope_sv_saturation, quadratic_sv_saturation, &
-         cubic_sv_saturation, quartic_sv_saturation, quintic_sv_saturation, &
-         sextic_sv_saturation
-
       integer i, j, k, n, unit
       initial_x_perturbation = (nx1 + 1.)*dx1/2.  !! Initial disturbance’s x-coordinate
       initial_y_perturbation = (nx1 + 1.)*dx1/2.
-      intercept_lv_saturation = 6.10780
-      slope_lv_saturation = 4.43652e-1
-      quadratic_lv_saturation = 1.42895e-2
-      cubic_lv_saturation = 2.65065e-4
-      quartic_lv_saturation = 3.03124e-6
-      quintic_lv_saturation = 2.03408e-8
-      sextic_lv_saturation = 6.13682e-11
-
-      intercept_sv_saturation = 6.10918
-      slope_sv_saturation = 5.03470e-1
-      quadratic_sv_saturation = 1.88601e-2
-      cubic_sv_saturation = 4.17622e-4
-      quartic_sv_saturation = 5.82472e-6
-      quintic_sv_saturation = 4.83880e-8
-      sextic_sv_saturation = 1.83883e-10
 
       call PP(G, Rd, dx1, nz, Presi0, P00)
 
@@ -112,18 +89,8 @@ contains
          v_z_initial(k) = v_z_initial(k)*0.
       end do
 
-      !**   calculo de 'constantes' que dependen de T
-
-      open (newunit=unit, file=output_directory//"ccc", access='append')
+      open (newunit=unit, file=output_directory//"initial_z_arrays", access='append')
       do concurrent(k=210:313)
-         celcius_temperature_aux = k - T0
-         Tvis(k) = 4.9e-8*celcius_temperature_aux + Vis0
-
-         if (k < 273.15) Tvis(k) = Tvis(k) - 1.2e-10*celcius_temperature_aux**2.
-
-         !cambio por las expresiones de Straka
-         Eautcn(k) = 10.**(.035*(celcius_temperature_aux) - .7)
-         Eacrcn(k) = exp(.09*celcius_temperature_aux)
          write (unit, *) k, Tvis(k), Tlvl(k), Tlsl(k), Tlvs(k), Telvs(k), Tesvs(k), &
             Eautcn(k), Eacrcn(k)
       end do

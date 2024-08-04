@@ -59,6 +59,9 @@ zeta = np.arange(0, (n + 1) * dx1, dx1)
 Tmin = 210  # Kelvin
 Tmax = 314  # Kelvin
 
+k = np.arange(Tmin, Tmax, dtype=np.float32)
+celcius_temperature_aux = k - T0
+
 # Calulo de las velocidades horizontales
 zeta_p = np.array([0, 500, 2000, 9000, 13500.0])
 U_p = np.array([0.0, 0.0, 4.0, -6.0, -5])
