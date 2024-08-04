@@ -41,7 +41,7 @@ contains
       implicit none
 
       real aux, x_aux, y_aux, z_aux, sat_press_lv_aux, relative_humidity_aux, &
-         latent_heat_exponent_aux, celcius_temperature_aux, temperature_aux
+         celcius_temperature_aux, temperature_aux
 
       real vapor_total, aerosol_total, base_horizontal_velocity, z_reference, &
          gaussian
@@ -122,11 +122,6 @@ contains
          if (k < 273.15) Tvis(k) = Tvis(k) - 1.2e-10*celcius_temperature_aux**2.
 
          !calores latentes de evaporacion, fusion y sublimacion
-         latent_heat_exponent_aux = .167 + 3.67e-4*k
-         Tlvl(k) = Lvl0*(T0/k)**latent_heat_exponent_aux
-         Tlsl(k) = (Lsl0 + 0.485*celcius_temperature_aux &
-                    - 2.5e-3*celcius_temperature_aux**2.)*4180.
-         Tlvs(k) = Tlvl(k) + Tlsl(k)
 
          !tension de vapor de saturacion liquido y solido
          aux = cubic_lv_saturation + celcius_temperature_aux*( &

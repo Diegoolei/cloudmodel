@@ -10,9 +10,9 @@ program main
                     directory="Data/z_initials_param/")
                     
    call set_dimensions(dx1_in=300, nz1_in=45)
-   call set_constants(G_in=9.8, Rd_in=287.04, Rv_in=461.05, Kapa_in=0.2857, &
-                      T0_in=273.15, P00_in=101300., Lvl0_in=2.500e6, Lsl0_in=79.7, &
-                      Vis0_in=1.718e-5, rhogra_in=500., Av0_in=1455., Vtnie0_in=.5)
+   !call set_constants(G_in=9.8, Rd_in=287.04, Rv_in=461.05, Kapa_in=0.2857, &
+   !                   T0_in=273.15, P00_in=101300., Lvl0_in=2.500e6, Lsl0_in=79.7, &
+   !                   Vis0_in=1.718e-5, rhogra_in=500., Av0_in=1455., Vtnie0_in=.5)
 
    call model()
 end program main

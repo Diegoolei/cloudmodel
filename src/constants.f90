@@ -67,9 +67,6 @@ module constants
    real, parameter :: Efcolgn = 0.7 !! Efficiency factor for collision (graupel)
 
    real :: Tvis(210:320) !! Temperature profile (viscous)
-   real :: Tlvl(210:320) !! Temperature profile (liquid)
-   real :: Tlsl(210:320) !! Temperature profile (solid-liquid)
-   real :: Tlvs(210:320) !! Temperature profile (liquid-vapor-solid)
    real :: Telvs(210:320) !! Temperature profile (equilibrium liquid-vapor-solid)
    real :: Tesvs(210:320) !! Temperature profile (equilibrium solid-vapor-solid)
    real :: Eautcn(210:320) !! Equilibrium constants (liquid-vapor)
@@ -87,16 +84,22 @@ module constants
    real :: rhogra !! Densities of hail (kg/m^3)
    real :: Av0 !! Terminal fall velocity of ice crystals (m/s)
    real :: Vtnie0 !! Threshold velocity for ice crystal nucleation (m/s)
+
+   real :: Tlvl(210:320) !! Temperature profile (liquid)
+   real :: Tlsl(210:320) !! Temperature profile (solid-liquid)
+   real :: Tlvs(210:320) !! Temperature profile (liquid-vapor-solid)
 contains
    subroutine set_constants(G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
-      Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in)
+      Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in,&
+      Tlsl_in, Tlvs_in)
       !! Sets the dimensions and intervals for the grid.
       !! Parameters:
       !! dx1: Spatial interval (grid spacing) in the x-direction
       !! nz1: Number of points in the z-direction (first grid)
       implicit none
-      real, intent(in) :: G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in, Lvl0_in,&
-         Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in
+      real, intent(in) :: G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
+         Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in
+      real, intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:)
       G = G_in
       Rd = Rd_in
       Rv = Rv_in
@@ -109,6 +112,10 @@ contains
       rhogra = rhogra_in
       Av0 = Av0_in
       Vtnie0 = Vtnie0_in
+
+      Tlvl = Tlvl_in
+      Tlsl = Tlsl_in
+      Tlvs = Tlvs_in
    end subroutine set_constants
 end module constants
 

@@ -33,7 +33,10 @@ from .constants import (
     rhogra,
     Av0,
     Vtnie0,
+    Tmin,
+    Tmax
 )
+from .z_profile import (latent_heat,) 
 from .interface import c_interface as nb
 
 
@@ -96,6 +99,10 @@ class CloudSimulation:
         rhogra=rhogra,
         Av0=Av0,
         Vtnie0=Vtnie0,
+        Tlvl=None,
+        Tlsl=None,
+        Tlvs=None,
+        
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
@@ -121,7 +128,14 @@ class CloudSimulation:
         self.rhogra = rhogra
         self.Av0 = Av0
         self.Vtnie0 = Vtnie0
-
+        if (Tlvl or Tlsl or Tlvs) is None:
+            l_heat = latent_heat(Tmin=Tmin, Tmax=Tmax)
+            if Tlvl is None:
+                self.Tlvl = l_heat[0]
+            if Tlsl is None:
+                self.Tlsl = l_heat[1]
+            if Tlvs is None:
+                self.Tlvs = l_heat[2]
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -147,6 +161,10 @@ class CloudSimulation:
             self.rhogra,
             self.Av0,
             self.Vtnie0,
+
+            self.Tlvl,
+            self.Tlsl,
+            self.Tlvs,
         )
         nb.run_model_python(
             self.simulation_time_minutes,
