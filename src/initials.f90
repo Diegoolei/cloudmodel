@@ -65,7 +65,6 @@ contains
       close (unit)
       
       do k = -1, nz1 + 2
-         air_density_z_initial(k) = Presi0(k)/Rd/temperature_z_initial(k)
          theta_z_initial(k) = temperature_z_initial(k)*(P00/Presi0(k))**Kapa
          Pres00(k) = temperature_z_initial(k)/theta_z_initial(k)
       end do

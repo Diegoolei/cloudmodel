@@ -31,16 +31,13 @@ contains
    end subroutine set_constants_python
 
    subroutine set_initial_z_state_python(temperature_z_initial_in, u_z_initial_in,&
-      v_z_initial_in, Presi0_in,&! air_density_z_initial_in, 
-      aerosol_z_initial_in)
+      v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in)
 
       real(c_float), intent(in), dimension(:) :: temperature_z_initial_in, u_z_initial_in,&
-         v_z_initial_in, Presi0_in,&! air_density_z_initial_in, 
-         aerosol_z_initial_in
+         v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in
 
       call set_initial_z_state(temperature_z_initial_in, u_z_initial_in,&
-         v_z_initial_in, Presi0_in,&! air_density_z_initial_in, 
-         aerosol_z_initial_in)
+         v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in)
 
    end subroutine set_initial_z_state_python
 

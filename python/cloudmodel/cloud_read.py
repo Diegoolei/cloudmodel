@@ -227,7 +227,7 @@ class CloudSimulation:
             self.u_z_initial,
             self.v_z_initial,
             self.Presi0,
-        #    self.air_density_z_initial),
+            self.air_density_z_initial,
             self.aerosol_z_initial,
         )
 

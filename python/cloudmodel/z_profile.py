@@ -224,8 +224,10 @@ def temperature():  # sourcery skip: inline-immediately-returned-variable
 def air_density(Presi0, temperature_z_initial):
     # sourcery skip: inline-immediately-returned-variable
     air_density_z_initial = np.zeros(nz1 + 7)
-    for k in range(len(air_density_z_initial) - 3):
-        air_density_z_initial[k + 3] = Presi0[k] / Rd / temperature_z_initial[k]
+    for k in range(len(air_density_z_initial)-1):
+        air_density_z_initial[k] = Presi0[k] / Rd / temperature_z_initial[k]
+    for i in range(3):
+        air_density_z_initial[i] = Presi0[2] / Rd / temperature_z_initial[2]
     return air_density_z_initial
 
 
@@ -238,6 +240,28 @@ def aerosol():  # sourcery skip: inline-immediately-returned-variable
 
     return aerosol_z_initial
 
+
+def humidity():
+    """
+    Interpola valores de las humedades relativas entre capas, en forma lineal
+    zeta: posiciones en metros, float array
+    zeta_p: limite de capas metros, float array
+    H_p: humedad relativa, [0, 1], float array
+    """    
+    relative_humidity_aux = np.zeros(nz1)
+    for k in range(nz1):
+        z_aux = k*dx1
+        if (z_aux <= 500):
+            relative_humidity_aux[k] = .55 + .05*z_aux/500.
+        elif (z_aux <= 1500.):
+            relative_humidity_aux[k] = .6
+        elif (z_aux <= 4000):
+            relative_humidity_aux[k] = .6 - (z_aux - 1500)/2500.*.25
+        elif (z_aux <= 7000):
+            relative_humidity_aux[k] = .35 - (z_aux - 4000.)/3000.*.25
+        else:
+            relative_humidity_aux[k] = .1 - (z_aux - 7000)/3000.*.02
+    return relative_humidity_aux
 
 def rain_terminal_velocity(Presi0):  # revisar indices!
     """
@@ -293,6 +317,7 @@ def hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial):
         Vtgra0[2 * k - 1] = (Vtgra0[2 * k - 2] + Vtgra0[2 * k]) / 2.0
 
 
+
 # Presion para aire humedo
 def PP2(air_density_z_initial, Presi0):
     """
@@ -326,24 +351,6 @@ def PP2(air_density_z_initial, Presi0):
     Pres00[0] = Presi0
     Pres00[-1] = Presi0
 
-
-def humedad(z_aux):    # !perfil de humedad relativa no perturbado
-    """
-    Interpola valores de las humedades relativas entre capas, en forma lineal
-    zeta: posiciones en metros, float array
-    zeta_p: limite de capas metros, float array
-    H_p: humedad relativa, [0, 1], float array
-    """
-    if (z_aux <= 500):
-        return .55 + .05*z_aux/500.
-    elif (z_aux <= 1500.):
-        return .6
-    elif (z_aux <= 4000):
-        return .6 - (z_aux - 1500)/2500.*.25
-    elif (z_aux <= 7000):
-        return .35 - (z_aux - 4000.)/3000.*.25
-    else:
-        return .1 - (z_aux - 7000)/3000.*.02
 
 
 # ---------------------------------------------------------------
@@ -395,7 +402,7 @@ def main():
     Vtgra0 = hail_terminal_velocity(
         Tvis, temperature_z_initial, air_density_z_initial
     )
-    relative_humidity_aux = humedad(zeta, zeta_p, rel1_p)
+    relative_humidity_aux = humidity(z_aux)
 
     Qvap0 = vapor(Telvs, temperature_z_initial, Tmin, relative_humidity_aux, Rv)
 
