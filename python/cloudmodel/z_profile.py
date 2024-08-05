@@ -67,24 +67,26 @@ def saturated_vapor_pressure2(
 
     Telvs = auxiliar_fun(lv_coefficients)
     Tesvs = auxiliar_fun(sv_coefficients)
-
     for k_temp, i in enumerate(range(10), start=210):
         aux_Telvs = Tlvl[10] / Rv * (1.0 / 220.0 - 1.0 / k_temp)
         Telvs[i] = Telvs[10] * np.exp(aux_Telvs)
         aux_Tesvs = Tlvs[10] / Rv * (1.0 / 220.0 - 1.0 / k_temp)
         Tesvs[i] = Tesvs[10] * np.exp(aux_Tesvs)
+    for i in range(10):
+        Telvs[i] = 0.0
+        Tesvs[i] = 0.0
     return [Telvs, Tesvs]
 
 
 def auxiliar_fun(coefficients):
-    aux_pre = np.array([0.0] * len(k))
+    aux_pre = np.zeros(len(k))
     aux_pre = coefficients[3] + celcius_temperature_aux * (
         coefficients[4]
         + celcius_temperature_aux
         * (coefficients[5] + celcius_temperature_aux * coefficients[6])
     )
 
-    aux = np.array([0.0] * len(k))
+    aux = np.zeros(len(k))
     aux = coefficients[0] + celcius_temperature_aux * (
         coefficients[1]
         + celcius_temperature_aux
@@ -142,7 +144,7 @@ def velocities() -> list[np.ndarray]:
     return [u_z_initial, v_z_initial]
 
 
-def TT_f(z_aux: np.array) -> np.array:
+def TT_f(z_aux) -> np.array:
     """
     Interpola valores de las temperaturas entre capas, en forma cuadratica
     La derivada primera de la temperatura es lineal y a traves de ella se calcula T
@@ -152,6 +154,7 @@ def TT_f(z_aux: np.array) -> np.array:
     TT0: temperatura del aire en el piso, en K, float
     dT_p TT0: derivada primera de la temperatura del aire, en K/m, float
     """
+    np.float32(z_aux)
     a = 298.15
     if z_aux <= 2000:
         return a - 9.0e-3 * z_aux
@@ -231,11 +234,9 @@ def aerosol():  # sourcery skip: inline-immediately-returned-variable
     for k in range(len(aerosol_z_initial) - 3):
         aerosol_z_initial[k + 3] = 10000.0 * np.exp(-(k * dx1) / 2500.0)
     for i in range(3):
-        aerosol_z_initial[i] = - aerosol_z_initial[3]
+        aerosol_z_initial[i] = -aerosol_z_initial[3]
 
     return aerosol_z_initial
-
-
 
 
 def rain_terminal_velocity(Presi0):  # revisar indices!
@@ -291,6 +292,7 @@ def hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial):
     for k in range(1, nz1 + 1):
         Vtgra0[2 * k - 1] = (Vtgra0[2 * k - 2] + Vtgra0[2 * k]) / 2.0
 
+
 # Presion para aire humedo
 def PP2(air_density_z_initial, Presi0):
     """
@@ -324,14 +326,24 @@ def PP2(air_density_z_initial, Presi0):
     Pres00[0] = Presi0
     Pres00[-1] = Presi0
 
-def humedad(zeta, zeta_p, H_p):  # !perfil de humedad relativa no perturbado
+
+def humedad(z_aux):    # !perfil de humedad relativa no perturbado
     """
     Interpola valores de las humedades relativas entre capas, en forma lineal
     zeta: posiciones en metros, float array
     zeta_p: limite de capas metros, float array
     H_p: humedad relativa, [0, 1], float array
     """
-    return np.interp(zeta, zeta_p, H_p)
+    if (z_aux <= 500):
+        return .55 + .05*z_aux/500.
+    elif (z_aux <= 1500.):
+        return .6
+    elif (z_aux <= 4000):
+        return .6 - (z_aux - 1500)/2500.*.25
+    elif (z_aux <= 7000):
+        return .35 - (z_aux - 4000.)/3000.*.25
+    else:
+        return .1 - (z_aux - 7000)/3000.*.02
 
 
 # ---------------------------------------------------------------
@@ -380,17 +392,16 @@ def main():
 
     Av = rain_terminal_velocity(Presi0)
     Vtnie = snow_terminal_velocity(Presi0)
-    Vtgra0 = hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial)
-    # rel1 = humedad(zeta, zeta_p, rel1_p)
+    Vtgra0 = hail_terminal_velocity(
+        Tvis, temperature_z_initial, air_density_z_initial
+    )
+    relative_humidity_aux = humedad(zeta, zeta_p, rel1_p)
 
-    # Calculo del vapor de agua
-    # Qvap0 = vapor(Telvs, Temp0, Tmin, rel1, Rv)
+    Qvap0 = vapor(Telvs, temperature_z_initial, Tmin, relative_humidity_aux, Rv)
 
-    # Recalculo de las cantidades base considerando el vapor de agua
     # Den0 = Den0 + Qvap0
     Presi0 = PP2(air_density_z_initial, Presi0)
 
     # theta_z_initial = theta(temperature_z_initial, Presi0)
     # Pres00 = Temp0 / Tita0
 
-    # revisar asignaciones y los indices

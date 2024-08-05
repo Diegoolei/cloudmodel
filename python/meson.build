@@ -67,8 +67,12 @@ py.install_sources(f_sources, subdir:'cloudmodel/interface')
 
 main_sources = ['cloudmodel/__init__.py']
 cloud_read_sources = ['cloudmodel/cloud_read.py']
+
+z_profiles_sources = ['cloudmodel/z_profiles.py']
+
 constants_sources = ['cloudmodel/constants.py']
-py.install_sources(main_sources, cloud_read_sources, constants_sources, subdir:'cloudmodel')
+py.install_sources(main_sources, cloud_read_sources, constants_sources, z_profiles_sources, subdir:'cloudmodel')
+
 
 # Extension fortran module
 inc_np = include_directories(incdir_numpy, incdir_f2py, '..' / '..' / 'build' / 'gfortran_AFF0773A2CF7CD9C')
