@@ -224,7 +224,7 @@ def temperature():  # sourcery skip: inline-immediately-returned-variable
 def air_density(Presi0, temperature_z_initial):
     # sourcery skip: inline-immediately-returned-variable
     air_density_z_initial = np.zeros(nz1 + 7)
-    for k in range(len(air_density_z_initial)-1):
+    for k in range(len(air_density_z_initial) - 1):
         air_density_z_initial[k] = Presi0[k] / Rd / temperature_z_initial[k]
     for i in range(3):
         air_density_z_initial[i] = Presi0[2] / Rd / temperature_z_initial[2]
@@ -241,27 +241,53 @@ def aerosol():  # sourcery skip: inline-immediately-returned-variable
     return aerosol_z_initial
 
 
-def humidity():
+def humidity(z_aux):
     """
     Interpola valores de las humedades relativas entre capas, en forma lineal
     zeta: posiciones en metros, float array
     zeta_p: limite de capas metros, float array
     H_p: humedad relativa, [0, 1], float array
-    """    
-    relative_humidity_aux = np.zeros(nz1)
-    for k in range(nz1):
-        z_aux = k*dx1
-        if (z_aux <= 500):
-            relative_humidity_aux[k] = .55 + .05*z_aux/500.
-        elif (z_aux <= 1500.):
-            relative_humidity_aux[k] = .6
-        elif (z_aux <= 4000):
-            relative_humidity_aux[k] = .6 - (z_aux - 1500)/2500.*.25
-        elif (z_aux <= 7000):
-            relative_humidity_aux[k] = .35 - (z_aux - 4000.)/3000.*.25
-        else:
-            relative_humidity_aux[k] = .1 - (z_aux - 7000)/3000.*.02
+    """
+    if z_aux <= 500:
+        relative_humidity_aux = 0.55 + 0.05 * z_aux / 500.0
+    elif z_aux <= 1500.0:
+        relative_humidity_aux = 0.6
+    elif z_aux <= 4000:
+        relative_humidity_aux = 0.6 - (z_aux - 1500) / 2500.0 * 0.25
+    elif z_aux <= 7000:
+        relative_humidity_aux = 0.35 - (z_aux - 4000.0) / 3000.0 * 0.25
+    else:
+        relative_humidity_aux = 0.1 - (z_aux - 7000) / 3000.0 * 0.02
     return relative_humidity_aux
+
+def vapor(temperature_z_initial, Telvs):
+    """
+    Calcula la densidad de vapor de agua para todos los niveles z
+    Telvs: Tension de vapor liquido vapor saturada, kg/m**3 , float array (en temperaturas)
+    temp: perfil de temperaturas, en K, float array
+    rel: humedad relativa, [0, 1], float array, en z
+    Rv: Constante de los gases para el vapor de agua
+    """
+    vapor_z_initial = np.zeros(nz1 + 7)
+    for k in range(3, nz1+4):
+        z_aux = (k-3) * dx1
+        temperature_aux = temperature_z_initial[k]
+        n = int(temperature_aux)
+        aux = temperature_aux - n
+        sat_press_lv_aux = Telvs[n - 210] * (1 - aux) + Telvs[n + 1 - 210] * aux
+        relative_humidity_aux = humidity(z_aux)
+        vapor_z_initial[k] = (
+            relative_humidity_aux * sat_press_lv_aux / Rv / temperature_aux
+        )
+    return vapor_z_initial
+
+def air_density_recalc(air_density_z_initial, vapor_z_initial):
+    air_density_z_initial_recalc = np.zeros(nz1 + 7)
+    for k in range(len(air_density_z_initial_recalc) - 1):
+        air_density_z_initial_recalc[k] = air_density_z_initial(k) + vapor_z_initial(k)
+    for i in range(3):
+        air_density_z_initial_recalc[i] = air_density_z_initial(2) + vapor_z_initial(2)
+    return air_density_z_initial_recalc
 
 def rain_terminal_velocity(Presi0):  # revisar indices!
     """
@@ -317,7 +343,6 @@ def hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial):
         Vtgra0[2 * k - 1] = (Vtgra0[2 * k - 2] + Vtgra0[2 * k]) / 2.0
 
 
-
 # Presion para aire humedo
 def PP2(air_density_z_initial, Presi0):
     """
@@ -352,28 +377,8 @@ def PP2(air_density_z_initial, Presi0):
     Pres00[-1] = Presi0
 
 
-
 # ---------------------------------------------------------------
 # Lo que sigue no lo puedo chequear pues necesitaria las funciones de Telvs,el valor de Rv, etc
-def vapor(Telvs, temp, Tmin, rel, Rv):
-    """
-    Calcula la densidad de vapor de agua para todos los niveles z
-    Telvs: Tension de vapor liquido vapor saturada, kg/m**3 , float array (en temperaturas)
-    temp: perfil de temperaturas, en K, float array
-    rel: humedad relativa, [0, 1], float array, en z
-    Rv: Constante de los gases para el vapor de agua
-    """
-    Qvap0 = np.zeros_like(temp)
-    TC = temp - T0
-    for k in range(len(temp)):
-        n = int(TC[k] - Tmin)
-        aux = TC[k] - Tmin - n
-        elv1 = (
-            Telvs[n] * (1 - aux) + Telvs[n + 1] * aux
-        )  # interpolacion para la tension de vapor saturada liquido vapor
-        Qvap0[k] = rel[k] * elv1 / Rv / temp[k]
-
-    return Qvap0
 
 
 def main():
@@ -397,18 +402,17 @@ def main():
     air_density_z_initial = air_density(Presi0, temperature_z_initial)
     aerosol_z_initial = aerosol()
 
+    vapor_z_initial = vapor(temperature_z_initial, Telvs)
+
+    air_density_z_initial = air_density(air_density_z_initial, vapor_z_initial)
+
     Av = rain_terminal_velocity(Presi0)
     Vtnie = snow_terminal_velocity(Presi0)
     Vtgra0 = hail_terminal_velocity(
         Tvis, temperature_z_initial, air_density_z_initial
     )
-    relative_humidity_aux = humidity(z_aux)
 
-    Qvap0 = vapor(Telvs, temperature_z_initial, Tmin, relative_humidity_aux, Rv)
-
-    # Den0 = Den0 + Qvap0
     Presi0 = PP2(air_density_z_initial, Presi0)
 
     # theta_z_initial = theta(temperature_z_initial, Presi0)
     # Pres00 = Temp0 / Tita0
-

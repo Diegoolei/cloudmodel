@@ -33,8 +33,6 @@ from .constants import (
     rhogra,
     Av0,
     Vtnie0,
-    Tmin,
-    Tmax,
 )
 from .z_profile import (
     latent_heat,
@@ -46,6 +44,7 @@ from .z_profile import (
     temperature,
     air_density,
     aerosol,
+    vapor,
     hail_terminal_velocity,
 )
 from .interface import c_interface as nb
@@ -122,6 +121,7 @@ class CloudSimulation:
         temperature_z_initial=None,
         air_density_z_initial=None,
         aerosol_z_initial=None,
+        vapor_z_initial=None,
         Vtgra0=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
@@ -186,8 +186,10 @@ class CloudSimulation:
             )
         if aerosol_z_initial is None:
             self.aerosol_z_initial = aerosol()
-        #if Vtgra0 is None:
-            #self.Vtgra0_in = hail_terminal_velocity()
+        if vapor_z_initial is None:
+            self.vapor_z_initial = vapor(self.temperature_z_initial, self.Telvs)
+        # if Vtgra0 is None:
+        # self.Vtgra0_in = hail_terminal_velocity()
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -229,11 +231,12 @@ class CloudSimulation:
             self.Presi0,
             self.air_density_z_initial,
             self.aerosol_z_initial,
+            self.vapor_z_initial,
         )
 
-        #nb.set_microphysics_perturbation_python(
+        # nb.set_microphysics_perturbation_python(
         #    self.Vtgra0_in)
-        #)
+        # )
 
         nb.run_model_python(
             self.simulation_time_minutes,
@@ -275,7 +278,7 @@ class CloudSimulation:
             chosen_file="Nube",
             output_data_path=self.directory,
             img_path="img/",
-            img_option="Contour",
+            img_option=ImageStyle.CONTOUR.value,
             folder_handle="Delete",
         )
         self.cloud_analytics = data

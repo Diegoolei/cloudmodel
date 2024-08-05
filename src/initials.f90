@@ -63,7 +63,7 @@ contains
             Eautcn(k), Eacrcn(k)
       end do
       close (unit)
-      
+
       do k = -1, nz1 + 2
          theta_z_initial(k) = temperature_z_initial(k)*(P00/Presi0(k))**Kapa
          Pres00(k) = temperature_z_initial(k)/theta_z_initial(k)
@@ -94,28 +94,9 @@ contains
                                     -z_aux**2./sigma_a)*gaussian
          end do
 
-         !vapor base
-         temperature_aux = temperature_z_initial(k)
-         if (z_aux <= 500) then
-            relative_humidity_aux = .55 + .05*z_aux/500.
-         else if (z_aux <= 1500.) then
-            relative_humidity_aux = .6
-         else if (z_aux <= 4000) then
-            relative_humidity_aux = .6 - (z_aux - 1500)/2500.*.25
-         else if (z_aux <= 7000) then
-            relative_humidity_aux = .35 - (z_aux - 4000.)/3000.*.25
-         else if (z_aux > 7000) then
-            relative_humidity_aux = .1 - (z_aux - 7000)/3000.*.02
-         end if
-         n = int(temperature_aux)
-         aux = temperature_aux - n
-         sat_press_lv_aux = Telvs(n)*(1 - aux) + Telvs(n + 1)*aux
-         vapor_z_initial(k) = relative_humidity_aux*sat_press_lv_aux/Rv/temperature_aux
-
          !recalculo de la densidad
          air_density_z_initial(k) = air_density_z_initial(k) + vapor_z_initial(k)
       end do
-
       !**   Velocidad terminal para gota de lluvia, cte que depende de P
       do concurrent(k=1:nz1 + 1)
          Av(2*k - 1) = Av0*((P00/Presi0(k - 1))**.286 + (P00/Presi0(k))**.286)/2. !puntos intermedios
@@ -178,6 +159,7 @@ contains
       do concurrent(k=1:nz1)
          vapor_total = vapor_total + vapor_z_initial(k)
       end do
+
       do concurrent(k=1:nz1)
          vapor_z_relative(k) = vapor_z_initial(k)/vapor_total
       end do
@@ -198,14 +180,13 @@ contains
 
    subroutine PP2(G, dx, air_density_z_initial, Pres00, Pres0)
       use dimensions
-      integer k
-      real Pres00(-3:nz1 + 3)
-      real air_density_z_initial(-3:nz1 + 3)
+      real, intent(inout) :: Pres00(-3:nz1 + 3)
+      real, intent(in) :: air_density_z_initial(-3:nz1 + 3)
+      real, intent(in) :: Pres0, G, dx
       real Den00(-3:3*nz1 + 3)
       real integ(-3:3*nz1 + 3)
-      real Pres0
-      real G, dx
       real ya, ym, yd
+      integer k
 
       do concurrent(k=0:nz1 - 1)
          Den00(2*k) = air_density_z_initial(k)

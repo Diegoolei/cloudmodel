@@ -96,19 +96,21 @@ module initial_z_state
    real :: Presi0(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
    real :: u_z_initial(-3:mod_nz1 + 3) !! Non perturbed u z initial
    real :: v_z_initial(-3:mod_nz1 + 3) !! Non perturbed v z initial
-   real :: aerosol_z_initial(-3:mod_nz1 + 3) !! Non perturbed aerosol z initial
    real :: air_density_z_initial(-3:mod_nz1 + 3) !! Non perturbed air density z initial
+   real :: aerosol_z_initial(-3:mod_nz1 + 3) !! Non perturbed aerosol z initial
+   real :: vapor_z_initial(-3:mod_nz1 + 3) !! Non perturbed vapor z initial
 
    real, allocatable :: cc2(:) !! Non perturbed cc2 z initial
-   real, allocatable :: vapor_z_initial(:) !! Non perturbed vapor z initial
 
    real, allocatable :: vapor_z_relative(:) !! Non perturbed Relative vapor z initial
    real, allocatable :: aerosol_z_relative(:) !! Non perturbed Relative aerosol z initial
 contains
    subroutine set_initial_z_state(temperature_z_initial_in, u_z_initial_in,&
-      v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in)
+      v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in,&
+      vapor_z_initial_in)
       real, intent(in), dimension(:) :: temperature_z_initial_in, u_z_initial_in,&
-         v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in
+         v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in,&
+         vapor_z_initial_in
 
       temperature_z_initial = temperature_z_initial_in
       Presi0 = Presi0_in
@@ -117,6 +119,7 @@ contains
 
       air_density_z_initial = air_density_z_initial_in
       aerosol_z_initial = aerosol_z_initial_in
+      vapor_z_initial = vapor_z_initial_in
    end subroutine set_initial_z_state
 
    subroutine allocate_initial_z_state
@@ -132,7 +135,7 @@ contains
       allocate(cc2(-3:nz1 + 3))
       !allocate(air_density_z_initial(-3:nz1 + 3))
       !allocate(aerosol_z_initial(-3:nz1 + 3))
-      allocate(vapor_z_initial(-3:nz1 + 3))
+      !allocate(vapor_z_initial(-3:nz1 + 3))
 
       allocate(vapor_z_relative(nz1))
       allocate(aerosol_z_relative(nz1))
@@ -151,7 +154,7 @@ contains
       deallocate(cc2)
       !deallocate(air_density_z_initial)
       !deallocate(aerosol_z_initial)
-      deallocate(vapor_z_initial)
+      !deallocate(vapor_z_initial)
 
       deallocate(vapor_z_relative)
       deallocate(aerosol_z_relative)
