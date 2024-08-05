@@ -56,6 +56,8 @@ contains
       integer i, j, k, n, unit
       initial_x_perturbation = (nx1 + 1.)*dx1/2.  !! Initial disturbance’s x-coordinate
       initial_y_perturbation = (nx1 + 1.)*dx1/2.
+
+      ! call PP(G, Rd, dx1, nz, Presi0, P00)
       
       open (newunit=unit, file=output_directory//"initial_z_arrays", access='append')
       do concurrent(k=210:313)
@@ -68,6 +70,7 @@ contains
       do k = -1, nz1 + 2
          ! cantidades base
          z_aux = k*dx1
+         temperature_z_initial(k) = TT_f(z_aux)
          air_density_z_initial(k) = Presi0(k)/Rd/temperature_z_initial(k)
          theta_z_initial(k) = temperature_z_initial(k)*(P00/Presi0(k))**Kapa
          Pres00(k) = temperature_z_initial(k)/theta_z_initial(k)
@@ -199,6 +202,61 @@ contains
       return
 
    end subroutine initial_conditions
+
+   function TT_f(z_aux)
+      real(4), intent(in) :: z_aux
+      real :: a, xx, TT_f
+      a = 298.15
+      if (z_aux <= 2000) then
+         TT_f = a - 9.e-3*z_aux
+      elseif (z_aux <= 5500) then
+         xx = z_aux - 2000.
+         TT_f = a - 18.-xx*(9.e-3 - 2e-3*xx/3500./2.)
+      elseif (z_aux <= 9000) then
+         xx = z_aux - 5500.
+         TT_f = a - 46.-7e-3*xx
+      elseif (z_aux <= 11000) then
+         xx = z_aux - 9000
+         TT_f = a - 70.5 - 7e-3*xx + 1.75e-6*xx**2.
+      elseif (z_aux <= 12000) then
+         TT_f = a - 77.5
+      else
+         xx = z_aux - 12000
+         TT_f = a - 77.5 + 50.*(xx/9000.)**2.
+      end if
+   end function TT_f
+
+   subroutine PP(G, Rd, dx, nz1, Pres, Pres0)
+      integer, intent(in) :: nz1
+      real, intent(in) :: G, Rd, dx, Pres0
+      real, intent(inout) :: Pres(-3:nz1 + 3)
+      integer k, nx4
+      parameter(nx4=500)
+      real integ(-2:nx4 + 2)
+      real zetaa, zetam, zetad, dx4
+      real ya, ym, yd
+      dx4 = dx/4.
+
+      integ(0) = 0
+      ! TT_f not pure function, do concurrent not allowed
+      do k = 1, nx4
+         zetaa = (2*k - 2)*dx4
+         zetam = (2*k - 1)*dx4
+         zetad = (2*k)*dx4
+         ya = 1/TT_f(zetaa)
+         ym = 1/TT_f(zetam)
+         yd = 1/TT_f(zetad)
+         integ(k) = integ(k - 1) + ya + 4*ym + yd
+      end do
+
+      do concurrent(k=1:nz1 + 2)
+         Pres(k) = Pres0*exp(-G/Rd*(integ(2*k)*dx4/3))
+      end do
+      Pres(0) = Pres0
+      Pres(-1) = Pres0
+
+      return
+   end subroutine PP
 
    subroutine PP2(G, dx, air_density_z_initial, Pres00, Pres0)
       use dimensions

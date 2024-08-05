@@ -201,44 +201,98 @@ def PP():  # sourcery skip: inline-immediately-returned-variable
         yd = 1 / TT_f(zetad)
         integ[k] = integ[k - 1] + ya + 4 * ym + yd
 
-    Presi0 = np.zeros(nz1 + 5)
-    for k in range(1, nz1 + 4):
-        Presi0[k + 1] = P00 * np.exp(-G / Rd * (integ[2 * k] * dx4 / 3))
-    Presi0[0] = P00
-    Presi0[1] = P00
-    for _ in range(2):
-        Presi0 = np.insert(Presi0, 0, P00)
+    Presi0 = np.zeros(nz1 + 7)
+    for k in range(len(Presi0) - 3):
+        Presi0[k + 3] = P00 * np.exp(-G / Rd * (integ[2 * k] * dx4 / 3))
+    for i in range(3):
+        Presi0[i] = P00
     return Presi0
 
 
 def temperature():  # sourcery skip: inline-immediately-returned-variable
-    temperature_z_initial = np.zeros(nz1 + 5)
-    for k in range(-1, nz1 + 4):
-        temperature_z_initial[k + 1] = TT_f(k * dx1)
-    for _ in range(2):
-        temperature_z_initial = np.insert(temperature_z_initial, 0, P00)
+    temperature_z_initial = np.zeros(nz1 + 7)
+    for k in range(len(temperature_z_initial) - 3):
+        temperature_z_initial[k + 3] = TT_f(k * dx1)
+    for i in range(3):
+        temperature_z_initial[i] = P00
     return temperature_z_initial
 
 
 def air_density(Presi0, temperature_z_initial):
     # sourcery skip: inline-immediately-returned-variable
     air_density_z_initial = np.zeros(nz1 + 7)
-    for k in range(len(Presi0) - 4):
-        air_density_z_initial[k] = (
-            Presi0[k + 4] / Rd / temperature_z_initial[k + 4]
-        )
+    for k in range(len(air_density_z_initial) - 3):
+        air_density_z_initial[k + 3] = Presi0[k] / Rd / temperature_z_initial[k]
     return air_density_z_initial
 
 
 def aerosol():  # sourcery skip: inline-immediately-returned-variable
     aerosol_z_initial = np.zeros(nz1 + 7)
-    for k in range(len(aerosol_z_initial) - 4):
-        aerosol_z_initial[k] = 10000.0 * np.exp(-((k + 1) * dx1) / 2500.0)
+    for k in range(len(aerosol_z_initial) - 3):
+        aerosol_z_initial[k + 3] = 10000.0 * np.exp(-(k * dx1) / 2500.0)
+    for i in range(3):
+        aerosol_z_initial[i] = - aerosol_z_initial[3]
+
     return aerosol_z_initial
 
 
+
+
+def rain_terminal_velocity(Presi0):  # revisar indices!
+    """
+    Velocidad terminal para gota de lluvia, cte que depende de P
+    se define para niveles intermedios
+    """
+    Av = np.zeros(2 * nz1 + 2)
+    for k in range(1, nz1 + 1):
+        Av[2 * k - 1] = (
+            Av0
+            * ((P00 / Presi0(k - 1)) ** 0.286 + (P00 / Presi0(k)) ** 0.286)
+            / 2.0
+        )
+        Av[2 * k] = Av0 * (P00 / Presi0(k)) ** 0.286
+
+    return Av
+
+
+def snow_terminal_velocity(Presi0):
+    """
+    Velocidad terminal para la nieve, cte que depende de P
+    se define para niveles intermedios
+    """
+    Vtnie = np.zeros(2 * nz1 + 2)
+    for k in range(1, nz1 + 1):
+        Vtnie[2 * k - 1] = (
+            Vtnie0
+            * ((P00 / Presi0(k - 1)) ** 0.3 + (P00 / Presi0(k)) ** 0.3)
+            / 2.0
+        )
+        Vtnie[2 * k] = Vtnie0 * (P00 / Presi0(k)) ** 0.3
+
+    return Vtnie0
+
+
+def hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial):
+    """
+    Velocidad terminal para el granizo, depende de la viscosidad y de la densidad
+    se define para niveles intermedios
+    """
+
+    ## viscosidad se define por temperaturas y Den por alturas!!
+    Vtgra0 = np.zeros(2 * nz1 + 2)
+    for k in range(nz1 + 1):
+        aux = 2.754 * rhogra**0.605
+        Vtgra0[2 * k] = (
+            aux
+            / Tvis(int(temperature_z_initial(k))) ** 0.21
+            / air_density_z_initial(k) ** 0.395
+        )
+
+    for k in range(1, nz1 + 1):
+        Vtgra0[2 * k - 1] = (Vtgra0[2 * k - 2] + Vtgra0[2 * k]) / 2.0
+
 # Presion para aire humedo
-def PP2(G, dx, Den0, Pres0):
+def PP2(air_density_z_initial, Presi0):
     """
     Calcula la presion del aire humedo no perturbada
     Se basa en la ecuacion de equilibrio hidrostatico integrando G * rho
@@ -248,62 +302,27 @@ def PP2(G, dx, Den0, Pres0):
     Den0: densidad del aire humedo en z, kg/m**3, float array
     Pres0: presion a nivel del suelo, Pascales, float
     """
+    Den00 = np.zeros(2 * nz1 + 2)
+    for k in range(nz1 - 1):
+        Den00[2 * k] = air_density_z_initial[k]
+        Den00[2 * k + 1] = (
+            air_density_z_initial(k) + air_density_z_initial(k + 1)
+        ) / 2.0
+    Den00[2 * nz1] = air_density_z_initial(nz1)
+    Den00[2 * nz1 + 1] = 2.0 * air_density_z_initial(nz1) - Den00[2 * nz1 - 1]
 
-    nz1 = len(Den0)
-    ind = np.arange(nz1)
-    ind2 = np.arange(nz1 * 2 + 2)  # revisar estos indices (SM 23/7/24)
+    integ = np.zeros(nz1 + 1)
+    for k in range(1, nz1):
+        ya = Den00[2 * k - 1]
+        ym = Den00[2 * k]
+        yd = Den00[2 * k + 1]
+        integ[k] = integ[k - 1] + ya + 4 * ym + yd
 
-    Den00 = np.interp(ind2, ind, Den0)
-
-    ya = Den00[:-3:2]
-    ym = Den00[1:-2:2]
-    yd = Den00[2:-1:2]
-
-    integ = np.cumsum(ya + 4 * ym + yd) * dx / 3.0  # revisar indices
-
-    return Pres0 - G * integ
-
-
-def rain_terminal_velocity(Presi):  # revisar indices!
-    """
-    Velocidad terminal para gota de lluvia, cte que depende de P
-    se define para niveles intermedios
-    """
-    nz = len(Presi)
-    ind = np.arange(nz)
-    ind2 = np.arange(0, nz, 0.5)  # revisar estos indices (SM 23/7/24)
-    aux = Av0 * (P00 / Presi) ** 0.286
-    return np.interp(ind2, ind, aux)
-
-
-def snow_terminal_velocity(Presi):
-    """
-    Velocidad terminal para la nieve, cte que depende de P
-    se define para niveles intermedios
-    """
-
-    nz = len(Presi)
-    ind = np.arange(nz)
-    ind2 = np.arange(0, nz, 0.5)  # revisar estos indices (SM 23/7/24)
-    aux = Vtnie0 * (P00 / Presi) ** 0.3
-    return np.interp(ind2, ind, aux)
-
-
-def hail_terminal_velocity(Tvis, Den0):
-    """
-    Velocidad terminal para el granizo, depende de la viscosidad y de la densidad
-    se define para niveles intermedios
-    """
-
-    ## viscosidad se define por temperaturas y Den por alturas!!
-
-    nz = len(Tvis)
-    ind = np.arange(nz)
-    ind2 = np.arange(0, nz, 0.5)  # revisar estos indices (SM 23/7/24)
-    aux = 2.754 * rhogra**0.605 / Tvis**0.21 / Den0**0.395
-    Vtgra0 = np.interp(ind2, ind, aux)
-    return Vtgra0
-
+    Pres00 = np.zeros(nz1 + 2)
+    for k in range(1, nz1):
+        Pres00[k] = Presi0 - G * integ[k] * dx1 / 6.0
+    Pres00[0] = Presi0
+    Pres00[-1] = Presi0
 
 def humedad(zeta, zeta_p, H_p):  # !perfil de humedad relativa no perturbado
     """
@@ -358,6 +377,10 @@ def main():
     temperature_z_initial = temperature()
     air_density_z_initial = air_density(Presi0, temperature_z_initial)
     aerosol_z_initial = aerosol()
+
+    Av = rain_terminal_velocity(Presi0)
+    Vtnie = snow_terminal_velocity(Presi0)
+    Vtgra0 = hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial)
     # rel1 = humedad(zeta, zeta_p, rel1_p)
 
     # Calculo del vapor de agua
@@ -365,12 +388,9 @@ def main():
 
     # Recalculo de las cantidades base considerando el vapor de agua
     # Den0 = Den0 + Qvap0
-    # Presi0 = PP2(Den0, Presi0)
+    Presi0 = PP2(air_density_z_initial, Presi0)
 
     # theta_z_initial = theta(temperature_z_initial, Presi0)
     # Pres00 = Temp0 / Tita0
 
     # revisar asignaciones y los indices
-    # Av = rain_terminal_velocity(Presi0)
-    # Vtnie = snow_terminal_velocity(Presi0)
-    # Vtgra0 = hail_terminal_velocity(Tvis, Den0)

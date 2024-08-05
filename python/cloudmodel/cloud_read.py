@@ -213,26 +213,26 @@ class CloudSimulation:
             self.rhogra,
             self.Av0,
             self.Vtnie0,
-            np.asfortranarray(self.Tlvl),
-            np.asfortranarray(self.Tlsl),
-            np.asfortranarray(self.Tlvs),
-            np.asfortranarray(self.Telvs),
-            np.asfortranarray(self.Tesvs),
-            np.asfortranarray(self.Tvis),
-            np.asfortranarray(self.Eautcn),
-            np.asfortranarray(self.Eacrcn),
+            self.Tlvl,
+            self.Tlsl,
+            self.Tlvs,
+            self.Telvs,
+            self.Tesvs,
+            self.Tvis,
+            self.Eautcn,
+            self.Eacrcn,
         )
         nb.set_initial_z_state_python(
-            np.asfortranarray(self.temperature_z_initial),
-            np.asfortranarray(self.u_z_initial),
-            np.asfortranarray(self.v_z_initial),
-            np.asfortranarray(self.Presi0),
-        #    np.asfortranarray(self.air_density_z_initial),
-            np.asfortranarray(self.aerosol_z_initial),
+            self.temperature_z_initial,
+            self.u_z_initial,
+            self.v_z_initial,
+            self.Presi0,
+        #    self.air_density_z_initial),
+            self.aerosol_z_initial,
         )
 
         #nb.set_microphysics_perturbation_python(
-        #    np.asfortranarray(self.Vtgra0_in)
+        #    self.Vtgra0_in)
         #)
 
         nb.run_model_python(

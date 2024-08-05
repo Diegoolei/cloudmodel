@@ -96,10 +96,10 @@ module initial_z_state
    real :: Presi0(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
    real :: u_z_initial(-3:mod_nz1 + 3) !! Non perturbed u z initial
    real :: v_z_initial(-3:mod_nz1 + 3) !! Non perturbed v z initial
+   real:: aerosol_z_initial(-3:mod_nz1 + 3) !! Non perturbed aerosol z initial
 
    real, allocatable :: cc2(:) !! Non perturbed cc2 z initial
    real, allocatable :: air_density_z_initial(:) !! Non perturbed air density z initial
-   real, allocatable :: aerosol_z_initial(:) !! Non perturbed aerosol z initial
    real, allocatable :: vapor_z_initial(:) !! Non perturbed vapor z initial
 
    real, allocatable :: vapor_z_relative(:) !! Non perturbed Relative vapor z initial
