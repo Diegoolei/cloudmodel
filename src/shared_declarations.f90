@@ -4,7 +4,7 @@ module turbvar1
    real, allocatable :: D(:,:,:,:,:)
 contains
    subroutine allocate_turbvar1
-      !! Allocate the turbulence variables 
+      !! Allocate the turbulence variables
       allocate(D(3, 3, -3:nx1 + 2, -3:nx1 + 2, 3))
    end subroutine allocate_turbvar1
 
@@ -105,11 +105,20 @@ module initial_z_state
    real, allocatable :: vapor_z_relative(:) !! Non perturbed Relative vapor z initial
    real, allocatable :: aerosol_z_relative(:) !! Non perturbed Relative aerosol z initial
 contains
-   subroutine set_initial_z_state(u_z_initial_in, v_z_initial_in)
-      real, intent(in), dimension(:) :: u_z_initial_in, v_z_initial_in
+   subroutine set_initial_z_state(temperature_z_initial_in, u_z_initial_in,&
+      v_z_initial_in, Presi0_in,&! air_density_z_initial_in, 
+      aerosol_z_initial_in)
+      real, intent(in), dimension(:) :: temperature_z_initial_in, u_z_initial_in,&
+         v_z_initial_in, Presi0_in,&! air_density_z_initial_in,
+         aerosol_z_initial_in
 
+      temperature_z_initial = temperature_z_initial_in
+      Presi0 = Presi0_in
       u_z_initial = u_z_initial_in
       v_z_initial = v_z_initial_in
+
+      !air_density_z_initial = air_density_z_initial_in
+      aerosol_z_initial = aerosol_z_initial_in
    end subroutine set_initial_z_state
 
    subroutine allocate_initial_z_state
@@ -124,7 +133,7 @@ contains
       !!!
       allocate(cc2(-3:nz1 + 3))
       allocate(air_density_z_initial(-3:nz1 + 3))
-      allocate(aerosol_z_initial(-3:nz1 + 3))
+      !allocate(aerosol_z_initial(-3:nz1 + 3))
       allocate(vapor_z_initial(-3:nz1 + 3))
 
       allocate(vapor_z_relative(nz1))
@@ -143,7 +152,7 @@ contains
       !!!
       deallocate(cc2)
       deallocate(air_density_z_initial)
-      deallocate(aerosol_z_initial)
+      !deallocate(aerosol_z_initial)
       deallocate(vapor_z_initial)
 
       deallocate(vapor_z_relative)
@@ -267,6 +276,13 @@ module microphysics_perturbation
    real, allocatable :: Vtnie(:) !! Other related variables,
    real, allocatable :: Vtgra0(:) !! Other related variables
 contains
+   !subroutine set_microphysics_perturbation(Vtgra0_in)
+   !   real, intent(in), dimension(:) :: Vtgra0_in
+
+   !   Vtgra0 = Vtgra0_in
+      !v_z_initial = v_z_initial_in
+   !end subroutine set_microphysics_perturbation
+
    subroutine allocate_microphysics_perturbation()
       !! Allocate the microphysics_perturbation variables
       allocate(vapor_base(-3:nx1 + 3, -3:nx1 + 3, -2:nz1 + 2))

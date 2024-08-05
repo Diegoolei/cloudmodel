@@ -6,6 +6,7 @@ module c_interface
    use dimensions, only: set_dimensions
    use constants, only: set_constants
    use initial_z_state, only: set_initial_z_state
+   !use microphysics_perturbation, only: set_microphysics_perturbation
 
 contains
    subroutine set_dimensions_python(dx1, nz1)
@@ -29,10 +30,24 @@ contains
          Tlvs_in, Telvs_in, Tesvs_in, Tvis_in, Eautcn_in, Eacrcn_in)
    end subroutine set_constants_python
 
-   subroutine set_initial_z_state_python(u_z_initial_in, v_z_initial_in)
-      real(c_float), intent(in), dimension(:) :: u_z_initial_in, v_z_initial_in
-      call set_initial_z_state(u_z_initial_in, v_z_initial_in)
+   subroutine set_initial_z_state_python(temperature_z_initial_in, u_z_initial_in,&
+      v_z_initial_in, Presi0_in,&! air_density_z_initial_in, 
+      aerosol_z_initial_in)
+
+      real(c_float), intent(in), dimension(:) :: temperature_z_initial_in, u_z_initial_in,&
+         v_z_initial_in, Presi0_in,&! air_density_z_initial_in, 
+         aerosol_z_initial_in
+
+      call set_initial_z_state(temperature_z_initial_in, u_z_initial_in,&
+         v_z_initial_in, Presi0_in,&! air_density_z_initial_in, 
+         aerosol_z_initial_in)
+
    end subroutine set_initial_z_state_python
+
+   !subroutine set_microphysics_perturbation_python(Vtgra0_in)
+   !   real(c_float), intent(in), dimension(:) :: Vtgra0_in
+   !   call set_microphysics_perturbation(Vtgra0_in)
+   !end subroutine set_microphysics_perturbation_python
 
    subroutine run_model_python(sim_time, save_lapse, statistic_time, backup_time, restore_backup, directory)
       ! bind(C, name="run_model")

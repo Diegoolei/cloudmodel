@@ -25,33 +25,6 @@ def latent_heat() -> list[np.ndarray]:
     return [Tlvl, Tlsl, Tlvs]
 
 
-def saturated_vapor_pressure(Tmin, Tmax):
-    """
-      Coeficientes y Expresiones extraidas de Pruppacher and Klett, 2010, Apendix A4-2 y A4-3
-
-    Inputs:
-      Tmin: temperatura minima, en C, int
-      Tmax: temperatura maxima, en C, int
-    """
-    # Coeficientes: el primero es para agua liquida y el segundo para hielo
-    es = np.array([610.70, 610.64])  # presion de vapor para 0 grado
-    A = np.array([7.15, 21.88])  # factor para la temperatura en C
-    B = np.array([38.25, 7.65])  # Temperatura de minima en K
-
-    TC2K = T0
-    T_C = np.arange(Tmin, Tmax)
-    tension_saturada = np.zeros([len(T_C), len(es)])
-
-    for i in range(len(es)):
-        tension_saturada[:, i] = es[i] * np.exp(
-            A[i] * T_C / (T_C + TC2K - B[i])
-        )
-
-    return tension_saturada[:, 0], tension_saturada[:, 1]
-
-
-# @%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%
-# ORIGINAL A DESCARTAR
 def saturated_vapor_pressure2(
     Tlvl: np.array, Tlvs: np.array
 ) -> list[np.ndarray]:
@@ -123,9 +96,6 @@ def auxiliar_fun(coefficients):
     return result
 
 
-# @%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%
-
-
 def viscosity() -> np.ndarray:
 
     Tvis = 4.9e-8 * celcius_temperature_aux + Vis0
@@ -141,6 +111,157 @@ def crystal_efficiencies() -> list[np.ndarray]:
     Eacrcn = np.exp(celcius_temperature_aux * 0.09)
 
     return [Eautcn, Eacrcn]
+
+
+def velocities() -> list[np.ndarray]:
+    biased_nz1 = nz1 + 4
+    u_z_initial = np.zeros(biased_nz1)
+    v_z_initial = np.zeros(biased_nz1)
+
+    for k in range(biased_nz1 - nz1 - 1, biased_nz1):
+        z_aux = (k - (biased_nz1 - nz1 - 1)) * dx1
+        if z_aux <= 500.0:
+            u_z_initial[k] = 0.0
+            v_z_initial[k] = 0.0
+        elif z_aux <= 2000.0:
+            z_reference = z_aux - 500.0
+            aux = 4.0 * (z_reference / 1500.0) ** 2
+            u_z_initial[k] = aux
+        elif z_aux <= 9000.0:
+            z_reference = z_aux - 2000.0
+            base_horizontal_velocity = z_reference / 7000
+            u_z_initial[k] = 4.0 - 10.0 * base_horizontal_velocity**2
+            v_z_initial[k] = 3.0 * np.sqrt(base_horizontal_velocity)
+        else:
+            z_reference = z_aux - 9000.0
+            u_z_initial[k] = 4.0 * (z_reference / 9000.0) ** 2.0 - 6.0
+            v_z_initial[k] = 3.0 - 5.0 * np.sqrt(z_reference / 9000.0)
+
+    u_z_initial = u_z_initial * 0.7
+    v_z_initial = u_z_initial * 0.0
+    return [u_z_initial, v_z_initial]
+
+
+def TT_f(z_aux: np.array) -> np.array:
+    """
+    Interpola valores de las temperaturas entre capas, en forma cuadratica
+    La derivada primera de la temperatura es lineal y a traves de ella se calcula T
+    Condicionalmente inestable (lineal) hasta los 2000 y estable entre los 5500m y los 9000m (lineal)
+    zeta: posiciones en metros, float array
+    zeta_p: limite de capas metros, float array
+    TT0: temperatura del aire en el piso, en K, float
+    dT_p TT0: derivada primera de la temperatura del aire, en K/m, float
+    """
+    a = 298.15
+    if z_aux <= 2000:
+        return a - 9.0e-3 * z_aux
+    elif z_aux <= 5500:
+        xx = z_aux - 2000.0
+        return a - 18.0 - xx * (9.0e-3 - 2e-3 * xx / 3500.0 / 2.0)
+    elif z_aux <= 9000:
+        xx = z_aux - 5500.0
+        return a - 46.0 - 7e-3 * xx
+    elif z_aux <= 11000:
+        xx = z_aux - 9000
+        return a - 70.5 - 7e-3 * xx + 1.75e-6 * xx**2.0
+    elif z_aux <= 12000:
+        return a - 77.5
+    else:
+        xx = z_aux - 12000
+        return a - 77.5 + 50.0 * (xx / 9000.0) ** 2.0
+
+
+# Presion para aire seco
+def PP():  # sourcery skip: inline-immediately-returned-variable
+    """
+    Calcula la presion del aire seco no perturbada
+    Se basa en la ecuacion de equilibrio hidrostatico integrando G/(Rd * T(z))
+    La integracion se hace sobre un dominio mas fino (4 veces) y para mas altura (que deberia ser superflua, ie con nx4 = nz1*4 deberia andar)
+    La integracion es del tipo Simpson
+    G: aceleracion de la gravedad, m/s, float
+    Rd: constante de los gases ideales para el aire seco, s/(m K), float
+    dx: espaciamiento de capas en z, m, float
+    nz1: numero de puntos en z
+    Pres0: presion a nivel del suelo, Pascales, float
+    zeta_p: limite de capas metros, float array
+    TT0: temperatura del aire en el piso, en K, float
+    dT_p TT0: derivada primera de la temperatura del aire, en K/m, float
+    """
+
+    nx4 = 500  # considera 500 niveles en altura para la integracion
+    dx4 = dx1 / 4.0  # subdivide el espacio entre capas
+    integ = np.zeros(nx4 + 2)
+    for k in range(1, nx4 + 2):
+        zetaa = (2 * k - 2) * dx4
+        zetam = (2 * k - 1) * dx4
+        zetad = (2 * k) * dx4
+
+        ya = 1 / TT_f(zetaa)
+        ym = 1 / TT_f(zetam)
+        yd = 1 / TT_f(zetad)
+        integ[k] = integ[k - 1] + ya + 4 * ym + yd
+
+    Presi0 = np.zeros(nz1 + 5)
+    for k in range(1, nz1 + 4):
+        Presi0[k + 1] = P00 * np.exp(-G / Rd * (integ[2 * k] * dx4 / 3))
+    Presi0[0] = P00
+    Presi0[1] = P00
+    for _ in range(2):
+        Presi0 = np.insert(Presi0, 0, P00)
+    return Presi0
+
+
+def temperature():  # sourcery skip: inline-immediately-returned-variable
+    temperature_z_initial = np.zeros(nz1 + 5)
+    for k in range(-1, nz1 + 4):
+        temperature_z_initial[k + 1] = TT_f(k * dx1)
+    for _ in range(2):
+        temperature_z_initial = np.insert(temperature_z_initial, 0, P00)
+    return temperature_z_initial
+
+
+def air_density(Presi0, temperature_z_initial):
+    # sourcery skip: inline-immediately-returned-variable
+    air_density_z_initial = np.zeros(nz1 + 7)
+    for k in range(len(Presi0) - 4):
+        air_density_z_initial[k] = (
+            Presi0[k + 4] / Rd / temperature_z_initial[k + 4]
+        )
+    return air_density_z_initial
+
+
+def aerosol():  # sourcery skip: inline-immediately-returned-variable
+    aerosol_z_initial = np.zeros(nz1 + 7)
+    for k in range(len(aerosol_z_initial) - 4):
+        aerosol_z_initial[k] = 10000.0 * np.exp(-((k + 1) * dx1) / 2500.0)
+    return aerosol_z_initial
+
+
+# Presion para aire humedo
+def PP2(G, dx, Den0, Pres0):
+    """
+    Calcula la presion del aire humedo no perturbada
+    Se basa en la ecuacion de equilibrio hidrostatico integrando G * rho
+    La integracion es del tipo Simpson en un dominio mas fino (2 veces)
+    G: aceleracion de la gravedad, m/s, float
+    dx: espaciamiento de capas en z, m, float
+    Den0: densidad del aire humedo en z, kg/m**3, float array
+    Pres0: presion a nivel del suelo, Pascales, float
+    """
+
+    nz1 = len(Den0)
+    ind = np.arange(nz1)
+    ind2 = np.arange(nz1 * 2 + 2)  # revisar estos indices (SM 23/7/24)
+
+    Den00 = np.interp(ind2, ind, Den0)
+
+    ya = Den00[:-3:2]
+    ym = Den00[1:-2:2]
+    yd = Den00[2:-1:2]
+
+    integ = np.cumsum(ya + 4 * ym + yd) * dx / 3.0  # revisar indices
+
+    return Pres0 - G * integ
 
 
 def rain_terminal_velocity(Presi):  # revisar indices!
@@ -180,70 +301,8 @@ def hail_terminal_velocity(Tvis, Den0):
     ind = np.arange(nz)
     ind2 = np.arange(0, nz, 0.5)  # revisar estos indices (SM 23/7/24)
     aux = 2.754 * rhogra**0.605 / Tvis**0.21 / Den0**0.395
-    return np.interp(ind2, ind, aux)
-
-
-def velocities() -> list[np.ndarray]:
-    biased_nz1 = nz1 + 4
-    u_z_initial = np.zeros(biased_nz1)
-    v_z_initial = np.zeros(biased_nz1)
-
-    for k in range(biased_nz1 - nz1 - 1, biased_nz1):
-        z_aux = (k - (biased_nz1 - nz1 - 1)) * dx1
-        if (z_aux <= 500.):
-            u_z_initial[k] = 0.
-            v_z_initial[k] = 0. 
-        elif z_aux <= 2000.0:
-            z_reference = z_aux - 500.0
-            aux = 4.0 * (z_reference / 1500.0) ** 2
-            u_z_initial[k] = aux
-        elif z_aux <= 9000.0:
-            z_reference = z_aux - 2000.0
-            base_horizontal_velocity = z_reference / 7000
-            u_z_initial[k] = 4.0 - 10.0 * base_horizontal_velocity**2
-            v_z_initial[k] = 3.0 * np.sqrt(base_horizontal_velocity)
-        else:
-            z_reference = z_aux - 9000.0
-            u_z_initial[k] = 4.0 * (z_reference / 9000.0) ** 2.0 - 6.0
-            v_z_initial[k] = 3.0 - 5.0 * np.sqrt(z_reference / 9000.0)
-
-    u_z_initial = [
-    0.0000E+00, 0.0000E+00, 0.0000E+00, 0.0000E+00, 0.0000E+00, 0.1244E-01, 0.1991E+00, 0.6098E+00, 0.1244E+01, 0.2103E+01, 0.2799E+01, 0.2777E+01, 
-    0.2730E+01, 0.2657E+01, 0.2559E+01, 0.2434E+01, 0.2284E+01, 0.2109E+01, 0.1907E+01, 0.1680E+01, 0.1427E+01, 
-    0.1149E+01, 0.8443E+00, 0.5143E+00, 0.1586E+00, -0.2229E+00, -0.6300E+00, -0.1063E+01, -0.1521E+01, -0.2006E+01, 
-    -0.2516E+01, -0.3051E+01, -0.3613E+01, -0.4200E+01, -0.4197E+01, -0.4188E+01, -0.4172E+01, -0.4150E+01, -0.4122E+01, 
-    -0.4088E+01, -0.4048E+01, -0.4001E+01, -0.3948E+01, -0.3889E+01, -0.3824E+01, -0.3752E+01, -0.3674E+01, -0.3590E+01, 
-    -0.3500E+01
-]
-    v_z_initial = v_z_initial * 0.0
-    return [u_z_initial, v_z_initial]
-
-
-def TTT(zeta, zeta_p, TT0, dT_p):  # !perfil de temperaturas no perturbado
-    """
-    Interpola valores de las temperaturas entre capas, en forma cuadratica
-    La derivada primera de la temperatura es lineal y a traves de ella se calcula T
-    Condicionalmente inestable (lineal) hasta los 2000 y estable entre los 5500m y los 9000m (lineal)
-    zeta: posiciones en metros, float array
-    zeta_p: limite de capas metros, float array
-    TT0: temperatura del aire en el piso, en K, float
-    dT_p TT0: derivada primera de la temperatura del aire, en K/m, float
-    """
-
-    dTT = np.interp(zeta, zeta_p, dT_p)
-    TT_f = np.zeros_like(zeta)
-    TT_f[0] = TT0
-    dx = zeta[1] - zeta[0]
-    # dx = zeta_p[1] - zeta_p[0]
-
-    # for k in range(1, len(zeta)):
-    #   for j in range(len(zeta_p)-1):
-    #      if zeta[k]  <=  zeta_p[j]:
-    #        TT_f[k] = TT_f[k-1] + dTT[k] * dx
-    for k in range(1, len(zeta)):
-        TT_f[k] = TT_f[k - 1] + dTT[k] * dx
-
-    return TT_f
+    Vtgra0 = np.interp(ind2, ind, aux)
+    return Vtgra0
 
 
 def humedad(zeta, zeta_p, H_p):  # !perfil de humedad relativa no perturbado
@@ -279,66 +338,6 @@ def vapor(Telvs, temp, Tmin, rel, Rv):
     return Qvap0
 
 
-# Presion para aire seco
-def PP(G, Rd, dx, nz1, Pres0, zeta_p, T_0, dT_p):
-    """
-    Calcula la presion del aire seco no perturbada
-    Se basa en la ecuacion de equilibrio hidrostatico integrando G/(Rd * T(z))
-    La integracion se hace sobre un dominio mas fino (4 veces) y para mas altura (que deberia ser superflua, ie con nx4 = nz1*4 deberia andar)
-    La integracion es del tipo Simpson
-    G: aceleracion de la gravedad, m/s, float
-    Rd: constante de los gases ideales para el aire seco, s/(m K), float
-    dx: espaciamiento de capas en z, m, float
-    nz1: numero de puntos en z
-    Pres0: presion a nivel del suelo, Pascales, float
-    zeta_p: limite de capas metros, float array
-    TT0: temperatura del aire en el piso, en K, float
-    dT_p TT0: derivada primera de la temperatura del aire, en K/m, float
-    """
-
-    nx4 = 500  # considera 500 niveles en altura para la integracion
-    dx4 = dx / 4.0  # subdivide el espacio entre capas
-
-    zetaa = np.arange(0, nx4 * dx4 - 2 * dx4, dx4)
-    zetam = np.arange(dx4, nx4 * dx4 - dx4, dx4)
-    zetad = np.arange(2 * dx4, nx4 * dx4, dx4)
-
-    ya = 1 / TTT(zetaa, zeta_p, T_0, dT_p)
-    ym = 1 / TTT(zetam, zeta_p, T_0, dT_p)
-    yd = 1 / TTT(zetad, zeta_p, T_0, dT_p)
-
-    integ = np.cumsum(ya + 4 * ym + yd) * dx4 / 3  # revisar indices
-
-    return Pres0 * np.exp(-G / Rd * 2 * integ[: 2 * nz1 + 1 : 2])
-
-
-# Presion para aire humedo
-def PP2(G, dx, Den0, Pres0):
-    """
-    Calcula la presion del aire humedo no perturbada
-    Se basa en la ecuacion de equilibrio hidrostatico integrando G * rho
-    La integracion es del tipo Simpson en un dominio mas fino (2 veces)
-    G: aceleracion de la gravedad, m/s, float
-    dx: espaciamiento de capas en z, m, float
-    Den0: densidad del aire humedo en z, kg/m**3, float array
-    Pres0: presion a nivel del suelo, Pascales, float
-    """
-
-    nz1 = len(Den0)
-    ind = np.arange(nz1)
-    ind2 = np.arange(nz1 * 2 + 2)  # revisar estos indices (SM 23/7/24)
-
-    Den00 = np.interp(ind2, ind, Den0)
-
-    ya = Den00[:-3:2]
-    ym = Den00[1:-2:2]
-    yd = Den00[2:-1:2]
-
-    integ = np.cumsum(ya + 4 * ym + yd) * dx / 3.0  # revisar indices
-
-    return Pres0 - G * integ
-
-
 def main():
     T_heat = latent_heat()
     Tlvl = T_heat[0]
@@ -354,25 +353,24 @@ def main():
     speed = velocities()
     u_z_initial = speed[0]
     v_z_initial = speed[1]
-    TT_f = TTT(zeta, zeta_p, T_0, dT_p)
-    Temp0 = np.copy(TT_f)
-    Pres = PP(G, Rd, dx, nz1, P00, zeta_p, T_0, dT_p)
-    Den0 = Pres / Rd / Temp0
-    Tita0 = Temp0 * (P00 / Pres) ** Kapa
-    Pres00 = Temp0 / Tita0
-    rel1 = humedad(zeta, zeta_p, rel1_p)
+
+    Presi0 = PP()
+    temperature_z_initial = temperature()
+    air_density_z_initial = air_density(Presi0, temperature_z_initial)
+    aerosol_z_initial = aerosol()
+    # rel1 = humedad(zeta, zeta_p, rel1_p)
 
     # Calculo del vapor de agua
-    Qvap0 = vapor(Telvs, Temp0, Tmin, rel1, Rv)
+    # Qvap0 = vapor(Telvs, Temp0, Tmin, rel1, Rv)
 
     # Recalculo de las cantidades base considerando el vapor de agua
-    Den0 = Den0 + Qvap0
-    Pres2 = PP2(G, dx, Den0, P00)
+    # Den0 = Den0 + Qvap0
+    # Presi0 = PP2(Den0, Presi0)
 
-    Tita0 = Temp0 * (P00 / Pres) ** Kapa
-    Pres00 = Temp0 / Tita0
+    # theta_z_initial = theta(temperature_z_initial, Presi0)
+    # Pres00 = Temp0 / Tita0
 
     # revisar asignaciones y los indices
-    Av = rain_terminal_velocity(Pres)
-    Vtnie = snow_terminal_velocity(Pres)
-    Vtgra0 = hail_terminal_velocity(Tvis, Den0)
+    # Av = rain_terminal_velocity(Presi0)
+    # Vtnie = snow_terminal_velocity(Presi0)
+    # Vtgra0 = hail_terminal_velocity(Tvis, Den0)

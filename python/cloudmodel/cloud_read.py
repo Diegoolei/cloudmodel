@@ -42,6 +42,11 @@ from .z_profile import (
     viscosity,
     crystal_efficiencies,
     velocities,
+    PP,
+    temperature,
+    air_density,
+    aerosol,
+    hail_terminal_velocity,
 )
 from .interface import c_interface as nb
 
@@ -113,6 +118,11 @@ class CloudSimulation:
         Tvis=None,
         u_z_initial=None,
         v_z_initial=None,
+        Presi0=None,
+        temperature_z_initial=None,
+        air_density_z_initial=None,
+        aerosol_z_initial=None,
+        Vtgra0=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
@@ -166,6 +176,18 @@ class CloudSimulation:
                 self.u_z_initial = z_profile[0]
             if v_z_initial is None:
                 self.v_z_initial = z_profile[1]
+        if Presi0 is None:
+            self.Presi0 = PP()
+        if temperature_z_initial is None:
+            self.temperature_z_initial = temperature()
+        if air_density_z_initial is None:
+            self.air_density_z_initial = air_density(
+                self.Presi0, self.temperature_z_initial
+            )
+        if aerosol_z_initial is None:
+            self.aerosol_z_initial = aerosol()
+        #if Vtgra0 is None:
+            #self.Vtgra0_in = hail_terminal_velocity()
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -201,9 +223,18 @@ class CloudSimulation:
             np.asfortranarray(self.Eacrcn),
         )
         nb.set_initial_z_state_python(
+            np.asfortranarray(self.temperature_z_initial),
             np.asfortranarray(self.u_z_initial),
             np.asfortranarray(self.v_z_initial),
+            np.asfortranarray(self.Presi0),
+        #    np.asfortranarray(self.air_density_z_initial),
+            np.asfortranarray(self.aerosol_z_initial),
         )
+
+        #nb.set_microphysics_perturbation_python(
+        #    np.asfortranarray(self.Vtgra0_in)
+        #)
+
         nb.run_model_python(
             self.simulation_time_minutes,
             self.save_time_minutes,
