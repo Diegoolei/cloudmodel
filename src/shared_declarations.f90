@@ -91,28 +91,31 @@ module initial_z_state
    !real, allocatable :: v_z_initial(:) !! Non perturbed v z initial
    !!!
    real :: temperature_z_initial(-3:mod_nz1 + 3) !! Non perturbed temperature z initial
-   real :: theta_z_initial(-3:mod_nz1 + 3) !! Non perturbed theta z initial
-   real :: Pres00(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
-   real :: Presi0(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
+   real(8) :: theta_z_initial(-3:mod_nz1 + 3) !! Non perturbed theta z initial
+   real(8) :: Pres00(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
+   real(8) :: Presi0(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
+   real :: Presi0_aux(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
    real :: u_z_initial(-3:mod_nz1 + 3) !! Non perturbed u z initial
    real :: v_z_initial(-3:mod_nz1 + 3) !! Non perturbed v z initial
    real :: air_density_z_initial(-3:mod_nz1 + 3) !! Non perturbed air density z initial
    real :: aerosol_z_initial(-3:mod_nz1 + 3) !! Non perturbed aerosol z initial
    real :: vapor_z_initial(-3:mod_nz1 + 3) !! Non perturbed vapor z initial
 
-   real, allocatable :: cc2(:) !! Non perturbed cc2 z initial
+   real(8) :: cc2(-3:mod_nz1 + 3) !! Non perturbed cc2 z initial
 
    real, allocatable :: vapor_z_relative(:) !! Non perturbed Relative vapor z initial
    real, allocatable :: aerosol_z_relative(:) !! Non perturbed Relative aerosol z initial
 contains
    subroutine set_initial_z_state(temperature_z_initial_in, u_z_initial_in,&
       v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in,&
-      vapor_z_initial_in)
+      vapor_z_initial_in, theta_z_initial_in, Pres00_in, cc2_in)
       real, intent(in), dimension(:) :: temperature_z_initial_in, u_z_initial_in,&
-         v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in,&
-         vapor_z_initial_in
-
+         v_z_initial_in, air_density_z_initial_in, aerosol_z_initial_in,&
+         vapor_z_initial_in, theta_z_initial_in, Pres00_in, cc2_in
+      real(8), intent(in), dimension(:) :: Presi0_in
       temperature_z_initial = temperature_z_initial_in
+      theta_z_initial = theta_z_initial_in
+      Pres00 = Pres00_in
       Presi0 = Presi0_in
       u_z_initial = u_z_initial_in
       v_z_initial = v_z_initial_in
@@ -120,6 +123,7 @@ contains
       air_density_z_initial = air_density_z_initial_in
       aerosol_z_initial = aerosol_z_initial_in
       vapor_z_initial = vapor_z_initial_in
+      cc2 = cc2_in
    end subroutine set_initial_z_state
 
    subroutine allocate_initial_z_state
@@ -132,7 +136,7 @@ contains
       !allocate(u_z_initial(-3:nz1 + 3))
       !allocate(v_z_initial(-3:nz1 + 3))
       !!!
-      allocate(cc2(-3:nz1 + 3))
+      !allocate(cc2(-3:nz1 + 3))
       !allocate(air_density_z_initial(-3:nz1 + 3))
       !allocate(aerosol_z_initial(-3:nz1 + 3))
       !allocate(vapor_z_initial(-3:nz1 + 3))
@@ -151,7 +155,7 @@ contains
       !deallocate(u_z_initial)
       !deallocate(v_z_initial)
       !!!
-      deallocate(cc2)
+      !deallocate(cc2)
       !deallocate(air_density_z_initial)
       !deallocate(aerosol_z_initial)
       !deallocate(vapor_z_initial)
@@ -274,12 +278,12 @@ module microphysics_perturbation
    real, allocatable :: hail_base(:, :, :) !! Graupel (snow pellets) variables
    real, allocatable :: hail_new(:, :, :) !! Graupel (snow pellets) variables
 
-   real :: Av(-3:2*mod_nz1 + 5) !! Other related variables,
-   real :: Vtnie(-3:2*mod_nz1 + 5) !! Other related variables,
-   real :: Vtgra0(-3:2*mod_nz1 + 5) !! Other related variables
+   real(8) :: Av(-3:2*mod_nz1 + 5) !! Other related variables,
+   real(8) :: Vtnie(-3:2*mod_nz1 + 5) !! Other related variables,
+   real(8) :: Vtgra0(-3:2*mod_nz1 + 5) !! Other related variables
 contains
    subroutine set_microphysics_perturbation(Av_in, Vtnie_in, Vtgra0_in)
-      real, intent(in), dimension(:) :: Av_in, Vtnie_in, Vtgra0_in
+      real(8), intent(in), dimension(:) :: Av_in, Vtnie_in, Vtgra0_in
       Vtgra0 = Vtgra0_in
       Av = Av_in
       Vtnie = Vtnie_in

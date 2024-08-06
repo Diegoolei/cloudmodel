@@ -1,5 +1,5 @@
 """Constants for the cloud model."""
-
+import numpy as np
 # Var list for the cloud model
 # All var lists must be in the same order as the data in the binary files
 
@@ -47,8 +47,8 @@ Vis0 = 1.718e-5
 rhogra = 500.0
 Av0 = 1455.0
 Vtnie0 = 0.5
-
-import numpy as np
+Cp = 1003.
+Cv = 716.
 
 zeta_offset = 3  # extension del dominio arriba y abajo para corregir problemas de memoria del Fortran
 zeta = np.arange(0, (nz1 + 1) * dx1, dx1)

@@ -15,9 +15,10 @@ contains
       use config
       implicit none
       real, dimension(-3:nz1 + 3), &
-         intent(in) :: air_density_z_initial, &
-                       temperature_z_initial, theta_z_initial, Pres00, vapor_z_initial, &
-                       cc2, aerosol_z_initial, u_z_initial, v_z_initial
+         intent(in) :: air_density_z_initial, vapor_z_initial, &
+                       temperature_z_initial, aerosol_z_initial, u_z_initial, v_z_initial
+      real(8), dimension(-3:nz1 + 3), &
+         intent(in) :: theta_z_initial, Pres00, cc2
       real, dimension(-3:nx1 + 3, -3:nx1 + 3, -2:nz1 + 2), &
          intent(in) :: u_perturbed_base, &
                        u_perturbed_new, v_perturbed_base, v_perturbed_new, w_perturbed_base, &
@@ -30,7 +31,7 @@ contains
       real, dimension(210:320), intent(in) :: Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, &
                                               Eautcn, Eacrcn
 
-      real, dimension(-3:2*nz1 + 5), intent(in) :: Av, Vtnie, Vtgra0
+      real(8), dimension(-3:2*nz1 + 5), intent(in) :: Av, Vtnie, Vtgra0
       real, dimension(nz1), intent(in)  :: vapor_z_relative, aerosol_z_relative
       integer :: unit_number
 

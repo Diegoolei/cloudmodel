@@ -45,8 +45,6 @@ module constants
 
    real, parameter :: Lvs0 = 2.835e6  !! Latent heats (vapor-solid)
 
-   real, parameter :: Cp = 1003. !! Specific heat capacities (constant pressure)
-   real, parameter :: Cv = 716. !! Specific heat capacities (constant volume)
 
    real, parameter :: elvs0 = 610.78 !! Saturation vapor pressures (liquid vapor solid)
    real, parameter :: esvs0 = 610.918 !! Saturation vapor pressures (solid vapor solid)
@@ -80,6 +78,8 @@ module constants
    real :: rhogra !! Densities of hail (kg/m^3)
    real :: Av0 !! Terminal fall velocity of ice crystals (m/s)
    real :: Vtnie0 !! Threshold velocity for ice crystal nucleation (m/s)
+   real :: Cp !! Specific heat capacities (constant pressure)
+   real :: Cv !! Specific heat capacities (constant volume)
 
    real :: Tlvl(210:320) !! Temperature profile (liquid)
    real :: Tlsl(210:320) !! Temperature profile (solid-liquid)
@@ -91,15 +91,17 @@ module constants
    real :: Eacrcn(210:320) !! Equilibrium constants (solid-liquid)
 contains
    subroutine set_constants(G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
-      Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Tlvl_in,&
-      Tlsl_in, Tlvs_in, Telvs_in, Tesvs_in, Tvis_in, Eautcn_in, Eacrcn_in)
+      Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Cp_in,&
+      Cv_in, Tlvl_in, Tlsl_in, Tlvs_in, Telvs_in, Tesvs_in, Tvis_in, &
+      Eautcn_in, Eacrcn_in)
       !! Sets the dimensions and intervals for the grid.
       !! Parameters:
       !! dx1: Spatial interval (grid spacing) in the x-direction
       !! nz1: Number of points in the z-direction (first grid)
       implicit none
       real, intent(in) :: G_in, Rd_in, Rv_in, Kapa_in, T0_in, P00_in,&
-         Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in
+         Lvl0_in, Lsl0_in, Vis0_in, rhogra_in, Av0_in, Vtnie0_in, Cp_in,&
+         Cv_in
       real, intent(in) :: Tlvl_in(:), Tlsl_in(:), Tlvs_in(:), Telvs_in(:),&
          Tesvs_in(:), Tvis_in(:), Eautcn_in(:), Eacrcn_in(:)
       G = G_in
@@ -114,6 +116,8 @@ contains
       rhogra = rhogra_in
       Av0 = Av0_in
       Vtnie0 = Vtnie0_in
+      Cp = Cp_in
+      Cv = Cv_in
 
       Tlvl = Tlvl_in
       Tlsl = Tlsl_in

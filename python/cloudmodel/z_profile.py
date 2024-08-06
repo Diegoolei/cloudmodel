@@ -285,18 +285,22 @@ def vapor(temperature_z_initial, Telvs):
 
 def air_density_recalc(air_density_z_initial, vapor_z_initial):
     air_density_z_initial_recalc = np.zeros(nz1 + 7)
-    for k in range(len(air_density_z_initial_recalc) - 1):
-        air_density_z_initial_recalc[k] = air_density_z_initial(
-            k
-        ) + vapor_z_initial(k)
     for i in range(3):
-        air_density_z_initial_recalc[i] = air_density_z_initial(
-            2
-        ) + vapor_z_initial(2)
+        air_density_z_initial_recalc[i] = (
+            air_density_z_initial[i]
+        )
+    for k in range(3, nz1 + 1):
+        air_density_z_initial_recalc[k] = (
+            air_density_z_initial[k] + vapor_z_initial[k]
+        )
+    for i in range(nz1 + 1, nz1 + 7):
+        air_density_z_initial_recalc[i] = (
+            air_density_z_initial[i]
+        )
     return air_density_z_initial_recalc
 
 
-def rain_terminal_velocity(Presi0):  # revisar indices!
+def rain_terminal_velocity(Presi0):
     """
     Velocidad terminal para gota de lluvia, cte que depende de P
     se define para niveles intermedios
@@ -305,10 +309,10 @@ def rain_terminal_velocity(Presi0):  # revisar indices!
     for k in range(2, nz1 + 3):
         Av[2 * k - 1] = (
             Av0
-            * ((P00 / Presi0[k+1]) ** 0.286 + (P00 / Presi0[k+2]) ** 0.286)
+            * ((P00 / Presi0[k + 1]) ** 0.286 + (P00 / Presi0[k + 2]) ** 0.286)
             / 2.0
         )
-        Av[2 * k] = (Av0 * (P00 / Presi0[k+2]) ** 0.286)
+        Av[2 * k] = Av0 * (P00 / Presi0[k + 2]) ** 0.286
     Av = np.insert(Av, 0, 0)
     Av_1 =np.array([
     0.00000000, 0.00000000, 0.00000000, 0.00000000, 1462.21582, 1469.43164,
@@ -329,7 +333,7 @@ def rain_terminal_velocity(Presi0):  # revisar indices!
     2440.58325, 2456.73315, 2473.06567, 2489.39795, 2505.90576, 2522.41382,
     0.00000000, 0.00000000, 0.00000000
 ])
-    Av =np.array([
+    Av_2 =np.array([
     0.00000000, 0.00000000, 0.00000000, 0.00000000, 1462.21585852, 1469.43171703, 
     1476.78638484, 1484.14105265, 1491.63851749, 1499.13598234, 1506.78038509, 1514.42478784,
     1522.22042987, 1530.0160719, 1537.96742292, 1545.91877394, 1554.03047154, 1562.14216914,
@@ -348,7 +352,8 @@ def rain_terminal_velocity(Presi0):  # revisar indices!
     2440.58302154, 2456.73321937, 2473.06557375, 2489.39792813, 2505.90581505, 2522.41370196,
     0.00000000, 0.00000000, 0.00000000
     ])
-    return Av_1
+    return Av
+
 
 def snow_terminal_velocity(Presi0):
     """
@@ -359,10 +364,10 @@ def snow_terminal_velocity(Presi0):
     for k in range(2, nz1 + 3):
         Vtnie[2 * k - 1] = (
             Vtnie0
-            * ((P00 / Presi0[k+1]) ** 0.3 + (P00 / Presi0[k+2]) ** 0.3)
+            * ((P00 / Presi0[k + 1]) ** 0.3 + (P00 / Presi0[k + 2]) ** 0.3)
             / 2.0
         )
-        Vtnie[2 * k] = Vtnie0 * (P00 / Presi0[k+2]) ** 0.3
+        Vtnie[2 * k] = Vtnie0 * (P00 / Presi0[k + 2]) ** 0.3
     Vtnie = np.insert(Vtnie, 0, 0)
     return Vtnie
 
@@ -379,50 +384,100 @@ def hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial):
         aux = 2.754 * rhogra**0.605
         Vtgra0[2 * k] = (
             aux
-            / Tvis[int(temperature_z_initial[k+2]) - 210] ** 0.21
-            / air_density_z_initial[k+2] ** 0.395
+            / Tvis[int(temperature_z_initial[k + 2]) - 210] ** 0.21
+            / air_density_z_initial[k + 2] ** 0.395
         )
     for k in range(3, nz1 + 3):
         Vtgra0[2 * k - 1] = (Vtgra0[2 * k - 2] + Vtgra0[2 * k]) / 2.0
     Vtgra0 = np.insert(Vtgra0, 0, 0)
     return Vtgra0
 
-# Presion para aire humedo
-def PP2(air_density_z_initial, Presi0):
-    """
-    Calcula la presion del aire humedo no perturbada
-    Se basa en la ecuacion de equilibrio hidrostatico integrando G * rho
-    La integracion es del tipo Simpson en un dominio mas fino (2 veces)
-    G: aceleracion de la gravedad, m/s, float
-    dx: espaciamiento de capas en z, m, float
-    Den0: densidad del aire humedo en z, kg/m**3, float array
-    Pres0: presion a nivel del suelo, Pascales, float
-    """
-    Den00 = np.zeros(2 * nz1 + 2)
-    for k in range(nz1 - 1):
+
+def PP2_2(air_density_z_initial, Presi0_aux, temperature_z_initial):
+    theta_z_initial = np.zeros(nz1 + 7)
+    Pres00 = np.zeros(nz1 + 7)
+    for k in range(2, nz1 + 6):
+        theta_z_initial[k] = (
+            temperature_z_initial[k] * (P00 / Presi0_aux[k]) ** Kapa
+        )
+        Pres00[k] = temperature_z_initial[k] / theta_z_initial[k]
+
+
+#--------------------------------------------------------------!!!!!!!!!!!!!
+    Den00 = np.zeros(3 * nz1 + 7)
+    for k in range(3, nz1 + 3):
         Den00[2 * k] = air_density_z_initial[k]
         Den00[2 * k + 1] = (
-            air_density_z_initial(k) + air_density_z_initial(k + 1)
+            air_density_z_initial[k] + air_density_z_initial[k + 1]
         ) / 2.0
-    Den00[2 * nz1] = air_density_z_initial(nz1)
-    Den00[2 * nz1 + 1] = 2.0 * air_density_z_initial(nz1) - Den00[2 * nz1 - 1]
+    Den00[2 * (nz1+3)] = air_density_z_initial[(nz1+3)]
+    Den00[2 * (nz1+3) + 1] = 2.0 * air_density_z_initial[(nz1+3)] - Den00[2 * (nz1+3) - 1]
 
-    integ = np.zeros(nz1 + 1)
-    for k in range(1, nz1):
+    integ = np.zeros(3 * nz1 + 7)
+    for k in range(4, nz1 + 4):
         ya = Den00[2 * k - 1]
         ym = Den00[2 * k]
         yd = Den00[2 * k + 1]
         integ[k] = integ[k - 1] + ya + 4 * ym + yd
 
-    Pres00 = np.zeros(nz1 + 2)
-    for k in range(1, nz1):
-        Pres00[k] = Presi0 - G * integ[k] * dx1 / 6.0
-    Pres00[0] = Presi0
-    Pres00[-1] = Presi0
+    Presi0 = np.zeros(nz1 + 7)
+    for k in range(4, nz1 + 4):
+        Presi0[k] = P00 - G * integ[k] * dx1 / 6.0
+    Presi0[2] = P00
+    Presi0[3] = P00
+#--------------------------------------------------------------¡¡¡¡¡¡¡¡¡¡¡¡¡¡
+
+    cc2 = np.zeros(nz1 + 7)
+    for k in range(3, nz1 + 4):
+        theta_z_initial[k] = (
+            temperature_z_initial[k] * (P00 / Presi0[k]) ** Kapa
+        )
+        Pres00[k] = temperature_z_initial[k] / theta_z_initial[k]
+        cc2[k] = Cp * Rd * theta_z_initial[k] * Pres00[k] / Cv
+    return [Presi0, theta_z_initial, Pres00, cc2]
+
+def PP2(air_density_z_initial, Presi0_aux, temperature_z_initial):
+    theta_z_initial = np.zeros(nz1 + 7)
+    Pres00 = np.zeros(nz1 + 7)
+    for k in range(2, nz1 + 6):
+        theta_z_initial[k] = (
+            temperature_z_initial[k] * (P00 / Presi0_aux[k]) ** Kapa
+        )
+        Pres00[k] = temperature_z_initial[k] / theta_z_initial[k]
 
 
-# ---------------------------------------------------------------
-# Lo que sigue no lo puedo chequear pues necesitaria las funciones de Telvs,el valor de Rv, etc
+#--------------------------------------------------------------!!!!!!!!!!!!!
+    Den00 = np.zeros(3 * nz1 + 7)
+    for k in range(3, nz1 + 3):
+        Den00[2 * k] = air_density_z_initial[k]
+        Den00[2 * k + 1] = (
+            air_density_z_initial[k] + air_density_z_initial[k + 1]
+        ) / 2.0
+    Den00[2 * (nz1+3)] = air_density_z_initial[(nz1+3)]
+    Den00[2 * (nz1+3) + 1] = 2.0 * air_density_z_initial[(nz1+3)] - Den00[2 * (nz1+3) - 1]
+
+    integ = np.zeros(3 * nz1 + 7)
+    for k in range(4, nz1 + 4):
+        ya = Den00[2 * k - 1]
+        ym = Den00[2 * k]
+        yd = Den00[2 * k + 1]
+        integ[k] = integ[k - 1] + ya + 4 * ym + yd
+
+    Presi0 = np.zeros(nz1 + 7)
+    for k in range(4, nz1 + 4):
+        Presi0[k] = P00 - G * integ[k] * dx1 / 6.0
+    Presi0[2] = P00
+    Presi0[3] = P00
+#--------------------------------------------------------------¡¡¡¡¡¡¡¡¡¡¡¡¡¡
+
+    cc2 = np.zeros(nz1 + 7)
+    for k in range(3, nz1 + 4):
+        theta_z_initial[k] = (
+            temperature_z_initial[k] * (P00 / Presi0[k]) ** Kapa
+        )
+        Pres00[k] = temperature_z_initial[k] / theta_z_initial[k]
+        cc2[k] = Cp * Rd * theta_z_initial[k] * Pres00[k] / Cv
+    return [Presi0, theta_z_initial, Pres00, cc2]
 
 
 def main():
@@ -440,23 +495,22 @@ def main():
     speed = velocities()
     u_z_initial = speed[0]
     v_z_initial = speed[1]
-
     Presi0 = PP()
     temperature_z_initial = temperature()
     air_density_z_initial = air_density(Presi0, temperature_z_initial)
     aerosol_z_initial = aerosol()
-
     vapor_z_initial = vapor(temperature_z_initial, Telvs)
-
     air_density_z_initial = air_density(air_density_z_initial, vapor_z_initial)
-
     Av = rain_terminal_velocity(Presi0)
     Vtnie = snow_terminal_velocity(Presi0)
     Vtgra0 = hail_terminal_velocity(
         Tvis, temperature_z_initial, air_density_z_initial
     )
-
-    Presi0 = PP2(air_density_z_initial, Presi0)
+    pp2_aux = PP2(air_density_z_initial, Presi0, temperature_z_initial)
+    Presi0 = pp2_aux[0]
+    theta_z_initial = pp2_aux[1]
+    Pres00 = pp2_aux[2]
+    cc2 = pp2_aux[3]
 
     # theta_z_initial = theta(temperature_z_initial, Presi0)
     # Pres00 = Temp0 / Tita0

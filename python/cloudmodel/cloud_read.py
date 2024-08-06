@@ -33,6 +33,8 @@ from .constants import (
     rhogra,
     Av0,
     Vtnie0,
+    Cp,
+    Cv,
 )
 from .z_profile import (
     latent_heat,
@@ -48,6 +50,8 @@ from .z_profile import (
     rain_terminal_velocity,
     snow_terminal_velocity,
     hail_terminal_velocity,
+    air_density_recalc,
+    PP2,
 )
 from .interface import c_interface as nb
 
@@ -111,6 +115,8 @@ class CloudSimulation:
         rhogra=rhogra,
         Av0=Av0,
         Vtnie0=Vtnie0,
+        Cp=Cp,
+        Cv=Cv,
         Tlvl=None,
         Tlsl=None,
         Tlvs=None,
@@ -120,6 +126,9 @@ class CloudSimulation:
         u_z_initial=None,
         v_z_initial=None,
         Presi0=None,
+        theta_z_initial=None,
+        Pres00=None,
+        cc2=None,
         temperature_z_initial=None,
         air_density_z_initial=None,
         aerosol_z_initial=None,
@@ -152,6 +161,8 @@ class CloudSimulation:
         self.rhogra = rhogra
         self.Av0 = Av0
         self.Vtnie0 = Vtnie0
+        self.Cp = Cp
+        self.Cv = Cv
         if Tlvl is None or Tlsl is None or Tlvs is None:
             l_heat = latent_heat()
             if Tlvl is None:
@@ -180,28 +191,52 @@ class CloudSimulation:
                 self.u_z_initial = z_profile[0]
             if v_z_initial is None:
                 self.v_z_initial = z_profile[1]
-        if Presi0 is None:
-            self.Presi0 = PP()
         if temperature_z_initial is None:
             self.temperature_z_initial = temperature()
-        if air_density_z_initial is None:
-            self.air_density_z_initial = air_density(
-                self.Presi0, self.temperature_z_initial
-            )
         if aerosol_z_initial is None:
             self.aerosol_z_initial = aerosol()
         if vapor_z_initial is None:
             self.vapor_z_initial = vapor(self.temperature_z_initial, self.Telvs)
-        if Av is None:
-            self.Av = rain_terminal_velocity(self.Presi0)
-        if Vtnie is None:
-            self.Vtnie = snow_terminal_velocity(self.Presi0)
+        if (Av is None) or (Vtnie is None):
+            Presi0_aux = PP()
+            if Av is None:
+                self.Av = rain_terminal_velocity(Presi0_aux)
+            if Vtnie is None:
+                self.Vtnie = snow_terminal_velocity(Presi0_aux)
+            
         if Vtgra0 is None:
             self.Vtgra0_in = hail_terminal_velocity(
                 self.Tvis,
                 self.temperature_z_initial,
-                self.air_density_z_initial,
+                air_density(Presi0_aux, self.temperature_z_initial),
             )
+        if air_density_z_initial is None:
+            self.air_density_z_initial = air_density_recalc(
+                air_density(PP(), self.temperature_z_initial),
+                self.vapor_z_initial,
+            )
+            #self.air_density_z_initial = air_density(PP(), self.temperature_z_initial)
+        if (
+            (Presi0 is None)
+            or (theta_z_initial is None)
+            or (Pres00 is None)
+            or (cc2 is None)
+        ):
+            Presi0_aux = PP()
+            pp2_aux = PP2(
+                self.air_density_z_initial,
+                Presi0_aux,
+                self.temperature_z_initial,
+            )
+            if Presi0 is None:
+                self.Presi0 = pp2_aux[0]
+            if theta_z_initial is None:
+                self.theta_z_initial = pp2_aux[1]
+            if Pres00 is None:
+                self.Pres00 = pp2_aux[2]
+            if cc2 is None:
+                self.cc2 = pp2_aux[3]
+
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -227,6 +262,8 @@ class CloudSimulation:
             self.rhogra,
             self.Av0,
             self.Vtnie0,
+            self.Cp,
+            self.Cv,
             self.Tlvl,
             self.Tlsl,
             self.Tlvs,
@@ -244,6 +281,9 @@ class CloudSimulation:
             self.air_density_z_initial,
             self.aerosol_z_initial,
             self.vapor_z_initial,
+            self.theta_z_initial,
+            self.Pres00,
+            self.cc2,
         )
 
         nb.set_microphysics_perturbation_python(
@@ -291,7 +331,7 @@ class CloudSimulation:
         data = FileStyle(
             chosen_file="Nube",
             output_data_path=self.directory,
-            img_path="img/",
+            img_path="image/",
             img_option=ImageStyle.CONTOUR.value,
             folder_handle="Delete",
         )
