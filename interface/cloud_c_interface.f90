@@ -6,7 +6,7 @@ module c_interface
    use dimensions, only: set_dimensions
    use constants, only: set_constants
    use initial_z_state, only: set_initial_z_state
-   !use microphysics_perturbation, only: set_microphysics_perturbation
+   use microphysics_perturbation, only: set_microphysics_perturbation
 
 contains
    subroutine set_dimensions_python(dx1, nz1)
@@ -44,10 +44,10 @@ contains
 
    end subroutine set_initial_z_state_python
 
-   !subroutine set_microphysics_perturbation_python(Vtgra0_in)
-   !   real(c_float), intent(in), dimension(:) :: Vtgra0_in
-   !   call set_microphysics_perturbation(Vtgra0_in)
-   !end subroutine set_microphysics_perturbation_python
+   subroutine set_microphysics_perturbation_python(Av_in, Vtnie_in, Vtgra0_in)
+      real(c_float), intent(in), dimension(:) :: Av_in, Vtnie_in, Vtgra0_in
+      call set_microphysics_perturbation(Av_in, Vtnie_in, Vtgra0_in)
+   end subroutine set_microphysics_perturbation_python
 
    subroutine run_model_python(sim_time, save_lapse, statistic_time, backup_time, restore_backup, directory)
       ! bind(C, name="run_model")

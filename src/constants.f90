@@ -66,6 +66,7 @@ module constants
    real, parameter :: Efcol = 0.8 !! Efficiency factor for collision
    real, parameter :: Efcolgn = 0.7 !! Efficiency factor for collision (graupel)
 
+   integer, parameter :: mod_nz1 = 45
 
    real :: G !! Acceleration due to gravity (m/s^2)
    real :: Rd !! Specific gas constants (dry air and water vapor)

@@ -40,8 +40,7 @@ contains
 
       implicit none
 
-      real aux, x_aux, y_aux, z_aux, sat_press_lv_aux, relative_humidity_aux, &
-         temperature_aux
+      real x_aux, y_aux, z_aux
 
       real vapor_total, aerosol_total, gaussian
       real :: initial_x_perturbation  !! Initial disturbance’s x-coordinate
@@ -53,7 +52,7 @@ contains
       real :: temperature_max_perturbation = .7  !! Maximum temperature perturbation
       real :: aerosol_max_perturbation = 10000. !! Maximum aerosol perturbation
 
-      integer i, j, k, n, unit
+      integer i, j, k, unit
       initial_x_perturbation = (nx1 + 1.)*dx1/2.  !! Initial disturbance’s x-coordinate
       initial_y_perturbation = (nx1 + 1.)*dx1/2.
       
@@ -69,16 +68,10 @@ contains
          Pres00(k) = temperature_z_initial(k)/theta_z_initial(k)
       end do
 
-      temperature_z_initial(-1) = temperature_z_initial(0)
-      air_density_z_initial(-1) = air_density_z_initial(0)
-      theta_z_initial(-1) = theta_z_initial(0)
-      Pres00(-1) = Pres00(0)
-      aerosol_z_initial(-1) = -aerosol_z_initial(0)
-
       do concurrent(k=0:nz1)
+         z_aux = k*dx1
          do concurrent(i=1:nx1, j=1:nx1)
             !perturbaciones iniciales en la temperatura y en los aerosoles
-            z_aux = k*dx1
             x_aux = i*dx1
             y_aux = j*dx1
 
@@ -96,27 +89,6 @@ contains
 
          !recalculo de la densidad
          air_density_z_initial(k) = air_density_z_initial(k) + vapor_z_initial(k)
-      end do
-      !**   Velocidad terminal para gota de lluvia, cte que depende de P
-      do concurrent(k=1:nz1 + 1)
-         Av(2*k - 1) = Av0*((P00/Presi0(k - 1))**.286 + (P00/Presi0(k))**.286)/2. !puntos intermedios
-         Av(2*k) = Av0*(P00/Presi0(k))**.286
-      end do
-
-      !**   Velocidad terminal para la nieve, cte que depende de P
-      do concurrent(k=1:nz1 + 1)
-         Vtnie(2*k - 1) = Vtnie0*((P00/Presi0(k - 1))**.3 + (P00/Presi0(k))**.3)/2. !puntos intermedios&
-         Vtnie(2*k) = Vtnie0*(P00/Presi0(k))**.3
-      end do
-
-      !**   Velocidad terminal para el granizo, cte que depende de z
-      do concurrent(k=0:nz1 + 1)
-         aux = 2.754*rhogra**.605
-         Vtgra0(2*k) = aux/Tvis(int(temperature_z_initial(k)))**.21/air_density_z_initial(k)**.395
-      end do
-
-      do concurrent(k=1:nz1 + 1)
-         Vtgra0(2*k - 1) = (Vtgra0(2*k - 2) + Vtgra0(2*k))/2.  ! punto intermedio
       end do
 
       !**************************************************************
@@ -137,11 +109,6 @@ contains
             vapor_z_initial(k), u_z_initial(k), v_z_initial(k)
       end do
       close (unit)
-
-      theta_z_initial(-1) = theta_z_initial(0)
-      Pres00(-1) = Pres00(0)
-      air_density_z_initial(-1) = air_density_z_initial(0)
-      vapor_z_initial(-1) = 0
 
       do concurrent(i=1:nx1, j=1:nx1)
          pressure_base(i, j, 0) = pressure_base(i, j, 1)

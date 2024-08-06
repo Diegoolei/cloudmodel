@@ -80,6 +80,7 @@ end module advecs
 module initial_z_state
    !! Non perturbed quantities
    use dimensions
+   use constants, only: mod_nz1
    implicit none
    !!!
    !real, allocatable :: temperature_z_initial(:) !! Non perturbed temperature z initial
@@ -89,7 +90,6 @@ module initial_z_state
    !real, allocatable :: u_z_initial(:) !! Non perturbed u z initial
    !real, allocatable :: v_z_initial(:) !! Non perturbed v z initial
    !!!
-   integer, parameter :: mod_nz1 = 45
    real :: temperature_z_initial(-3:mod_nz1 + 3) !! Non perturbed temperature z initial
    real :: theta_z_initial(-3:mod_nz1 + 3) !! Non perturbed theta z initial
    real :: Pres00(-3:mod_nz1 + 3) !! Non perturbed pressure z initial
@@ -252,6 +252,7 @@ module microphysics_perturbation
    !! Module declaration for the microphysics_perturbation module.
    !! The microphysics_perturbation module defines variables related to cloud microphysics.
    use dimensions
+   use constants, only: mod_nz1
    real, allocatable :: vapor_base(:, :, :) !! Vapor variable
    real, allocatable :: vapor_new(:, :, :) !! Vapor variable
 
@@ -273,16 +274,16 @@ module microphysics_perturbation
    real, allocatable :: hail_base(:, :, :) !! Graupel (snow pellets) variables
    real, allocatable :: hail_new(:, :, :) !! Graupel (snow pellets) variables
 
-   real, allocatable :: Av(:) !! Other related variables,
-   real, allocatable :: Vtnie(:) !! Other related variables,
-   real, allocatable :: Vtgra0(:) !! Other related variables
+   real :: Av(-3:2*mod_nz1 + 5) !! Other related variables,
+   real :: Vtnie(-3:2*mod_nz1 + 5) !! Other related variables,
+   real :: Vtgra0(-3:2*mod_nz1 + 5) !! Other related variables
 contains
-   !subroutine set_microphysics_perturbation(Vtgra0_in)
-   !   real, intent(in), dimension(:) :: Vtgra0_in
-
-   !   Vtgra0 = Vtgra0_in
-      !v_z_initial = v_z_initial_in
-   !end subroutine set_microphysics_perturbation
+   subroutine set_microphysics_perturbation(Av_in, Vtnie_in, Vtgra0_in)
+      real, intent(in), dimension(:) :: Av_in, Vtnie_in, Vtgra0_in
+      Vtgra0 = Vtgra0_in
+      Av = Av_in
+      Vtnie = Vtnie_in
+   end subroutine set_microphysics_perturbation
 
    subroutine allocate_microphysics_perturbation()
       !! Allocate the microphysics_perturbation variables
@@ -307,9 +308,9 @@ contains
       allocate(hail_base(-3:nx1 + 3, -3:nx1 + 3, -2:nz1 + 2))
       allocate(hail_new(-3:nx1 + 3, -3:nx1 + 3, -2:nz1 + 2))
 
-      allocate(Av(-3:2*nz1 + 5))
-      allocate(Vtnie(-3:2*nz1 + 5))
-      allocate(Vtgra0(-3:2*nz1 + 5))
+      !allocate(Av(-3:2*nz1 + 5))
+      !allocate(Vtnie(-3:2*nz1 + 5))
+      !allocate(Vtgra0(-3:2*nz1 + 5))
    end subroutine allocate_microphysics_perturbation
 
    subroutine deallocate_microphysics_perturbation()
@@ -335,9 +336,9 @@ contains
       deallocate(hail_base)
       deallocate(hail_new)
 
-      deallocate(Av)
-      deallocate(Vtnie)
-      deallocate(Vtgra0)
+      !deallocate(Av)
+      !deallocate(Vtnie)
+      !deallocate(Vtgra0)
    end subroutine deallocate_microphysics_perturbation
 end module microphysics_perturbation
 

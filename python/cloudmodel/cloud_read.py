@@ -45,6 +45,8 @@ from .z_profile import (
     air_density,
     aerosol,
     vapor,
+    rain_terminal_velocity,
+    snow_terminal_velocity,
     hail_terminal_velocity,
 )
 from .interface import c_interface as nb
@@ -122,6 +124,8 @@ class CloudSimulation:
         air_density_z_initial=None,
         aerosol_z_initial=None,
         vapor_z_initial=None,
+        Av=None,
+        Vtnie=None,
         Vtgra0=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
@@ -188,8 +192,16 @@ class CloudSimulation:
             self.aerosol_z_initial = aerosol()
         if vapor_z_initial is None:
             self.vapor_z_initial = vapor(self.temperature_z_initial, self.Telvs)
-        # if Vtgra0 is None:
-        # self.Vtgra0_in = hail_terminal_velocity()
+        if Av is None:
+            self.Av = rain_terminal_velocity(self.Presi0)
+        if Vtnie is None:
+            self.Vtnie = snow_terminal_velocity(self.Presi0)
+        if Vtgra0 is None:
+            self.Vtgra0_in = hail_terminal_velocity(
+                self.Tvis,
+                self.temperature_z_initial,
+                self.air_density_z_initial,
+            )
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
 
@@ -234,9 +246,11 @@ class CloudSimulation:
             self.vapor_z_initial,
         )
 
-        # nb.set_microphysics_perturbation_python(
-        #    self.Vtgra0_in)
-        # )
+        nb.set_microphysics_perturbation_python(
+            self.Av,
+            self.Vtnie,
+            self.Vtgra0_in,
+        )
 
         nb.run_model_python(
             self.simulation_time_minutes,

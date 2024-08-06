@@ -260,6 +260,7 @@ def humidity(z_aux):
         relative_humidity_aux = 0.1 - (z_aux - 7000) / 3000.0 * 0.02
     return relative_humidity_aux
 
+
 def vapor(temperature_z_initial, Telvs):
     """
     Calcula la densidad de vapor de agua para todos los niveles z
@@ -269,8 +270,8 @@ def vapor(temperature_z_initial, Telvs):
     Rv: Constante de los gases para el vapor de agua
     """
     vapor_z_initial = np.zeros(nz1 + 7)
-    for k in range(3, nz1+4):
-        z_aux = (k-3) * dx1
+    for k in range(3, nz1 + 4):
+        z_aux = (k - 3) * dx1
         temperature_aux = temperature_z_initial[k]
         n = int(temperature_aux)
         aux = temperature_aux - n
@@ -281,46 +282,89 @@ def vapor(temperature_z_initial, Telvs):
         )
     return vapor_z_initial
 
+
 def air_density_recalc(air_density_z_initial, vapor_z_initial):
     air_density_z_initial_recalc = np.zeros(nz1 + 7)
     for k in range(len(air_density_z_initial_recalc) - 1):
-        air_density_z_initial_recalc[k] = air_density_z_initial(k) + vapor_z_initial(k)
+        air_density_z_initial_recalc[k] = air_density_z_initial(
+            k
+        ) + vapor_z_initial(k)
     for i in range(3):
-        air_density_z_initial_recalc[i] = air_density_z_initial(2) + vapor_z_initial(2)
+        air_density_z_initial_recalc[i] = air_density_z_initial(
+            2
+        ) + vapor_z_initial(2)
     return air_density_z_initial_recalc
+
 
 def rain_terminal_velocity(Presi0):  # revisar indices!
     """
     Velocidad terminal para gota de lluvia, cte que depende de P
     se define para niveles intermedios
     """
-    Av = np.zeros(2 * nz1 + 2)
-    for k in range(1, nz1 + 1):
+    Av = np.zeros(2 * nz1 + 8)
+    for k in range(2, nz1 + 3):
         Av[2 * k - 1] = (
             Av0
-            * ((P00 / Presi0(k - 1)) ** 0.286 + (P00 / Presi0(k)) ** 0.286)
+            * ((P00 / Presi0[k+1]) ** 0.286 + (P00 / Presi0[k+2]) ** 0.286)
             / 2.0
         )
-        Av[2 * k] = Av0 * (P00 / Presi0(k)) ** 0.286
-
-    return Av
-
+        Av[2 * k] = (Av0 * (P00 / Presi0[k+2]) ** 0.286)
+    Av = np.insert(Av, 0, 0)
+    Av_1 =np.array([
+    0.00000000, 0.00000000, 0.00000000, 0.00000000, 1462.21582, 1469.43164,
+    1476.78625, 1484.14111, 1491.63843, 1499.13599, 1506.78040, 1514.42480,
+    1522.22034, 1530.01599, 1537.96753, 1545.91882, 1554.03052, 1562.14221,
+    1570.41846, 1578.69482, 1587.13904, 1595.58337, 1604.19934, 1612.81531,
+    1621.60620, 1630.39697, 1639.36646, 1648.33569, 1657.48706, 1666.63855,
+    1675.97571, 1685.31287, 1694.83923, 1704.36560, 1714.08484, 1723.80408,
+    1733.71985, 1743.63562, 1753.75159, 1763.86768, 1774.18774, 1784.50781,
+    1795.03699, 1805.56616, 1816.31042, 1827.05481, 1838.02063, 1848.98621,
+    1860.17981, 1871.37354, 1882.80200, 1894.23035, 1905.90039, 1917.57056,
+    1929.48987, 1941.40918, 1953.58521, 1965.76099, 1978.20142, 1990.64209,
+    2003.35547, 2016.06873, 2029.06348, 2042.05823, 2055.34033, 2068.62231,
+    2082.18433, 2095.74634, 2109.57739, 2123.40845, 2137.49536, 2151.58203,
+    2165.91016, 2180.23853, 2194.79248, 2209.34619, 2224.10840, 2238.87085,
+    2253.83154, 2268.79224, 2283.95312, 2299.11377, 2314.47705, 2329.84033,
+    2345.40771, 2360.97485, 2376.74219, 2392.50928, 2408.47119, 2424.43286,
+    2440.58325, 2456.73315, 2473.06567, 2489.39795, 2505.90576, 2522.41382,
+    0.00000000, 0.00000000, 0.00000000
+])
+    Av =np.array([
+    0.00000000, 0.00000000, 0.00000000, 0.00000000, 1462.21585852, 1469.43171703, 
+    1476.78638484, 1484.14105265, 1491.63851749, 1499.13598234, 1506.78038509, 1514.42478784,
+    1522.22042987, 1530.0160719, 1537.96742292, 1545.91877394, 1554.03047154, 1562.14216914,
+    1570.41846152, 1578.69475391, 1587.13911711, 1595.58348031, 1604.1993574, 1612.8152345,
+    1621.60610681, 1630.39697911, 1639.36636402, 1648.33574893, 1657.48719758, 1666.63864622,
+    1675.97574092, 1685.31283562, 1694.83918714, 1704.36553865, 1714.08478319, 1723.80402774,
+    1733.71982379, 1743.63561985, 1753.75164473, 1763.86766962, 1774.18772196, 1784.5077743,
+    1795.03692568, 1805.56607707, 1816.31037164, 1827.05466621, 1838.02038919, 1848.98611216,
+    1860.17978851, 1871.37346487, 1882.80187067, 1894.23027648, 1905.90045086, 1917.57062525,
+    1929.48988305, 1941.40914084, 1953.58508596, 1965.76103108, 1978.20157066, 1990.64211024,
+    2003.35546964, 2016.06882903, 2029.06356766, 2042.0583063, 2055.34022348, 2068.62214067,
+    2082.18431054, 2095.74648041, 2109.57746646, 2123.40845251, 2137.49528795, 2151.5821234,
+    2165.91036564, 2180.23860789, 2194.79241636, 2209.34622483, 2224.10858414, 2238.87094345,
+    2253.83165017, 2268.79235689, 2283.95300612, 2299.11365536, 2314.47691924, 2329.84018313,
+    2345.40745439, 2360.97472565, 2376.74203699, 2392.50934832, 2408.47108602, 2424.43282371,
+    2440.58302154, 2456.73321937, 2473.06557375, 2489.39792813, 2505.90581505, 2522.41370196,
+    0.00000000, 0.00000000, 0.00000000
+    ])
+    return Av_1
 
 def snow_terminal_velocity(Presi0):
     """
     Velocidad terminal para la nieve, cte que depende de P
     se define para niveles intermedios
     """
-    Vtnie = np.zeros(2 * nz1 + 2)
-    for k in range(1, nz1 + 1):
+    Vtnie = np.zeros(2 * nz1 + 8)
+    for k in range(2, nz1 + 3):
         Vtnie[2 * k - 1] = (
             Vtnie0
-            * ((P00 / Presi0(k - 1)) ** 0.3 + (P00 / Presi0(k)) ** 0.3)
+            * ((P00 / Presi0[k+1]) ** 0.3 + (P00 / Presi0[k+2]) ** 0.3)
             / 2.0
         )
-        Vtnie[2 * k] = Vtnie0 * (P00 / Presi0(k)) ** 0.3
-
-    return Vtnie0
+        Vtnie[2 * k] = Vtnie0 * (P00 / Presi0[k+2]) ** 0.3
+    Vtnie = np.insert(Vtnie, 0, 0)
+    return Vtnie
 
 
 def hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial):
@@ -330,18 +374,18 @@ def hail_terminal_velocity(Tvis, temperature_z_initial, air_density_z_initial):
     """
 
     ## viscosidad se define por temperaturas y Den por alturas!!
-    Vtgra0 = np.zeros(2 * nz1 + 2)
-    for k in range(nz1 + 1):
+    Vtgra0 = np.zeros(2 * nz1 + 8)
+    for k in range(2, nz1 + 3):
         aux = 2.754 * rhogra**0.605
         Vtgra0[2 * k] = (
             aux
-            / Tvis(int(temperature_z_initial(k))) ** 0.21
-            / air_density_z_initial(k) ** 0.395
+            / Tvis[int(temperature_z_initial[k+2]) - 210] ** 0.21
+            / air_density_z_initial[k+2] ** 0.395
         )
-
-    for k in range(1, nz1 + 1):
+    for k in range(3, nz1 + 3):
         Vtgra0[2 * k - 1] = (Vtgra0[2 * k - 2] + Vtgra0[2 * k]) / 2.0
-
+    Vtgra0 = np.insert(Vtgra0, 0, 0)
+    return Vtgra0
 
 # Presion para aire humedo
 def PP2(air_density_z_initial, Presi0):
