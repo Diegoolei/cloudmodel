@@ -25,8 +25,6 @@
       
             Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+
      &            Qnie1(i,j,k)+Qgra1(i,j,k)
-            Qagua=Qgot1(i,j,k)+Qllu1(i,j,k)+
-     &            (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
             zmed=zmed+k*Qagua
             Qaguat=Qaguat+Qagua
 

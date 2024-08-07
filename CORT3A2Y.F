@@ -25,7 +25,7 @@
 
 
 ***   datos generales
-      nombre='31'
+      nombre='21'
       var(1)='UU'
       var(2)='VV'
       var(3)='WW'
@@ -37,19 +37,17 @@
       var(9)='GR'
       var(10)='VA'
       var(11)='AE'
-      var(12)='V1'
-      var(13)='A1'
 
 
       paso='01020304050607080910111213141516171819202122232425'
      &     //'26272829303132333435363738394041424344454647484950'
-      pasoaux(1)=1
+      pasoaux(1)=0
       pasoaux(2)=0
-      pasoaux(3)=1
+      pasoaux(3)=0
       pasoaux(4)=0
-      pasoaux(5)=1
+      pasoaux(5)=0
       pasoaux(6)=0
-      pasoaux(7)=1
+      pasoaux(7)=0
       pasoaux(8)=0
       pasoaux(9)=1
       pasoaux(10)=0
@@ -59,15 +57,15 @@
       pasoaux(14)=0
       pasoaux(15)=1
       pasoaux(16)=0
-      pasoaux(17)=0
+      pasoaux(17)=1
       pasoaux(18)=0
-      pasoaux(19)=0
+      pasoaux(19)=1
       pasoaux(20)=0
-      pasoaux(21)=0
+      pasoaux(21)=1
       pasoaux(22)=0
-      pasoaux(23)=0
+      pasoaux(23)=1
       pasoaux(24)=0
-      pasoaux(25)=0
+      pasoaux(25)=1
 
 **    lectura de los datos generales y de base
 
@@ -92,7 +90,7 @@
 
 **        lectura de la nube
 
-          arch='nube'//nombre
+          arch='d:\nube'//nombre//'\nube'//nombre
      &          //paso(ii*2-1:ii*2)//'.sal'
 
           write(*,*) arch
@@ -119,7 +117,7 @@
           write(4,*) ii,ymax,maypre
 
 **        cortes (no incluyen el piso)
-          j=25
+          j=ymax
           do 50 i=1,nx1
           do 50 k=1,nz1
 *           calculo de la temperatua
@@ -178,7 +176,7 @@
             variable(i,k,13)=aer1(i,j,k)*1e1
    50     continue
 
-          do 80 lvar=1,nvar
+          do 80 lvar=1,11
             archaux=var(lvar)//nombre//
      &              'y'//paso(ii*2-1:ii*2)
             write(*,*) archaux

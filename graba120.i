@@ -1,8 +1,7 @@
       open(unit=40,file='inis.da')
       open(unit=41,file='velos.da',status='unknown',form='unformatted')
       rewind 41
-      open(unit=42,file='varconz.da',status='unknown',  
-     &   form='unformatted')
+      open(unit=42,file='varconz.da',status='unknown',form='unformatted')
       rewind 42
 
         write(40,*) Den0,Temp0,Tita0,Pres00,Qvap0

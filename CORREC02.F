@@ -9,7 +9,7 @@
       include 'lmngot.i'
       include 'corgot.i'
 
-      write(*,*) 'dentro de corgot'
+*      write(*,*) 'dentro de corgot'
 
       neg1=0.
       pos1=0.

@@ -31,7 +31,7 @@
 
 
 ***   datos generales
-      nombre='25'
+      nombre='21'
       var(1)='UU'
       var(2)='VV'
       var(3)='WW'
@@ -56,21 +56,21 @@
       pasoaux(7)=0
       pasoaux(8)=0
       pasoaux(9)=1
-      pasoaux(10)=1
+      pasoaux(10)=0
       pasoaux(11)=1
-      pasoaux(12)=1
+      pasoaux(12)=0
       pasoaux(13)=1
-      pasoaux(14)=1
+      pasoaux(14)=0
       pasoaux(15)=1
-      pasoaux(16)=1
+      pasoaux(16)=0
       pasoaux(17)=1
-      pasoaux(18)=1
+      pasoaux(18)=0
       pasoaux(19)=1
-      pasoaux(20)=1
+      pasoaux(20)=0
       pasoaux(21)=1
-      pasoaux(22)=1
+      pasoaux(22)=0
       pasoaux(23)=1
-      pasoaux(24)=1
+      pasoaux(24)=0
       pasoaux(25)=1
 
 **    lectura de los datos generales y de base
@@ -103,7 +103,7 @@
 
 **        lectura de la nube
 
-          arch='d:\nube21c2\nube'//nombre
+          arch='d:\nube'//nombre//'\nube'//nombre
      &          //paso(ii*2-1:ii*2)//'.sal'
 
           write(*,*) arch
@@ -352,12 +352,6 @@
 *###
 
       write(*,*) 'antes de microfis'
-
-      do 27 i=1,nx1
-      do 27 j=1,nx1
-      do 27 k=1,nz1
-        aer1(i,j,k)=aer2(i,j,k)
-   27 continue
 
 *********************************************************************
 

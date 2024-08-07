@@ -24,6 +24,8 @@
       real*8 aert1,aert2,aert3,aert4
       real*8 totnuc,totmic
 
+      integer aermax
+
       real cks,turbu,lapla
 
       real aerdif(-3:nx1+3,-3:nx1+3,-3:nz1+3)

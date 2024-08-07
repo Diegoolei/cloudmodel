@@ -7,7 +7,7 @@
       include 'dimen.i'
       include 'const.i'
       include 'cant01.i'
-      include 'nuclea61.i'
+      include 'nuclea60.i'
 
 
       B=Lvl/Rv
@@ -31,12 +31,12 @@
         auxs=Naux*mcri
 
 *##
-*      if (l.eq.16.and.m.eq.17.and.n.ge.12.and.n.le.14) then
-*        write(*,*) 'nuclcri',l,m,n,auxs,Naux,mcri,Naer
-*        write(*,*) Naux,Acri,Bcri,Tc,rs
-*        write(*,*) auxs,(Qvap-ess/Rv/TT*.95),Qvap
+      if (l.eq.16.and.m.eq.17.and.n.ge.12.and.n.le.14) then
+        write(*,*) 'nucl',n,auxs,Naux,mcri,Naer
+        write(*,*) 'nucl',Naux,Acri,Bcri,Tc,rs
+        write(*,*) 'nu',auxs,(Qvap-ess/Rv/TT*.95),Qvap
 *        stop
-*      endif
+      endif
 
 
 *        write(*,*) 'vapor?',auxs,Qvap-ess/Rv/TT
@@ -118,10 +118,8 @@
 
       endif
 
-*      if (auxs.gt.0.or. auxl.gt.0) then
-*        write(*,*) 'nucl',l,m,n,auxs,auxl,TT
-*	write(*,*) Naux,Qvap,e1,esl,ess,rl,rs
-*        pause
+*      if (l.eq.16.and.(m.eq.15.or.m.eq.18).and. n.eq.10) then
+*        write(*,*) 'nucl',m,auxs,auxl,TT
 *      endif
 
       return

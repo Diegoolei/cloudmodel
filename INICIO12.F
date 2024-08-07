@@ -1,13 +1,14 @@
 *23456789*123456789*123456789*123456789*123456789*123456789*123456789*
-*     revisado  3/4/99
+*     revisado  7/11/99
 *     Condiciones iniciales para las variables dinamicas
 *     Corresponde a una nube con hielo
 *     Calcula la presion inicial en forma iterativa, primero supone aire
 *      seco y luego integra considerando la densidad total, incluyendo el 
 *      vapor.
+*     Incluye viento de corte.
 *     Solo hay una perturbacion en temperatura para iniciar la conveccion
-*     Incluye viento de corte, tipo frente
 
+*     Dos masas que confluyen a distintas alturas
 
       subroutine condi
 
@@ -18,7 +19,7 @@
       include 'const.i'
       include 'estbas.i'
       include 'cant01.i'
-      include 'inicio11.i'
+      include 'inicio10.i'
    
 ***** comienzo de la rutina
 
@@ -64,7 +65,7 @@
         endif
 
        UU(k)=UU(k)*.7
-       VV(k)=VV(k)*0.
+       VV(k)=VV(k)*.7
 
 
 *##
@@ -78,7 +79,7 @@
 
       open(3,file='ccc')
 
-      do 400 k=313,210,-1
+      do 400 k=313,203,-1
         
         Tk=k-T0
 

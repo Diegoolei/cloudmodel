@@ -4,7 +4,7 @@
 *     Si hay nucleacion de gotitas no hay condensacion de agua liquida
 *     Se ha modificado la parte de evaporacion teniendo en cuenta que 
 *     se debe tender a alcanzar el nivel de saturacion (25/6/99)
-*     revisado 24/09/00
+*     revisado 14/11/99
 
 *$$
       subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,
@@ -18,7 +18,7 @@
       include 'perdim.i'
       include 'permic.i'
       include 'cant01.i'
-      include 'microf05.i'
+      include 'microf04.i'
 
 **    Parametros comunes
 
@@ -162,7 +162,7 @@
         libaer=0.
       endif
       if (coevcri.gt.0) 
-     &    libaer=libaer+coevcri/(pi*rhocri*Rcri**3./10.)*.5 !mod(2/4/00)
+     &    libaer=libaer+coevcri/(pi*rhocri*Rcri**3./10.)
 
 ***********************************************************
 
@@ -204,8 +204,8 @@
       endif
 
 *##
-*       if(l.eq.21 .and. m.eq.36 .and. n.ge.23)
-*    &     write(*,*) 'cri2',n,qcriaux,hieconv
+ *       if(l.eq.21 .and. m.eq.36 .and. n.ge.23)
+ *    &     write(*,*) 'cri2',n,qcriaux,hieconv
 
 **    nieve a cristales (solo cuando hay evaporacion) !19/12/99)
 
@@ -416,7 +416,7 @@
 
 **    difusion a gotitas
 
-      coaergot=-4.*pi*Dfaer*Naux*Rgot*Ngot
+      coaergot=-4.*pi*Dfaer*Naux*Rgot*Ncri
 
 **    difusion a cristales
 
