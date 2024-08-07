@@ -6,7 +6,7 @@ import os
 
 def generate_cut_image():
     dirout = '../cortes/'
-    directory = 'Data/z_initials_param/cortes/'
+    directory = 'Data/ORIGINAL_DATA/cortes/'
     os.chdir(directory)
 
     ny = 45
@@ -38,11 +38,11 @@ def main():
         statistic_time_minutes=3,
         bacup_time_minutes=3,
         restore_backup=False,
-        directory="Data/z_initials_param",
+        directory="Data/ORIGINAL_DATA",
     )
     z_initials_param.run_model()
-    #z_initials_param.load_model()
-    z_initials_param.cloud_analytics.parse_status_img()
+    # z_initials_param.load_model()
     generate_cut_image()
+    z_initials_param.cloud_analytics.parse_status_img()
 
 main()

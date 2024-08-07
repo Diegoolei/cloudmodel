@@ -41,6 +41,8 @@ contains
       implicit none
 
       real x_aux, y_aux, z_aux
+      real :: cenaerx=(nx1+1.)*300/2.+3000.   !Coord x de la perturbacion de aerosoles
+      real :: cenaery=(nx1+1.)*300/2.   !Coord y de la perturbacion de aerosoles
 
       real vapor_total, aerosol_total, gaussian
       real :: initial_x_perturbation  !! Initial disturbance’s x-coordinate
@@ -76,6 +78,9 @@ contains
                                                                   - initial_z_perturbation)**2./sigma_t)*gaussian
 
          if (theta_base(i, j, k) < 1e-5) theta_base(i, j, k) = 0.
+
+         gaussian = exp(-((cenaerx - x_aux)**2. &
+                           +(cenaery - y_aux)**2.)*.5/perturbation_width**2.)
 
          aerosol_base(i, j, k) = aerosol_max_perturbation*exp( &
                                  -z_aux**2./sigma_a)*gaussian

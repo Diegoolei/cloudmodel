@@ -15,7 +15,7 @@ contains
       use memory_managment
       use model_initialization, only: initialize_model
       implicit none
-      character*22 :: directory
+      character*26 :: directory
       integer ii,i,j,k,l,m,n,ymax
       integer pasoaux(25),lvar
       integer, parameter :: nvar=13
@@ -72,10 +72,14 @@ contains
       pasoaux(24)=0
       pasoaux(25)=0
       !*    lectura de los datos generales y de base
-      directory='Data/z_initials_param/'
-      open (newunit=unit_number, file=directory//'inis.da',status='unknown',form='unformatted')
-      read(unit_number) air_density_z_initial, temperature_z_initial, theta_z_initial, Pres00, vapor_z_initial, cc2,&
-         aerosol_z_initial, u_z_initial, v_z_initial
+      directory='python/Data/ORIGINAL_DATA/'
+
+      open (newunit=unit_number, file=directory//"inis.da", status= &
+            'unknown', form='unformatted')
+      read(unit_number) air_density_z_initial, temperature_z_initial, theta_z_initial, &
+         Pres00, vapor_z_initial, cc2, aerosol_z_initial, u_z_initial, v_z_initial
+
+
       close (unit_number)
 
       open(newunit=unit_number,file=directory//'varconz.da',status='unknown',form='unformatted')
@@ -86,7 +90,7 @@ contains
       !open(newunit=unit_number, file=directory//'cortes/POSSY',status='unknown',form='unformatted')
       do 10 ii=1,1
          if(pasoaux(ii).eq.1) then
-            open(newunit=unit_number2,file=directory//'nube15.sal',status='unknown',form='unformatted')
+            open(newunit=unit_number2,file=directory//'nube3115.sal',status='unknown',form='unformatted')
             read(unit_number2) u_perturbed_base,v_perturbed_base,w_perturbed_base,theta_base,pressure_base,vapor_base,drop_base,&
                rain_base,crystal_base,snow_base,hail_base,aerosol_base
             close(unit_number2)
