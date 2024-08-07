@@ -15,7 +15,7 @@ contains
       use memory_managment
       use model_initialization, only: initialize_model
       implicit none
-      character*26 :: directory
+      character*17 :: directory
       integer ii,i,j,k,l,m,n,ymax
       integer pasoaux(25),lvar
       integer, parameter :: nvar=13
@@ -29,7 +29,7 @@ contains
       integer unit_number2
 
       !**   datos generales
-      nombre='31'
+      nombre=''
       var(1)='UU'
       var(2)='VV'
       var(3)='WW'
@@ -45,24 +45,25 @@ contains
       var(13)='A1'
 
 
-      paso='17'
-      pasoaux(1)=1
+      paso='01020304050607080910111213141516171819202122232425'&
+          //'26272829303132333435363738394041424344454647484950'
+      pasoaux(1)=0
       pasoaux(2)=0
-      pasoaux(3)=1
+      pasoaux(3)=0
       pasoaux(4)=0
-      pasoaux(5)=1
+      pasoaux(5)=0
       pasoaux(6)=0
-      pasoaux(7)=1
+      pasoaux(7)=0
       pasoaux(8)=0
-      pasoaux(9)=1
+      pasoaux(9)=0
       pasoaux(10)=0
-      pasoaux(11)=1
+      pasoaux(11)=0
       pasoaux(12)=0
-      pasoaux(13)=1
+      pasoaux(13)=0
       pasoaux(14)=0
-      pasoaux(15)=1
+      pasoaux(15)=0
       pasoaux(16)=0
-      pasoaux(17)=0
+      pasoaux(17)=1
       pasoaux(18)=0
       pasoaux(19)=0
       pasoaux(20)=0
@@ -72,13 +73,11 @@ contains
       pasoaux(24)=0
       pasoaux(25)=0
       !*    lectura de los datos generales y de base
-      directory='python/Data/ORIGINAL_DATA/'
+      directory='python/Data/P10B/'
 
-      open (newunit=unit_number, file=directory//"inis.da", status= &
-            'unknown', form='unformatted')
-      read(unit_number) air_density_z_initial, temperature_z_initial, theta_z_initial, &
+      open (newunit=unit_number, file=directory//"inis.da")
+      read(unit_number,*) air_density_z_initial, temperature_z_initial, theta_z_initial, &
          Pres00, vapor_z_initial, cc2, aerosol_z_initial, u_z_initial, v_z_initial
-
 
       close (unit_number)
 
@@ -87,10 +86,11 @@ contains
          vapor_z_relative,aerosol_z_relative,Eautcn,Eacrcn
       close(unit_number)
 
-      !open(newunit=unit_number, file=directory//'cortes/POSSY',status='unknown',form='unformatted')
-      do 10 ii=1,1
+      open(newunit=unit_number, file=directory//'cortes/possy')
+      do 10 ii=1,25
          if(pasoaux(ii).eq.1) then
-            open(newunit=unit_number2,file=directory//'nube3115.sal',status='unknown',form='unformatted')
+            open(newunit=unit_number2,file=directory//'nube'&!//nombre&
+               //paso(ii*2-1:ii*2)//'.sal',status='unknown',form='unformatted')
             read(unit_number2) u_perturbed_base,v_perturbed_base,w_perturbed_base,theta_base,pressure_base,vapor_base,drop_base,&
                rain_base,crystal_base,snow_base,hail_base,aerosol_base
             close(unit_number2)
@@ -107,10 +107,10 @@ contains
                      endif
 300         continue
 
-            !write(unit_number) ii,ymax,maypre
+            write(unit_number,*) ii,ymax,maypre
 
             !*        cortes (no incluyen el piso)
-            j=1
+            j=ymax
             do 50 i=1,nx1
                do 50 k=1,mod_nz1
                   !           calculo de la temperatua
@@ -170,7 +170,8 @@ contains
 50          continue
 
             do 80 lvar=1,nvar
-               archaux=var(lvar)//nombre//'y17'
+               archaux=var(lvar)&!//nombre
+               //'y'//paso(ii*2-1:ii*2)
                write(*,*) archaux
                open(10+lvar,file=directory//'cortes/'//archaux)
                do 90 k=1,mod_nz1
