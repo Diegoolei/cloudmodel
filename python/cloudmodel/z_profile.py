@@ -140,7 +140,7 @@ def velocities() -> list[np.ndarray]:
             v_z_initial[k] = 3.0 - 5.0 * np.sqrt(z_reference / 9000.0)
 
     u_z_initial = u_z_initial * 0.7
-    v_z_initial = u_z_initial * 0.0
+    v_z_initial = u_z_initial * 0.7
     return [u_z_initial, v_z_initial]
 
 

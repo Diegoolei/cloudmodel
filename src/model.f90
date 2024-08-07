@@ -32,35 +32,37 @@ contains
       use, intrinsic :: iso_fortran_env, only: I4P => int32, R8P => real64
       use, intrinsic :: iso_fortran_env
       use forbear, only: bar_object
+      use get_cut, only: get_cutted
       implicit none
       type(bar_object) :: progress_bar
       real(R8P)        :: progress_percent
       call allocate_model()
       call initialize_model()
-      call progress_bar%initialize(filled_char_string='㊂', empty_char_string='●', &
-                                   suffix_string='| ', add_progress_percent=.true., prefix_string='Progress |', &
-                                   scale_bar_color_fg='blue', scale_bar_style='underline_on', spinner_string='(  ●   )')
-      call progress_bar%start
-      do current_time = 1, total_time
-         call vapor_advection()
-         call dinamics()
-         call negative_correction()
-         call water_calculation()
-         call microphisics_substring()
-         call floor_and_ceiling_contour()
-         call lateral_contour()
-         call speed_pressure()
-         call floor_condition_redefinition()
-         call floor_and_ceiling_contour_redefinition()
-         call lateral_contour_redefinition()
-         call filtro(theta_base, .01, .01, .02)
-         call vapour_negative_correction()
-         call save_backup()
-         progress_percent = real(current_time, R8P)/real(total_time, R8P)
-         call progress_bar%update(current=progress_percent)
-      end do
+      call get_cutted()
+      !call progress_bar%initialize(filled_char_string='㊂', empty_char_string='●', &
+      !                             suffix_string='| ', add_progress_percent=.true., prefix_string='Progress |', &
+      !                             scale_bar_color_fg='blue', scale_bar_style='underline_on', spinner_string='(  ●   )')
+      !call progress_bar%start
+      !do current_time = 1, total_time
+      !   call vapor_advection()
+      !   call dinamics()
+      !   call negative_correction()
+      !   call water_calculation()
+      !   call microphisics_substring()
+      !   call floor_and_ceiling_contour()
+      !   call lateral_contour()
+      !  call speed_pressure()
+      !   call floor_condition_redefinition()
+      !   call floor_and_ceiling_contour_redefinition()
+      !   call lateral_contour_redefinition()
+      !   call filtro(theta_base, .01, .01, .02)
+      !   call vapour_negative_correction()
+      !   call save_backup()
+      !   progress_percent = real(current_time, R8P)/real(total_time, R8P)
+      !   call progress_bar%update(current=progress_percent)
+      !end do
 
-      call progress_bar%destroy
+      !call progress_bar%destroy
       call deallocate_model()
    end subroutine model
 end module cloud_model

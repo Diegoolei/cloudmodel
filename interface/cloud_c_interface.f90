@@ -7,6 +7,7 @@ module c_interface
    use constants, only: set_constants
    use initial_z_state, only: set_initial_z_state
    use microphysics_perturbation, only: set_microphysics_perturbation
+   use get_cut, only: get_cutted
 
 contains
    subroutine set_dimensions_python(dx1, nz1)
@@ -50,6 +51,10 @@ contains
       real(c_double), intent(in), dimension(:) :: Av_in, Vtnie_in, Vtgra0_in
       call set_microphysics_perturbation(Av_in, Vtnie_in, Vtgra0_in)
    end subroutine set_microphysics_perturbation_python
+
+   subroutine get_cut_python()
+      call get_cutted()
+   end subroutine get_cut_python
 
    subroutine run_model_python(sim_time, save_lapse, statistic_time, backup_time, restore_backup, directory)
       ! bind(C, name="run_model")

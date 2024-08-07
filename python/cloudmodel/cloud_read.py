@@ -245,6 +245,10 @@ class CloudSimulation:
         self.run_initial_analysis()
         self.run_cloud_analysis()
 
+    def get_cuts(self):
+        """Get the cuts from the cloud model."""
+        nb.get_cut_python()
+
     def run_model(self):
         """Run the cloud model."""
         check_path(FolderHandle.IGNORE.value, self.directory)
