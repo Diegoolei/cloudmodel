@@ -195,10 +195,10 @@ contains
       implicit none
       integer :: unit_number
 
-      ltt = sim_time_minutes*60.*2.
-      ltg = save_lapse_minutes*60.*2.
-      lte = statistic_time_minutes*60.*2.
-      ltb = backup_time_minutes*60.*2.
+      ltt = 25.*3.*60.         !tiempo total de simulacion
+      ltg = 3*60.                !tiempo de grabacion
+      lte = 30.                       !tiempo de grabacion estadistica
+      ltb = 3*60.                       !tiempo de backup
 
       ctur = 0.5
       pro1 = 1.-2e-2*(dt1/5.)

@@ -35,9 +35,8 @@ contains
       real, dimension(nz1), intent(in)  :: vapor_z_relative, aerosol_z_relative
       integer :: unit_number
 
-      open (newunit=unit_number, file=output_directory//"inis.da", status= &
-            'unknown', form='unformatted')
-      write (unit_number) air_density_z_initial, temperature_z_initial, theta_z_initial, &
+      open (newunit=unit_number, file=output_directory//"inis.da")
+      write (unit_number,*) air_density_z_initial, temperature_z_initial, theta_z_initial, &
          Pres00, vapor_z_initial, cc2, aerosol_z_initial, u_z_initial, v_z_initial
       close (unit_number)
 

@@ -398,7 +398,7 @@ contains
 
       !*    difusion a gotitas
 
-      coaergot = -4.*pi*Dfaer*Naux*Rgot*Ngot
+      coaergot = -4.*pi*Dfaer*Naux*Rgot*Ncri
 
       !*    difusion a cristales
 

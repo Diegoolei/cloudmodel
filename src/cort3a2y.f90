@@ -15,7 +15,7 @@ contains
       use memory_managment
       use model_initialization, only: initialize_model
       implicit none
-      character*17 :: directory
+      character*13 :: directory
       integer ii,i,j,k,l,m,n,ymax
       integer pasoaux(25),lvar
       integer, parameter :: nvar=13
@@ -29,7 +29,6 @@ contains
       integer unit_number2
 
       !**   datos generales
-      nombre=''
       var(1)='UU'
       var(2)='VV'
       var(3)='WW'
@@ -61,10 +60,10 @@ contains
       pasoaux(12)=0
       pasoaux(13)=0
       pasoaux(14)=0
-      pasoaux(15)=0
-      pasoaux(16)=0
+      pasoaux(15)=1
+      pasoaux(16)=1
       pasoaux(17)=1
-      pasoaux(18)=0
+      pasoaux(18)=1
       pasoaux(19)=0
       pasoaux(20)=0
       pasoaux(21)=0
@@ -73,7 +72,7 @@ contains
       pasoaux(24)=0
       pasoaux(25)=0
       !*    lectura de los datos generales y de base
-      directory='python/Data/P10B/'
+      directory='Data/py_data/'
 
       open (newunit=unit_number, file=directory//"inis.da")
       read(unit_number,*) air_density_z_initial, temperature_z_initial, theta_z_initial, &
@@ -89,7 +88,7 @@ contains
       open(newunit=unit_number, file=directory//'cortes/possy')
       do 10 ii=1,25
          if(pasoaux(ii).eq.1) then
-            open(newunit=unit_number2,file=directory//'nube'&!//nombre&
+            open(newunit=unit_number2,file=directory//'nube'&
                //paso(ii*2-1:ii*2)//'.sal',status='unknown',form='unformatted')
             read(unit_number2) u_perturbed_base,v_perturbed_base,w_perturbed_base,theta_base,pressure_base,vapor_base,drop_base,&
                rain_base,crystal_base,snow_base,hail_base,aerosol_base
@@ -170,7 +169,7 @@ contains
 50          continue
 
             do 80 lvar=1,nvar
-               archaux=var(lvar)&!//nombre
+               archaux=var(lvar)&
                //'y'//paso(ii*2-1:ii*2)
                write(*,*) archaux
                open(10+lvar,file=directory//'cortes/'//archaux)

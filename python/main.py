@@ -6,13 +6,13 @@ import os
 
 def generate_cut_image():
     dirout = '../cortes/'
-    directory = 'Data/ORIGINAL_DATA/cortes/'
+    directory = 'Data/py_data/cortes/'
     os.chdir(directory)
 
     ny = 45
     nx = 50
     part = ['GO', 'LL', 'CR', 'NI','GR' ]
-    pos = '31y'
+    pos = 'y'
 
     vec = np.ones([ny, nx, len(part), 1])
 
@@ -33,16 +33,16 @@ def generate_cut_image():
 
 def main():
     z_initials_param = CloudSimulation(
-        simulation_time_minutes=45,
-        save_time_minutes=3,
-        statistic_time_minutes=3,
-        bacup_time_minutes=3,
+        simulation_time_minutes=1,
+        save_time_minutes=1,
+        statistic_time_minutes=1,
+        bacup_time_minutes=1,
         restore_backup=False,
-        directory="Data/ORIGINAL_DATA",
+        directory="Data/py_data",
     )
     z_initials_param.run_model()
-    # z_initials_param.load_model()
+    #z_initials_param.load_model()
     generate_cut_image()
-    z_initials_param.cloud_analytics.parse_status_img()
+    #z_initials_param.cloud_analytics.parse_status_img()
 
 main()
