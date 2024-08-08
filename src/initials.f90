@@ -131,10 +131,10 @@ contains
 
       ini = 0                                !inicio por vez primera= 0
       t1 = 0                                 !paso a inicio (si ini=0->t1=0)
-      ltt = 250.
-      ltg = 10.                              !tiempo de grabacion
-      lte = 30.                              !tiempo de grabacion estadistica
-      ltb = 10.                              !tiempo de grabacion de backup
+      ltt=25.*3.*60.                       !tiempo total de simulacion
+      ltg=3*60.                        !tiempo de grabacion
+      lte=30.                          !tiempo de grabacion estadistica
+      ltb=3*60.                        ! tiempo de grabacion de backup
 
       ctur = 0.5
 
@@ -477,8 +477,6 @@ contains
 
                   Qagua=Qgot1(i,j,k)+Qcri1(i,j,k)+Qllu1(i,j,k)+&
                      Qnie1(i,j,k)+Qgra1(i,j,k)
-                  Qagua=Qgot1(i,j,k)+Qllu1(i,j,k)+&
-                     (Qcri1(i,j,k)+Qnie1(i,j,k)+Qgra1(i,j,k))/1000
                   zmed=zmed+k*Qagua
                   Qaguat=Qaguat+Qagua
 

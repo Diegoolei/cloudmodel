@@ -2,7 +2,7 @@ subroutine graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
    U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
    Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo,&
    Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn)
-   
+
    USE dimen
    implicit none
    real, dimension(-3:nz1+3), intent(in) :: Den0, Temp0, Tita0, Pres00, Qvap0, cc2, aer0, UU, VV
@@ -10,27 +10,28 @@ subroutine graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: Pres1,Pres2,Fcalo
    real, dimension(-3:nx1+3,-3:nx1+3,-2:nz1+2), intent(in) :: Qvap1,Qvap2,Qgot1,Qgot2,aer1,aer2,Qllu1,Qllu2,Qcri1,Qcri2,&
       Qnie1,Qnie2,Qgra1,Qgra2
-   
+
    real, dimension(210:320), intent(in) :: Tvis, Tlvl, Tlsl, Tlvs, Telvs, Tesvs, Eautcn, Eacrcn
-   
+
    real, dimension(-3:2*nz1+5), intent(in) :: Av,Vtnie,Vtgra0
    real, dimension(nz1), intent(in)  :: Qvaprel,aerrel
+   integer :: unit_number
 
-   open(unit=40,file='outputdata/inis.da',status='unknown',form='unformatted')
-   open(unit=41,file='outputdata/velos.da',status='unknown',form='unformatted')
-   rewind 41
-   open(unit=42,file='outputdata/varconz.da',status='unknown',form='unformatted')
-   rewind 42
+   open(newunit=unit_number,file="outputdata/inis.da")
+   write(unit_number,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
+   close(unit_number)
 
-   write(40) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
-!$$
-   write(41) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
+   open(newunit=unit_number,file="outputdata/velos.da",status='unknown',form='unformatted')
+   rewind unit_number
+   write(unit_number) U1,U2,V1,V2,W1,W2,Titaa1,Titaa2,Pres1,Pres2,Qvap1,Qvap2,Qgot1,Qgot2,Qllu1,Qllu2,&
       Qcri1,Qcri2,Qnie1,Qnie2,Qgra1,Qgra2,aer1,aer2,Fcalo
-   write(42)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
+   close(unit_number)
 
-   close(42)
-   close(41)
-   close(40)
+   open(newunit=unit_number,file="outputdata/varconz.da",status='unknown',form='unformatted')
+   rewind unit_number
+   write(unit_number)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,Qvaprel,aerrel,Eautcn,Eacrcn
+   close(unit_number)
+
 end subroutine graba120
 
 subroutine graba231(k, t1, W2, Titaa1, Qvap1, Qllu1, Qgra1, aer1, Qvap0, aer0, tie, bre)
