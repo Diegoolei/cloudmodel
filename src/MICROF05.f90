@@ -376,7 +376,7 @@ subroutine microfis(els,ess,Lvl,Lvs,Lsl,T,Dv,Eaccn,Eaucn,Eacng,Lsl00,Fcal,n,&
 
 !*    difusion a gotitas
 
-   coaergot=-4.*pi*Dfaer*Naux*Rgot*Ngot
+   coaergot=-4.*pi*Dfaer*Naux*Rgot*Ncri
 
 !*    difusion a cristales
 

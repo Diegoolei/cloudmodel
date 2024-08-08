@@ -29,8 +29,8 @@ contains
       centx=(nx1+1.)*dx1/2.           !Coord x de la perturbacion inicial
       centy=(nx1+1.)*dx1/2.           !Coord y de la perturbacion inicial
       centz=0.                        !Coord z de la perturbacion inicial
-      cenaerx=(nx1+1.)*dx1/2.+4000.   !Coord x de la perturbacion de aerosoles
-      cenaery=(nx1+1.)*dx1/2.+1000.   !Coord y de la perturbacion de aerosoles
+      cenaerx=(nx1+1.)*dx1/2.+3000.   !Coord x de la perturbacion de aerosoles
+      cenaery=(nx1+1.)*dx1/2.         !Coord y de la perturbacion de aerosoles
       cenaerz=0.                      !Coord z de la perturbacion de aerosoles
       sigmat=2*1000.**2.              !Decaimiento en z de la perturbacion en T
       sigmaa=200.**2.                 !Decaimiento en z de la perturbacion en A
@@ -85,10 +85,10 @@ contains
             VV(k)=3.-5.*(zeta1/9000.)**.5
 !
          endif
+         UU(k)=UU(k)*0.7
+         VV(k)=VV(k)*0.7
 
-         UU(k)=UU(k)*.7
-         VV(k)=VV(k)*0.
-      end do
+5     continue
 
 
 !**   calculo de 'constantes' que dependen de T

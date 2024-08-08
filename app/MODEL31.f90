@@ -595,10 +595,10 @@ program modelo
             aer1(i,j,k)=pro3*aer2(i,j,k)+pro4*((aer2(i+1,j,k)+aer2(i-1,j,k))+(aer2(i,j+1,k)+aer2(i,j-1,k)))
 
             !correccion cambiando la absorcion de aerosoles
-            if ((Qllu1(i,j,1)+Qgra1(i,j,1)).gt.1e-6 .and.W2(i,j,1).lt.0) then
-               aeraux=-W2(i,j,1)*.5*dt1/(dx1/2)
+            if (Qllu1(i,j,0).gt.1e-6 .and. W2(i,j,1).lt.-.1) then
+               aeraux=(-W2(i,j,1)/1.)*(Qllu1(i,j,0)/1e-3)*.02*(dt1/5.)
                aer1(i,j,k)=aer1(i,j,k)-(aer1(i,j,k)+aer0(k))*aeraux
-            endif
+             endif
 
             if (abs(aer1(i,j,k)).lt.1e-10) aer1(i,j,k)=0
 

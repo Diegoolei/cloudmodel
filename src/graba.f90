@@ -18,8 +18,8 @@ subroutine graba120(Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV,&
    real, dimension(nz1), intent(in)  :: Qvaprel,aerrel
    integer :: unit_number
 
-   open(newunit=unit_number,file=output_directory//"inis.da",status='unknown',form='unformatted')
-   write(unit_number) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
+   open(newunit=unit_number,file=output_directory//"inis.da")
+   write(unit_number,*) Den0,Temp0,Tita0,Pres00,Qvap0,cc2,aer0,UU,VV
    close(unit_number)
 
    open(newunit=unit_number,file=output_directory//"velos.da",status='unknown',form='unformatted')
