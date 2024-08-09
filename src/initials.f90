@@ -57,6 +57,30 @@ contains
       integer i, j, k, unit
       initial_x_perturbation = (nx1 + 1.)*dx1/2.  !! Initial disturbance’s x-coordinate
       initial_y_perturbation = (nx1 + 1.)*dx1/2.
+      
+      do concurrent(k=0:nz1)
+         z_aux = k*dx1
+         if (z_aux <= 500.) then
+            u_z_initial(k) = 0.
+            v_z_initial(k) = 0.
+
+         elseif (z_aux <= 2000.) then
+            u_z_initial(k) = 4.*((z_aux - 500.)/1500.)**2.
+            v_z_initial(k) = 0.
+
+         elseif (z_aux <= 9000.) then
+            u_z_initial(k) = 4.-10.*((z_aux - 2000.)/7000.)**2.
+            v_z_initial(k) = 3.*((z_aux - 2000.)/7000.)**.5
+            !
+         else
+            u_z_initial(k) = 4.*((z_aux - 9000.)/9000.)**2.-6.
+            v_z_initial(k) = 3.-5.*((z_aux - 9000.)/9000.)**.5
+            !
+         end if
+
+         u_z_initial(k) = u_z_initial(k)*0.7
+         v_z_initial(k) = v_z_initial(k)*0.7
+      end do
 
       open (newunit=unit, file=output_directory//"initial_z_arrays", access='append')
       do concurrent(k=210:313)

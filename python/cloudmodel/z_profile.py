@@ -116,12 +116,11 @@ def crystal_efficiencies() -> list[np.ndarray]:
 
 
 def velocities() -> list[np.ndarray]:
-    biased_nz1 = nz1 + 4
-    u_z_initial = np.zeros(biased_nz1)
-    v_z_initial = np.zeros(biased_nz1)
+    u_z_initial = np.zeros(nz1 + 7)
+    v_z_initial = np.zeros(nz1 + 7)
 
-    for k in range(biased_nz1 - nz1 - 1, biased_nz1):
-        z_aux = (k - (biased_nz1 - nz1 - 1)) * dx1
+    for k in range(3, nz1 + 4):
+        z_aux =  k * dx1
         if z_aux <= 500.0:
             u_z_initial[k] = 0.0
             v_z_initial[k] = 0.0

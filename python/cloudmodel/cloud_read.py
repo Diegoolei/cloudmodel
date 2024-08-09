@@ -242,7 +242,7 @@ class CloudSimulation:
 
     def load_model(self):
         """Load the cloud model."""
-        self.run_initial_analysis()
+        #self.run_initial_analysis()
         self.run_cloud_analysis()
 
     def get_cuts(self):
@@ -304,7 +304,7 @@ class CloudSimulation:
             self.restore_backup,
             self.directory,
         )
-        self.load_model()
+        # self.load_model()
 
     def run_initial_analysis(self):
         """
