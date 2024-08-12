@@ -19,6 +19,40 @@ from .constants import (
     nube31_biased_nz1,
     nube31_var_list,
 )
+from .constants import nz1, dx1
+from .constants import (
+    G,
+    Rd,
+    Rv,
+    Kapa,
+    T0,
+    P00,
+    Lvl0,
+    Lsl0,
+    Vis0,
+    rhogra,
+    Av0,
+    Vtnie0,
+    Cp,
+    Cv,
+)
+from .z_profile import (
+    latent_heat,
+    saturated_vapor_pressure2,
+    viscosity,
+    crystal_efficiencies,
+    velocities,
+    PP,
+    temperature,
+    air_density,
+    aerosol,
+    vapor,
+    rain_terminal_velocity,
+    snow_terminal_velocity,
+    hail_terminal_velocity,
+    air_density_recalc,
+    PP2,
+)
 from .interface import c_interface as nb
 
 
@@ -67,19 +101,201 @@ class CloudSimulation:
         bacup_time_minutes=0,
         restore_backup=False,
         directory=".temp/",
+        dx1=dx1,
+        nz1=nz1,
+        G=G,
+        Rd=Rd,
+        Rv=Rv,
+        Kapa=Kapa,
+        T0=T0,
+        P00=P00,
+        Lvl0=Lvl0,
+        Lsl0=Lsl0,
+        Vis0=Vis0,
+        rhogra=rhogra,
+        Av0=Av0,
+        Vtnie0=Vtnie0,
+        Cp=Cp,
+        Cv=Cv,
+        Tlvl=None,
+        Tlsl=None,
+        Tlvs=None,
+        Telvs=None,
+        Tesvs=None,
+        Tvis=None,
+        u_z_initial=None,
+        v_z_initial=None,
+        Presi0=None,
+        theta_z_initial=None,
+        Pres00=None,
+        cc2=None,
+        temperature_z_initial=None,
+        air_density_z_initial=None,
+        aerosol_z_initial=None,
+        vapor_z_initial=None,
+        Av=None,
+        Vtnie=None,
+        Vtgra0=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
         self.statistic_time_minutes = statistic_time_minutes
         self.bacup_time_minutes = bacup_time_minutes
         self.restore_backup = restore_backup
+        if directory[-1] != "/":
+            directory += "/"
+        print(f"Destination directory: {directory}")
         self.directory = directory
+
+        self.dx1 = dx1
+        self.nz1 = nz1
+        self.G = G
+        self.Rd = Rd
+        self.Rv = Rv
+        self.Kapa = Kapa
+        self.T0 = T0
+        self.P00 = P00
+        self.Lvl0 = Lvl0
+        self.Lsl0 = Lsl0
+        self.Vis0 = Vis0
+        self.rhogra = rhogra
+        self.Av0 = Av0
+        self.Vtnie0 = Vtnie0
+        self.Cp = Cp
+        self.Cv = Cv
+        if Tlvl is None or Tlsl is None or Tlvs is None:
+            l_heat = latent_heat()
+            if Tlvl is None:
+                self.Tlvl = l_heat[0]
+            if Tlsl is None:
+                self.Tlsl = l_heat[1]
+            if Tlvs is None:
+                self.Tlvs = l_heat[2]
+        if Telvs is None or Tesvs is None:
+            s_vapor = saturated_vapor_pressure2(self.Tlvl, self.Tlvs)
+            if Telvs is None:
+                self.Telvs = s_vapor[0]
+            if Tesvs is None:
+                self.Tesvs = s_vapor[1]
+        if Tvis is None:
+            self.Tvis = viscosity()
+        if Telvs is None or Tesvs is None:
+            cry_effic = crystal_efficiencies()
+            if Telvs is None:
+                self.Eautcn = cry_effic[0]
+            if Tesvs is None:
+                self.Eacrcn = cry_effic[1]
+        if u_z_initial is None or v_z_initial is None:
+            z_profile = velocities()
+            if u_z_initial is None:
+                self.u_z_initial = z_profile[0]
+            if v_z_initial is None:
+                self.v_z_initial = z_profile[1]
+        if temperature_z_initial is None:
+            self.temperature_z_initial = temperature()
+        if aerosol_z_initial is None:
+            self.aerosol_z_initial = aerosol()
+        if vapor_z_initial is None:
+            self.vapor_z_initial = vapor(self.temperature_z_initial, self.Telvs)
+        if (Av is None) or (Vtnie is None):
+            Presi0_aux = PP()
+            if Av is None:
+                self.Av = rain_terminal_velocity(Presi0_aux)
+            if Vtnie is None:
+                self.Vtnie = snow_terminal_velocity(Presi0_aux)
+            
+        if Vtgra0 is None:
+            self.Vtgra0_in = hail_terminal_velocity(
+                self.Tvis,
+                self.temperature_z_initial,
+                air_density(Presi0_aux, self.temperature_z_initial),
+            )
+        if air_density_z_initial is None:
+            self.air_density_z_initial = air_density_recalc(
+                air_density(PP(), self.temperature_z_initial),
+                self.vapor_z_initial,
+            )
+            #self.air_density_z_initial = air_density(PP(), self.temperature_z_initial)
+        if (
+            (Presi0 is None)
+            or (theta_z_initial is None)
+            or (Pres00 is None)
+            or (cc2 is None)
+        ):
+            Presi0_aux = PP()
+            pp2_aux = PP2(
+                self.air_density_z_initial,
+                Presi0_aux,
+                self.temperature_z_initial,
+            )
+            if Presi0 is None:
+                self.Presi0 = pp2_aux[0]
+            if theta_z_initial is None:
+                self.theta_z_initial = pp2_aux[1]
+            if Pres00 is None:
+                self.Pres00 = pp2_aux[2]
+            if cc2 is None:
+                self.cc2 = pp2_aux[3]
+
         self.initial_analytics: FileStyle = None
         self.cloud_analytics: FileStyle = None
+
+    def load_model(self):
+        """Load the cloud model."""
+        #self.run_initial_analysis()
+        self.run_cloud_analysis()
+
+    def get_cuts(self):
+        """Get the cuts from the cloud model."""
+        nb.get_cut_python()
 
     def run_model(self):
         """Run the cloud model."""
         check_path(FolderHandle.IGNORE.value, self.directory)
+        nb.set_dimensions_python(self.dx1, self.nz1)
+        nb.set_constants_python(
+            self.G,
+            self.Rd,
+            self.Rv,
+            self.Kapa,
+            self.T0,
+            self.P00,
+            self.Lvl0,
+            self.Lsl0,
+            self.Vis0,
+            self.rhogra,
+            self.Av0,
+            self.Vtnie0,
+            self.Cp,
+            self.Cv,
+            self.Tlvl,
+            self.Tlsl,
+            self.Tlvs,
+            self.Telvs,
+            self.Tesvs,
+            self.Tvis,
+            self.Eautcn,
+            self.Eacrcn,
+        )
+        nb.set_initial_z_state_python(
+            self.temperature_z_initial,
+            self.u_z_initial,
+            self.v_z_initial,
+            self.Presi0,
+            self.air_density_z_initial,
+            self.aerosol_z_initial,
+            self.vapor_z_initial,
+            self.theta_z_initial,
+            self.Pres00,
+            self.cc2,
+        )
+
+        nb.set_microphysics_perturbation_python(
+            self.Av,
+            self.Vtnie,
+            self.Vtgra0_in,
+        )
+
         nb.run_model_python(
             self.simulation_time_minutes,
             self.save_time_minutes,
@@ -88,8 +304,7 @@ class CloudSimulation:
             self.restore_backup,
             self.directory,
         )
-        self.run_initial_analysis()
-        self.run_cloud_analysis()
+        # self.load_model()
 
     def run_initial_analysis(self):
         """
@@ -120,8 +335,8 @@ class CloudSimulation:
         data = FileStyle(
             chosen_file="Nube",
             output_data_path=self.directory,
-            img_path="img/" + self.directory,
-            img_option="Contour",
+            img_path="image/",
+            img_option=ImageStyle.CONTOUR.value,
             folder_handle="Delete",
         )
         self.cloud_analytics = data
@@ -185,7 +400,7 @@ class FileStyle:
         if output_data_path[-1] != "/":
             output_data_path += "/"
         self.output_data_path = output_data_path
-        self.img_path = img_path
+        self.img_path = f"{output_data_path}{img_path}"
         self.data_file = []
         self.folder_handle = folder_handle
         match chosen_file:

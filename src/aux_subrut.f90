@@ -7,10 +7,13 @@ contains
       use dinamic_var_perturbation
       use constants
       use turbvar1
-      use turbu1_vars
       implicit none
 
       integer, intent(in) :: kk
+
+      real dv(3, 3)
+      real vel(3, -5:5, -5:5, -5:5)
+      integer lx, ly, lz, ldis, i, j, k, n, m
 
       k = kk + 1
       do concurrent(i=0:nx1 + 1, j=0:nx1 + 1)
@@ -95,10 +98,12 @@ contains
       use dimensions
       use turbvar
       use turbvar1
-      use turbu2_vars
       implicit none
       integer, intent(in) :: i, j
       real aux
+      real sum
+      real KM(-3:3, -3:3, -3:3)
+      integer lx, ly, lz, n, m, ldis
 
       !     calculo de KM
       do lx = -1, 1
@@ -107,14 +112,14 @@ contains
                ldis = abs(lx) + abs(ly) + abs(lz)
                if (ldis <= 2) then
                   call suma(aux, &
-                            D(1, 1, i + lx, j + ly, 2 + lz)**2., &
-                            D(2, 2, i + lx, j + ly, 2 + lz)**2., &
-                            D(3, 3, i + lx, j + ly, 2 + lz)**2.)
+                     D(1, 1, i + lx, j + ly, 2 + lz)**2., &
+                     D(2, 2, i + lx, j + ly, 2 + lz)**2., &
+                     D(3, 3, i + lx, j + ly, 2 + lz)**2.)
                   sum = aux/2.
                   call suma(aux, &
-                            D(1, 2, i + lx, j + ly, 2 + lz)**2., &
-                            D(1, 3, i + lx, j + ly, 2 + lz)**2., &
-                            D(2, 3, i + lx, j + ly, 2 + lz)**2.)
+                     D(1, 2, i + lx, j + ly, 2 + lz)**2., &
+                     D(1, 3, i + lx, j + ly, 2 + lz)**2., &
+                     D(2, 3, i + lx, j + ly, 2 + lz)**2.)
                   sum = sum + aux
 
                   KM(lx, ly, lz) = sum**.5
@@ -179,32 +184,32 @@ contains
       real(8) :: laplacian_of_laplacian !! Laplacian of laplacian
 
       velocity_xx = (u_perturbed_new(i - 2, j, k) - u_perturbed_new(i + 2, j, k)) &
-                    + 8.*(u_perturbed_new(i + 1, j, k) - u_perturbed_new(i - 1, j, k))
+         + 8.*(u_perturbed_new(i + 1, j, k) - u_perturbed_new(i - 1, j, k))
       velocity_xy = (u_perturbed_new(i, j - 2, k) - u_perturbed_new(i, j + 2, k)) &
-                    + 8.*(u_perturbed_new(i, j + 1, k) - u_perturbed_new(i, j - 1, k))
+         + 8.*(u_perturbed_new(i, j + 1, k) - u_perturbed_new(i, j - 1, k))
       velocity_xz = (u_perturbed_new(i, j, k - 2) - u_perturbed_new(i, j, k + 2)) &
-                    + 8.*(u_perturbed_new(i, j, k + 1) - u_perturbed_new(i, j, k - 1))
+         + 8.*(u_perturbed_new(i, j, k + 1) - u_perturbed_new(i, j, k - 1))
 
       velocity_yx = (v_perturbed_new(i - 2, j, k) - v_perturbed_new(i + 2, j, k)) &
-                    + 8.*(v_perturbed_new(i + 1, j, k) - v_perturbed_new(i - 1, j, k))
+         + 8.*(v_perturbed_new(i + 1, j, k) - v_perturbed_new(i - 1, j, k))
       velocity_yy = (v_perturbed_new(i, j - 2, k) - v_perturbed_new(i, j + 2, k)) &
-                    + 8.*(v_perturbed_new(i, j + 1, k) - v_perturbed_new(i, j - 1, k))
+         + 8.*(v_perturbed_new(i, j + 1, k) - v_perturbed_new(i, j - 1, k))
       velocity_yz = (v_perturbed_new(i, j, k - 2) - v_perturbed_new(i, j, k + 2)) &
-                    + 8.*(v_perturbed_new(i, j, k + 1) - v_perturbed_new(i, j, k - 1))
+         + 8.*(v_perturbed_new(i, j, k + 1) - v_perturbed_new(i, j, k - 1))
 
       velocity_zx = (w_perturbed_new(i - 2, j, k) - w_perturbed_new(i + 2, j, k)) &
-                    + 8.*(w_perturbed_new(i + 1, j, k) - w_perturbed_new(i - 1, j, k))
+         + 8.*(w_perturbed_new(i + 1, j, k) - w_perturbed_new(i - 1, j, k))
       velocity_zy = (w_perturbed_new(i, j - 2, k) - w_perturbed_new(i, j + 2, k)) &
-                    + 8.*(w_perturbed_new(i, j + 1, k) - w_perturbed_new(i, j - 1, k))
+         + 8.*(w_perturbed_new(i, j + 1, k) - w_perturbed_new(i, j - 1, k))
       velocity_zz = (w_perturbed_new(i, j, k - 2) - w_perturbed_new(i, j, k + 2)) &
-                    + 8.*(w_perturbed_new(i, j, k + 1) - w_perturbed_new(i, j, k - 1))
+         + 8.*(w_perturbed_new(i, j, k + 1) - w_perturbed_new(i, j, k - 1))
 
       divergence_x = (u_perturbed_new(i, j, k)*velocity_xx + v_perturbed_new(i, j, k)*velocity_xy) &
-                     + w_perturbed_new(i, j, k)*velocity_xz
+         + w_perturbed_new(i, j, k)*velocity_xz
       divergence_y = (u_perturbed_new(i, j, k)*velocity_yx + v_perturbed_new(i, j, k)*velocity_yy) &
-                     + w_perturbed_new(i, j, k)*velocity_yz
+         + w_perturbed_new(i, j, k)*velocity_yz
       divergence_z = (u_perturbed_new(i, j, k)*velocity_zx + v_perturbed_new(i, j, k)*velocity_zy) &
-                     + w_perturbed_new(i, j, k)*velocity_zz
+         + w_perturbed_new(i, j, k)*velocity_zz
 
       coefficient_a1 = (KM1*DD(1, 1) + KM2*DD(1, 2)) + KM3*DD(1, 3)
       coefficient_a2 = KMM*((D1(1) + D2(1)) + D3(1))
@@ -223,9 +228,9 @@ contains
 
       !$$
       gravitational_acceleration = G*(theta_base(i, j, k)/theta_z_initial(k) &
-                                      + (AA*vapor_base(i, j, k) - drop_base(i, j, k) - rain_base(i, j, k) &
-                                         - crystal_base(i, j, k) - snow_base(i, j, k) - hail_base(i, j, k) &
-                                         )/air_density_z_initial(k))
+         + (AA*vapor_base(i, j, k) - drop_base(i, j, k) - rain_base(i, j, k) &
+         - crystal_base(i, j, k) - snow_base(i, j, k) - hail_base(i, j, k) &
+         )/air_density_z_initial(k))
 
       fu(i, j, k) = turbulence_x/dx8 - divergence_x/dx12
       fv(i, j, k) = turbulence_y/dx8 - divergence_y/dx12
@@ -233,9 +238,9 @@ contains
 
       !     agregado para la P (23/8/97)
       laplacian_of_laplacian = (pressure_new(i + 1, j, k) + pressure_new(i - 1, j, k)) &
-                               + (pressure_new(i, j + 1, k) + pressure_new(i, j - 1, k)) &
-                               + pressure_new(i, j, k + 1) + pressure_new(i, j, k - 1) &
-                               - 6.*pressure_new(i, j, k)
+         + (pressure_new(i, j + 1, k) + pressure_new(i, j - 1, k)) &
+         + pressure_new(i, j, k + 1) + pressure_new(i, j, k - 1) &
+         - 6.*pressure_new(i, j, k)
 
       fp(i, j, k) = cteturb*KMM/dx2*laplacian_of_laplacian
 
@@ -250,11 +255,13 @@ contains
       use constants
       use initial_z_state
       use turbvar
-      use tempe01
       implicit none
 
       real, intent(in) :: dden0z, Fcal
       integer, intent(in) :: i, j, k
+
+      real dtita(3), adv(3)
+      real advec, verti, escal, lapla, turden, turbul, calor
 
       adv(1) = (u_perturbed_new(i, j, k) + u_z_initial(k))*(theta_base(i + 1, j, k) - theta_base(i - 1, j, k))
       adv(2) = (v_perturbed_new(i, j, k) + v_z_initial(k))*(theta_base(i, j + 1, k) - theta_base(i, j - 1, k))
@@ -273,9 +280,9 @@ contains
       escal = (dtita(1)*KM1 + dtita(2)*KM2) + dtita(3)*KM3
 
       lapla = (theta_base(i + 1, j, k) + theta_base(i - 1, j, k)) &
-              + (theta_base(i, j + 1, k) + theta_base(i, j - 1, k)) &
-              + theta_base(i, j, k + 1) + theta_base(i, j, k - 1) &
-              - 6*theta_base(i, j, k)
+         + (theta_base(i, j + 1, k) + theta_base(i, j - 1, k)) &
+         + theta_base(i, j, k + 1) + theta_base(i, j, k - 1) &
+         - 6*theta_base(i, j, k)
       lapla = lapla + (theta_z_initial(k + 1) + theta_z_initial(k - 1) - 2.*theta_z_initial(k))
 
       turden = dden0z*(theta_z_initial(k + 1) - theta_z_initial(k - 1))
@@ -283,7 +290,7 @@ contains
       turbul = 3.*cteturb/dx8*(escal + KMM*(4.*lapla + turden))
 
       theta_new(i, j, k) = dt1*((advec + verti)/dx2 + turbul + calor) + &
-                           theta_base(i, j, k)
+         theta_base(i, j, k)
       return
    end subroutine tempot
 
@@ -296,47 +303,49 @@ contains
       use initial_z_state
       use advecs
       use turbvar
-      use dvapor_vars
       implicit none
 
       integer, intent(in) :: l, m, n
+
+      real dqvap(3), adv(3)
+      real advec, verti, escal, lapla, turbul, aux
 
       dqvap(1) = vapor_base(l + 1, m, n) - vapor_base(l - 1, m, n)
       dqvap(2) = vapor_base(l, m + 1, n) - vapor_base(l, m - 1, n)
       dqvap(3) = vapor_base(l, m, n + 1) - vapor_base(l, m, n - 1)
 
       adv(1) = (((u_perturbed_new(l + 1, m, n) + u_perturbed_new(l, m, n))* &
-                 (vapor_base(l + 1, m, n) + vapor_base(l, m, n))) - &
-                ((u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))* &
-                 (vapor_base(l - 1, m, n) + vapor_base(l, m, n))))/4.
+         (vapor_base(l + 1, m, n) + vapor_base(l, m, n))) - &
+         ((u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))* &
+         (vapor_base(l - 1, m, n) + vapor_base(l, m, n))))/4.
       adv(1) = adv(1) + dqvap(1)/2.*u_z_initial(n)
 
       adv(2) = (((v_perturbed_new(l, m + 1, n) + v_perturbed_new(l, m, n))* &
-                 (vapor_base(l, m + 1, n) + vapor_base(l, m, n))) - &
-                ((v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))* &
-                 (vapor_base(l, m - 1, n) + vapor_base(l, m, n))))/4.
+         (vapor_base(l, m + 1, n) + vapor_base(l, m, n))) - &
+         ((v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))* &
+         (vapor_base(l, m - 1, n) + vapor_base(l, m, n))))/4.
       adv(2) = adv(2) + dqvap(2)/2.*v_z_initial(n)
 
       advvap2(l, m) = (w_perturbed_new(l, m, n) + w_perturbed_new(l, m, n + 1))* &
-                      (vapor_base(l, m, n) + vapor_base(l, m, n + 1))/4.
+         (vapor_base(l, m, n) + vapor_base(l, m, n + 1))/4.
 
       adv(3) = advvap2(l, m) - advvap1(l, m)
 
       advec = -((adv(1) + adv(2)) + adv(3))
 
       verti = -((w_perturbed_new(l, m, n + 1) + w_perturbed_new(l, m, n))*(vapor_z_initial(n + 1) + vapor_z_initial(n)) - &
-                (w_perturbed_new(l, m, n - 1) + w_perturbed_new(l, m, n))*(vapor_z_initial(n - 1) + vapor_z_initial(n)))/4.
+         (w_perturbed_new(l, m, n - 1) + w_perturbed_new(l, m, n))*(vapor_z_initial(n - 1) + vapor_z_initial(n)))/4.
 
       aux = -(u_perturbed_new(l + 1, m, n) - u_perturbed_new(l - 1, m, n) &
-              + v_perturbed_new(l, m + 1, n) - v_perturbed_new(l, m - 1, n))* &
-            vapor_z_initial(n)/2.
+         + v_perturbed_new(l, m + 1, n) - v_perturbed_new(l, m - 1, n))* &
+         vapor_z_initial(n)/2.
 
       escal = dqvap(1)*KM1 + dqvap(2)*KM2 + dqvap(3)*KM3
 
       lapla = ((vapor_base(l + 1, m, n) + vapor_base(l - 1, m, n)) + &
-               (vapor_base(l, m + 1, n) + vapor_base(l, m - 1, n))) + &
-              vapor_base(l, m, n + 1) + vapor_base(l, m, n - 1) - &
-              6.*vapor_base(l, m, n)
+         (vapor_base(l, m + 1, n) + vapor_base(l, m - 1, n))) + &
+         vapor_base(l, m, n + 1) + vapor_base(l, m, n - 1) - &
+         6.*vapor_base(l, m, n)
 
       lapla = lapla + (vapor_z_initial(n + 1) + vapor_z_initial(n - 1) - 2.*vapor_z_initial(n))
 
@@ -359,27 +368,29 @@ contains
       use initial_z_state
       use advecs
       use turbvar
-      use dgotit_vars
       implicit none
 
       integer, intent(in) :: l, m, n
+
+      real dqgot(3), adv(3)
+      real advec, escal, lapla, turbul
 
       dqgot(1) = drop_base(l + 1, m, n) - drop_base(l - 1, m, n)
       dqgot(2) = drop_base(l, m + 1, n) - drop_base(l, m - 1, n)
       dqgot(3) = drop_base(l, m, n + 1) - drop_base(l, m, n - 1)
 
       adv(1) = ((u_perturbed_new(l + 1, m, n) + u_perturbed_new(l, m, n))*(drop_base(l + 1, m, n) + drop_base(l, m, n)) &
-                - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(drop_base(l - 1, m, n) + drop_base(l, m, n)))/4.
+         - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(drop_base(l - 1, m, n) + drop_base(l, m, n)))/4.
       adv(1) = adv(1) + dqgot(1)/2.*u_z_initial(n)
 
       adv(2) = ((v_perturbed_new(l, m + 1, n) + v_perturbed_new(l, m, n))*(drop_base(l, m + 1, n) + drop_base(l, m, n)) &
-                - (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(drop_base(l, m - 1, n) + drop_base(l, m, n)))/4.
+         - (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(drop_base(l, m - 1, n) + drop_base(l, m, n)))/4.
       adv(2) = adv(2) + dqgot(2)/2.*v_z_initial(n)
 
       advgot2(l, m) = (w_perturbed_new(l, m, n) + w_perturbed_new(l, m, n + 1))* &
-                      (drop_base(l, m, n) + drop_base(l, m, n + 1))/4.
+         (drop_base(l, m, n) + drop_base(l, m, n + 1))/4.
       if ((advgot2(l, m) - advgot1(l, m))*dt1/dx1 > drop_base(l, m, n) .and. &
-          w_perturbed_new(l, m, n) > 0) then
+         w_perturbed_new(l, m, n) > 0) then
          advgot2(l, m) = advgot1(l, m) + drop_base(l, m, n)*dx1/dt1
       end if
       adv(3) = advgot2(l, m) - advgot1(l, m)
@@ -389,8 +400,8 @@ contains
       escal = dqgot(1)*KM1 + dqgot(2)*KM2 + dqgot(3)*KM3
 
       lapla = drop_base(l + 1, m, n) + drop_base(l, m + 1, n) + drop_base(l, m, n + 1) + &
-              drop_base(l - 1, m, n) + drop_base(l, m - 1, n) + drop_base(l, m, n - 1) - &
-              6.*drop_base(l, m, n)
+         drop_base(l - 1, m, n) + drop_base(l, m - 1, n) + drop_base(l, m, n - 1) - &
+         6.*drop_base(l, m, n)
 
       turbul = cteturb*(escal/dx8 + KMM/dx2*lapla)
 
@@ -408,25 +419,27 @@ contains
       use initial_z_state
       use advecs
       use turbvar
-      use dlluvi_vars
       implicit none
 
       integer, intent(in) :: l, m, n
+
+      real dqllu(3), adv(3)
+      real advec, escal, lapla, turbul, sedim, Qllus, Qllui, Rms, Rmm, Rmi, Vtllus, Vtllui
 
       dqllu(1) = rain_base(l + 1, m, n) - rain_base(l - 1, m, n)
       dqllu(2) = rain_base(l, m + 1, n) - rain_base(l, m - 1, n)
       dqllu(3) = rain_base(l, m, n + 1) - rain_base(l, m, n - 1)
 
       adv(1) = ((u_perturbed_new(l + 1, m, n) + u_perturbed_new(l, m, n))*(rain_base(l + 1, m, n) + rain_base(l, m, n)) &
-                - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(rain_base(l - 1, m, n) + rain_base(l, m, n)))/4.
+         - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(rain_base(l - 1, m, n) + rain_base(l, m, n)))/4.
       adv(1) = adv(1) + dqllu(1)/2.*u_z_initial(n)
 
       adv(2) = ((v_perturbed_new(l, m + 1, n) + v_perturbed_new(l, m, n))*(rain_base(l, m + 1, n) + rain_base(l, m, n)) - &
-                (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(rain_base(l, m - 1, n) + rain_base(l, m, n)))/4.
+         (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(rain_base(l, m - 1, n) + rain_base(l, m, n)))/4.
       adv(2) = adv(2) + dqllu(2)/2.*v_z_initial(n)
 
       advllu2(l, m) = (w_perturbed_new(l, m, n) + w_perturbed_new(l, m, n + 1))* &
-                      (rain_base(l, m, n) + rain_base(l, m, n + 1))/4.
+         (rain_base(l, m, n) + rain_base(l, m, n + 1))/4.
 
       adv(3) = advllu2(l, m) - advllu1(l, m)
 
@@ -435,8 +448,8 @@ contains
       escal = dqllu(1)*KM1 + dqllu(2)*KM2 + dqllu(3)*KM3
 
       lapla = rain_base(l + 1, m, n) + rain_base(l, m + 1, n) + rain_base(l, m, n + 1) + &
-              rain_base(l - 1, m, n) + rain_base(l, m - 1, n) + rain_base(l, m, n - 1) - &
-              6.*rain_base(l, m, n)
+         rain_base(l - 1, m, n) + rain_base(l, m - 1, n) + rain_base(l, m, n - 1) - &
+         6.*rain_base(l, m, n)
 
       turbul = cteturb*(escal/dx8 + KMM/dx2*lapla)
 
@@ -469,25 +482,27 @@ contains
       use initial_z_state
       use advecs
       use turbvar
-      use dcrist_vars
       implicit none
 
       integer, intent(in) :: l, m, n
+
+      real dqcri(3), adv(3)
+      real advec, escal, lapla, turbul
 
       dqcri(1) = crystal_base(l + 1, m, n) - crystal_base(l - 1, m, n)
       dqcri(2) = crystal_base(l, m + 1, n) - crystal_base(l, m - 1, n)
       dqcri(3) = crystal_base(l, m, n + 1) - crystal_base(l, m, n - 1)
 
       adv(1) = ((u_perturbed_new(l + 1, m, n) + u_perturbed_new(l, m, n))*(crystal_base(l + 1, m, n) + crystal_base(l, m, n)) &
-                - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(crystal_base(l - 1, m, n) + crystal_base(l, m, n)))/4.
+         - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(crystal_base(l - 1, m, n) + crystal_base(l, m, n)))/4.
       adv(1) = adv(1) + dqcri(1)/2.*u_z_initial(n)
 
       adv(2) = ((v_perturbed_new(l, m + 1, n) + v_perturbed_new(l, m, n))*(crystal_base(l, m + 1, n) + crystal_base(l, m, n)) - &
-                (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(crystal_base(l, m - 1, n) + crystal_base(l, m, n)))/4.
+         (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(crystal_base(l, m - 1, n) + crystal_base(l, m, n)))/4.
       adv(2) = adv(2) + dqcri(2)/2.*v_z_initial(n)
 
       advcri2(l, m) = (w_perturbed_new(l, m, n) + w_perturbed_new(l, m, n + 1))* &
-                      (crystal_base(l, m, n) + crystal_base(l, m, n + 1))/4.
+         (crystal_base(l, m, n) + crystal_base(l, m, n + 1))/4.
 
       adv(3) = advcri2(l, m) - advcri1(l, m)
 
@@ -496,8 +511,8 @@ contains
       escal = dqcri(1)*KM1 + dqcri(2)*KM2 + dqcri(3)*KM3
 
       lapla = crystal_base(l + 1, m, n) + crystal_base(l, m + 1, n) + crystal_base(l, m, n + 1) + &
-              crystal_base(l - 1, m, n) + crystal_base(l, m - 1, n) + crystal_base(l, m, n - 1) - &
-              6.*crystal_base(l, m, n)
+         crystal_base(l - 1, m, n) + crystal_base(l, m - 1, n) + crystal_base(l, m, n - 1) - &
+         6.*crystal_base(l, m, n)
 
       turbul = cteturb*(escal/dx8 + KMM/dx2*lapla)
 
@@ -515,25 +530,27 @@ contains
       use initial_z_state
       use advecs
       use turbvar
-      use dnieve_vars
       implicit none
 
       integer, intent(in) :: l, m, n
+
+      real dqnie(3), adv(3)
+      real advec, escal, lapla, turbul, sedim, Qnies, Qniei
 
       dqnie(1) = snow_base(l + 1, m, n) - snow_base(l - 1, m, n)
       dqnie(2) = snow_base(l, m + 1, n) - snow_base(l, m - 1, n)
       dqnie(3) = snow_base(l, m, n + 1) - snow_base(l, m, n - 1)
 
       adv(1) = ((u_perturbed_new(l + 1, m, n) + u_perturbed_new(l, m, n))*(snow_base(l + 1, m, n) + snow_base(l, m, n)) &
-                - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(snow_base(l - 1, m, n) + snow_base(l, m, n)))/4.
+         - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(snow_base(l - 1, m, n) + snow_base(l, m, n)))/4.
       adv(1) = adv(1) + dqnie(1)/2.*u_z_initial(n)
 
       adv(2) = ((v_perturbed_new(l, m + 1, n) + v_perturbed_new(l, m, n))*(snow_base(l, m + 1, n) + snow_base(l, m, n)) - &
-                (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(snow_base(l, m - 1, n) + snow_base(l, m, n)))/4.
+         (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(snow_base(l, m - 1, n) + snow_base(l, m, n)))/4.
       adv(2) = adv(2) + dqnie(2)/2.*v_z_initial(n)
 
       advnie2(l, m) = (w_perturbed_new(l, m, n) + w_perturbed_new(l, m, n + 1))* &
-                      (snow_base(l, m, n) + snow_base(l, m, n + 1))/4.
+         (snow_base(l, m, n) + snow_base(l, m, n + 1))/4.
 
       adv(3) = advnie2(l, m) - advnie1(l, m)
 
@@ -542,8 +559,8 @@ contains
       escal = dqnie(1)*KM1 + dqnie(2)*KM2 + dqnie(3)*KM3
 
       lapla = snow_base(l + 1, m, n) + snow_base(l, m + 1, n) + snow_base(l, m, n + 1) + &
-              snow_base(l - 1, m, n) + snow_base(l, m - 1, n) + snow_base(l, m, n - 1) - &
-              6.*snow_base(l, m, n)
+         snow_base(l - 1, m, n) + snow_base(l, m - 1, n) + snow_base(l, m, n - 1) - &
+         6.*snow_base(l, m, n)
 
       turbul = cteturb*(escal/dx8 + KMM/dx2*lapla)
 
@@ -567,25 +584,27 @@ contains
       use initial_z_state
       use advecs
       use turbvar
-      use dgrani_vars
       implicit none
 
       integer, intent(in) :: l, m, n
+
+      real dqgra(3), adv(3)
+      real advec, escal, lapla, turbul, sedim, Qgras, Qgrai, Rms, Rmm, Rmi, Vtgras, Vtgrai
 
       dqgra(1) = hail_base(l + 1, m, n) - hail_base(l - 1, m, n)
       dqgra(2) = hail_base(l, m + 1, n) - hail_base(l, m - 1, n)
       dqgra(3) = hail_base(l, m, n + 1) - hail_base(l, m, n - 1)
 
       adv(1) = ((u_perturbed_new(l + 1, m, n) + u_perturbed_new(l, m, n))*(hail_base(l + 1, m, n) + hail_base(l, m, n)) &
-                - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(hail_base(l - 1, m, n) + hail_base(l, m, n)))/4.
+         - (u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(hail_base(l - 1, m, n) + hail_base(l, m, n)))/4.
       adv(1) = adv(1) + dqgra(1)/2.*u_z_initial(n)
 
       adv(2) = ((v_perturbed_new(l, m + 1, n) + v_perturbed_new(l, m, n))*(hail_base(l, m + 1, n) + hail_base(l, m, n)) - &
-                (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(hail_base(l, m - 1, n) + hail_base(l, m, n)))/4.
+         (v_perturbed_new(l, m - 1, n) + v_perturbed_new(l, m, n))*(hail_base(l, m - 1, n) + hail_base(l, m, n)))/4.
       adv(2) = adv(2) + dqgra(2)/2.*v_z_initial(n)
 
       advgra2(l, m) = (w_perturbed_new(l, m, n) + w_perturbed_new(l, m, n + 1))* &
-                      (hail_base(l, m, n) + hail_base(l, m, n + 1))/4.
+         (hail_base(l, m, n) + hail_base(l, m, n + 1))/4.
 
       adv(3) = advgra2(l, m) - advgra1(l, m)
 
@@ -594,8 +613,8 @@ contains
       escal = dqgra(1)*KM1 + dqgra(2)*KM2 + dqgra(3)*KM3
 
       lapla = hail_base(l + 1, m, n) + hail_base(l, m + 1, n) + hail_base(l, m, n + 1) + &
-              hail_base(l - 1, m, n) + hail_base(l, m - 1, n) + hail_base(l, m, n - 1) - &
-              6.*hail_base(l, m, n)
+         hail_base(l - 1, m, n) + hail_base(l, m - 1, n) + hail_base(l, m, n - 1) - &
+         6.*hail_base(l, m, n)
 
       turbul = cteturb*(escal/dx8 + KMM/dx2*lapla)
 
@@ -629,51 +648,53 @@ contains
       use initial_z_state
       use advecs
       use turbvar
-      use daeros_vars
       implicit none
 
       integer, intent(in) :: l, m, n
+
+      real daer(3), adv(3)
+      real advec, verti, escal, lapla, turbul, aux
 
       daer(1) = aerosol_base(l + 1, m, n) - aerosol_base(l - 1, m, n)
       daer(2) = aerosol_base(l, m + 1, n) - aerosol_base(l, m - 1, n)
       daer(3) = aerosol_base(l, m, n + 1) - aerosol_base(l, m, n - 1)
 
       adv(1) = (((u_perturbed_new(l + 1, m, n) + u_perturbed_new(l, m, n))*(aerosol_base(l + 1, m, n) + aerosol_base(l, m, n))) - &
-                ((u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(aerosol_base(l - 1, m, n) + aerosol_base(l, m, n))))/4.
+         ((u_perturbed_new(l - 1, m, n) + u_perturbed_new(l, m, n))*(aerosol_base(l - 1, m, n) + aerosol_base(l, m, n))))/4.
       adv(1) = adv(1) + daer(1)/2.*u_z_initial(n)
 
       adv(2) = (((v_perturbed_new(l, m + 1, n) &
-                  + v_perturbed_new(l, m, n))*(aerosol_base(l, m + 1, n) &
-                                               + aerosol_base(l, m, n))) &
-                - ((v_perturbed_new(l, m - 1, n) &
-                    + v_perturbed_new(l, m, n))*(aerosol_base(l, m - 1, n) &
-                                                 + aerosol_base(l, m, n))))/4.
+         + v_perturbed_new(l, m, n))*(aerosol_base(l, m + 1, n) &
+         + aerosol_base(l, m, n))) &
+         - ((v_perturbed_new(l, m - 1, n) &
+         + v_perturbed_new(l, m, n))*(aerosol_base(l, m - 1, n) &
+         + aerosol_base(l, m, n))))/4.
       adv(2) = adv(2) + daer(2)/2.*v_z_initial(n)
 
       advaer2(l, m) = (w_perturbed_new(l, m, n) + w_perturbed_new(l, m, n + 1))* &
-                      (aerosol_base(l, m, n) + aerosol_base(l, m, n + 1))/4.
+         (aerosol_base(l, m, n) + aerosol_base(l, m, n + 1))/4.
 
       adv(3) = advaer2(l, m) - advaer1(l, m)
 
       advec = -(adv(1) + adv(2) + adv(3))
 
       verti = -((w_perturbed_new(l, m, n + 1) + w_perturbed_new(l, m, n))*(aerosol_z_initial(n + 1) + aerosol_z_initial(n)) - &
-                (w_perturbed_new(l, m, n - 1) + w_perturbed_new(l, m, n))*(aerosol_z_initial(n - 1) + aerosol_z_initial(n)))/4.
+         (w_perturbed_new(l, m, n - 1) + w_perturbed_new(l, m, n))*(aerosol_z_initial(n - 1) + aerosol_z_initial(n)))/4.
 
       aux = -((u_perturbed_new(l + 1, m, n) - u_perturbed_new(l - 1, m, n)) &
-              + (v_perturbed_new(l, m + 1, n) - v_perturbed_new(l, m - 1, n)))* &
-            aerosol_z_initial(n)/2.
+         + (v_perturbed_new(l, m + 1, n) - v_perturbed_new(l, m - 1, n)))* &
+         aerosol_z_initial(n)/2.
 
       escal = daer(1)*KM1 + daer(2)*KM2 + daer(3)*KM3
 
       lapla = aerosol_base(l + 1, m, n) + aerosol_base(l, m + 1, n) + aerosol_base(l, m, n + 1) + &
-              aerosol_base(l - 1, m, n) + aerosol_base(l, m - 1, n) + aerosol_base(l, m, n - 1) - &
-              6.*aerosol_base(l, m, n)
+         aerosol_base(l - 1, m, n) + aerosol_base(l, m - 1, n) + aerosol_base(l, m, n - 1) - &
+         6.*aerosol_base(l, m, n)
 
       lapla = ((aerosol_base(l + 1, m, n) + aerosol_base(l - 1, m, n)) &
-               + (aerosol_base(l, m + 1, n) + aerosol_base(l, m - 1, n))) &
-              + aerosol_base(l, m, n - 1) + aerosol_base(l, m, n + 1) &
-              - 6.*aerosol_base(l, m, n)
+         + (aerosol_base(l, m + 1, n) + aerosol_base(l, m - 1, n))) &
+         + aerosol_base(l, m, n - 1) + aerosol_base(l, m, n + 1) &
+         - 6.*aerosol_base(l, m, n)
 
       lapla = lapla + (aerosol_z_initial(n + 1) + aerosol_z_initial(n - 1) - 2.*aerosol_z_initial(n))
 
@@ -689,8 +710,9 @@ contains
       use dimensions
       use microphysics_perturbation
       use lmngot
-      use corgot_vars
       implicit none
+      integer l, m, n
+      real aux1, pos1, neg1
 
       neg1 = 0.
       pos1 = 0.
@@ -725,8 +747,9 @@ contains
       use dimensions
       use microphysics_perturbation
       use lmnllu
-      use corgot_vars
       implicit none
+      integer l, m, n
+      real aux1, pos1, neg1
 
       neg1 = 0.
       pos1 = 0.
@@ -760,8 +783,11 @@ contains
       use dimensions
       use microphysics_perturbation
       use lmncri
-      use corgot_vars
       implicit none
+
+      integer l, m, n
+      real aux1, pos1, neg1
+
       neg1 = 0.
       pos1 = 0.
       do concurrent(n=ncri(1):ncri(2), l=lcri(1):lcri(2), m=mcri(1):mcri(2))
@@ -795,8 +821,11 @@ contains
       use dimensions
       use microphysics_perturbation
       use lmnnie
-      use corgot_vars
       implicit none
+
+      integer l, m, n
+      real aux1, pos1, neg1
+
       neg1 = 0.
       pos1 = 0.
       do concurrent(n=nnie(1):nnie(2), l=lnie(1):lnie(2), m=mnie(1):mnie(2))
@@ -829,8 +858,11 @@ contains
       use dimensions
       use microphysics_perturbation
       use lmngra
-      use corgot_vars
       implicit none
+
+      integer l, m, n
+      real aux1, pos1, neg1
+
       neg1 = 0.
       pos1 = 0.
       do concurrent(n=ngra(1):ngra(2), l=lgra(1):lgra(2), m=mgra(1):mgra(2))
@@ -863,8 +895,10 @@ contains
       use dimensions
       use microphysics_perturbation
       use initial_z_state
-      use corvap_vars
       implicit none
+
+      integer i, j, k
+      real dq
 
       real(8), intent(in) :: Qvapneg
 
@@ -885,10 +919,10 @@ contains
       use dimensions
       use microphysics_perturbation
       use initial_z_state
-      use coraer_vars
       implicit none
-
       real(8), intent(in) :: aerneg
+      integer i, j, k
+      real dq
 
       do concurrent(k=1:nz1)
          dq = aerneg*aerosol_z_relative(k)/nx1**2.
@@ -926,12 +960,17 @@ contains
       use cant01
       use dimensions
       use constants
-      use nuclea61
       implicit none
 
       real, intent(in) ::  Naer, rhoa, rs, Lvl, Lvs
       real, intent(inout) :: Qliq, Qvap, TT, e1, esl, ess, rl
-      real, intent(inout) :: Naux, auxl, auxs   !     Numero de aesosoles
+      real, intent(inout) :: Naux, auxl, auxs   !!     Numero de aesosoles
+
+      real Qliq1, TT1, TT2, B, Tc, Ti, ei, esli, F0, F0p, mcri, Rcri, caux
+      integer hhh, s, xxx
+
+      real Rgotmin, Acri, Bcri !! Parametros de las particulas
+      parameter(Rgotmin=5e-6, Acri=1e-11, Bcri=.6)   !!A en cm^-3
 
       B = Lvl/Rv
       auxl = 0.
