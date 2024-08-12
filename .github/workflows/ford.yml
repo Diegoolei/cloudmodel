@@ -1,0 +1,48 @@
+name: Build and Deploy Documentation
+
+on: 
+  push:
+    branches: [ "dev" ]
+  
+jobs:
+  documentation:
+    runs-on: ubuntu-22.04
+
+    env:
+      FC: gfortran
+      GCC_V: 12
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Install Dependencies Ubuntu
+      run: |
+        sudo apt-get update
+        sudo apt install -y gfortran-${GCC_V} python3-dev graphviz
+        sudo pip install ford markdown
+
+    - name: Build Developer Documentation
+      run: |
+        ford ford.yml
+
+    - name: Upload Documentation
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: doc/ford_site
+        if-no-files-found: error
+
+    - name: Broken Link Check
+      uses: technote-space/broken-link-checker-action@v2
+      with:
+        TARGET: file://${{ github.workspace }}/ford_site/index.html
+        RECURSIVE: true
+        ASSIGNEES: ${{ github.actor }}
+
+    - name: Deploy API Documentation🚀
+      uses: JamesIves/github-pages-deploy-action@v4
+      if: ${{ github.event_name == 'push'}}
+      with:
+        branch: gh-pages
+        folder: doc/ford_site

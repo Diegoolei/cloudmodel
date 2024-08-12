@@ -1,0 +1,18 @@
+recursive-include cloudmodel/interface *
+recursive-include cloudmodel *.py
+include LICENSE
+include README.md
+include pyproject.toml
+include setup.py
+include MANIFEST.in
+include requirements.txt
+include tox.ini
+include *.py
+recursive-include cloudmodel *.da
+recursive-include cloudmodel *.sa
+recursive-include cloudmodel *.sal
+recursive-include cloudmodel ccc
+recursive-include cloudmodel est
+recursive-include cloudmodel esta
+recursive-exclude cloudmodel/cloud_compiled *.so
+recursive-exclude cloudmodel/interface *.pyc

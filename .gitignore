@@ -31,28 +31,33 @@
 *.out
 *.app
 
-# Output files
-*.sal
-*.da
-*.sa
-*.png
-*.txt
+# Generated files
 *.mp4
+*.png
 
+# Generated directories
+img/
+img1/
+Data/
+vid/
+txt/
+txt1/
+Data/
 
-ae3101
-ccc
-est3101
-esta3101
-fort.6
-go3101
-pr3101
-prog
-ti3101
-u23101
-v23101
-va3101
-vara3101
-w23101
-termina
-__pycache__/constants.cpython-310.pyc
+# PyPI
+dist/
+*.egg-info/
+
+# Testing
+*/*.tox*/*
+.coverage
+*.temp/
+*compiled_flag
+# Ignore the following files
+.vscode/settings.json
+__pycache__/*
+*.pyc
+*.pyc
+callgrind.out.30406
+Fortran77-Cloud-Model.code-workspace
+P10*
