@@ -1,6 +1,5 @@
 from .constants import *
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 def latent_heat() -> list[np.ndarray]:

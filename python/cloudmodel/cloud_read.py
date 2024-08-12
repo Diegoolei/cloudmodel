@@ -242,7 +242,6 @@ class CloudSimulation:
 
     def load_model(self):
         """Load the cloud model."""
-        #self.run_initial_analysis()
         self.run_cloud_analysis()
 
     def get_cuts(self):
