@@ -71,19 +71,19 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.5% of total for modules and submodules.">15 statements</a>
+                 title=" 1.2% of total for modules and submodules.">41 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/var_dec.f90"> Source File</a>
+              <a href="../src/shared_declarations.f90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/var_dec.f90.html'>var_dec.f90</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/shared_declarations.f90.html'>shared_declarations.f90</a></li>
             <li class="breadcrumb-item active" aria-current="page">initial_z_state</li>
           </ol>
         </nav>
@@ -110,11 +110,12 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/initial_z_state.html#variable-pres00~3">Pres00</a>
+            <a class="list-group-item" href="../module/initial_z_state.html#variable-pres00~2">Pres00</a>
             <a class="list-group-item" href="../module/initial_z_state.html#variable-presi0">Presi0</a>
+            <a class="list-group-item" href="../module/initial_z_state.html#variable-presi0_aux">Presi0_aux</a>
             <a class="list-group-item" href="../module/initial_z_state.html#variable-aerosol_z_initial~3">aerosol_z_initial</a>
             <a class="list-group-item" href="../module/initial_z_state.html#variable-aerosol_z_relative~2">aerosol_z_relative</a>
-            <a class="list-group-item" href="../module/initial_z_state.html#variable-air_density_z_initial~3">air_density_z_initial</a>
+            <a class="list-group-item" href="../module/initial_z_state.html#variable-air_density_z_initial~2">air_density_z_initial</a>
             <a class="list-group-item" href="../module/initial_z_state.html#variable-cc2~2">cc2</a>
             <a class="list-group-item" href="../module/initial_z_state.html#variable-temperature_z_initial~2">temperature_z_initial</a>
             <a class="list-group-item" href="../module/initial_z_state.html#variable-theta_z_initial~2">theta_z_initial</a>
@@ -136,7 +137,20 @@
   
   
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/initial_z_state.html#proc-allocate_initial_z_state">allocate_initial_z_state</a>
+            <a class="list-group-item" href="../module/initial_z_state.html#proc-deallocate_initial_z_state">deallocate_initial_z_state</a>
+            <a class="list-group-item" href="../module/initial_z_state.html#proc-set_initial_z_state">set_initial_z_state</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -151,7 +165,9 @@
     </div>
 
     <div class="col-md-9" id='text'>
-      <p>Non perturbed quantities</p>
+      <p>Non perturbed quantities
+!</p>
+<p>!</p>
 <br>          <div class="card mb-4">
       <h3 class="card-header card-title bg-light">Uses</h3>
       <div class="card-body">
@@ -159,6 +175,7 @@
             <li class="list-group-item">
               <ul class="list-inline">
                   <li class="list-inline-item"><a href='dimensions.html'>dimensions</a></li>
+                  <li class="list-inline-item"><a href='constants.html'>constants</a></li>
               </ul>
             </li>
         </ul>
@@ -183,15 +200,15 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-pres00~3"></span>
-              real,
+              <span class="anchor" id="variable-pres00~2"></span>
+              real(kind=8),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>Pres00</strong>(-3:nz1+3)</td>
+            <td><strong>Pres00</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -201,6 +218,23 @@
         <tr>
             <td>
               <span class="anchor" id="variable-presi0"></span>
+              real(kind=8),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Presi0</strong>(-3:mod_nz1+3)</td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Non perturbed pressure z initial</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-presi0_aux"></span>
               real,
             </td>
               <td>public</td>
@@ -208,7 +242,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Presi0</strong>(-3:nz1+3)</td>
+            <td><strong>Presi0_aux</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -225,7 +259,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>aerosol_z_initial</strong>(-3:nz1+3)</td>
+            <td><strong>aerosol_z_initial</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -237,12 +271,12 @@
               <span class="anchor" id="variable-aerosol_z_relative~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>aerosol_z_relative</strong>(nz1)</td>
+            <td><strong>aerosol_z_relative</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -251,7 +285,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-air_density_z_initial~3"></span>
+              <span class="anchor" id="variable-air_density_z_initial~2"></span>
               real,
             </td>
               <td>public</td>
@@ -259,7 +293,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>air_density_z_initial</strong>(-3:nz1+3)</td>
+            <td><strong>air_density_z_initial</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -269,14 +303,14 @@
         <tr>
             <td>
               <span class="anchor" id="variable-cc2~2"></span>
-              real,
+              real(kind=8),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>cc2</strong>(-3:nz1+3)</td>
+            <td><strong>cc2</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -293,7 +327,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>temperature_z_initial</strong>(-3:nz1+3)</td>
+            <td><strong>temperature_z_initial</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -303,14 +337,14 @@
         <tr>
             <td>
               <span class="anchor" id="variable-theta_z_initial~2"></span>
-              real,
+              real(kind=8),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>theta_z_initial</strong>(-3:nz1+3)</td>
+            <td><strong>theta_z_initial</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -327,7 +361,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>u_z_initial</strong>(-3:nz1+3)</td>
+            <td><strong>u_z_initial</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -344,7 +378,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>v_z_initial</strong>(-3:nz1+3)</td>
+            <td><strong>v_z_initial</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -361,7 +395,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>vapor_z_initial</strong>(-3:nz1+3)</td>
+            <td><strong>vapor_z_initial</strong>(-3:mod_nz1+3)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -373,12 +407,12 @@
               <span class="anchor" id="variable-vapor_z_relative~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>vapor_z_relative</strong>(nz1)</td>
+            <td><strong>vapor_z_relative</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -396,6 +430,213 @@
 
 
 
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-allocate_initial_z_state"></span> <h3>public  subroutine <a href='../proc/allocate_initial_z_state.html'>allocate_initial_z_state</a>()  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Allocate the initial z state variables
+!!</p><a href="../proc/allocate_initial_z_state.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-deallocate_initial_z_state"></span> <h3>public  subroutine <a href='../proc/deallocate_initial_z_state.html'>deallocate_initial_z_state</a>()  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Deallocate the initial z state variables
+!</p><a href="../proc/deallocate_initial_z_state.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_initial_z_state"></span> <h3>public  subroutine <a href='../proc/set_initial_z_state.html'>set_initial_z_state</a>(temperature_z_initial_in, u_z_initial_in, v_z_initial_in, Presi0_in, air_density_z_initial_in, aerosol_z_initial_in, vapor_z_initial_in, theta_z_initial_in, Pres00_in, cc2_in)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-temperature_z_initial_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>temperature_z_initial_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-u_z_initial_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>u_z_initial_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-v_z_initial_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>v_z_initial_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-presi0_in"></span>
+              real(kind=8),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>Presi0_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-air_density_z_initial_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>air_density_z_initial_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-aerosol_z_initial_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>aerosol_z_initial_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vapor_z_initial_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>vapor_z_initial_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-theta_z_initial_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>theta_z_initial_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pres00_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>Pres00_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cc2_in"></span>
+              real,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>cc2_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -417,7 +658,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-08-03 00:01              </p>
+ on 2024-08-12 14:45              </p>
           </div>
         </div>
         <br>

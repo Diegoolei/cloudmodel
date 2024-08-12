@@ -71,7 +71,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 1.1% of total for procedures.">31 statements</a>
+                 title=" 1.0% of total for procedures.">32 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -104,7 +104,23 @@
       <div id="sidebar">
       <h3>Contents</h3>
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../proc/dgotit.html#variable-adv~3">adv</a>
+            <a class="list-group-item" href="../proc/dgotit.html#variable-advec~3">advec</a>
+            <a class="list-group-item" href="../proc/dgotit.html#variable-dqgot~2">dqgot</a>
+            <a class="list-group-item" href="../proc/dgotit.html#variable-escal~3">escal</a>
+            <a class="list-group-item" href="../proc/dgotit.html#variable-lapla~4">lapla</a>
+            <a class="list-group-item" href="../proc/dgotit.html#variable-turbul~3">turbul</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -138,15 +154,14 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='../module/initial_z_state.html'>initial_z_state</a></li>
-                  <li class="list-inline-item"><a href='../module/dimensions.html'>dimensions</a></li>
                   <li class="list-inline-item"><a href='../module/turbvar.html'>turbvar</a></li>
-                  <li class="list-inline-item"><a href='../module/dgotit_vars.html'>dgotit_vars</a></li>
-                  <li class="list-inline-item"><a href='../module/constants.html'>constants</a></li>
-                  <li class="list-inline-item"><a href='../module/cant01.html'>cant01</a></li>
-                  <li class="list-inline-item"><a href='../module/dinamic_var_perturbation.html'>dinamic_var_perturbation</a></li>
-                  <li class="list-inline-item"><a href='../module/advecs.html'>advecs</a></li>
                   <li class="list-inline-item"><a href='../module/microphysics_perturbation.html'>microphysics_perturbation</a></li>
+                  <li class="list-inline-item"><a href='../module/advecs.html'>advecs</a></li>
+                  <li class="list-inline-item"><a href='../module/dimensions.html'>dimensions</a></li>
+                  <li class="list-inline-item"><a href='../module/constants.html'>constants</a></li>
+                  <li class="list-inline-item"><a href='../module/dinamic_var_perturbation.html'>dinamic_var_perturbation</a></li>
+                  <li class="list-inline-item"><a href='../module/initial_z_state.html'>initial_z_state</a></li>
+                  <li class="list-inline-item"><a href='../module/cant01.html'>cant01</a></li>
               </ul>
             </li>
         </ul>
@@ -169,7 +184,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-l~3"></span>
+              <span class="anchor" id="variable-l~5"></span>
               integer,
             </td>
 <td>intent(in)</td>
@@ -184,7 +199,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-m~3"></span>
+              <span class="anchor" id="variable-m~7"></span>
               integer,
             </td>
 <td>intent(in)</td>
@@ -199,7 +214,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-n~4"></span>
+              <span class="anchor" id="variable-n~7"></span>
               integer,
             </td>
 <td>intent(in)</td>
@@ -218,6 +233,125 @@
     <br>
 
 
+    <section>    
+      <h2>Variables</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-adv~3"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>adv</strong>(3)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-advec~3"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>advec</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dqgot~2"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dqgot</strong>(3)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-escal~3"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>escal</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-lapla~4"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>lapla</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-turbul~3"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>turbul</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
     
     
 
@@ -246,7 +380,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-08-03 00:01              </p>
+ on 2024-08-12 14:45              </p>
           </div>
         </div>
         <br>

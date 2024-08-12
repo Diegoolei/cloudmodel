@@ -71,19 +71,19 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.6% of total for modules and submodules.">20 statements</a>
+                 title=" 1.8% of total for modules and submodules.">60 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/var_dec.f90"> Source File</a>
+              <a href="../src/shared_declarations.f90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/var_dec.f90.html'>var_dec.f90</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/shared_declarations.f90.html'>shared_declarations.f90</a></li>
             <li class="breadcrumb-item active" aria-current="page">microphysics_perturbation</li>
           </ol>
         </nav>
@@ -141,7 +141,20 @@
   
   
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/microphysics_perturbation.html#proc-allocate_microphysics_perturbation">allocate_microphysics_perturbation</a>
+            <a class="list-group-item" href="../module/microphysics_perturbation.html#proc-deallocate_microphysics_perturbation">deallocate_microphysics_perturbation</a>
+            <a class="list-group-item" href="../module/microphysics_perturbation.html#proc-set_microphysics_perturbation">set_microphysics_perturbation</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -165,6 +178,7 @@ The microphysics_perturbation module defines variables related to cloud microphy
             <li class="list-group-item">
               <ul class="list-inline">
                   <li class="list-inline-item"><a href='dimensions.html'>dimensions</a></li>
+                  <li class="list-inline-item"><a href='constants.html'>constants</a></li>
               </ul>
             </li>
         </ul>
@@ -190,14 +204,14 @@ The microphysics_perturbation module defines variables related to cloud microphy
         <tr>
             <td>
               <span class="anchor" id="variable-av~2"></span>
-              real,
+              real(kind=8),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>Av</strong>(-3:2*nz1+5)</td>
+            <td><strong>Av</strong>(-3:2*mod_nz1+5)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -207,14 +221,14 @@ The microphysics_perturbation module defines variables related to cloud microphy
         <tr>
             <td>
               <span class="anchor" id="variable-vtgra0~2"></span>
-              real,
+              real(kind=8),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>Vtgra0</strong>(-3:2*nz1+5)</td>
+            <td><strong>Vtgra0</strong>(-3:2*mod_nz1+5)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -224,14 +238,14 @@ The microphysics_perturbation module defines variables related to cloud microphy
         <tr>
             <td>
               <span class="anchor" id="variable-vtnie~2"></span>
-              real,
+              real(kind=8),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>Vtnie</strong>(-3:2*nz1+5)</td>
+            <td><strong>Vtnie</strong>(-3:2*mod_nz1+5)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -243,12 +257,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-aerosol_base~4"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>aerosol_base</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>aerosol_base</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -260,12 +274,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-aerosol_new~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>aerosol_new</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>aerosol_new</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -277,12 +291,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-crystal_base~3"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>crystal_base</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>crystal_base</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -294,12 +308,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-crystal_new~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>crystal_new</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>crystal_new</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -311,12 +325,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-drop_base~3"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>drop_base</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>drop_base</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -328,12 +342,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-drop_new~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>drop_new</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>drop_new</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -345,12 +359,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-hail_base~4"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>hail_base</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>hail_base</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -362,12 +376,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-hail_new~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>hail_new</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>hail_new</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -379,12 +393,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-rain_base~4"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>rain_base</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>rain_base</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -396,12 +410,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-rain_new~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>rain_new</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>rain_new</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -413,12 +427,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-snow_base~3"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>snow_base</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>snow_base</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -430,12 +444,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-snow_new~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>snow_new</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>snow_new</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -447,12 +461,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-vapor_base~4"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>vapor_base</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>vapor_base</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -464,12 +478,12 @@ The microphysics_perturbation module defines variables related to cloud microphy
               <span class="anchor" id="variable-vapor_new~2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>vapor_new</strong>(-3:nx1+3,-3:nx1+3,-2:nz1+2)</td>
+            <td><strong>vapor_new</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -487,6 +501,106 @@ The microphysics_perturbation module defines variables related to cloud microphy
 
 
 
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-allocate_microphysics_perturbation"></span> <h3>public  subroutine <a href='../proc/allocate_microphysics_perturbation.html'>allocate_microphysics_perturbation</a>()  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Allocate the microphysics_perturbation variables</p>
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-deallocate_microphysics_perturbation"></span> <h3>public  subroutine <a href='../proc/deallocate_microphysics_perturbation.html'>deallocate_microphysics_perturbation</a>()  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Deallocate the microphysics_perturbation variables</p>
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-set_microphysics_perturbation"></span> <h3>public  subroutine <a href='../proc/set_microphysics_perturbation.html'>set_microphysics_perturbation</a>(Av_in, Vtnie_in, Vtgra0_in)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-av_in"></span>
+              real(kind=8),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>Av_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vtnie_in"></span>
+              real(kind=8),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>Vtnie_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vtgra0_in"></span>
+              real(kind=8),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(:)
+            </td>
+            <td>::</td>
+            <td><strong>Vtgra0_in</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -508,7 +622,7 @@ The microphysics_perturbation module defines variables related to cloud microphy
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-08-03 00:01              </p>
+ on 2024-08-12 14:45              </p>
           </div>
         </div>
         <br>

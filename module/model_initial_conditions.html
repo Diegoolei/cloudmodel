@@ -71,7 +71,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 8.2% of total for modules and submodules.">264 statements</a>
+                 title=" 2.7% of total for modules and submodules.">92 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -113,18 +113,7 @@
   
   
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#funcs-0"
-         aria-expanded="false" aria-controls="funcs-0">
-         <h4 class="card-header bg-primary text-white">Functions</h4>
-      </a>
-      <div id="funcs-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/model_initial_conditions.html#proc-tt_f">TT_f</a>
-        </div>
-      </div>
-    </div>
-
+  
       <div class="card mb-4">
       <a data-bs-toggle="collapse" href="#subs-0"
          aria-expanded="false" aria-controls="subs-0">
@@ -132,8 +121,6 @@
       </a>
       <div id="subs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/model_initial_conditions.html#proc-pp">PP</a>
-            <a class="list-group-item" href="../module/model_initial_conditions.html#proc-pp2">PP2</a>
             <a class="list-group-item" href="../module/model_initial_conditions.html#proc-initial_conditions">initial_conditions</a>
         </div>
       </div>
@@ -164,280 +151,15 @@
 
 
 
-        <section>
-          <h2>Functions</h2>
-              <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-tt_f"></span> <h3>public  function <a href='../proc/tt_f.html'>TT_f</a>(z_aux)  
-</h3></div>
-    <div class="card-body">
-          
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-z_aux~2"></span>
-              real(kind=4),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>z_aux</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>real</small>
-    </h4>
-    
-
-    </div>
-  </div>
-
-        </section>
-        <br>
 
         <section>
           <h2>Subroutines</h2>
-              <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-pp"></span> <h3>public  subroutine <a href='../proc/pp.html'>PP</a>(G, Rd, dx, nz1, Pres, Pres0)  
-</h3></div>
-    <div class="card-body">
-          
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-g"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>G</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-rd"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Rd</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-dx"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>dx</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-nz1"></span>
-              integer
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>nz1</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-pres"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Pres</strong>(-3:nz1+3)</td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-pres0"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Pres0</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-    </div>
-  </div>
-
-              <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-pp2"></span> <h3>public  subroutine <a href='../proc/pp2.html'>PP2</a>(G, dx, air_density_z_initial, Pres00, Pres0)  
-</h3></div>
-    <div class="card-body">
-          
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-g~2"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>G</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-dx~2"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>dx</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-air_density_z_initial"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>air_density_z_initial</strong>(-3:nz1+3)</td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-pres00"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Pres00</strong>(-3:nz1+3)</td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-pres0~2"></span>
-              real
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Pres0</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-    </div>
-  </div>
-
               <div class="card">
     <div class="card-header codesum"><span class="anchor" id="proc-initial_conditions"></span> <h3>public  subroutine <a href='../proc/initial_conditions.html'>initial_conditions</a>()  
 </h3></div>
     <div class="card-body">
           
-  <p>condiciones de tiempo bueno
- TT_f not pure function, do concurrent not allowed</p><a href="../proc/initial_conditions.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+  <p>Initial disturbance’s x-coordinate</p><a href="../proc/initial_conditions.html" class="pull-right"><emph>Read more&hellip;</emph></a>
 
   <h4>Arguments</h4>
     <em>None</em>
@@ -468,7 +190,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-08-03 00:01              </p>
+ on 2024-08-12 14:45              </p>
           </div>
         </div>
         <br>

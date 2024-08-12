@@ -3,7 +3,7 @@
 module microphysics
 contains
    subroutine microfis(els, ess, Lvl, Lvs, Lsl, T, Dv, Eaccn, Eaucn, Eacng, Lsl00, Fcal, n, &
-                       qvapaux, qgotaux, qlluaux, qcriaux, qnieaux, qgraaux, Naer, daer2, nu, yy)
+      qvapaux, qgotaux, qlluaux, qcriaux, qnieaux, qgraaux, Naer, daer2, nu, yy)
       !! Esta subrutina resuelve lo que le pasa a las gotitas,las gotas,
       !! los cristales, la nieve, el granizo  y al vapor entre si.
       !! Si hay nucleacion de gotitas no hay condensacion de agua liquida
@@ -14,13 +14,43 @@ contains
       use dinamic_var_perturbation
       use microphysics_perturbation
       use constants
-      use microf05
       implicit none
 
       real, intent(in) :: els, ess, Lvl, Lvs, Lsl, T, Dv, Eaccn, Eaucn, Eacng, Lsl00, Naer, nu
       real, intent(inout) :: Fcal, daer2
       real(8), intent(inout) :: qvapaux, qgotaux, qlluaux, qcriaux, qnieaux, qgraaux
       integer, intent(in) :: n, yy
+
+      !!     variables auxiliares
+      real(8) qauxl, qauxs, aux, qauxl0, Naux
+      !!     variables de procesos microfisicos
+      real(8) coevgot, coevllu, coevcri, coevnie, coevgra, liqconv, hieconv, nieconv, acgollu, &
+         acgonie, accrnie, acgogra, acllgra, accrgra, acnigra, cfgotcri, cfllunie, cfllugra, &
+         fugrallu, libaer, coaergot, coaerllu, coaercri, coaernie, coaergra, ccnigra, colilc, &
+         coliln, congagua, mucrgrni, mucrgrgr, invapgot, invapllu, invapcri, invapnie, invapgra, &
+         ingotllu, ingotcri, ingotnie, ingotgra, incrinie, incrigra, inllunie, inllugra, inniegra, &
+         Intvap, Intgot, Intllu, Intcri, Intnie, Intgra, Intaer, cfln1, cfln2
+      !     numero de cristales por colision
+      real Ncrgrni, Ncrgrgr
+      parameter(Ncrgrni=20., Ncrgrgr=20.)
+      !     variables para la evaporacion y la condensacion
+      real Qvls, Qvss, Qvls0
+      !     parametros de las particulas
+      real(8) Rgot, Ngot, Rllu, Nllu, Rcri, Ncri, Rnie, Nnie, Rgra, Ngra, Vtm, Vtgra, Nre, Nsc, A, fventl, &
+         fventn, fventgs, fventgl, Rgotmin, qvapaux1, qgotaux1, qlluaux1, qcriaux1, qnieaux1, qgraaux1
+      parameter(Rgotmin=5e-6)
+      integer s
+      !     variables para tgra
+      real Tg, agual, hielo, alfagra, fugra, Aalfa, Balfa, A1, A2, A3, A3b, A4, B1, B2b, B3, B4, BB, CC2, CC3, &
+         Q1, Q2, Q3, Q4, Qt, dQt, Qvaux, esaux, Taux, Fcalgra
+      integer crecigra, i
+      !     parametros para los cristales
+      real Acri, Bcri
+      parameter(Acri=1e-2, Bcri=.6)  !A en m^-3
+      !     difusion de aerosoles
+      real Dfaer, Efcaer
+      parameter(Dfaer=1e-10, Efcaer=.01)
+
 
       !*    Parametros comunes
       Nsc = nu/Dv
@@ -251,9 +281,9 @@ contains
       !*    lluvia por granizo
       if (Rllu > 0 .and. Rgra > 0 .and. s == 0 .and. Vtgra > Vtm) then
          acllgra = -pi*Efcol*Ngra*qlluaux* &
-                   (gam3p8*(Vtgra*Rgra**2.-Vtm*Rllu**2.) + &
-                    2.*gam2p8*Rgra*Rllu*(Vtgra - Vtm) + &
-                    2.*gam1p8*(Vtgra*Rllu**2.-Vtm*Rgra**2.))
+            (gam3p8*(Vtgra*Rgra**2.-Vtm*Rllu**2.) + &
+            2.*gam2p8*Rgra*Rllu*(Vtgra - Vtm) + &
+            2.*gam1p8*(Vtgra*Rllu**2.-Vtm*Rgra**2.))
          !     para que no de cantidades negativas de lluvia siendo colectada
          if (acllgra > qlluaux/dt2*.98) acllgra = qlluaux/dt2*.98
       else
@@ -315,7 +345,7 @@ contains
             if (T < T0 - 10.) cfln2 = 0.
          else
             cfln2 = -coevnie*Lvl0/Lsl00 + &
-                    (8.*Kair*fventl*Rnie*Nnie + Cwl*cfln1)*(T - T0)/Lsl00
+               (8.*Kair*fventl*Rnie*Nnie + Cwl*cfln1)*(T - T0)/Lsl00
          end if
          if (cfln2 < 0) cfln2 = 0.
          cfllunie = cfln1 + cfln2
@@ -346,8 +376,8 @@ contains
       !*    lluvia con nieve
       if (T < T0 .and. (Rllu > 5e-5 .and. Rnie > 0)) then
          coliln = pi*Efcol*Nllu*Nnie*(Vtm* &
-                                      (gam3p8*Rllu**2.+gam1p8*2.*Rnie**2.+2.*gam2p8*Rnie*Rllu) &
-                                      - Vtnie(2*n)*2.*(Rllu**2.+Rnie**2.+Rnie*Rllu))
+            (gam3p8*Rllu**2.+gam1p8*2.*Rnie**2.+2.*gam2p8*Rnie*Rllu) &
+            - Vtnie(2*n)*2.*(Rllu**2.+Rnie**2.+Rnie*Rllu))
          coliln = min(abs(coliln), Nllu*.3, Nnie*.3)
          congagua = congagua + coliln*(qnieaux/Nnie + qlluaux/Nllu)
       else
@@ -368,7 +398,7 @@ contains
 
       !*    difusion a gotitas
 
-      coaergot = -4.*pi*Dfaer*Naux*Rgot*Ngot
+      coaergot = -4.*pi*Dfaer*Naux*Rgot*Ncri
 
       !*    difusion a cristales
 
@@ -467,7 +497,7 @@ contains
                crecigra = 2          ! crecimiento seco
                Qvaux = esvs0/Rv/Tg*exp(Lvs0/Rv*(1./T0 - 1./Tg))
                coevgra = -4.*pi*Dv*Rgra*Ngra*fventgs* &
-                         (qvapaux - Qvaux)
+                  (qvapaux - Qvaux)
                Q2 = -coevgra*Lvs0
                Qt = Q1 + Q2 + Q3 + Q4
             else
@@ -588,7 +618,7 @@ contains
 
       !     prevencion de negativos
       if (qgotaux1 < 0 .or. qlluaux1 < 0 .or. qcriaux1 < 0 .or. &
-          qnieaux1 < 0 .or. qgraaux1 < 0) then
+         qnieaux1 < 0 .or. qgraaux1 < 0) then
          if (qgotaux1 < 0) qgotaux1 = 0.
          if (qlluaux1 < 0) qlluaux1 = 0.
          if (qcriaux1 < 0) qcriaux1 = 0.
@@ -605,7 +635,7 @@ contains
 
       ! calculo del calor obtenido por cambio de fase (por m^-3)
       Fcal = Fcal + (-(invapgot + invapllu)*Lvl - &
-                     ingotcri*Lsl - invapcri*Lvs + Fcalgra)*dt2
+         ingotcri*Lsl - invapcri*Lvs + Fcalgra)*dt2
 
       if (invapnie > 0 .or. T < T0 - 10.) then
          Fcal = Fcal - invapnie*Lvs*dt2

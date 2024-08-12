@@ -830,8 +830,8 @@ contains
                                  (aerosol_new(i, j + 1, k) + aerosol_new(i, j - 1, k)))
 
          !correccion cambiando la absorcion de aerosoles
-         if ((rain_base(i, j, 1) + hail_base(i, j, 1)) > 1e-6 .and. w_perturbed_new(i, j, 1) < 0) then
-            aeraux = -w_perturbed_new(i, j, 1)*.5*dt1/(dx1/2)
+         if (rain_base(i, j, 0) > 1e-6 .and. w_perturbed_new(i, j, 1) < -0.1) then
+            aeraux = (-w_perturbed_new(i, j, 1)/1.)*(rain_base(i,j,0)/1e-3)*.02*(dt1/5.)
             aerosol_base(i, j, k) = aerosol_base(i, j, k) - (aerosol_base(i, j, k) + aerosol_z_initial(k))*aeraux
          end if
 

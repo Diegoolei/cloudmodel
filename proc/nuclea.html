@@ -71,7 +71,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 2.5% of total for procedures.">73 statements</a>
+                 title=" 2.4% of total for procedures.">76 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -104,7 +104,36 @@
       <div id="sidebar">
       <h3>Contents</h3>
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../proc/nuclea.html#variable-acri">Acri</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-b">B</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-bcri">Bcri</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-f0">F0</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-f0p">F0p</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-qliq1">Qliq1</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-rcri">Rcri</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-rgotmin">Rgotmin</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-tt1">TT1</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-tt2">TT2</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-tc">Tc</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-ti">Ti</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-caux">caux</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-ei">ei</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-esli">esli</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-hhh">hhh</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-mcri">mcri</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-s~2">s</a>
+            <a class="list-group-item" href="../proc/nuclea.html#variable-xxx">xxx</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -141,7 +170,6 @@
                   <li class="list-inline-item"><a href='../module/cant01.html'>cant01</a></li>
                   <li class="list-inline-item"><a href='../module/dimensions.html'>dimensions</a></li>
                   <li class="list-inline-item"><a href='../module/constants.html'>constants</a></li>
-                  <li class="list-inline-item"><a href='../module/nuclea61.html'>nuclea61</a></li>
               </ul>
             </li>
         </ul>
@@ -149,8 +177,10 @@
     </div>
 
 
-    <p>variacion en los aerosoles
-considerando que las nuevas gotitas tienen un radio Rgotmin</p>
+    <p>A en cm^-3</p>
+<div class="codehilite"><pre><span></span><code><span class="w">  </span><span class="n">variacion</span><span class="w"> </span><span class="n">en</span><span class="w"> </span><span class="n">los</span><span class="w"> </span><span class="n">aerosoles</span>
+<span class="w">  </span><span class="n">considerando</span><span class="w"> </span><span class="n">que</span><span class="w"> </span><span class="n">las</span><span class="w"> </span><span class="n">nuevas</span><span class="w"> </span><span class="n">gotitas</span><span class="w"> </span><span class="n">tienen</span><span class="w"> </span><span class="n">un</span><span class="w"> </span><span class="n">radio</span><span class="w"> </span><span class="n">Rgotmin</span>
+</code></pre></div>
 
 
     <h3>Arguments</h3>
@@ -356,7 +386,7 @@ considerando que las nuevas gotitas tienen un radio Rgotmin</p>
             <td>::</td>
             <td><strong>Naux</strong></td>
             <td>
-                
+                <p>Numero de aesosoles</p>
             </td>
         </tr>
         <tr>
@@ -371,7 +401,7 @@ considerando que las nuevas gotitas tienen un radio Rgotmin</p>
             <td>::</td>
             <td><strong>auxl</strong></td>
             <td>
-                
+                <p>Numero de aesosoles</p>
             </td>
         </tr>
         <tr>
@@ -386,7 +416,7 @@ considerando que las nuevas gotitas tienen un radio Rgotmin</p>
             <td>::</td>
             <td><strong>auxs</strong></td>
             <td>
-                
+                <p>Numero de aesosoles</p>
             </td>
         </tr>
     </tbody>
@@ -395,6 +425,346 @@ considerando que las nuevas gotitas tienen un radio Rgotmin</p>
     <br>
 
 
+    <section>    
+      <h2>Variables</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-acri"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Acri</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Parametros de las particulas</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>B</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bcri"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Bcri</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Parametros de las particulas</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-f0"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>F0</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-f0p"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>F0p</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-qliq1"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Qliq1</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rcri"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Rcri</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rgotmin"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Rgotmin</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Parametros de las particulas</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tt1"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>TT1</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tt2"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>TT2</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tc"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Tc</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ti"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ti</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-caux"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>caux</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ei"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ei</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-esli"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>esli</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-hhh"></span>
+              integer,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>hhh</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-mcri"></span>
+              real,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>mcri</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-s~2"></span>
+              integer,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>s</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-xxx"></span>
+              integer,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>xxx</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
     
     
 
@@ -423,7 +793,7 @@ considerando que las nuevas gotitas tienen un radio Rgotmin</p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-08-03 00:01              </p>
+ on 2024-08-12 14:45              </p>
           </div>
         </div>
         <br>

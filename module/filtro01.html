@@ -71,19 +71,19 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.2% of total for modules and submodules.">6 statements</a>
+                 title=" 0.4% of total for modules and submodules.">13 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/var_dec.f90"> Source File</a>
+              <a href="../src/shared_declarations.f90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/var_dec.f90.html'>var_dec.f90</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/shared_declarations.f90.html'>shared_declarations.f90</a></li>
             <li class="breadcrumb-item active" aria-current="page">filtro01</li>
           </ol>
         </nav>
@@ -111,9 +111,9 @@
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../module/filtro01.html#variable-fact">fact</a>
-            <a class="list-group-item" href="../module/filtro01.html#variable-i~11">i</a>
-            <a class="list-group-item" href="../module/filtro01.html#variable-j~12">j</a>
-            <a class="list-group-item" href="../module/filtro01.html#variable-k~12">k</a>
+            <a class="list-group-item" href="../module/filtro01.html#variable-i~20">i</a>
+            <a class="list-group-item" href="../module/filtro01.html#variable-j~23">j</a>
+            <a class="list-group-item" href="../module/filtro01.html#variable-k~18">k</a>
             <a class="list-group-item" href="../module/filtro01.html#variable-varia2">varia2</a>
             <a class="list-group-item" href="../module/filtro01.html#variable-varx">varx</a>
             <a class="list-group-item" href="../module/filtro01.html#variable-vary">vary</a>
@@ -132,7 +132,19 @@
   
   
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/filtro01.html#proc-allocate_filtro01">allocate_filtro01</a>
+            <a class="list-group-item" href="../module/filtro01.html#proc-deallocate_filtro01">deallocate_filtro01</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -196,7 +208,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-i~11"></span>
+              <span class="anchor" id="variable-i~20"></span>
               integer,
             </td>
               <td>public</td>
@@ -213,7 +225,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-j~12"></span>
+              <span class="anchor" id="variable-j~23"></span>
               integer,
             </td>
               <td>public</td>
@@ -230,7 +242,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-k~12"></span>
+              <span class="anchor" id="variable-k~18"></span>
               integer,
             </td>
               <td>public</td>
@@ -250,12 +262,12 @@
               <span class="anchor" id="variable-varia2"></span>
               real,
             </td>
-              <td>public</td>
+              <td>public,</td>
             <td>
-              
+              allocatable
             </td>
             <td>::</td>
-            <td><strong>varia2</strong>(-5:nx1+5,-5:nx1+5,-4:nz1+4)</td>
+            <td><strong>varia2</strong>(:,:,:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -324,6 +336,36 @@
 
 
 
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-allocate_filtro01"></span> <h3>public  subroutine <a href='../proc/allocate_filtro01.html'>allocate_filtro01</a>()  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Allocate the filtro01 variables</p>
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-deallocate_filtro01"></span> <h3>public  subroutine <a href='../proc/deallocate_filtro01.html'>deallocate_filtro01</a>()  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Deallocate the filtro01 variables</p>
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+    </div>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -345,7 +387,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-08-03 00:01              </p>
+ on 2024-08-12 14:45              </p>
           </div>
         </div>
         <br>
