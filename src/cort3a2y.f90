@@ -171,7 +171,7 @@ contains
             do 80 lvar=1,nvar
                archaux=var(lvar)&
                //'y'//paso(ii*2-1:ii*2)
-               write(*,*) archaux
+               ! write(*,*) archaux
                open(10+lvar,file=directory//'cortes/'//archaux)
                do 90 k=1,mod_nz1
                   write(10+lvar,1000) (variable(j,k,lvar),j=1,nx1)

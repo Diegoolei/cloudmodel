@@ -10,50 +10,50 @@ import numpy as np
 
 import pandas as pd
 
-from scipy.io import FortranFile
-
-from .constants import (
+from python.cloudmodel.constants import (
+    Av0,
+    Cp,
+    Cv,
+    G,
+    Kapa,
+    Lsl0,
+    Lvl0,
+    P00,
+    Rd,
+    Rv,
+    T0,
+    Vis0,
+    Vtnie0,
+    rhogra,
+)
+from python.cloudmodel.constants import (
     biased_nx1,
     inis_biased_nz1,
     inis_var_list,
     nube31_biased_nz1,
     nube31_var_list,
 )
-from .constants import nz1, dx1
-from .constants import (
-    G,
-    Rd,
-    Rv,
-    Kapa,
-    T0,
-    P00,
-    Lvl0,
-    Lsl0,
-    Vis0,
-    rhogra,
-    Av0,
-    Vtnie0,
-    Cp,
-    Cv,
-)
-from .z_profile import (
-    latent_heat,
-    saturated_vapor_pressure2,
-    viscosity,
-    crystal_efficiencies,
-    velocities,
-    PP,
-    temperature,
-    air_density,
+from python.cloudmodel.constants import dx1, nz1
+from python.cloudmodel.interface import c_interface as nb
+from python.cloudmodel.z_profile import (
     aerosol,
-    vapor,
-    rain_terminal_velocity,
-    snow_terminal_velocity,
-    hail_terminal_velocity,
+    air_density,
     air_density_recalc,
-    PP2,
+    crystal_efficiencies,
+    hail_terminal_velocity,
+    latent_heat,
+    pp,
+    pp2,
+    rain_terminal_velocity,
+    saturated_vapor_pressure2,
+    snow_terminal_velocity,
+    temperature,
+    vapor,
+    velocities,
+    viscosity,
 )
-from .interface import c_interface as nb
+
+from scipy.io import FortranFile
 
 
 class ImageStyle(Enum):
@@ -103,39 +103,39 @@ class CloudSimulation:
         directory=".temp/",
         dx1=dx1,
         nz1=nz1,
-        G=G,
-        Rd=Rd,
-        Rv=Rv,
-        Kapa=Kapa,
-        T0=T0,
-        P00=P00,
-        Lvl0=Lvl0,
-        Lsl0=Lsl0,
-        Vis0=Vis0,
+        g=G,
+        rd=Rd,
+        rv=Rv,
+        kapa=Kapa,
+        t0=T0,
+        p00=P00,
+        lvl0=Lvl0,
+        lsl0=Lsl0,
+        vis0=Vis0,
         rhogra=rhogra,
-        Av0=Av0,
-        Vtnie0=Vtnie0,
-        Cp=Cp,
-        Cv=Cv,
-        Tlvl=None,
-        Tlsl=None,
-        Tlvs=None,
-        Telvs=None,
-        Tesvs=None,
-        Tvis=None,
+        av0=Av0,
+        vtnie0=Vtnie0,
+        cp=Cp,
+        cv=Cv,
+        tlvl=None,
+        tlsl=None,
+        tlvs=None,
+        telvs=None,
+        tesvs=None,
+        tvis=None,
         u_z_initial=None,
         v_z_initial=None,
-        Presi0=None,
+        presi0=None,
         theta_z_initial=None,
-        Pres00=None,
+        pres00=None,
         cc2=None,
         temperature_z_initial=None,
         air_density_z_initial=None,
         aerosol_z_initial=None,
         vapor_z_initial=None,
-        Av=None,
-        Vtnie=None,
-        Vtgra0=None,
+        av=None,
+        vtnie=None,
+        vtgra0=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
@@ -149,41 +149,41 @@ class CloudSimulation:
 
         self.dx1 = dx1
         self.nz1 = nz1
-        self.G = G
-        self.Rd = Rd
-        self.Rv = Rv
-        self.Kapa = Kapa
-        self.T0 = T0
-        self.P00 = P00
-        self.Lvl0 = Lvl0
-        self.Lsl0 = Lsl0
-        self.Vis0 = Vis0
+        self.G = g
+        self.Rd = rd
+        self.Rv = rv
+        self.Kapa = kapa
+        self.T0 = t0
+        self.P00 = p00
+        self.Lvl0 = lvl0
+        self.Lsl0 = lsl0
+        self.Vis0 = vis0
         self.rhogra = rhogra
-        self.Av0 = Av0
-        self.Vtnie0 = Vtnie0
-        self.Cp = Cp
-        self.Cv = Cv
-        if Tlvl is None or Tlsl is None or Tlvs is None:
+        self.Av0 = av0
+        self.Vtnie0 = vtnie0
+        self.Cp = cp
+        self.Cv = cv
+        if tlvl is None or tlsl is None or tlvs is None:
             l_heat = latent_heat()
-            if Tlvl is None:
+            if tlvl is None:
                 self.Tlvl = l_heat[0]
-            if Tlsl is None:
+            if tlsl is None:
                 self.Tlsl = l_heat[1]
-            if Tlvs is None:
+            if tlvs is None:
                 self.Tlvs = l_heat[2]
-        if Telvs is None or Tesvs is None:
+        if telvs is None or tesvs is None:
             s_vapor = saturated_vapor_pressure2(self.Tlvl, self.Tlvs)
-            if Telvs is None:
+            if telvs is None:
                 self.Telvs = s_vapor[0]
-            if Tesvs is None:
+            if tesvs is None:
                 self.Tesvs = s_vapor[1]
-        if Tvis is None:
+        if tvis is None:
             self.Tvis = viscosity()
-        if Telvs is None or Tesvs is None:
+        if telvs is None or tesvs is None:
             cry_effic = crystal_efficiencies()
-            if Telvs is None:
+            if telvs is None:
                 self.Eautcn = cry_effic[0]
-            if Tesvs is None:
+            if tesvs is None:
                 self.Eacrcn = cry_effic[1]
         if u_z_initial is None or v_z_initial is None:
             z_profile = velocities()
@@ -196,43 +196,44 @@ class CloudSimulation:
         if aerosol_z_initial is None:
             self.aerosol_z_initial = aerosol()
         if vapor_z_initial is None:
-            self.vapor_z_initial = vapor(self.temperature_z_initial, self.Telvs)
-        if (Av is None) or (Vtnie is None):
-            Presi0_aux = PP()
-            if Av is None:
-                self.Av = rain_terminal_velocity(Presi0_aux)
-            if Vtnie is None:
-                self.Vtnie = snow_terminal_velocity(Presi0_aux)
-            
-        if Vtgra0 is None:
+            self.vapor_z_initial = vapor(
+                self.temperature_z_initial, self.Telvs
+            )
+        if (av is None) or (vtnie is None):
+            presi0_aux = pp()
+            if av is None:
+                self.Av = rain_terminal_velocity(presi0_aux)
+            if vtnie is None:
+                self.Vtnie = snow_terminal_velocity(presi0_aux)
+
+        if vtgra0 is None:
             self.Vtgra0_in = hail_terminal_velocity(
                 self.Tvis,
                 self.temperature_z_initial,
-                air_density(Presi0_aux, self.temperature_z_initial),
+                air_density(presi0_aux, self.temperature_z_initial),
             )
         if air_density_z_initial is None:
             self.air_density_z_initial = air_density_recalc(
-                air_density(PP(), self.temperature_z_initial),
+                air_density(pp(), self.temperature_z_initial),
                 self.vapor_z_initial,
             )
-            #self.air_density_z_initial = air_density(PP(), self.temperature_z_initial)
         if (
-            (Presi0 is None)
+            (presi0 is None)
             or (theta_z_initial is None)
-            or (Pres00 is None)
+            or (pres00 is None)
             or (cc2 is None)
         ):
-            Presi0_aux = PP()
-            pp2_aux = PP2(
+            presi0_aux = pp()
+            pp2_aux = pp2(
                 self.air_density_z_initial,
-                Presi0_aux,
+                presi0_aux,
                 self.temperature_z_initial,
             )
-            if Presi0 is None:
+            if presi0 is None:
                 self.Presi0 = pp2_aux[0]
             if theta_z_initial is None:
                 self.theta_z_initial = pp2_aux[1]
-            if Pres00 is None:
+            if pres00 is None:
                 self.Pres00 = pp2_aux[2]
             if cc2 is None:
                 self.cc2 = pp2_aux[3]
@@ -303,7 +304,7 @@ class CloudSimulation:
             self.restore_backup,
             self.directory,
         )
-        # self.load_model()
+        self.load_model()
 
     def run_initial_analysis(self):
         """
@@ -376,7 +377,6 @@ class FileStyle:
         _get_data(): Get the data from the selected files.
         _get_var_from_data(file_number, var_iterator): Get a variable
             from the data.
-        list_var(): List all the variables.
         get_var(var, time): Get a specific variable at a given time.
         show_var_dataframe(var_array, center, axes): Show a variable as
             a DataFrame.
@@ -461,11 +461,6 @@ class FileStyle:
         return actual_file_data[
             var_iterator : var_iterator + self.var_structure_size
         ].reshape(self.var_structure, order="F")
-
-    def list_var(self):
-        """Print all the file variables in order."""
-        for var in self.var_list:
-            print(var)
 
     def get_var(self, var: str, time: int):
         """

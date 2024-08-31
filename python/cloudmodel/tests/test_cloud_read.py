@@ -102,14 +102,14 @@ def test_simulation_equal():
 
     verify_vars(model, True)
 
-    model.clean_model()
+    # model.clean_model()
 
 
 def test_simulation_different():
     """Execute function to run the cloud model."""
     model = CloudSimulation(
-        simulation_time_minutes=1,
-        save_time_minutes=1,
+        simulation_time_minutes=2,
+        save_time_minutes=2,
         statistic_time_minutes=1,
         bacup_time_minutes=1,
         restore_backup=False,
@@ -138,7 +138,7 @@ def test_get_data():
     model.run_model()
 
     model.cloud_analytics._get_data()
-
+    print(model.cloud_analytics.data_file)
     model.clean_model()
 
     assert isinstance(model.cloud_analytics.data_file, list)
@@ -154,21 +154,6 @@ def test_get_data_with_invalid_file():
             img_option="Contour",
             folder_handle="Delete",
         )
-
-
-def test_get_var_list():
-    model = CloudSimulation(
-        simulation_time_minutes=1,
-        save_time_minutes=1,
-        statistic_time_minutes=1,
-        bacup_time_minutes=1,
-        restore_backup=False,
-    )
-
-    model.run_model()
-    model.cloud_analytics.list_var()
-    model.initial_analytics.list_var()
-    model.clean_model()
 
 
 def test_get_var_with_invalid_file():
@@ -299,7 +284,7 @@ def test_parse_status_img():
     cloud = FileStyle(
         chosen_file="Nube",
         output_data_path="cloudmodel/tests/test_data",
-        img_path=".temp/img",
+        img_path=".temp/img/",
         img_option="Image",
         folder_handle="Delete",
     )
@@ -313,7 +298,7 @@ def test_multi_var_img_valid_type():
     initials = FileStyle(
         chosen_file="Inis",
         output_data_path="cloudmodel/tests/test_data",
-        img_path=".temp/img",
+        img_path=".temp/img/",
         img_option="Image",
         folder_handle="Delete",
     )
@@ -339,20 +324,20 @@ def test_multi_var_invalid_type():
 
 
 def test_check_path_delete():
-    check_path("Delete", ".temp/Delete/", "test.txt")
-    check_path("Delete", ".temp/Delete/", "test.txt")
-    check_path("Delete", ".temp/Delete/", "test.txt")
+    check_path("Delete", ".temp/Delete/", "test")
+    check_path("Delete", ".temp/Delete/", "test")
+    check_path("Delete", ".temp/Delete/", "test")
 
 
 def test_check_path_cancel():
-    check_path("Cancel", ".temp/Cancel/", "test.txt")
-    check_path("Cancel", ".temp/Cancel/", "test.txt")
+    check_path("Cancel", ".temp/Cancel/", "test")
+    check_path("Cancel", ".temp/Cancel/", "test")
     with pytest.raises(ValueError):
-        check_path("Cancel", ".temp/Cancel/", "test.txt")
+        check_path("Cancel", ".temp/Cancel/", "test")
 
 
 def test_check_path_invalid():
     with pytest.raises(ValueError):
-        check_path("Invalid", ".temp/img/", "test.txt")
-        check_path("Invalid", ".temp/img/", "test.txt")
-        check_path("Invalid", ".temp/img/", "test.txt")
+        check_path("Invalid", ".temp/img/", "test")
+        check_path("Invalid", ".temp/img/", "test")
+        check_path("Invalid", ".temp/img/", "test")
