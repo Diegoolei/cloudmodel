@@ -33,7 +33,7 @@ from python.cloudmodel.constants import (
     nube31_biased_nz1,
     nube31_var_list,
 )
-from python.cloudmodel.constants import dx1, nz1
+from python.cloudmodel.constants import dx1, nz1, nx1
 from python.cloudmodel.interface import c_interface as nb
 from python.cloudmodel.z_profile import (
     aerosol,
@@ -89,7 +89,7 @@ class CloudSimulation:
             model state is saved.
         statistic_time_minutes (int): The time interval in minutes at which
             statistics are calculated.
-        bacup_time_minutes (int): The time interval in minutes at which
+        backup_time_minutes (int): The time interval in minutes at which
             backups are created.
     """
 
@@ -98,7 +98,7 @@ class CloudSimulation:
         simulation_time_minutes=0,
         save_time_minutes=0,
         statistic_time_minutes=0,
-        bacup_time_minutes=0,
+        backup_time_minutes=0,
         restore_backup=False,
         directory=".temp/",
         dx1=dx1,
@@ -140,7 +140,7 @@ class CloudSimulation:
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
         self.statistic_time_minutes = statistic_time_minutes
-        self.bacup_time_minutes = bacup_time_minutes
+        self.backup_time_minutes = backup_time_minutes
         self.restore_backup = restore_backup
         if directory[-1] != "/":
             directory += "/"
@@ -296,11 +296,13 @@ class CloudSimulation:
             self.Vtgra0_in,
         )
 
+        check_path(FolderHandle.DELETE.value, self.directory, "cortes")
+
         nb.run_model_python(
             self.simulation_time_minutes,
             self.save_time_minutes,
             self.statistic_time_minutes,
-            self.bacup_time_minutes,
+            self.backup_time_minutes,
             self.restore_backup,
             self.directory,
         )
@@ -359,6 +361,29 @@ class CloudSimulation:
         if self.directory == ".temp/":
             check_path(FolderHandle.DELETE.value, self.directory)
 
+    def generate_cut_image(self, filename="cut_image.png"):
+        cut_dir = f"{self.directory}cortes/"
+        part = ["GO", "LL", "CR", "NI", "GR"]
+        colores = ["r", "tab:orange", "c", "b", "g"]
+        pos = "y"
+
+        vec = np.ones([nz1, nx1, len(part), 1])
+
+        for i, nom in enumerate(part):
+            nombre = nom + pos + "17"
+            vec[:, :, i, 0] = np.genfromtxt(f"{cut_dir}{nombre}")
+        plt.figure(figsize=[10, 10])
+        plt.ylim(0, 35)
+        plt.xlim(10, 40)
+        plt.xlabel("X", fontsize=20)
+        plt.ylabel("Z", fontsize=20)
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+        for i in range(len(part)):
+            plt.contour(vec[:, :, i, 0], [10, 500], colors=colores[i])
+
+        plt.savefig(f"{cut_dir}{filename}")
+
 
 class FileStyle:
     """
@@ -378,10 +403,10 @@ class FileStyle:
         _get_var_from_data(file_number, var_iterator): Get a variable
             from the data.
         get_var(var, time): Get a specific variable at a given time.
-        show_var_dataframe(var_array, center, axes): Show a variable as
+        show_var_dataframe(var_array, center, axis): Show a variable as
             a DataFrame.
-        center_var(var_array, center, axes): Center a variable along a
-            given axes.
+        center_var(var_array, center, axis): Center a variable along a
+            given axis.
         get_var_max_value_position(var_array): Get the position of the
             maximum value in a variable.
         _plot_style(variable): Plot the style of a variable.
@@ -483,7 +508,7 @@ class FileStyle:
         var_iterator = var_index * self.var_structure_size
         return self._get_var_from_data(time, var_iterator)
 
-    def show_var_dataframe(self, var_array, center: tuple, axes: str):
+    def get_var_dataframe(self, var_array, center: tuple, axis: str):
         """
         Show a variable as a DataFrame.
 
@@ -491,28 +516,27 @@ class FileStyle:
         ----
             var_array (numpy.ndarray): The variable data as a numpy array.
             center (tuple): The center coordinates for the variable.
-            axes (str): The axes along which to center the variable.
+            axis (str): The axis along which to center the variable.
         """
-        df = pd.DataFrame(self.center_var(var_array, center, axes))
-        print(df)
+        return pd.DataFrame(self.center_var(var_array, center, axis))
 
-    def center_var(self, var_array, center: tuple, axes: str):
+    def center_var(self, var_array, center: tuple, axis: str):
         """
-        Center a variable along a given axes.
+        Center a variable along a given axis.
 
         Args
         ----
             var_array (numpy.ndarray): The variable data as a numpy array.
             center (tuple): The center coordinates for the variable.
                 can be provided by _get_var_max_value_position.
-            axes (str): The axes along which to center the variable.
+            axis (str): The axis along which to center the variable.
                 options: "x", "y", "z"
 
         Returns
         -------
             numpy.ndarray: The centered variable data as a numpy array.
         """
-        match axes:
+        match axis:
             case "x":
                 return var_array[center[0][0], :, :]
             case "y":
@@ -586,7 +610,7 @@ class FileStyle:
         plt.xlabel("X")
         plt.ylabel("Y")
 
-    def parse_status_img(self):
+    def parse_status_img(self, img_option):
         """
         Parse the status image data and generates plots for each variable.
 
@@ -598,6 +622,7 @@ class FileStyle:
         -------
             None
         """
+        self.img_option = img_option
         check_path(self.folder_handle, f"{self.img_path}{self.file_name}")
         for file_iterator in range(len(self.data_file)):
             full_img_path = (

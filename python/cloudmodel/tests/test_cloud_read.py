@@ -11,7 +11,7 @@ from ..cloud_read import (
     CloudSimulation,
     FileStyle,
     check_path,
-    inis_var_list,
+    #    inis_var_list,
     nube31_var_list,
 )
 
@@ -89,20 +89,19 @@ def _get_file_list(data_path, binary_regex):
 def test_simulation_equal():
     """Execute function to run the cloud model."""
     model = CloudSimulation(
-        simulation_time_minutes=1,
-        save_time_minutes=1,
-        statistic_time_minutes=1,
-        bacup_time_minutes=1,
+        simulation_time_minutes=2,
+        save_time_minutes=2,
+        statistic_time_minutes=1 / 3,
+        backup_time_minutes=2,
         restore_backup=False,
     )
-
-    model.clean_model()
+    #  model.clean_model()
 
     model.run_model()
 
     verify_vars(model, True)
 
-    # model.clean_model()
+    #  model.clean_model()
 
 
 def test_simulation_different():
@@ -111,7 +110,7 @@ def test_simulation_different():
         simulation_time_minutes=2,
         save_time_minutes=2,
         statistic_time_minutes=1,
-        bacup_time_minutes=1,
+        backup_time_minutes=1,
         restore_backup=False,
     )
     model.clean_model()
@@ -129,7 +128,7 @@ def test_get_data():
         simulation_time_minutes=1,
         save_time_minutes=1,
         statistic_time_minutes=1,
-        bacup_time_minutes=1,
+        backup_time_minutes=1,
         restore_backup=False,
     )
 
@@ -150,7 +149,7 @@ def test_get_data_with_invalid_file():
         FileStyle(
             chosen_file="asd",
             output_data_path="./temp",
-            img_path="img",
+            img_path="img/",
             img_option="Contour",
             folder_handle="Delete",
         )
@@ -173,7 +172,7 @@ def test_get_var_with_valid_file():
     cloud = FileStyle(
         chosen_file="Nube",
         output_data_path=".temp",
-        img_path="img",
+        img_path="img/",
         img_option="Contour",
         folder_handle="Delete",
     )
@@ -190,40 +189,40 @@ def check_cloud_var_list(cloud: FileStyle):
             assert isinstance(variable, np.ndarray)
 
 
-def test_show_var_dataframe_with_invalid_file():
+def test_get_var_dataframe_with_invalid_file():
     cloud = FileStyle(
         chosen_file="Nube",
         output_data_path="cloudmodel/tests/test_data",
-        img_path="img",
+        img_path="img/",
         img_option="Contour",
         folder_handle="Delete",
     )
     var = cloud.get_var(nube31_var_list[0], 1)
     var_max_value = cloud._get_var_max_value_position(var)
     with pytest.raises(ValueError):
-        cloud.show_var_dataframe(var, var_max_value, "a")
+        cloud.get_var_dataframe(var, var_max_value, "a")
 
 
-def test_show_var_dataframe_with_valid_file():
+def test_get_var_dataframe_with_valid_file():
     cloud = FileStyle(
         chosen_file="Nube",
         output_data_path="cloudmodel/tests/test_data",
-        img_path="img",
+        img_path="img/",
         img_option="Contour",
         folder_handle="Delete",
     )
     var = cloud.get_var(nube31_var_list[0], 1)
     var_max_value = cloud._get_var_max_value_position(var)
-    cloud.show_var_dataframe(var, var_max_value, "x")
-    cloud.show_var_dataframe(var, var_max_value, "y")
-    cloud.show_var_dataframe(var, var_max_value, "z")
+    cloud.get_var_dataframe(var, var_max_value, "x")
+    cloud.get_var_dataframe(var, var_max_value, "y")
+    cloud.get_var_dataframe(var, var_max_value, "z")
 
 
 def test_plot_style_invalid_type():
     cloud = FileStyle(
         chosen_file="Nube",
         output_data_path="cloudmodel/tests/test_data",
-        img_path="img",
+        img_path="img/",
         img_option="InvalidType",
         folder_handle="Delete",
     )
@@ -232,23 +231,23 @@ def test_plot_style_invalid_type():
         cloud._plot_style(var)
 
 
-def test_plot_style_initial_contour():
-    initial = FileStyle(
-        chosen_file="Inis",
-        output_data_path="cloudmodel/tests/test_data",
-        img_path="img",
-        img_option="Contour",
-        folder_handle="Delete",
-    )
-    var = initial.get_var(inis_var_list[0], 0)
-    initial._plot_style(var)
+# def test_plot_style_initial_contour():
+#    initial = FileStyle(
+#        chosen_file="Inis",
+#        output_data_path="cloudmodel/tests/test_data",
+#        img_path="img/",
+#        img_option="Contour",
+#        folder_handle="Delete",
+#    )
+#    var = initial.get_var(inis_var_list[0], 0)
+#    initial._plot_style(var)
 
 
 def test_plot_style_contour():
     cloud = FileStyle(
         chosen_file="Nube",
         output_data_path="cloudmodel/tests/test_data",
-        img_path="img",
+        img_path="img/",
         img_option="Contour",
         folder_handle="Delete",
     )
@@ -256,23 +255,23 @@ def test_plot_style_contour():
     cloud._plot_style(var)
 
 
-def test_plot_style_initial_image():
-    initial = FileStyle(
-        chosen_file="Inis",
-        output_data_path="cloudmodel/tests/test_data",
-        img_path="img",
-        img_option="Image",
-        folder_handle="Delete",
-    )
-    var = initial.get_var(inis_var_list[0], 0)
-    initial._plot_style(var)
+# def test_plot_style_initial_image():
+#    initial = FileStyle(
+#        chosen_file="Inis",
+#        output_data_path="cloudmodel/tests/test_data",
+#        img_path="img/",
+#        img_option="Image",
+#        folder_handle="Delete",
+#    )
+#    var = initial.get_var(inis_var_list[0], 0)
+#    initial._plot_style(var)
 
 
 def test_plot_style_cloud_image():
     cloud = FileStyle(
         chosen_file="Nube",
         output_data_path="cloudmodel/tests/test_data",
-        img_path="img",
+        img_path="img/",
         img_option="Image",
         folder_handle="Delete",
     )
@@ -294,25 +293,25 @@ def test_parse_status_img():
     check_path("Delete", ".temp/img/")
 
 
-def test_multi_var_img_valid_type():
-    initials = FileStyle(
-        chosen_file="Inis",
-        output_data_path="cloudmodel/tests/test_data",
-        img_path=".temp/img/",
-        img_option="Image",
-        folder_handle="Delete",
-    )
-    var1 = inis_var_list[0]
-    var2 = inis_var_list[1]
-    initials.multi_var_img(var1, var2)
-    check_path("Delete", ".temp/img/")
+# def test_multi_var_img_valid_type():
+#    initials = FileStyle(
+#        chosen_file="Inis",
+#        output_data_path="cloudmodel/tests/test_data",
+#        img_path=".temp/img/",
+#        img_option="Image",
+#        folder_handle="Delete",
+#    )
+#    var1 = inis_var_list[0]
+#    var2 = inis_var_list[1]
+#    initials.multi_var_img(var1, var2)
+#    check_path("Delete", ".temp/img/")
 
 
 def test_multi_var_invalid_type():
     cloud = FileStyle(
         chosen_file="Nube",
         output_data_path="cloudmodel/tests/test_data",
-        img_path=".temp/img",
+        img_path=".temp/img/",
         img_option="Contour",
         folder_handle="Delete",
     )

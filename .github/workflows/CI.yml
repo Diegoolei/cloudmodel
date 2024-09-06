@@ -1,7 +1,7 @@
 name: Continuous Integration
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "dev" ]
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}-gcc${{ matrix.gcc-version }}

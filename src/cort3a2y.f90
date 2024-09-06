@@ -14,8 +14,8 @@ contains
       use dinamic_var_perturbation
       use memory_managment
       use model_initialization, only: initialize_model
+      use config
       implicit none
-      character*13 :: directory
       integer ii,i,j,k,l,m,n,ymax
       integer pasoaux(25),lvar
       integer, parameter :: nvar=13
@@ -72,23 +72,22 @@ contains
       pasoaux(24)=0
       pasoaux(25)=0
       !*    lectura de los datos generales y de base
-      directory='Data/py_data/'
 
-      open (newunit=unit_number, file=directory//"inis.da")
+      open (newunit=unit_number, file=output_directory//"inis.da")
       read(unit_number,*) air_density_z_initial, temperature_z_initial, theta_z_initial, &
          Pres00, vapor_z_initial, cc2, aerosol_z_initial, u_z_initial, v_z_initial
 
       close (unit_number)
 
-      open(newunit=unit_number,file=directory//'varconz.da',status='unknown',form='unformatted')
+      open(newunit=unit_number,file=output_directory//'varconz.da',status='unknown',form='unformatted')
       read(unit_number)  Tvis,Tlvl,Tlsl,Tlvs,Telvs,Tesvs,Av,Vtnie,Vtgra0,&
          vapor_z_relative,aerosol_z_relative,Eautcn,Eacrcn
       close(unit_number)
 
-      open(newunit=unit_number, file=directory//'cortes/possy')
+      open(newunit=unit_number, file=output_directory//'cortes/possy')
       do 10 ii=1,25
          if(pasoaux(ii).eq.1) then
-            open(newunit=unit_number2,file=directory//'nube'&
+            open(newunit=unit_number2,file=output_directory//'nube'&
                //paso(ii*2-1:ii*2)//'.sal',status='unknown',form='unformatted')
             read(unit_number2) u_perturbed_base,v_perturbed_base,w_perturbed_base,theta_base,pressure_base,vapor_base,drop_base,&
                rain_base,crystal_base,snow_base,hail_base,aerosol_base
@@ -172,7 +171,7 @@ contains
                archaux=var(lvar)&
                //'y'//paso(ii*2-1:ii*2)
                ! write(*,*) archaux
-               open(10+lvar,file=directory//'cortes/'//archaux)
+               open(10+lvar,file=output_directory//'cortes/'//archaux)
                do 90 k=1,mod_nz1
                   write(10+lvar,1000) (variable(j,k,lvar),j=1,nx1)
 90             continue
