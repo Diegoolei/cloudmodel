@@ -40,13 +40,8 @@ fpm_run = run_command(
     cflags
 ).stdout()
 
-message('@0@'.format(fpm_run))
-
-ls_meson_command = run_command('ls', meson_path).stdout()
-message('meson_dir: @0@'.format(ls_meson_command))
-
 # f2py?
-source_path = meson.source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
+source_path = meson.global_source_root() / '..' / 'interface' / 'cloud_c_interface.f90'
 cloud_c_f90 = files(source_path)
 
 cloud_source = custom_target('cloud_compiled.c',
@@ -76,12 +71,6 @@ constants_sources = ['cloudmodel/constants.py']
 py.install_sources(main_sources, cloud_read_sources, constants_sources, z_profiles_sources, subdir:'cloudmodel')
 
 
-elese = run_command(
-    'ls',
-    '-a').stdout()
-
-message('@0@'.format(elese))
-
 # Extension fortran module
 inc_np = include_directories(incdir_numpy, incdir_f2py, '..' / 'build' / 'python' / 'include')
 
@@ -91,7 +80,7 @@ py.extension_module('cloud_compiled',
   incdir_f2py / 'fortranobject.c',
   include_directories: [inc_np],
   dependencies : py_dep,
-  link_args: ['-L' + '..' / '..' / 'build' / 'python' / 'lib'],
+  link_args: ['-L' + '..' / '..' / 'build' / 'python' / 'lib', '-l' + 'cloudsim'],
   subdir: 'cloudmodel' / 'interface',
   install : true,
 )
