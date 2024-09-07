@@ -15,15 +15,15 @@ def main():
 
     aerosol_base_24 = z_initials_param.cloud_analytics.get_var(
         var="aerosol_base", time=24
-    )  # Obtiene la variable aerosol_base del tiempo 24
+    )  # Obtains aerosol_base from time 24
 
     cloud = z_initials_param.cloud_analytics
     center_aerosol_base_24 = cloud._get_var_max_value_position(
         aerosol_base_24
-    )  # Centro de variable por valor maximo
+    )  # Center aerosol_base by max value
     var_dataframe = z_initials_param.cloud_analytics.get_var_dataframe(
         aerosol_base_24, center_aerosol_base_24, "z"
-    )  # En pantalla muestra el dataframe de la var
+    )  # Z Centered aerosol_base dataframe
     print(var_dataframe)
 
     # Generate and Save all var images in directory/img
