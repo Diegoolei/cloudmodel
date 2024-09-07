@@ -10,7 +10,7 @@ import numpy as np
 
 import pandas as pd
 
-from python.cloudmodel.constants import (
+from cloudmodel.constants import (
     Av0,
     Cp,
     Cv,
@@ -26,16 +26,16 @@ from python.cloudmodel.constants import (
     Vtnie0,
     rhogra,
 )
-from python.cloudmodel.constants import (
+from cloudmodel.constants import (
     biased_nx1,
     inis_biased_nz1,
     inis_var_list,
     nube31_biased_nz1,
     nube31_var_list,
 )
-from python.cloudmodel.constants import dx1, nz1, nx1
-from python.cloudmodel.interface import c_interface as nb
-from python.cloudmodel.z_profile import (
+from cloudmodel.constants import dx1, nz1, nx1
+from cloudmodel.interface import c_interface as nb
+from cloudmodel.z_profile import (
     aerosol,
     air_density,
     air_density_recalc,
