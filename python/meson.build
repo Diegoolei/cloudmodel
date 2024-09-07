@@ -29,9 +29,11 @@ cflags = '-fPIC'
 
 fpm_run = run_command(
     'fpm',
-    'build',
+    'install',
     '--profile',
     'release',
+    '--prefix',
+    'build/python',
     '--flag',
     fflags,
     '--c-flag',
@@ -74,15 +76,22 @@ constants_sources = ['cloudmodel/constants.py']
 py.install_sources(main_sources, cloud_read_sources, constants_sources, z_profiles_sources, subdir:'cloudmodel')
 
 
+elese = run_command(
+    'ls',
+    '-a').stdout()
+
+message('@0@'.format(elese))
+
 # Extension fortran module
-inc_np = include_directories(incdir_numpy, incdir_f2py, '..' / '..' / 'build' / 'gfortran_63E63B2712D76620')
+inc_np = include_directories(incdir_numpy, incdir_f2py, '..' / 'build' / 'python' / 'include')
+
 
 py.extension_module('cloud_compiled',
   [cloud_c_f90, cloud_source],
   incdir_f2py / 'fortranobject.c',
   include_directories: [inc_np],
   dependencies : py_dep,
-  link_args: ['-L' + '..' / '..' / 'build' / 'gfortran_63E63B2712D76620' / 'cloudsim', '-lcloudsim'],
+  link_args: ['-L' + '..' / '..' / 'build' / 'python' / 'lib'],
   subdir: 'cloudmodel' / 'interface',
   install : true,
 )
