@@ -104,7 +104,7 @@
 </ul>
 </div>
 <h1 id="cloudmodel">CloudModel</h1>
-<p>This repository hosts the re-engineered cloud simulation model, now implemented in Fortran 90 and wrapped for Python integration. Below are the instructions for setting up and running the model, as well as additional requirements for animation functionality and compilation with different Fortran compilers.</p>
+<p>This repository hosts the re-engineered cloud simulation model, now implemented in Modern Fortran and wrapped for Python integration. Below are the instructions for setting up and running the model, as well as additional requirements for animation functionality and compilation with different Fortran compilers.</p>
 <h2 id="table-of-contents">Table of Contents</h2>
 <ul>
 <li>
@@ -134,12 +134,12 @@
 <h2 id="python">Python</h2>
 <h3 id="instalation">Instalation</h3>
 <p>To install as a pip package:</p>
-<div class="codehilite"><pre><span></span><code><span class="go">    pip install -i https://test.pypi.org/simple/ cloudmodel</span>
+<div class="codehilite"><pre><span></span><code><span class="go">    pip install cloudmodel</span>
 </code></pre></div>
 
 <h3 id="usage">Usage</h3>
 <p>To run the model, first import it from the library</p>
-<div class="codehilite"><pre><span></span><code>    <span class="kn">from</span> <span class="nn">cloudmodel</span> <span class="kn">import</span> <span class="n">CloudModel</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">cloudmodel.cloud_read</span> <span class="kn">import</span> <span class="n">CloudSimulation</span><span class="p">,</span> <span class="n">ImageStyle</span>
 </code></pre></div>
 
 <p>and call it with the desired parameters</p>
@@ -147,7 +147,8 @@
     <span class="n">simulation_time_minutes</span><span class="p">,</span>  <span class="c1">#(int): The total simulation time in minutes.</span>
     <span class="n">save_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which the model state is saved.</span>
     <span class="n">statistic_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which statistics are calculated.</span>
-    <span class="n">bacup_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which backups are created.</span>
+    <span class="n">backup_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which backups are created.</span>
+    <span class="n">directory</span><span class="p">,</span>  <span class="c1"># (str): Output Data Destination.</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -171,24 +172,13 @@
 <span class="sd">    Methods:</span>
 <span class="sd">        _get_data(): Get the data from the selected files.</span>
 <span class="sd">        _get_var_from_data(file_number, var_iterator): Get a specific variable from the data.</span>
-<span class="sd">        list_var(): List all the variables.</span>
+<span class="sd">        _get_var_max_value_position(var_array): Get the position of the maximum value in the variable data.</span>
+<span class="sd">        _plot_style(variable): Plot the style of a variable.</span>
 <span class="sd">        get_var(var, time): Get a specific variable at a given time.</span>
-<span class="sd">        show_var_dataframe(var_array, center, axes): Show the variable data as a DataFrame.</span>
+<span class="sd">        get_var_dataframe(var_array, center, axes): return the variable data as a DataFrame.</span>
 <span class="sd">        center_var(var_array, center, axes): Center the variable data along a specific axes.</span>
-<span class="sd">        get_var_max_value_position(var_array): Get the position of the maximum value in the variable data.</span>
-<span class="sd">        check_path(path, selected_file_name): Check if the path exists and create it if necessary.</span>
-<span class="sd">        cloud_binary_comparison(): Compare the binary files in the output data and comparison output data folders.</span>
-<span class="sd">        live_var_animation(variable): Create a live animation of a variable.</span>
-<span class="sd">        plot_style(variable): Plot the style of a variable.</span>
-<span class="sd">        generate_image(frame, var_number): Generate an image for a specific frame and variable.</span>
-<span class="sd">        animate_variables(var_list, save_animation, show_animation): Animate multiple variables.</span>
-<span class="sd">        animate_variable(var_to_animate, save_animation, show_animation, check_path): Animate a specific variable.</span>
 <span class="sd">        parse_status_img(): Parse the status images.</span>
 <span class="sd">        multi_var_img(var_1, var_2, file=&quot;inis.da&quot;): Create an image with multiple variables.</span>
-<span class="sd">        show_file_diff(file): Show the differences between two text files.</span>
-<span class="sd">        cloud_text_comparison(): Compare text files in the specified paths and display the differences, if any.</span>
-<span class="sd">        get_unequal_files(): Get the unequal files between two folders.</span>
-<span class="sd">        parse_text_files(): Parse the text files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div>
 
@@ -196,12 +186,12 @@
 <div class="codehilite"><pre><span></span><code>    <span class="kn">from</span> <span class="nn">cloudmodel</span> <span class="kn">import</span> <span class="n">CloudModel</span>
 
     <span class="n">CloudModel</span><span class="p">(</span>
-        <span class="n">simulation_time_minutes</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
-        <span class="n">save_time_minutes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-        <span class="n">statistic_time_minutes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-        <span class="n">bacup_time_minutes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">simulation_time_minutes</span><span class="p">,</span>  <span class="c1">#(int): The total simulation time in minutes.</span>
+        <span class="n">save_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which the model state is saved.</span>
+        <span class="n">statistic_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which statistics are calculated.</span>
+        <span class="n">backup_time_minutes</span><span class="p">,</span>  <span class="c1"># (int): The time interval in minutes at which backups are created.</span>
+        <span class="n">directory</span><span class="p">,</span>  <span class="c1"># (str): Output Data Destination.</span>
     <span class="p">)</span>
-
 
     <span class="n">cloud</span> <span class="o">=</span> <span class="n">FileStyle</span><span class="p">(</span>
         <span class="n">chosen_file</span><span class="o">=</span><span class="s2">&quot;Nube&quot;</span><span class="p">,</span>
@@ -240,19 +230,10 @@ sudo apt install ffmpeg</code></p>
 <h2 id="fortran-for-devs">Fortran for devs</h2>
 <p>This section is focused on the steps needed to re-compile the model to mantain usability with the Python package.</p>
 <h3 id="f2py-integration">F2Py Integration</h3>
-<p>To compile for F2Py, follow these steps:</p>
-<ol>
-<li>
-<p>Navigate to the <code>interface</code> directory:</p>
-<p><code>console
-cd interface</code></p>
-</li>
-<li>
-<p>Compile using <code>make</code>:</p>
-<p><code>console
-make</code></p>
-</li>
-</ol>
+<p>To compile for F2Py, from the python directory:</p>
+<div class="codehilite"><pre><span></span><code><span class="go">    pip install .</span>
+</code></pre></div>
+
 <hr>
 <h3 id="fortran-only-compiling">Fortran-only compiling</h3>
 <h4 id="gfortran">gfortran</h4>
@@ -366,7 +347,7 @@ make</code></p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-09-07 15:35              </p>
+ on 2024-09-10 15:15              </p>
           </div>
         </div>
         <br>
