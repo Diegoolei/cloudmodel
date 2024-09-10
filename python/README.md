@@ -14,7 +14,7 @@
 To install as a pip package:
 
 ```console
-    pip install -i https://test.pypi.org/simple/ cloudmodel
+    pip install cloudmodel
 ```
 
 ### Usage
@@ -32,7 +32,8 @@ CloudModel(
     simulation_time_minutes,  #(int): The total simulation time in minutes.
     save_time_minutes,  # (int): The time interval in minutes at which the model state is saved.
     statistic_time_minutes,  # (int): The time interval in minutes at which statistics are calculated.
-    bacup_time_minutes,  # (int): The time interval in minutes at which backups are created.
+    backup_time_minutes,  # (int): The time interval in minutes at which backups are created.
+    directory,  # (str): Output Data Destination.
 )
 ```
 
@@ -60,24 +61,13 @@ class FileStyle:
     Methods:
         _get_data(): Get the data from the selected files.
         _get_var_from_data(file_number, var_iterator): Get a specific variable from the data.
-        list_var(): List all the variables.
+        _get_var_max_value_position(var_array): Get the position of the maximum value in the variable data.
+        _plot_style(variable): Plot the style of a variable.
         get_var(var, time): Get a specific variable at a given time.
-        show_var_dataframe(var_array, center, axes): Show the variable data as a DataFrame.
+        get_var_dataframe(var_array, center, axes): return the variable data as a DataFrame.
         center_var(var_array, center, axes): Center the variable data along a specific axes.
-        get_var_max_value_position(var_array): Get the position of the maximum value in the variable data.
-        check_path(path, selected_file_name): Check if the path exists and create it if necessary.
-        cloud_binary_comparison(): Compare the binary files in the output data and comparison output data folders.
-        live_var_animation(variable): Create a live animation of a variable.
-        plot_style(variable): Plot the style of a variable.
-        generate_image(frame, var_number): Generate an image for a specific frame and variable.
-        animate_variables(var_list, save_animation, show_animation): Animate multiple variables.
-        animate_variable(var_to_animate, save_animation, show_animation, check_path): Animate a specific variable.
         parse_status_img(): Parse the status images.
         multi_var_img(var_1, var_2, file="inis.da"): Create an image with multiple variables.
-        show_file_diff(file): Show the differences between two text files.
-        cloud_text_comparison(): Compare text files in the specified paths and display the differences, if any.
-        get_unequal_files(): Get the unequal files between two folders.
-        parse_text_files(): Parse the text files.
     """
 ```
 

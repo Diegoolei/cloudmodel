@@ -10,50 +10,50 @@ import numpy as np
 
 import pandas as pd
 
-from scipy.io import FortranFile
-
-from .constants import (
+from cloudmodel.constants import (
+    Av0,
+    Cp,
+    Cv,
+    G,
+    Kapa,
+    Lsl0,
+    Lvl0,
+    P00,
+    Rd,
+    Rv,
+    T0,
+    Vis0,
+    Vtnie0,
+    rhogra,
+)
+from cloudmodel.constants import (
     biased_nx1,
     inis_biased_nz1,
     inis_var_list,
     nube31_biased_nz1,
     nube31_var_list,
 )
-from .constants import nz1, dx1
-from .constants import (
-    G,
-    Rd,
-    Rv,
-    Kapa,
-    T0,
-    P00,
-    Lvl0,
-    Lsl0,
-    Vis0,
-    rhogra,
-    Av0,
-    Vtnie0,
-    Cp,
-    Cv,
-)
-from .z_profile import (
-    latent_heat,
-    saturated_vapor_pressure2,
-    viscosity,
-    crystal_efficiencies,
-    velocities,
-    PP,
-    temperature,
-    air_density,
+from cloudmodel.constants import dx1, nz1, nx1
+from cloudmodel.interface import c_interface as nb
+from cloudmodel.z_profile import (
     aerosol,
-    vapor,
-    rain_terminal_velocity,
-    snow_terminal_velocity,
-    hail_terminal_velocity,
+    air_density,
     air_density_recalc,
-    PP2,
+    crystal_efficiencies,
+    hail_terminal_velocity,
+    latent_heat,
+    pp,
+    pp2,
+    rain_terminal_velocity,
+    saturated_vapor_pressure2,
+    snow_terminal_velocity,
+    temperature,
+    vapor,
+    velocities,
+    viscosity,
 )
-from .interface import c_interface as nb
+
+from scipy.io import FortranFile
 
 
 class ImageStyle(Enum):
@@ -89,7 +89,7 @@ class CloudSimulation:
             model state is saved.
         statistic_time_minutes (int): The time interval in minutes at which
             statistics are calculated.
-        bacup_time_minutes (int): The time interval in minutes at which
+        backup_time_minutes (int): The time interval in minutes at which
             backups are created.
     """
 
@@ -98,49 +98,49 @@ class CloudSimulation:
         simulation_time_minutes=0,
         save_time_minutes=0,
         statistic_time_minutes=0,
-        bacup_time_minutes=0,
+        backup_time_minutes=0,
         restore_backup=False,
         directory=".temp/",
         dx1=dx1,
         nz1=nz1,
-        G=G,
-        Rd=Rd,
-        Rv=Rv,
-        Kapa=Kapa,
-        T0=T0,
-        P00=P00,
-        Lvl0=Lvl0,
-        Lsl0=Lsl0,
-        Vis0=Vis0,
+        g=G,
+        rd=Rd,
+        rv=Rv,
+        kapa=Kapa,
+        t0=T0,
+        p00=P00,
+        lvl0=Lvl0,
+        lsl0=Lsl0,
+        vis0=Vis0,
         rhogra=rhogra,
-        Av0=Av0,
-        Vtnie0=Vtnie0,
-        Cp=Cp,
-        Cv=Cv,
-        Tlvl=None,
-        Tlsl=None,
-        Tlvs=None,
-        Telvs=None,
-        Tesvs=None,
-        Tvis=None,
+        av0=Av0,
+        vtnie0=Vtnie0,
+        cp=Cp,
+        cv=Cv,
+        tlvl=None,
+        tlsl=None,
+        tlvs=None,
+        telvs=None,
+        tesvs=None,
+        tvis=None,
         u_z_initial=None,
         v_z_initial=None,
-        Presi0=None,
+        presi0=None,
         theta_z_initial=None,
-        Pres00=None,
+        pres00=None,
         cc2=None,
         temperature_z_initial=None,
         air_density_z_initial=None,
         aerosol_z_initial=None,
         vapor_z_initial=None,
-        Av=None,
-        Vtnie=None,
-        Vtgra0=None,
+        av=None,
+        vtnie=None,
+        vtgra0=None,
     ):
         self.simulation_time_minutes = simulation_time_minutes
         self.save_time_minutes = save_time_minutes
         self.statistic_time_minutes = statistic_time_minutes
-        self.bacup_time_minutes = bacup_time_minutes
+        self.backup_time_minutes = backup_time_minutes
         self.restore_backup = restore_backup
         if directory[-1] != "/":
             directory += "/"
@@ -149,41 +149,41 @@ class CloudSimulation:
 
         self.dx1 = dx1
         self.nz1 = nz1
-        self.G = G
-        self.Rd = Rd
-        self.Rv = Rv
-        self.Kapa = Kapa
-        self.T0 = T0
-        self.P00 = P00
-        self.Lvl0 = Lvl0
-        self.Lsl0 = Lsl0
-        self.Vis0 = Vis0
+        self.G = g
+        self.Rd = rd
+        self.Rv = rv
+        self.Kapa = kapa
+        self.T0 = t0
+        self.P00 = p00
+        self.Lvl0 = lvl0
+        self.Lsl0 = lsl0
+        self.Vis0 = vis0
         self.rhogra = rhogra
-        self.Av0 = Av0
-        self.Vtnie0 = Vtnie0
-        self.Cp = Cp
-        self.Cv = Cv
-        if Tlvl is None or Tlsl is None or Tlvs is None:
+        self.Av0 = av0
+        self.Vtnie0 = vtnie0
+        self.Cp = cp
+        self.Cv = cv
+        if tlvl is None or tlsl is None or tlvs is None:
             l_heat = latent_heat()
-            if Tlvl is None:
+            if tlvl is None:
                 self.Tlvl = l_heat[0]
-            if Tlsl is None:
+            if tlsl is None:
                 self.Tlsl = l_heat[1]
-            if Tlvs is None:
+            if tlvs is None:
                 self.Tlvs = l_heat[2]
-        if Telvs is None or Tesvs is None:
+        if telvs is None or tesvs is None:
             s_vapor = saturated_vapor_pressure2(self.Tlvl, self.Tlvs)
-            if Telvs is None:
+            if telvs is None:
                 self.Telvs = s_vapor[0]
-            if Tesvs is None:
+            if tesvs is None:
                 self.Tesvs = s_vapor[1]
-        if Tvis is None:
+        if tvis is None:
             self.Tvis = viscosity()
-        if Telvs is None or Tesvs is None:
+        if telvs is None or tesvs is None:
             cry_effic = crystal_efficiencies()
-            if Telvs is None:
+            if telvs is None:
                 self.Eautcn = cry_effic[0]
-            if Tesvs is None:
+            if tesvs is None:
                 self.Eacrcn = cry_effic[1]
         if u_z_initial is None or v_z_initial is None:
             z_profile = velocities()
@@ -196,43 +196,44 @@ class CloudSimulation:
         if aerosol_z_initial is None:
             self.aerosol_z_initial = aerosol()
         if vapor_z_initial is None:
-            self.vapor_z_initial = vapor(self.temperature_z_initial, self.Telvs)
-        if (Av is None) or (Vtnie is None):
-            Presi0_aux = PP()
-            if Av is None:
-                self.Av = rain_terminal_velocity(Presi0_aux)
-            if Vtnie is None:
-                self.Vtnie = snow_terminal_velocity(Presi0_aux)
-            
-        if Vtgra0 is None:
+            self.vapor_z_initial = vapor(
+                self.temperature_z_initial, self.Telvs
+            )
+        if (av is None) or (vtnie is None):
+            presi0_aux = pp()
+            if av is None:
+                self.Av = rain_terminal_velocity(presi0_aux)
+            if vtnie is None:
+                self.Vtnie = snow_terminal_velocity(presi0_aux)
+
+        if vtgra0 is None:
             self.Vtgra0_in = hail_terminal_velocity(
                 self.Tvis,
                 self.temperature_z_initial,
-                air_density(Presi0_aux, self.temperature_z_initial),
+                air_density(presi0_aux, self.temperature_z_initial),
             )
         if air_density_z_initial is None:
             self.air_density_z_initial = air_density_recalc(
-                air_density(PP(), self.temperature_z_initial),
+                air_density(pp(), self.temperature_z_initial),
                 self.vapor_z_initial,
             )
-            #self.air_density_z_initial = air_density(PP(), self.temperature_z_initial)
         if (
-            (Presi0 is None)
+            (presi0 is None)
             or (theta_z_initial is None)
-            or (Pres00 is None)
+            or (pres00 is None)
             or (cc2 is None)
         ):
-            Presi0_aux = PP()
-            pp2_aux = PP2(
+            presi0_aux = pp()
+            pp2_aux = pp2(
                 self.air_density_z_initial,
-                Presi0_aux,
+                presi0_aux,
                 self.temperature_z_initial,
             )
-            if Presi0 is None:
+            if presi0 is None:
                 self.Presi0 = pp2_aux[0]
             if theta_z_initial is None:
                 self.theta_z_initial = pp2_aux[1]
-            if Pres00 is None:
+            if pres00 is None:
                 self.Pres00 = pp2_aux[2]
             if cc2 is None:
                 self.cc2 = pp2_aux[3]
@@ -242,7 +243,6 @@ class CloudSimulation:
 
     def load_model(self):
         """Load the cloud model."""
-        #self.run_initial_analysis()
         self.run_cloud_analysis()
 
     def get_cuts(self):
@@ -296,15 +296,17 @@ class CloudSimulation:
             self.Vtgra0_in,
         )
 
+        check_path(FolderHandle.DELETE.value, self.directory, "cortes")
+
         nb.run_model_python(
             self.simulation_time_minutes,
             self.save_time_minutes,
             self.statistic_time_minutes,
-            self.bacup_time_minutes,
+            self.backup_time_minutes,
             self.restore_backup,
             self.directory,
         )
-        # self.load_model()
+        self.load_model()
 
     def run_initial_analysis(self):
         """
@@ -359,6 +361,29 @@ class CloudSimulation:
         if self.directory == ".temp/":
             check_path(FolderHandle.DELETE.value, self.directory)
 
+    def generate_cut_image(self, filename="cut_image.png"):
+        cut_dir = f"{self.directory}cortes/"
+        part = ["GO", "LL", "CR", "NI", "GR"]
+        colores = ["r", "tab:orange", "c", "b", "g"]
+        pos = "y"
+
+        vec = np.ones([nz1, nx1, len(part), 1])
+
+        for i, nom in enumerate(part):
+            nombre = nom + pos + "17"
+            vec[:, :, i, 0] = np.genfromtxt(f"{cut_dir}{nombre}")
+        plt.figure(figsize=[10, 10])
+        plt.ylim(0, 35)
+        plt.xlim(10, 40)
+        plt.xlabel("X", fontsize=20)
+        plt.ylabel("Z", fontsize=20)
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+        for i in range(len(part)):
+            plt.contour(vec[:, :, i, 0], [10, 500], colors=colores[i])
+
+        plt.savefig(f"{cut_dir}{filename}")
+
 
 class FileStyle:
     """
@@ -377,12 +402,11 @@ class FileStyle:
         _get_data(): Get the data from the selected files.
         _get_var_from_data(file_number, var_iterator): Get a variable
             from the data.
-        list_var(): List all the variables.
         get_var(var, time): Get a specific variable at a given time.
-        show_var_dataframe(var_array, center, axes): Show a variable as
+        show_var_dataframe(var_array, center, axis): Show a variable as
             a DataFrame.
-        center_var(var_array, center, axes): Center a variable along a
-            given axes.
+        center_var(var_array, center, axis): Center a variable along a
+            given axis.
         get_var_max_value_position(var_array): Get the position of the
             maximum value in a variable.
         _plot_style(variable): Plot the style of a variable.
@@ -463,11 +487,6 @@ class FileStyle:
             var_iterator : var_iterator + self.var_structure_size
         ].reshape(self.var_structure, order="F")
 
-    def list_var(self):
-        """Print all the file variables in order."""
-        for var in self.var_list:
-            print(var)
-
     def get_var(self, var: str, time: int):
         """
         Get a specific variable at a given time.
@@ -489,7 +508,7 @@ class FileStyle:
         var_iterator = var_index * self.var_structure_size
         return self._get_var_from_data(time, var_iterator)
 
-    def show_var_dataframe(self, var_array, center: tuple, axes: str):
+    def get_var_dataframe(self, var_array, center: tuple, axis: str):
         """
         Show a variable as a DataFrame.
 
@@ -497,28 +516,27 @@ class FileStyle:
         ----
             var_array (numpy.ndarray): The variable data as a numpy array.
             center (tuple): The center coordinates for the variable.
-            axes (str): The axes along which to center the variable.
+            axis (str): The axis along which to center the variable.
         """
-        df = pd.DataFrame(self.center_var(var_array, center, axes))
-        print(df)
+        return pd.DataFrame(self.center_var(var_array, center, axis))
 
-    def center_var(self, var_array, center: tuple, axes: str):
+    def center_var(self, var_array, center: tuple, axis: str):
         """
-        Center a variable along a given axes.
+        Center a variable along a given axis.
 
         Args
         ----
             var_array (numpy.ndarray): The variable data as a numpy array.
             center (tuple): The center coordinates for the variable.
                 can be provided by _get_var_max_value_position.
-            axes (str): The axes along which to center the variable.
+            axis (str): The axis along which to center the variable.
                 options: "x", "y", "z"
 
         Returns
         -------
             numpy.ndarray: The centered variable data as a numpy array.
         """
-        match axes:
+        match axis:
             case "x":
                 return var_array[center[0][0], :, :]
             case "y":
@@ -592,7 +610,7 @@ class FileStyle:
         plt.xlabel("X")
         plt.ylabel("Y")
 
-    def parse_status_img(self):
+    def parse_status_img(self, img_option):
         """
         Parse the status image data and generates plots for each variable.
 
@@ -604,6 +622,7 @@ class FileStyle:
         -------
             None
         """
+        self.img_option = img_option
         check_path(self.folder_handle, f"{self.img_path}{self.file_name}")
         for file_iterator in range(len(self.data_file)):
             full_img_path = (
